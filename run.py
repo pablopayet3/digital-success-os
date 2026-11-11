@@ -10,6 +10,9 @@ Usage:
     uv run python run.py evals             score the agents on the evaluation cases
     uv run python run.py experiments       compare every play with its holdout
     uv run python run.py specs             rebuild docs/play-specs/ from the play config
+    uv run python run.py app               open the app (http://localhost:8501)
+    uv run python run.py api               start the API (http://localhost:8000/docs)
+    uv run python run.py demo              build everything from nothing, ready for the app
     uv run python run.py test              run the tests
     uv run python run.py lint              check code style
 
@@ -21,15 +24,12 @@ import argparse
 import subprocess
 import sys
 
-# Commands that later phases will deliver, and the phase that delivers them.
-LATER = {"demo": 7, "app": 7}
-
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Digital Success OS task runner")
     commands = ["data", "pipeline", "train", "run-day", "run-days", "evals", "experiments"]
     commands += ["specs", "test", "lint"]
-    commands += list(LATER)
+    commands += ["app", "api", "demo"]
     parser.add_argument("command", choices=commands)
     parser.add_argument("days", nargs="?", type=int, default=30, help="for run-days: how many")
     parser.add_argument("--profile", default=None, help="config profile, for example: small")
@@ -76,9 +76,32 @@ def main() -> None:
         sys.exit(subprocess.call([sys.executable, "-m", "pytest", "-q"]))
     elif args.command == "lint":
         sys.exit(subprocess.call([sys.executable, "-m", "ruff", "check", "."]))
-    else:
-        print(f"'{args.command}' arrives in Phase {LATER[args.command]}.")
+    elif args.command == "app":
+        sys.exit(subprocess.call([sys.executable, "-m", "streamlit", "run", "app/main.py"]))
+    elif args.command == "api":
+        command = [sys.executable, "-m", "uvicorn", "api.main:app", "--port", "8000"]
+        sys.exit(subprocess.call(command))
+    elif args.command == "demo":
+        build_demo(args.days, args.profile)
 
+
+def build_demo(days: int, profile: str | None = None) -> None:
+    """Everything from nothing: data, pipeline, models, simulated days, reports. Then the app."""
+    from analytics.train import train_all
+    from engine.run import run_days
+    from evals.run import run_evals
+    from experiments.analyze import analyse
+    from ingest.pipeline import run_pipeline
+    from synth.generate import generate
+
+    generate(profile=profile)
+    run_pipeline()
+    train_all()
+    run_pipeline(verbose=False)
+    run_days(days)
+    analyse()
+    run_evals()
+    print("\nReady. Start the app with: uv run python run.py app")
 
 if __name__ == "__main__":
     main()

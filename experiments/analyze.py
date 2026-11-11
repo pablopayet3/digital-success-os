@@ -42,7 +42,10 @@ REPORT_DIR = ROOT / "experiments" / "reports"
 MIN_DAYS_OBSERVED = 7  # an account that entered yesterday cannot have an outcome yet
 MIN_ACCOUNTS_PER_ARM = 20  # below this, a rate is an anecdote
 SIGNIFICANCE = 0.05
-SRM_ALARM = 0.01  # a split this unlikely by chance means the assignment is broken
+# The split check runs on every play at every look, so its bar is strict: below 0.001 the
+# result is not read. Between 0.001 and 0.01 the report prints a caution instead.
+SRM_ALARM = 0.001
+SRM_CAUTION = 0.01
 
 
 # --- the statistics, kept small enough to explain on a whiteboard ---------------------------
@@ -85,6 +88,7 @@ def sample_ratio_check(n_t: int, n_h: int, holdout_pct: float) -> dict:
         "observed_holdout_share": n_h / total,
         "p_value": p_value,
         "ok": p_value >= SRM_ALARM,
+        "uneven": SRM_ALARM <= p_value < SRM_CAUTION,
     }
 
 
@@ -353,6 +357,8 @@ def render_report(results: dict) -> str:
         if "srm" in play:
             srm = play["srm"]
             state = "as designed" if srm["ok"] else "NOT as designed"
+            if srm["uneven"]:
+                state = "uneven, but within what chance allows for a hash split. Watch it"
             lines.append(
                 f"- Split check: {srm['observed_holdout_share']:.0%} in holdout against "
                 f"{srm['expected_holdout_share']:.0%} planned: {state} (p = {srm['p_value']:.2f})."

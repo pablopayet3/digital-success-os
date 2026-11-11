@@ -1,0 +1,62 @@
+# The daily pipeline run, on a schedule. Synthetic data, fictional company.
+# See docs/decisions/0018 for why this is a GitHub Actions schedule.
+#
+# With Databricks credentials in GitHub Secrets it runs against the prod warehouse.
+# Without them it generates a small world and runs the same pipeline on DuckDB, so the
+# schedule and the alert can be shown working at no cost.
+# A failed run opens an issue labelled pipeline-failure.
+name: Daily pipeline
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # every day at 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  DSO_OFFLINE_MODE: "true"
+  DSO_LLM_STAND_IN: "true"
+
+jobs:
+  pipeline:
+    name: Ingest, dbt build and tests, score, freshness, contract
+    runs-on: ubuntu-latest
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - name: Choose the environment
+        run: |
+          if [ -n "$DATABRICKS_TOKEN" ] && [ -n "$DATABASE_URL" ]; then
+            echo "DSO_ENV=prod" >> "$GITHUB_ENV"
+          else
+            echo "DSO_ENV=dev" >> "$GITHUB_ENV"
+          fi
+      - name: Generate a small world
+        run: uv run python run.py data --profile small
+      - name: Load landing files into the prod warehouse
+        if: env.DSO_ENV == 'prod'
+        run: uv run python -m ingest.load_databricks
+      - name: Run the pipeline (fails when a data test or the contract fails)
+        run: uv run python run.py pipeline
+      - name: Open an issue when the run fails
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Daily pipeline failed on $(date -u +%F)" \
+            --label pipeline-failure \
+            --body "The scheduled pipeline run failed. Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          || gh issue create --repo "$GITHUB_REPOSITORY" \
+            --title "Daily pipeline failed on $(date -u +%F)" \
+            --body "The scheduled pipeline run failed. Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"

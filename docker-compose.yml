@@ -1,0 +1,27 @@
+# Digital Success OS (mini). Synthetic data, fictional company.
+#
+#   docker compose up --build
+#   app: http://localhost:8501     API: http://localhost:8000/docs
+#
+# Both services use the same image. Secrets come from your shell or a local .env file,
+# never from this file.
+services:
+  app:
+    build: .
+    ports: ["8501:8501"]
+    environment:
+      CONSOLE_PASSWORD_CSM: ${CONSOLE_PASSWORD_CSM:-demo}
+      CONSOLE_PASSWORD_SALES: ${CONSOLE_PASSWORD_SALES:-demo}
+      CONSOLE_PASSWORD_ADMIN: ${CONSOLE_PASSWORD_ADMIN:-demo}
+
+  api:
+    build: .
+    command: ["sh", "-c", "uv run --no-dev uvicorn api.main:app --host 0.0.0.0 --port 8000"]
+    ports: ["8000:8000"]
+    environment:
+      API_TOKEN: ${API_TOKEN:-local-demo-token}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

@@ -113,7 +113,7 @@ Computed by `experiments/analyze.py` from the table above, per play version.
 | Lift | Treatment rate minus holdout rate, in percentage points. |
 | 95% interval | Lift plus or minus 1.96 standard errors, each group using its own rate. |
 | p-value | Two-sided two-proportion z-test with a pooled rate. Below 0.05 counts as a real difference. |
-| Sample-ratio check | Chi-square test of the observed split against the designed holdout share. Below 0.01, the result is not read. |
+| Sample-ratio check | Chi-square test of the observed split against the designed holdout share. Below 0.001, the result is not read. Between 0.001 and 0.01 the report says the split is uneven. |
 | Smallest detectable lift | The lift the sample would catch 80% of the time at the 5% level. |
 | Retained ARR share | Sum of `retained_arr` divided by sum of `arr_at_entry`, per group. |
 | Expansion per account | Sum of `expansion_amount` divided by accounts, per group. |

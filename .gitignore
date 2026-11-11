@@ -26,3 +26,6 @@ cache/stand_in/
 # Secrets and private notes
 .env
 BRIEF.md
+
+# Local tool settings
+.claude/

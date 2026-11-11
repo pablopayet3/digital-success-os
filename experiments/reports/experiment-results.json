@@ -1,5 +1,5 @@
 {
- "as_of": "2026-10-09",
+ "as_of": "2026-10-27",
  "pilot_segments": [
   "uncovered"
  ],
@@ -13,36 +13,50 @@
    "metric_description": "Account has an emailable admin within 30 days.",
    "rollout_stage": "full",
    "holdout_pct": 0.0,
-   "entered_total": 59,
-   "n_treatment": 57,
+   "entered_total": 68,
+   "n_treatment": 67,
    "n_holdout": 0,
-   "successes_treatment": 43,
+   "successes_treatment": 47,
    "successes_holdout": 0,
-   "median_days_observed": 11.0,
+   "median_days_observed": 29.0,
    "ladder": [
     {
      "tier": "human",
-     "accounts": 57,
-     "successes": 43,
-     "rate": 0.7543859649122807
+     "accounts": 67,
+     "successes": 47,
+     "rate": 0.7014925373134329
     }
    ],
    "cohorts": [
     {
      "week_starting": "2026-09-28",
-     "n_treatment": 57,
-     "rate_treatment": 0.7543859649122807,
+     "n_treatment": 59,
+     "rate_treatment": 0.6949152542372882,
+     "n_holdout": 0,
+     "rate_holdout": null
+    },
+    {
+     "week_starting": "2026-10-05",
+     "n_treatment": 2,
+     "rate_treatment": 1.0,
+     "n_holdout": 0,
+     "rate_holdout": null
+    },
+    {
+     "week_starting": "2026-10-12",
+     "n_treatment": 6,
+     "rate_treatment": 0.6666666666666666,
      "n_holdout": 0,
      "rate_holdout": null
     }
    ],
    "money": {
     "treatment": {
-     "arr_at_entry": 95886.0,
-     "retained_arr": 95886.0,
-     "retained_arr_share": 1.0,
-     "expansion_won": 0.0,
-     "expansion_per_account": 0.0
+     "arr_at_entry": 124481.0,
+     "retained_arr": 122978.0,
+     "retained_arr_share": 0.9879258682047862,
+     "expansion_won": 3850.0,
+     "expansion_per_account": 57.46268656716418
     },
     "holdout": {
      "arr_at_entry": 0.0,
@@ -52,8 +66,8 @@
      "expansion_per_account": null
     }
    },
-   "rate_treatment": 0.7543859649122807,
-   "verdict": "Not an experiment (no holdout): 75% reached the goal.",
+   "rate_treatment": 0.7014925373134329,
+   "verdict": "Not an experiment (no holdout): 70% reached the goal.",
    "recommendation": "Keep running; track the rate."
   },
   {
@@ -64,43 +78,64 @@
    "metric_description": "Account is still active 30 days after entering the play.",
    "rollout_stage": "full",
    "holdout_pct": 0.2,
-   "entered_total": 54,
-   "n_treatment": 25,
-   "n_holdout": 7,
-   "successes_treatment": 25,
-   "successes_holdout": 7,
-   "median_days_observed": 11.0,
+   "entered_total": 72,
+   "n_treatment": 56,
+   "n_holdout": 12,
+   "successes_treatment": 56,
+   "successes_holdout": 12,
+   "median_days_observed": 24.0,
    "ladder": [
     {
      "tier": "human",
-     "accounts": 25,
-     "successes": 25,
+     "accounts": 56,
+     "successes": 56,
      "rate": 1.0
     }
    ],
    "cohorts": [
     {
      "week_starting": "2026-09-28",
-     "n_treatment": 25,
+     "n_treatment": 29,
      "rate_treatment": 1.0,
-     "n_holdout": 7,
+     "n_holdout": 8,
+     "rate_holdout": 1.0
+    },
+    {
+     "week_starting": "2026-10-05",
+     "n_treatment": 5,
+     "rate_treatment": 1.0,
+     "n_holdout": 2,
+     "rate_holdout": 1.0
+    },
+    {
+     "week_starting": "2026-10-12",
+     "n_treatment": 16,
+     "rate_treatment": 1.0,
+     "n_holdout": 1,
+     "rate_holdout": 1.0
+    },
+    {
+     "week_starting": "2026-10-19",
+     "n_treatment": 6,
+     "rate_treatment": 1.0,
+     "n_holdout": 1,
      "rate_holdout": 1.0
     }
    ],
    "money": {
     "treatment": {
-     "arr_at_entry": 64016.0,
-     "retained_arr": 64016.0,
+     "arr_at_entry": 166204.0,
+     "retained_arr": 166204.0,
      "retained_arr_share": 1.0,
-     "expansion_won": 1842.0,
-     "expansion_per_account": 73.68
+     "expansion_won": 873.0,
+     "expansion_per_account": 15.589285714285714
     },
     "holdout": {
-     "arr_at_entry": 17491.0,
-     "retained_arr": 17491.0,
+     "arr_at_entry": 31320.0,
+     "retained_arr": 31320.0,
      "retained_arr_share": 1.0,
-     "expansion_won": 0.0,
-     "expansion_per_account": 0.0
+     "expansion_won": 752.0,
+     "expansion_per_account": 62.666666666666664
     }
    },
    "rate_treatment": 1.0,
@@ -112,11 +147,12 @@
    "p_value": 1.0,
    "srm": {
     "expected_holdout_share": 0.2,
-    "observed_holdout_share": 0.2037037037037037,
-    "p_value": 0.9457526927267955,
-    "ok": true
+    "observed_holdout_share": 0.19444444444444445,
+    "p_value": 0.9061856157549283,
+    "ok": true,
+    "uneven": false
    },
-   "detectable_lift": 0.26095210288480153,
+   "detectable_lift": 0.19412195479474587,
    "guardrail_retention": {
     "rate_treatment": 1.0,
     "rate_holdout": 1.0
@@ -132,70 +168,98 @@
    "metric_description": "Prerequisite closure reaches 75% or more within 30 days.",
    "rollout_stage": "full",
    "holdout_pct": 0.5,
-   "entered_total": 89,
-   "n_treatment": 34,
-   "n_holdout": 43,
-   "successes_treatment": 11,
+   "entered_total": 100,
+   "n_treatment": 49,
+   "n_holdout": 50,
+   "successes_treatment": 17,
    "successes_holdout": 0,
-   "median_days_observed": 11.0,
+   "median_days_observed": 29.0,
    "ladder": [
     {
      "tier": "digital",
-     "accounts": 1,
+     "accounts": 4,
      "successes": 0,
      "rate": 0.0
     },
     {
+     "tier": "agentic",
+     "accounts": 7,
+     "successes": 3,
+     "rate": 0.42857142857142855
+    },
+    {
      "tier": "human",
-     "accounts": 33,
-     "successes": 11,
-     "rate": 0.3333333333333333
+     "accounts": 38,
+     "successes": 14,
+     "rate": 0.3684210526315789
     }
    ],
    "cohorts": [
     {
      "week_starting": "2026-09-28",
-     "n_treatment": 34,
-     "rate_treatment": 0.3235294117647059,
-     "n_holdout": 43,
+     "n_treatment": 37,
+     "rate_treatment": 0.43243243243243246,
+     "n_holdout": 44,
      "rate_holdout": 0.0
+    },
+    {
+     "week_starting": "2026-10-05",
+     "n_treatment": 6,
+     "rate_treatment": 0.16666666666666666,
+     "n_holdout": 5,
+     "rate_holdout": 0.0
+    },
+    {
+     "week_starting": "2026-10-12",
+     "n_treatment": 3,
+     "rate_treatment": 0.0,
+     "n_holdout": 1,
+     "rate_holdout": 0.0
+    },
+    {
+     "week_starting": "2026-10-19",
+     "n_treatment": 3,
+     "rate_treatment": 0.0,
+     "n_holdout": 0,
+     "rate_holdout": null
     }
    ],
    "money": {
     "treatment": {
-     "arr_at_entry": 75091.0,
-     "retained_arr": 75091.0,
+     "arr_at_entry": 79751.0,
+     "retained_arr": 79751.0,
      "retained_arr_share": 1.0,
      "expansion_won": 0.0,
      "expansion_per_account": 0.0
     },
     "holdout": {
-     "arr_at_entry": 76776.0,
-     "retained_arr": 76776.0,
-     "retained_arr_share": 1.0,
+     "arr_at_entry": 89700.0,
+     "retained_arr": 88905.0,
+     "retained_arr_share": 0.9911371237458194,
      "expansion_won": 0.0,
      "expansion_per_account": 0.0
     }
    },
-   "rate_treatment": 0.3235294117647059,
+   "rate_treatment": 0.3469387755102041,
    "rate_holdout": 0.0,
-   "lift": 0.3235294117647059,
-   "ci_low": 0.16627676772784217,
-   "ci_high": 0.48078205580156963,
-   "z": 4.028696086435753,
-   "p_value": 5.608706851045753e-05,
+   "lift": 0.3469387755102041,
+   "ci_low": 0.2136598750565972,
+   "ci_high": 0.48021767596381093,
+   "z": 4.576380158042037,
+   "p_value": 4.730905159400223e-06,
    "srm": {
     "expected_holdout_share": 0.5,
-    "observed_holdout_share": 0.5280898876404494,
-    "p_value": 0.5961126657233238,
-    "ok": true
+    "observed_holdout_share": 0.5,
+    "p_value": 1.0,
+    "ok": true,
+    "uneven": false
    },
-   "detectable_lift": 0.1400478714324129,
+   "detectable_lift": 0.12267028980156523,
    "guardrail_retention": {
-    "rate_treatment": 1.0,
-    "rate_holdout": 1.0
+    "rate_treatment": 0.9795918367346939,
+    "rate_holdout": 0.98
    },
-   "verdict": "Working: +32% on the success metric, unlikely to be chance (p = 0.000).",
+   "verdict": "Working: +35% on the success metric, unlikely to be chance (p = 0.000).",
    "recommendation": "Scale: move to the next rollout stage or the next segment, and keep a holdout."
   },
   {
@@ -206,12 +270,12 @@
    "metric_description": "Monthly active users back to at least 90% of the pre-drop level within 30 days.",
    "rollout_stage": "full",
    "holdout_pct": 0.5,
-   "entered_total": 43,
-   "n_treatment": 22,
-   "n_holdout": 12,
-   "successes_treatment": 3,
-   "successes_holdout": 1,
-   "median_days_observed": 11.0,
+   "entered_total": 72,
+   "n_treatment": 34,
+   "n_holdout": 26,
+   "successes_treatment": 6,
+   "successes_holdout": 4,
+   "median_days_observed": 25.0,
    "ladder": [
     {
      "tier": "digital",
@@ -221,9 +285,9 @@
     },
     {
      "tier": "human",
-     "accounts": 2,
-     "successes": 0,
-     "rate": 0.0
+     "accounts": 14,
+     "successes": 3,
+     "rate": 0.21428571428571427
     },
     {
      "tier": "none",
@@ -235,48 +299,63 @@
    "cohorts": [
     {
      "week_starting": "2026-09-28",
-     "n_treatment": 22,
-     "rate_treatment": 0.13636363636363635,
-     "n_holdout": 12,
-     "rate_holdout": 0.08333333333333333
+     "n_treatment": 25,
+     "rate_treatment": 0.16,
+     "n_holdout": 14,
+     "rate_holdout": 0.07142857142857142
+    },
+    {
+     "week_starting": "2026-10-05",
+     "n_treatment": 5,
+     "rate_treatment": 0.4,
+     "n_holdout": 7,
+     "rate_holdout": 0.2857142857142857
+    },
+    {
+     "week_starting": "2026-10-12",
+     "n_treatment": 4,
+     "rate_treatment": 0.0,
+     "n_holdout": 5,
+     "rate_holdout": 0.2
     }
    ],
    "money": {
     "treatment": {
-     "arr_at_entry": 40793.0,
-     "retained_arr": 40793.0,
-     "retained_arr_share": 1.0,
-     "expansion_won": 0.0,
-     "expansion_per_account": 0.0
+     "arr_at_entry": 64255.0,
+     "retained_arr": 59325.0,
+     "retained_arr_share": 0.9232744533499339,
+     "expansion_won": 873.0,
+     "expansion_per_account": 25.676470588235293
     },
     "holdout": {
-     "arr_at_entry": 17733.0,
-     "retained_arr": 17733.0,
-     "retained_arr_share": 1.0,
-     "expansion_won": 0.0,
-     "expansion_per_account": 0.0
+     "arr_at_entry": 49290.0,
+     "retained_arr": 45798.0,
+     "retained_arr_share": 0.92915398660986,
+     "expansion_won": 1497.0,
+     "expansion_per_account": 57.57692307692308
     }
    },
-   "rate_treatment": 0.13636363636363635,
-   "rate_holdout": 0.08333333333333333,
-   "lift": 0.053030303030303025,
-   "ci_low": -0.15914690491396954,
-   "ci_high": 0.26520751097457557,
-   "z": 0.45864314597902295,
-   "p_value": 0.6464904476724707,
+   "rate_treatment": 0.17647058823529413,
+   "rate_holdout": 0.15384615384615385,
+   "lift": 0.022624434389140274,
+   "ci_low": -0.16619999218876838,
+   "ci_high": 0.21144886096704893,
+   "z": 0.2330206912141852,
+   "p_value": 0.8157453387131137,
    "srm": {
     "expected_holdout_share": 0.5,
-    "observed_holdout_share": 0.3953488372093023,
-    "p_value": 0.16991184173149204,
-    "ok": true
+    "observed_holdout_share": 0.4166666666666667,
+    "p_value": 0.1572992070502851,
+    "ok": true,
+    "uneven": false
    },
-   "detectable_lift": 0.27772221666555524,
+   "detectable_lift": 0.2631937137330977,
    "guardrail_retention": {
-    "rate_treatment": 1.0,
-    "rate_holdout": 1.0
+    "rate_treatment": 0.9411764705882353,
+    "rate_holdout": 0.9230769230769231
    },
-   "verdict": "Too early: fewer than 20 accounts in a group.",
-   "recommendation": "Keep testing."
+   "verdict": "No effect detected. This sample could only have shown a lift of about 26% or more.",
+   "recommendation": "Keep testing until the sample can detect the lift that would justify the play."
   },
   {
    "play_id": "edition_upgrade",
@@ -286,22 +365,22 @@
    "metric_description": "A closed-won expansion opportunity within 30 days.",
    "rollout_stage": "slice",
    "holdout_pct": 0.5,
-   "entered_total": 6,
-   "n_treatment": 4,
+   "entered_total": 8,
+   "n_treatment": 5,
    "n_holdout": 2,
-   "successes_treatment": 0,
+   "successes_treatment": 1,
    "successes_holdout": 0,
-   "median_days_observed": 11.0,
+   "median_days_observed": 29.0,
    "ladder": [
     {
      "tier": "digital",
-     "accounts": 2,
-     "successes": 0,
-     "rate": 0.0
+     "accounts": 4,
+     "successes": 1,
+     "rate": 0.25
     },
     {
      "tier": "human",
-     "accounts": 2,
+     "accounts": 1,
      "successes": 0,
      "rate": 0.0
     }
@@ -310,18 +389,25 @@
     {
      "week_starting": "2026-09-28",
      "n_treatment": 4,
-     "rate_treatment": 0.0,
+     "rate_treatment": 0.25,
      "n_holdout": 2,
      "rate_holdout": 0.0
+    },
+    {
+     "week_starting": "2026-10-05",
+     "n_treatment": 1,
+     "rate_treatment": 0.0,
+     "n_holdout": 0,
+     "rate_holdout": null
     }
    ],
    "money": {
     "treatment": {
-     "arr_at_entry": 7455.0,
-     "retained_arr": 7455.0,
+     "arr_at_entry": 15342.0,
+     "retained_arr": 15342.0,
      "retained_arr_share": 1.0,
-     "expansion_won": 0.0,
-     "expansion_per_account": 0.0
+     "expansion_won": 1436.0,
+     "expansion_per_account": 287.2
     },
     "holdout": {
      "arr_at_entry": 2642.0,
@@ -331,20 +417,21 @@
      "expansion_per_account": 0.0
     }
    },
-   "rate_treatment": 0.0,
+   "rate_treatment": 0.2,
    "rate_holdout": 0.0,
-   "lift": 0.0,
-   "ci_low": 0.0,
-   "ci_high": 0.0,
-   "z": 0.0,
-   "p_value": 1.0,
+   "lift": 0.2,
+   "ci_low": -0.1506154588719671,
+   "ci_high": 0.5506154588719672,
+   "z": 0.6831300510639734,
+   "p_value": 0.4945246678838704,
    "srm": {
     "expected_holdout_share": 0.5,
-    "observed_holdout_share": 0.3333333333333333,
-    "p_value": 0.41421617824252516,
-    "ok": true
+    "observed_holdout_share": 0.375,
+    "p_value": 0.4795001221869534,
+    "ok": true,
+    "uneven": false
    },
-   "detectable_lift": 0.5284884104689525,
+   "detectable_lift": 0.5105683108066931,
    "guardrail_retention": {
     "rate_treatment": 1.0,
     "rate_holdout": 1.0
@@ -360,65 +447,87 @@
    "metric_description": "A closed-won expansion opportunity within 30 days.",
    "rollout_stage": "full",
    "holdout_pct": 0.5,
-   "entered_total": 125,
-   "n_treatment": 64,
-   "n_holdout": 35,
-   "successes_treatment": 1,
+   "entered_total": 149,
+   "n_treatment": 86,
+   "n_holdout": 50,
+   "successes_treatment": 20,
    "successes_holdout": 5,
-   "median_days_observed": 11.0,
+   "median_days_observed": 29.0,
    "ladder": [
     {
      "tier": "human",
-     "accounts": 64,
-     "successes": 1,
-     "rate": 0.015625
+     "accounts": 86,
+     "successes": 20,
+     "rate": 0.23255813953488372
     }
    ],
    "cohorts": [
     {
      "week_starting": "2026-09-28",
-     "n_treatment": 64,
-     "rate_treatment": 0.015625,
+     "n_treatment": 66,
+     "rate_treatment": 0.25757575757575757,
      "n_holdout": 35,
-     "rate_holdout": 0.14285714285714285
+     "rate_holdout": 0.11428571428571428
+    },
+    {
+     "week_starting": "2026-10-05",
+     "n_treatment": 14,
+     "rate_treatment": 0.21428571428571427,
+     "n_holdout": 9,
+     "rate_holdout": 0.0
+    },
+    {
+     "week_starting": "2026-10-12",
+     "n_treatment": 4,
+     "rate_treatment": 0.0,
+     "n_holdout": 6,
+     "rate_holdout": 0.16666666666666666
+    },
+    {
+     "week_starting": "2026-10-19",
+     "n_treatment": 2,
+     "rate_treatment": 0.0,
+     "n_holdout": 0,
+     "rate_holdout": null
     }
    ],
    "money": {
     "treatment": {
-     "arr_at_entry": 121567.0,
-     "retained_arr": 121567.0,
+     "arr_at_entry": 189280.0,
+     "retained_arr": 189280.0,
      "retained_arr_share": 1.0,
-     "expansion_won": 239.0,
-     "expansion_per_account": 3.734375
+     "expansion_won": 22143.0,
+     "expansion_per_account": 257.4767441860465
     },
     "holdout": {
-     "arr_at_entry": 92738.0,
-     "retained_arr": 92738.0,
-     "retained_arr_share": 1.0,
-     "expansion_won": 3986.0,
-     "expansion_per_account": 113.88571428571429
+     "arr_at_entry": 126487.0,
+     "retained_arr": 124984.0,
+     "retained_arr_share": 0.9881173559338113,
+     "expansion_won": 6071.0,
+     "expansion_per_account": 121.42
     }
    },
-   "rate_treatment": 0.015625,
-   "rate_holdout": 0.14285714285714285,
-   "lift": -0.12723214285714285,
-   "ci_low": -0.24707886197779452,
-   "ci_high": -0.007385423736491176,
-   "z": -2.536421049358985,
-   "p_value": 0.011199199208711486,
+   "rate_treatment": 0.23255813953488372,
+   "rate_holdout": 0.1,
+   "lift": 0.1325581395348837,
+   "ci_low": 0.010544574303413268,
+   "ci_high": 0.25457170476635416,
+   "z": 1.9243257367631592,
+   "p_value": 0.05431376654126474,
    "srm": {
     "expected_holdout_share": 0.5,
-    "observed_holdout_share": 0.4,
-    "p_value": 0.025347318677468256,
-    "ok": true
+    "observed_holdout_share": 0.38926174496644295,
+    "p_value": 0.0068620604607624435,
+    "ok": true,
+    "uneven": true
    },
-   "detectable_lift": 0.2059819686976785,
+   "detectable_lift": 0.14938758704387287,
    "guardrail_retention": {
     "rate_treatment": 1.0,
-    "rate_holdout": 1.0
+    "rate_holdout": 0.98
    },
-   "verdict": "Harmful: -13% on the success metric (p = 0.011).",
-   "recommendation": "Stop the play and review the journey."
+   "verdict": "No effect detected. This sample could only have shown a lift of about 15% or more.",
+   "recommendation": "Keep testing until the sample can detect the lift that would justify the play."
   },
   {
    "play_id": "cross_product_docs",
@@ -428,12 +537,12 @@
    "metric_description": "The account publishes its first doc within 30 days.",
    "rollout_stage": "slice",
    "holdout_pct": 0.5,
-   "entered_total": 8,
+   "entered_total": 7,
    "n_treatment": 4,
    "n_holdout": 3,
    "successes_treatment": 0,
    "successes_holdout": 0,
-   "median_days_observed": 11.0,
+   "median_days_observed": 29.0,
    "ladder": [
     {
      "tier": "digital",
@@ -453,18 +562,18 @@
    ],
    "money": {
     "treatment": {
-     "arr_at_entry": 21220.0,
-     "retained_arr": 21220.0,
+     "arr_at_entry": 18037.0,
+     "retained_arr": 18037.0,
      "retained_arr_share": 1.0,
-     "expansion_won": 1842.0,
-     "expansion_per_account": 460.5
+     "expansion_won": 0.0,
+     "expansion_per_account": 0.0
     },
     "holdout": {
-     "arr_at_entry": 5517.0,
-     "retained_arr": 5517.0,
+     "arr_at_entry": 4932.0,
+     "retained_arr": 4932.0,
      "retained_arr_share": 1.0,
-     "expansion_won": 585.0,
-     "expansion_per_account": 195.0
+     "expansion_won": 0.0,
+     "expansion_per_account": 0.0
     }
    },
    "rate_treatment": 0.0,
@@ -476,9 +585,10 @@
    "p_value": 1.0,
    "srm": {
     "expected_holdout_share": 0.5,
-    "observed_holdout_share": 0.375,
-    "p_value": 0.4795001221869534,
-    "ok": true
+    "observed_holdout_share": 0.42857142857142855,
+    "p_value": 0.7054569861112734,
+    "ok": true,
+    "uneven": false
    },
    "detectable_lift": 0.4660829682935575,
    "guardrail_retention": {
@@ -490,13 +600,13 @@
   }
  ],
  "handoffs": {
-  "handoffs": 225,
-  "closed": 216,
-  "open_now": 9,
-  "sla_breach_rate": 0.16,
-  "escalation_conversion": 0.6111111111111112,
-  "unnecessary_handoff_rate": 0.041666666666666664,
-  "agent_handoffs": 37,
-  "docs_gap_share": 0.0
+  "handoffs": 387,
+  "closed": 382,
+  "open_now": 5,
+  "sla_breach_rate": 0.22739018087855298,
+  "escalation_conversion": 0.6335078534031413,
+  "unnecessary_handoff_rate": 0.041884816753926704,
+  "agent_handoffs": 19,
+  "docs_gap_share": 0.47368421052631576
  }
 }

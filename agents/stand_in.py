@@ -80,10 +80,10 @@ def _agent(request: dict) -> dict:
 
 
 def _first_steps(text: str) -> str:
-    """The first numbered steps of an article, so the answer quotes the docs."""
-    steps = [line.strip() for line in text.splitlines() if line.strip()[:2] in ("1.", "2.", "3.")]
-    return " ".join(steps) if steps else "Follow the steps there."
-
+    """The first paragraph of an article after its title, so the answer quotes the docs."""
+    paragraphs = [part.strip() for part in text.split("\n\n") if part.strip()]
+    body = [part for part in paragraphs if not part.startswith(("#", "Search keywords"))]
+    return body[0] if body else "Follow the steps there."
 
 def _last_customer_message(messages: list[dict]) -> str:
     return next(m["content"] for m in reversed(messages) if isinstance(m["content"], str))

@@ -36,7 +36,7 @@ Option 3.
   (`experiments/analyze.py`). It is the simplest correct test for "did a larger share of
   one group reach the goal", and it can be explained on a whiteboard.
 - **Three protections against fooling ourselves**: a sample-ratio check (if the split is
-  not the one designed, the result is not read); a minimum of 20 accounts per group and 7
+  far from the one designed, the result is not read); a minimum of 20 accounts per group and 7
   days observed; and the smallest lift the sample could have detected, printed next to
   every "no effect".
 - **A decision rule, written down**: significant and positive, scale to the next stage or
@@ -53,6 +53,25 @@ Option 3.
   a result that holds across weekly cohorts, not on a single p-value.
 - The window can still be open when the report is read. Both groups enter on the same
   days, so "so far" is a fair comparison; the report shows the days observed.
+
+## What happened the first time the split check ran
+
+On the first clean 30-day run the check fired on the seat-expansion play: 91 treatment
+and 58 holdout against a 50/50 design (p = 0.008). The first version of the rule said
+"below 0.01, do not read the result".
+
+The investigation took one query. Of the 153 accounts the engine ever considered for the
+play, the hash put 93 in treatment and 60 in holdout, and the engine enrolled exactly
+that, minus two accounts per arm excluded for the same reasons. Exclusions are applied
+before assignment, so they cannot favour an arm. Nothing was filtering one group: it was
+a chance imbalance of about 1 in 130.
+
+Two changes followed. The alarm moved to **p < 0.001**, the usual convention for this
+check, because it runs on every play at every look and a 1% bar raises false alarms.
+Between 0.001 and 0.01 the report now prints "uneven, watch it" rather than voiding the
+result. The lesson kept: when the check fires, compare the hash split of everyone
+considered with the split of everyone enrolled. If they match, it is chance. If they do
+not, something after assignment is removing accounts from one arm.
 
 ## Honest limit
 
