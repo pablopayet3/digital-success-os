@@ -241,5 +241,8 @@ Phases 6 to 9 additions:
 - `DSO_DATA_DIR` points the app and the API at another data folder (tests, containers).
 
 Still open: one live run with `ANTHROPIC_API_KEY` to fill `cache/llm/` (then set
-`llm_stand_in: false`); first runs of CI, the image, the workflows, the Databricks target
-and the Postgres store.
+`llm_stand_in: false`); first runs of the hosted deployment, the Databricks target and
+the Postgres store.
+
+Ignore rules: anchor file names to the top folder (`/BRIEF.md`). Git on Windows matches
+without regard to case, and an unanchored `BRIEF.md` once hid `prompts/brief.md`.
