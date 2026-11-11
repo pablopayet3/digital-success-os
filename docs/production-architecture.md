@@ -98,7 +98,8 @@ flowchart TB
 | Databricks warehouse | **Written, not yet run** | Needs workspace credentials. The same models run on DuckDB today. |
 | Postgres operational store | **Written, not yet run** | SQLite in dev; Postgres by URL. |
 | CRM and CS platform sync | **Export only** | Endpoints return import-ready shapes. No live sync. |
-| Hosting, scheduled run, CI | **Written, not yet run** | Need a GitHub repository and a host. |
+| CI, image build, daily scheduled run | **Real** | They run on GitHub Actions: tests on every push, an image with a demo world built in, a daily pipeline run that opens an issue on failure. |
+| Hosting | **Written, not yet run** | Needs a host connected to the repository. |
 | Dashboards | **Streamlit** instead of a BI tool | One process, no licence. The gold tables are the interface a BI tool would read. |
 
 ## What I would do differently at scale

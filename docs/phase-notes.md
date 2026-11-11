@@ -567,11 +567,21 @@ uv run python run.py api     # http://localhost:8000/docs
   small demo world built in), docker-compose, a Render blueprint, a deploy workflow
   (build, publish, deploy hook) and a daily pipeline workflow that opens an issue on failure.
 
+### First runs on GitHub
+
+- CI, the image build and the daily pipeline workflow all pass on GitHub Actions.
+- **A bug the first run found.** The ignore rule that keeps the private brief out of the
+  repository was written as `BRIEF.md`. On Windows that matches without regard to case,
+  so it also hid `prompts/brief.md`, which was never committed. Everything passed
+  locally and failed on Linux. The rule is now anchored (`/BRIEF.md`). This is the
+  argument for CI on a second operating system in one sentence.
+- The first secret scan failed for an unrelated reason: on the very first push the
+  scanner asks git for the parent of the first commit, which does not exist. It passes
+  on every push after that.
+
 ### Not yet run
 
-- Docker is not installed on the build machine, and there is no GitHub repository yet,
-  so the image, the three workflows and the hosted deployment have not been run once.
-  Expect small fixes on the first run.
+- The hosted deployment (needs a host connected to the repository).
 - The Databricks target, the Postgres store and trace export need credentials.
 
 ### The three decisions to defend

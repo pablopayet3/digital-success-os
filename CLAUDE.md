@@ -127,8 +127,8 @@ dbt cross-database macros and the project's own dispatch macros in `dbt/macros/`
 6. Evals and experiments: **done** (eval report produced with the stand-in model)
 7. App and API: **done**
 8. Docs, demo, portfolio: **done** (README, operating documents, demo script, portfolio entry)
-9. Container, deploy and daily workflows, Render blueprint: **written, not yet run** (no Docker
-   on the build machine, no GitHub repository yet)
+9. Container, deploy and daily workflows: **done and passing on GitHub Actions**
+   (github.com/pablopayet3/digital-success-os, public). Render blueprint: written, not yet run
 
 What works after each phase, and what to be able to explain, is in `docs/phase-notes.md`.
 

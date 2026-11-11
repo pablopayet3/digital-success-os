@@ -1,5 +1,7 @@
 # Digital Success OS (mini)
 
+[![CI](https://github.com/pablopayet3/digital-success-os/actions/workflows/ci.yml/badge.svg)](https://github.com/pablopayet3/digital-success-os/actions/workflows/ci.yml)
+
 > **Synthetic data, fictional company.** "Lumen Labs" and its product "Relay" do not exist.
 > Every account, contact, event and message in this repository is generated.
 
@@ -176,18 +178,20 @@ options, the decision, consequences and when to revisit. The ones worth reading 
 What each phase delivered, and three decisions to defend for each, is in
 [docs/phase-notes.md](docs/phase-notes.md).
 
-## Not yet run against real services
+## What runs on GitHub, and what has not been run yet
 
-The code for these is written and tested locally, but has not been run against the real
-thing. Each needs an account or a key.
+Running on GitHub Actions: CI on every push (lint, 138 tests on Linux, the dbt build, a
+secret scan), the container image build (it generates a demo world inside the image and
+publishes it), and the daily pipeline schedule, which opens an issue when a run fails.
+
+Written but not yet run against the real thing. Each needs an account or a key.
 
 | What | Needs |
 |---|---|
 | Real model responses for the agents, the judge and the prompt comparison | An API key, one live run (stops at a $5 budget) |
 | Databricks as the `prod` warehouse | A workspace host, SQL warehouse path and token |
 | Postgres operational store | A database URL |
-| CI, image build, daily schedule | A GitHub repository |
-| Hosted app and API | A host connected to the repository; Docker to build locally |
+| Hosted app and API | A host connected to the repository (`render.yaml` is ready) |
 | Trace export | A tracing key (JSON traces work without one) |
 
 ## What I would do differently at scale
