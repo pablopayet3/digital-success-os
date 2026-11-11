@@ -321,10 +321,15 @@ def _give_history(world, account: Account, rng) -> None:
             account, admin, "board_created", done["board_created"],
             {"board_id": f"{account.account_id}-b0001", "template": "kanban"},
         )  # fmt: skip
-    if "integration_connected" in done:
+    for n in range(account.n_integrations):
         world.add_backfill_event(
             account, admin, "integration_connected", done["integration_connected"],
-            {"integration": "chat"},
+            {"integration": ["chat", "calendar", "cloud_drive"][n]},
+        )  # fmt: skip
+    for n in range(1, account.n_rules + 1):
+        world.add_backfill_event(
+            account, admin, "automation_rule_created", some_day_after_signup(),
+            {"rule_id": f"{account.account_id}-r{n:04d}", "rules_total": n},
         )  # fmt: skip
     if "sso_configured" in done:
         world.add_backfill_event(

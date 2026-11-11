@@ -47,13 +47,6 @@ REAL_BRANDS = [
 
 
 @pytest.fixture(scope="session")
-def small_world(tmp_path_factory):
-    data_dir = tmp_path_factory.mktemp("data")
-    world = generate(profile="small", data_dir=data_dir, verbose=False)
-    return world, data_dir
-
-
-@pytest.fixture(scope="session")
 def landing(small_world) -> Path:
     return small_world[1] / "landing"
 
@@ -94,7 +87,8 @@ def _file_hashes(folder: Path) -> dict[str, str]:
 def test_same_seed_gives_identical_files(small_world, tmp_path):
     _, first_dir = small_world
     generate(profile="small", data_dir=tmp_path, verbose=False)
-    assert _file_hashes(first_dir) == _file_hashes(tmp_path)
+    for folder in ("landing", "ground_truth"):
+        assert _file_hashes(first_dir / folder) == _file_hashes(tmp_path / folder)
 
 
 def test_files_have_expected_columns(landing):

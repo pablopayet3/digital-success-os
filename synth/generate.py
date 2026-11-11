@@ -71,9 +71,11 @@ def generate(profile: str | None = None, data_dir: Path = DATA_DIR, verbose: boo
     issues = mess.new_issue_log()
 
     landing, truth = data_dir / "landing", data_dir / "ground_truth"
-    for folder in (landing, truth):
+    for folder in (landing, truth, data_dir / "dead_letter"):
         if folder.exists():
             shutil.rmtree(folder)  # always start from a clean slate
+    # A new world makes the old warehouse stale, so it is rebuilt by the next pipeline run.
+    (data_dir / "warehouse.duckdb").unlink(missing_ok=True)
     (landing / "events").mkdir(parents=True)
     (landing / "mailbox").mkdir()
     truth.mkdir(parents=True)

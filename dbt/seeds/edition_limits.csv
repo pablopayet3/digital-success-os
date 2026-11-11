@@ -1,0 +1,5 @@
+edition,edition_rank,automation_rule_limit,integration_limit,assist_credits_per_seat
+free,1,5,2,0
+standard,2,15,3,10
+premium,3,60,10,40
+enterprise,4,100000,100,150

@@ -1,0 +1,168 @@
+version: 2
+
+# Silver: clean, typed, de-duplicated. Synthetic data, fictional company.
+models:
+  - name: stg_events
+    description: Clean product events, one row per event. Duplicates and future-dated events removed.
+    columns:
+      - name: event_id
+        description: Unique id of the event.
+        data_tests: [unique, not_null]
+      - name: account_id
+        description: The account the event belongs to. Joins to every other table.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_accounts')
+                field: account_id
+      - name: event_name
+        description: What happened.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - user_invited
+                  - user_active
+                  - board_created
+                  - doc_published
+                  - automation_rule_created
+                  - integration_connected
+                  - sso_configured
+                  - assist_invoked
+                  - admin_login
+      - name: event_date
+        description: The day the event happened (UTC).
+        data_tests: [not_null]
+
+  - name: stg_accounts
+    description: CRM accounts, one row per account.
+    columns:
+      - name: account_id
+        data_tests: [unique, not_null]
+      - name: segment
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [smb, mid, enterprise]
+      - name: coverage_tier
+        description: Who looks after the account. The pilot runs on "uncovered".
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [high_touch, pooled, uncovered]
+      - name: edition
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [free, standard, premium, enterprise]
+      - name: status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [active, churned]
+
+  - name: stg_contacts
+    description: CRM contacts, one row per person per account. Emails lowercased, persona normalised.
+    columns:
+      - name: contact_id
+        data_tests: [unique, not_null]
+      - name: account_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_accounts')
+                field: account_id
+      - name: persona
+        description: The role this person plays for us. Normalised from free-text CRM entries.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [admin, billing, champion, end_user]
+      - name: consent_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [opted_in, opted_out, unknown]
+
+  - name: stg_opportunities
+    description: CRM opportunities, one row per opportunity.
+    columns:
+      - name: opportunity_id
+        data_tests: [unique, not_null]
+      - name: account_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_accounts')
+                field: account_id
+      - name: opportunity_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [new_business, renewal, expansion]
+      - name: stage
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [open, negotiation, closed_won, closed_lost]
+
+  - name: stg_licenses
+    description: Daily licence snapshot, one row per account per day. The spine of the warehouse.
+    columns:
+      - name: account_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_accounts')
+                field: account_id
+      - name: snapshot_date
+        data_tests: [not_null]
+
+  - name: stg_tickets
+    description: Support tickets, one row per ticket.
+    columns:
+      - name: ticket_id
+        data_tests: [unique, not_null]
+      - name: account_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_accounts')
+                field: account_id
+      - name: priority
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [low, normal, high, urgent]
+
+  - name: stg_nps
+    description: NPS responses, one row per response.
+    columns:
+      - name: response_id
+        data_tests: [unique, not_null]
+      - name: score
+        data_tests: [not_null]
+
+  - name: stg_email_engagement
+    description: Lifecycle emails sent and what the recipient did, one row per send.
+    columns:
+      - name: send_id
+        data_tests: [unique, not_null]
+      - name: contact_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_contacts')
+                field: contact_id
+
+  - name: stg_mailbox
+    description: Replies in the shared success mailbox, one row per message, linked to the account.
+    columns:
+      - name: message_id
+        data_tests: [unique, not_null]
+      - name: account_id
+        description: Found through the email the message replies to.
+        data_tests: [not_null]

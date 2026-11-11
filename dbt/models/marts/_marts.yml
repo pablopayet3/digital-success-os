@@ -1,0 +1,84 @@
+version: 2
+
+# Gold: tables ready to use. Synthetic data, fictional company.
+models:
+  - name: dim_account
+    description: One row per account as it stands today.
+    columns:
+      - name: account_id
+        data_tests: [unique, not_null]
+
+  - name: dim_contact
+    description: One row per contact, with the flags plays check before a touch.
+    columns:
+      - name: contact_id
+        data_tests: [unique, not_null]
+      - name: can_email
+        description: True when the contact has opted in and the email address works.
+        data_tests: [not_null]
+      - name: is_valid_admin
+        description: True for an admin with a working email address.
+        data_tests: [not_null]
+
+  - name: fct_usage_daily
+    description: Product usage per account per day, including rolling 30-day MAU and Assist credits.
+    columns:
+      - name: account_id
+        data_tests: [not_null]
+      - name: mau_30d
+        description: Different users active in the 30 days ending on the snapshot date.
+        data_tests: [not_null]
+
+  - name: fct_prerequisites
+    description: Setup prerequisites per account and the share that is done.
+    columns:
+      - name: account_id
+        data_tests: [unique, not_null]
+      - name: prerequisite_closure_pct
+        description: Share of the four setup steps completed (0, 0.25, 0.5, 0.75 or 1).
+        data_tests: [not_null]
+
+  - name: int_account_daily_base
+    description: Building block for account_daily. Every fact about an account on a day.
+
+  - name: account_daily
+    description: >
+      The production table. One row per account per day, joining usage, seats, setup,
+      support, sentiment, contact engagement and commercial data.
+      Contract in contracts/account_daily.yaml.
+    columns:
+      - name: account_id
+        description: The account. Joins to every other table.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_account')
+                field: account_id
+      - name: snapshot_date
+        description: The day this row describes.
+        data_tests: [not_null]
+      - name: seat_utilisation
+        description: Seats assigned divided by seats licensed.
+        data_tests: [not_null]
+      - name: prerequisite_closure_pct
+        description: Share of the four setup steps done on that day.
+        data_tests: [not_null]
+      - name: coverage_tier
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [high_touch, pooled, uncovered]
+
+  - name: dq_summary
+    description: What the pipeline caught, one row per data-quality measure.
+    columns:
+      - name: measure
+        data_tests: [unique, not_null]
+
+seeds:
+  - name: edition_limits
+    description: What each edition includes. Reaching a limit is a signal that the next edition fits.
+    columns:
+      - name: edition
+        data_tests: [unique, not_null]

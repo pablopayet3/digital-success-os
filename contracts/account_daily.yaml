@@ -1,0 +1,136 @@
+# Data contract for the production table gold.account_daily.
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# A contract is a written promise from the team that produces a table to the teams
+# that use it. contracts/check.py compares the live table with this file on every
+# pipeline run, and a test fails if they disagree.
+
+table: gold.account_daily
+version: 1
+owner: Digital Success Portfolio Lead (accountable). Built and run by Data Engineering.
+purpose: >
+  The single daily view of every account: usage, seats, setup, support, sentiment,
+  contact engagement and commercial data. Signals, model features, the rules engine,
+  the agents' account context and the dashboards all read accounts from this table.
+
+grain: One row per account per day, for every day the account is active.
+primary_key: [account_id, snapshot_date]
+join_key: account_id
+
+freshness:
+  source: bronze.events
+  max_hours_since_load: 36
+  note: The pipeline runs daily. More than 36 hours without a load means a run was missed.
+
+consumers:
+  - Signals and health score (dbt gold models)
+  - Churn and expansion models (analytics/)
+  - Rules engine and journeys (engine/)
+  - Agent tools, account context (agents/)
+  - Dashboards and the human console (app/)
+  - CRM export (api/)
+
+change_policy:
+  additive: >
+    New columns may be added at any time. They must be added to this file in the same
+    change, with a definition.
+  breaking: >
+    Removing or renaming a column, changing its type or changing its definition needs an
+    ADR and seven days' notice to every consumer listed above.
+
+# Each rule is a query that must return zero rows.
+quality_rules:
+  - name: one_row_per_account_per_day
+    sql: >
+      select account_id, snapshot_date from gold.account_daily
+      group by account_id, snapshot_date having count(*) > 1
+  - name: seats_assigned_within_licence
+    sql: select 1 from gold.account_daily where seats_assigned > seats_licensed
+  - name: seat_utilisation_between_0_and_1
+    sql: select 1 from gold.account_daily where seat_utilisation < 0 or seat_utilisation > 1
+  - name: mau_not_above_seats
+    sql: select 1 from gold.account_daily where mau_30d > seats_assigned * 1.1
+  - name: closure_is_a_quarter_step
+    sql: >
+      select 1 from gold.account_daily
+      where prerequisite_closure_pct not in (0, 0.25, 0.5, 0.75, 1)
+  - name: nps_between_0_and_10
+    sql: >
+      select 1 from gold.account_daily
+      where latest_nps_score is not null and latest_nps_score not between 0 and 10
+  - name: no_days_in_the_future
+    sql: >
+      select 1 from gold.account_daily
+      where snapshot_date > (select max(snapshot_date) from silver.stg_licenses)
+
+# type is one of: text, integer, number, boolean, date.
+columns:
+  # keys
+  - {name: account_id, type: text, nullable: false, description: "The account. The one id that joins every table."}
+  - {name: snapshot_date, type: date, nullable: false, description: "The day this row describes."}
+
+  # account
+  - {name: account_name, type: text, nullable: false, description: "Customer name."}
+  - {name: segment, type: text, nullable: false, description: "smb, mid or enterprise."}
+  - {name: coverage_tier, type: text, nullable: false, description: "high_touch, pooled or uncovered. The pilot runs on uncovered."}
+  - {name: edition, type: text, nullable: false, description: "Edition on that day: free, standard, premium or enterprise."}
+  - {name: has_docs, type: boolean, nullable: false, description: "Owns Relay Docs."}
+  - {name: has_assist, type: boolean, nullable: false, description: "Owns Relay Assist (usage-based AI assistant)."}
+  - {name: contract_start, type: date, nullable: false, description: "Signup date."}
+  - {name: account_age_days, type: integer, nullable: false, description: "Days since signup, on that day."}
+
+  # seats
+  - {name: seats_licensed, type: integer, nullable: false, description: "Seats paid for on that day."}
+  - {name: seats_assigned, type: integer, nullable: false, description: "Seats given to a user on that day."}
+  - {name: seat_utilisation, type: number, nullable: false, description: "seats_assigned divided by seats_licensed."}
+  - {name: seats_assigned_30d_ago, type: integer, nullable: true, description: "Seats assigned 30 days earlier. Empty in the account's first 30 days."}
+
+  # usage
+  - {name: active_users, type: integer, nullable: false, description: "Different users active on that day."}
+  - {name: mau_30d, type: integer, nullable: false, description: "Monthly active users: different users active in the 30 days ending that day."}
+  - {name: mau_prior_30d, type: integer, nullable: true, description: "MAU as it stood 30 days earlier. Empty in the first 30 days."}
+  - {name: active_user_days_30d, type: integer, nullable: false, description: "Sum of daily active users over 30 days (depth of use)."}
+  - {name: admin_logins_30d, type: integer, nullable: false, description: "Admin logins in 30 days."}
+  - {name: boards_created_30d, type: integer, nullable: false, description: "Boards created in 30 days."}
+  - {name: doc_like_boards_60d, type: integer, nullable: false, description: "Boards created from document-style templates in 60 days (a sign the team needs Docs)."}
+  - {name: docs_published_30d, type: integer, nullable: false, description: "Docs published in 30 days."}
+  - {name: assist_invocations_30d, type: integer, nullable: false, description: "Calls to the AI assistant in 30 days."}
+  - {name: assist_credits_30d, type: integer, nullable: false, description: "Assist credits used in 30 days (consumption)."}
+  - {name: automation_rules_total, type: integer, nullable: false, description: "Automation rules created so far."}
+  - {name: integrations_total, type: integer, nullable: false, description: "Integrations connected so far."}
+
+  # edition limits
+  - {name: automation_rule_limit, type: integer, nullable: false, description: "Rules allowed by the edition."}
+  - {name: integration_limit, type: integer, nullable: false, description: "Integrations allowed by the edition."}
+  - {name: assist_credits_included, type: integer, nullable: false, description: "Assist credits included per month for the licensed seats."}
+
+  # setup prerequisites
+  - {name: has_first_board, type: boolean, nullable: false, description: "Setup step 1: a board exists."}
+  - {name: has_five_users, type: boolean, nullable: false, description: "Setup step 2: at least five users have a seat."}
+  - {name: has_integration, type: boolean, nullable: false, description: "Setup step 3: an integration is connected."}
+  - {name: has_sso, type: boolean, nullable: false, description: "Setup step 4: single sign-on is configured."}
+  - {name: prerequisite_closure_pct, type: number, nullable: false, description: "Share of the four setup steps done on that day."}
+
+  # support
+  - {name: tickets_30d, type: integer, nullable: false, description: "Support tickets opened in 30 days."}
+  - {name: high_priority_tickets_30d, type: integer, nullable: false, description: "High or urgent tickets opened in 30 days."}
+  - {name: open_high_priority_tickets, type: integer, nullable: false, description: "High or urgent tickets still open at the end of that day."}
+
+  # sentiment
+  - {name: latest_nps_score, type: integer, nullable: true, description: "Most recent NPS score on or before that day (0 to 10). Empty if never surveyed."}
+  - {name: latest_nps_date, type: date, nullable: true, description: "Date of that response."}
+  - {name: lowest_nps_14d, type: integer, nullable: true, description: "Lowest NPS score given in the last 14 days. Empty if none."}
+
+  # contact engagement
+  - {name: emails_sent_30d, type: integer, nullable: false, description: "Emails sent to the account's contacts in 30 days."}
+  - {name: emails_opened_30d, type: integer, nullable: false, description: "Of those, how many were opened."}
+  - {name: emails_clicked_30d, type: integer, nullable: false, description: "Of those, how many were clicked."}
+  - {name: email_replies_30d, type: integer, nullable: false, description: "Replies received in the shared mailbox in 30 days."}
+  - {name: contacts_total, type: integer, nullable: false, description: "Contacts on the account today."}
+  - {name: emailable_contacts, type: integer, nullable: false, description: "Contacts who opted in and have a working address, today."}
+  - {name: has_valid_admin, type: boolean, nullable: false, description: "True when at least one admin can be emailed, today."}
+
+  # commercial
+  - {name: arr, type: integer, nullable: false, description: "Annual recurring revenue today, in dollars."}
+  - {name: days_to_renewal, type: integer, nullable: false, description: "Days until the next contract anniversary, counted from that day."}
+  - {name: renewal_in_negotiation, type: boolean, nullable: false, description: "True when an open renewal opportunity is in negotiation today."}

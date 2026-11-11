@@ -1,0 +1,29 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+# ELT in three layers: bronze (raw, loaded by ingest/), silver (clean), gold (ready to use).
+name: digital_success_os
+version: "1.0.0"
+profile: digital_success_os
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+flags:
+  send_anonymous_usage_stats: false
+  require_generic_test_arguments_property: true
+
+models:
+  digital_success_os:
+    staging:
+      +schema: silver
+      +materialized: table
+    marts:
+      +schema: gold
+      +materialized: table
+
+seeds:
+  digital_success_os:
+    +schema: silver

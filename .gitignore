@@ -5,6 +5,12 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 
+# dbt working files
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+logs/
+
 # Generated data: rebuilt from the seed with `uv run python run.py data`
 data/
 outbox/

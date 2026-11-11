@@ -1,0 +1,9 @@
+# Connection to the local DuckDB warehouse. No secrets in here.
+# run.py sets DSO_WAREHOUSE to the full path of data/warehouse.duckdb.
+digital_success_os:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('DSO_WAREHOUSE', '../data/warehouse.duckdb') }}"
+      threads: 4

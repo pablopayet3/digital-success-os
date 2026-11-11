@@ -46,13 +46,14 @@ Option 3.
 
 ## Consequences
 
-- About 627,000 product events instead of 250,000. Generation takes about 25 seconds and
-  the files are about 125 MB. DuckDB handles this easily.
-- In history, about 11 to 12% of accounts churn and 10 to 12% expand within 90 days of a
-  snapshot. That is enough positive examples for a simple model.
-- On the last day of history the pilot segment has about 650 active accounts, with 77
-  stalled onboardings and between 23 and 78 accounts for each other signal. More qualify
-  during the 30 pilot days. The generation report prints these counts on every run.
+- About 500,000 product events instead of 250,000. Generation takes about 25 seconds and
+  the files are about 100 MB. DuckDB handles this easily.
+- In history, about 10% of accounts churn and 11% expand within 90 days of a snapshot.
+  That is enough positive examples for a simple model.
+- On the last day of history the pilot segment has about 650 active accounts, with about
+  75 stalled onboardings and between 30 and 65 accounts for each other signal. More
+  qualify during the 30 pilot days. The generation report prints the exact counts on
+  every run (`data/ground_truth/generation_report.md`).
 - Volumes are settings in `config/world.yaml`. A `small` profile keeps tests fast.
 
 ## Revisit if

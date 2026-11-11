@@ -41,12 +41,20 @@ human's outcome comes back into the system. Every play has a holdout.
 ```
 uv sync
 uv run python run.py data      # generate the synthetic world (about 25 seconds)
+uv run python run.py pipeline  # ingest + dbt build + freshness + contract check
 uv run python run.py test
 uv run python run.py lint
 ```
 
 `run.py` is the entry point (there is no `make` on the Windows machine this was built on).
 The `Makefile` only forwards to it.
+
+Windows note: keep the repo in a short path. In a deeply nested folder, file paths inside
+`.venv` and `dbt/target` exceed 260 characters and imports fail. If that happens, set
+`UV_PROJECT_ENVIRONMENT`, `DBT_TARGET_PATH` and `DBT_LOG_PATH` to short folders.
+
+"Today" in the warehouse is the latest licence snapshot date (dbt macro `as_of_date()`),
+never the real clock. The data runs on a simulated calendar.
 
 ## Decisions that differ from the brief
 
@@ -55,7 +63,7 @@ The `Makefile` only forwards to it.
 | Makefile entry point | `run.py`, with the Makefile as a thin wrapper | 0006 |
 | Generate 120 days up front, add treatment effects to outcomes afterwards | A day-by-day world (`World.step`) that reacts to touches from Phase 4 | 0005 |
 | 120 days, labels from hidden ground truth | 180 days; labels from churn and expansion recorded in the CRM files | 0007 |
-| About 600 accounts | 1,200 (1,092 signed up by the end of history) | 0007 |
+| About 600 accounts | 1,200 (1,091 signed up by the end of history) | 0007 |
 | Seven sources | Plus `crm_opportunities.csv`, `email_engagement.csv`, and `product_user_id` on contacts | 0007 |
 | (not stated) | No LLM in the generator: templates plus noise | 0008 |
 
@@ -66,8 +74,8 @@ pilot (Phase 6).
 ## Phases
 
 1. Skeleton and synthetic data: **done**
-2. Pipeline and data quality (ingest, dbt bronze/silver/gold, tests, contract)
-3. Signals, health score, segmentation, churn and expansion models
+2. Pipeline and data quality (ingest, dbt bronze/silver/gold, tests, contract): **done**
+3. Signals, health score, segmentation, churn and expansion models: **next**
 4. Rules engine, journeys, consent, holdout assignment
 5. Agents and human fallback
 6. Evals and experiments
@@ -88,4 +96,15 @@ What works after each phase, and what to be able to explain, is in `docs/phase-n
 - `synth/text.py`: wording templates. `synth/mess.py`: deliberate data problems.
 - `synth/generate.py`: writes `data/landing/` and `data/ground_truth/`.
 - `synth/report.py`: the generation report.
-- `tests/test_synth.py`: Phase 1 tests.
+- `ingest/schemas.py`: the pydantic `ProductEvent` and `validate_event` (reason codes).
+- `ingest/load.py`: bronze loads, dead letter, load log. `ingest/transform.py`: runs dbt,
+  stores test and freshness results. `ingest/pipeline.py`: the whole pipeline in one call.
+- `dbt/models/staging/`: silver (`stg_*`). `dbt/models/marts/`: gold. `account_daily` is
+  the production table; `int_account_daily_base` holds the joins.
+- `dbt/seeds/edition_limits.csv`: edition limits (must match `config/world.yaml`; tested).
+- `contracts/account_daily.yaml` and `contracts/check.py`: the data contract and its checker.
+- `tests/conftest.py`: one small world and one pipeline run shared by all tests.
+- `tests/test_synth.py` (Phase 1), `tests/test_pipeline.py` (Phase 2).
+
+Warehouse schemas: `bronze` (raw, loaded by ingest), `silver` (dbt staging), `gold` (dbt
+marts, plus `dq_test_results`, `dq_freshness`, `dq_contract_checks` written by Python).

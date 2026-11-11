@@ -9,6 +9,9 @@ dependencies = [
     "pandas",
     "faker",
     "pyyaml",
+    "duckdb>=2.0.0",
+    "dbt-duckdb>=1.11.1",
+    "pydantic>=2.14.3",
 ]
 
 [dependency-groups]

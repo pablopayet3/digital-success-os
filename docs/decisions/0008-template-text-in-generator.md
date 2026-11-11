@@ -4,7 +4,7 @@ Status: accepted (Phase 1). Synthetic data, fictional company.
 
 ## Context
 
-The world needs free text: about 3,300 support tickets, 1,700 NPS responses and 460
+The world needs free text: about 3,400 support tickets, 1,600 NPS responses and 480
 mailbox replies. Later phases classify this text with an LLM, so it has to be realistic
 enough to be a fair test.
 

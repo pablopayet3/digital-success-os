@@ -19,8 +19,8 @@ Built in phases. This README is a stub until Phase 8.
 | Phase | What | Status |
 |---|---|---|
 | 1 | Skeleton and synthetic data | done |
-| 2 | Pipeline and data quality | next |
-| 3 | Signals, health, models | |
+| 2 | Pipeline and data quality | done |
+| 3 | Signals, health, models | next |
 | 4 | Rules engine, journeys, consent | |
 | 5 | Agents and human fallback | |
 | 6 | Evals and experiments | |
@@ -34,10 +34,31 @@ Needs [uv](https://docs.astral.sh/uv/) and Python 3.12.
 ```
 uv sync
 uv run python run.py data      # generate the synthetic world (about 25 seconds)
+uv run python run.py pipeline  # ingest, build silver and gold, run the data tests
 uv run python run.py test      # run the tests
 ```
 
 `uv run python run.py data --profile small` builds a smaller world in about 5 seconds.
+
+On Windows, keep the project in a short folder path (for example
+`C:\Users\you\Projects\digital-success-os`). Deeply nested folders can push dbt's file
+names past the 260-character limit.
+
+## The pipeline (Phase 2)
+
+```
+data/landing/  ──ingest──►  bronze  ──dbt──►  silver  ──dbt──►  gold
+                  │                    (clean, typed,        (dim_account, dim_contact,
+                  ▼                     de-duplicated)        fct_usage_daily, fct_prerequisites,
+        data/dead_letter/                                     account_daily, dq_summary)
+        (rejected rows + reason)
+```
+
+- Events are validated on the way in. Unusable rows go to a dead-letter queue with a
+  reason. Loads are idempotent.
+- dbt cleans (silver) and shapes (gold), with 63 data tests and a freshness check.
+- `gold.account_daily` is the production table: one row per account per day, with a
+  [data contract](contracts/account_daily.yaml) checked by code on every run.
 
 ## What Phase 1 produces
 
@@ -45,7 +66,7 @@ uv run python run.py test      # run the tests
 
 | File | What it is |
 |---|---|
-| `events/YYYY-MM-DD.jsonl` | Product telemetry, one file per day (about 627,000 events over 180 days) |
+| `events/YYYY-MM-DD.jsonl` | Product telemetry, one file per day (about 500,000 events over 180 days) |
 | `crm_accounts.csv`, `crm_contacts.csv`, `crm_opportunities.csv` | CRM export |
 | `licenses.csv` | Seats licensed and assigned, per account per day |
 | `tickets.csv` | Support tickets with free text |
@@ -63,7 +84,10 @@ except validation and evaluation code.
 config/      world.yaml (generator), rollout.yaml (pilot segments, offline mode)
 common/      paths and config loading
 synth/       the world simulator                                   Phase 1
-ingest/ dbt/ contracts/ analytics/                                 Phases 2 and 3
+ingest/      validation, dead letter, bronze loads, dbt runner     Phase 2
+dbt/         silver and gold models, tests, sources                Phase 2
+contracts/   data contract for account_daily and its checker       Phase 2
+analytics/                                                         Phase 3
 engine/ agents/ prompts/ kb/                                       Phases 4 and 5
 evals/ experiments/ api/ app/                                      Phases 5 to 7
 docs/        decisions (ADRs), phase notes, and later the operating documents

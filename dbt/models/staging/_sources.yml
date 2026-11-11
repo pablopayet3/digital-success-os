@@ -1,0 +1,28 @@
+version: 2
+
+# Bronze: raw data exactly as it arrived, loaded by ingest/load.py.
+# Synthetic data, fictional company.
+sources:
+  - name: bronze
+    schema: bronze
+    description: Raw landing data. Events are append-only; the other tables are full snapshots.
+    tables:
+      - name: events
+        description: Product telemetry that passed schema validation. May contain duplicates and wrong clocks.
+        config:
+          loaded_at_field: _ingested_at
+          freshness:
+            warn_after: {count: 36, period: hour}
+            error_after: {count: 96, period: hour}
+      - name: dead_letter
+        description: Rows rejected at ingest, with the reason.
+      - name: _load_log
+        description: Which event files have been loaded, so re-runs do nothing.
+      - name: crm_accounts
+      - name: crm_contacts
+      - name: crm_opportunities
+      - name: licenses
+      - name: tickets
+      - name: nps
+      - name: email_engagement
+      - name: mailbox
