@@ -504,3 +504,87 @@ uv run python run.py evals
 ### Decisions recorded
 
 ADRs 0016 (experiment design for the pilot), 0017 (evals: code checks first, judge second).
+
+---
+
+## Phase 7: app and API
+
+### What works
+
+- **App** (`uv run python run.py app`, nine pages): Overview, Accounts, Plays and
+  experiments, Agents, Human console, Data quality, Pilot, Operating model, Live demo.
+  Every page carries the "Synthetic data, fictional company" banner and says who is
+  answering as the model.
+- **Human console with roles**: CSM, Sales and Admin sign in and see their own queues.
+  Opening a task shows the handoff packet. Resolving it sends the return signal, and
+  "the agent should have handled this" writes a draft evaluation case.
+- **Live demo**: talk to the onboarding agent as a stalled admin; a pricing question
+  hands off and the task appears in the Human console. A button advances the world one day.
+- **API** (`uv run python run.py api`): `/health`, `POST /events` (validated, rejects
+  kept with a reason), `POST /mailbox/inbound` (classified and routed), `POST
+  /cta/{id}/resolve` (the return signal), `GET /export/crm`, `GET /export/cs-platform`.
+  Writing endpoints need a token when `API_TOKEN` is set. Every request is one JSON log line.
+- 138 pytest tests pass, including the API called in-process.
+
+### How to run
+
+```
+uv run python run.py app     # http://localhost:8501   console password locally: demo
+uv run python run.py api     # http://localhost:8000/docs
+```
+
+### The three decisions to defend
+
+1. *The app shows the reasons, not only the numbers.* Every score has its drivers, every
+   signal its evidence, every exclusion its reason. A CSM or a seller will not act on a
+   number they cannot explain to the customer.
+2. *The console closes the loop.* The same function resolves a task from the console,
+   from the API and from the simulated staff. A person's outcome is data: it steers the
+   journey and feeds the evaluation set.
+3. *The hosted demo is read-only and holds no key.* Offline mode, console passwords from
+   the environment, a token on writing endpoints. A demo should not be a liability.
+
+### More to be able to explain
+
+- **Why Streamlit and not a BI tool.** One process, no licence, and it can also write
+  (resolve a task). The gold tables are the interface a BI tool would read.
+- **Why the chat replays the whole conversation on each message.** `converse()` has no
+  hidden state, so the same function serves the journey, the evals and the demo. Cached
+  answers make the replay free.
+
+---
+
+## Phases 8 and 9: documents, container, workflows
+
+### What works
+
+- **Operating documents**: PRD, roadmap, principles, ownership map with gaps and proposed
+  owners, change control with a pull-request template, data requirements for the six
+  data areas, pilot plan with a readiness checklist, dependency map, production
+  architecture with a real-versus-simulated table, demo script.
+- **README** with the coverage map, the tool mapping and "how this maps to the real job".
+- **Container and workflows, written**: Dockerfile (one image for app and API, with a
+  small demo world built in), docker-compose, a Render blueprint, a deploy workflow
+  (build, publish, deploy hook) and a daily pipeline workflow that opens an issue on failure.
+
+### Not yet run
+
+- Docker is not installed on the build machine, and there is no GitHub repository yet,
+  so the image, the three workflows and the hosted deployment have not been run once.
+  Expect small fixes on the first run.
+- The Databricks target, the Postgres store and trace export need credentials.
+
+### The three decisions to defend
+
+1. *Write the requirements backwards from the plays.* Each field in
+   `docs/data-requirements.md` is there because a play needs it to decide something. That
+   is what makes the ask to Data Engineering short and hard to argue with.
+2. *Change control with a fast track.* A copy edit ships the same day; anything that
+   changes who is contacted, what an agent may do or how success is measured goes to a
+   weekly review. Process sized to the risk.
+3. *Say what is real and what is simulated.* The production-architecture page has a
+   table for it. An interviewer will find the gap anyway; better that the document does.
+
+### Decisions recorded
+
+ADR 0018 (the daily run as a GitHub Actions schedule).

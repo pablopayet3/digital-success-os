@@ -21,8 +21,10 @@ human's outcome comes back into the system. Every play has a holdout.
 
 ## Conventions
 
-- **Never use real company names, logos or branding** in data, code or screens. The only
-  place real tool names appear is the tool-mapping table in the README.
+- **Never use real company names, logos or branding** in data, code or screens. Real tool
+  names appear only in the README mapping tables, `docs/production-architecture.md`,
+  `docs/demo-script.md` and the ADRs about the production profile (the brief update asked
+  for those). The app does not list those two documents. The employer is never named.
 - Every file and screen says "Synthetic data, fictional company".
 - Simple, readable code over clever code. The owner is not a software engineer and will
   walk through this code live. Short functions, plain names, comments that say why.
@@ -122,9 +124,11 @@ dbt cross-database macros and the project's own dispatch macros in `dbt/macros/`
 4. Rules engine, journeys, consent, holdouts, daily loop: **done**
 5. Agents and human fallback, with LLM cost controls: **done** (stand-in model; no real
    API call yet, there is no key on the build machine)
-6. Evals and experiments: **next**
-7. App and API
-8. Docs, demo, portfolio
+6. Evals and experiments: **done** (eval report produced with the stand-in model)
+7. App and API: **done**
+8. Docs, demo, portfolio: **done** (README, operating documents, demo script, portfolio entry)
+9. Container, deploy and daily workflows, Render blueprint: **written, not yet run** (no Docker
+   on the build machine, no GitHub repository yet)
 
 What works after each phase, and what to be able to explain, is in `docs/phase-notes.md`.
 
@@ -210,3 +214,32 @@ Phase 5 additions:
 - A simulated day is now: world -> pipeline -> staff -> mailbox triage -> feedback
   classification -> rules -> journeys (agent steps) -> capacity check.
 - Tests: `tests/test_agents.py`, `tests/fake_llm.py`.
+
+Phases 6 to 9 additions:
+
+- dbt: `stg_ops_*` (operational tables), `metrics_play_outcomes` (one row per enrolment,
+  six yes/no outcomes), `metrics_play_summary`, `metrics_play_ladder`, `metrics_handoffs`,
+  `metrics_agent`. All tagged `scored`. The measurement window is passed as a dbt var.
+- `experiments/analyze.py` (`run.py experiments`): z-test, interval, split check
+  (alarm below 0.001, "uneven" below 0.01), smallest detectable lift, cohorts, ladder,
+  revenue, verdict and recommendation. Writes `gold.experiment_results` and
+  `experiments/reports/`.
+- `evals/` (`run.py evals`): cases in `evals/cases/*.yaml` (accounts, onboarding agent,
+  mailbox, briefs), `evals/run.py`, reports in `evals/reports/`. `prompts/judge.md`.
+  Cases marked `needs_model` are skipped for the stand-in.
+- `api/main.py` and `api/exports.py` (`run.py api`). `common/logs.py` (JSON logs),
+  `common/today.py` (the warehouse's "today").
+- `app/main.py`, `app/ui.py`, `app/views/*.py` (`run.py app`). Console passwords:
+  `CONSOLE_PASSWORD_CSM/SALES/ADMIN`; locally `demo` when unset; none when `DSO_HOSTED` is set.
+- `run.py demo [days] [--profile small]` builds everything from nothing.
+- `Dockerfile`, `docker-compose.yml`, `render.yaml`, `.github/workflows/deploy.yml`,
+  `.github/workflows/daily.yml`, `.github/pull_request_template.md`.
+- Docs: `prd`, `roadmap`, `principles`, `ownership-map`, `change-control`,
+  `data-requirements`, `pilot-plan`, `dependency-map`, `production-architecture`,
+  `demo-script`, `portfolio-entry`. ADRs 0016 to 0018.
+- Tests: `tests/test_evals.py`, `tests/test_api.py`. 138 tests in total.
+- `DSO_DATA_DIR` points the app and the API at another data folder (tests, containers).
+
+Still open: one live run with `ANTHROPIC_API_KEY` to fill `cache/llm/` (then set
+`llm_stand_in: false`); first runs of CI, the image, the workflows, the Databricks target
+and the Postgres store.
