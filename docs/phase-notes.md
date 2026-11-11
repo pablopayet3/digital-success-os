@@ -268,3 +268,82 @@ DSO_ENV=prod uv run python run.py pipeline         # prod, once the Databricks v
 ### Decisions recorded
 
 ADRs 0011 (environments and secrets), 0012 (Databricks Free Edition, portable SQL).
+
+## Phase 4: rules engine, journeys, consent, holdouts, the daily loop
+
+### What works
+
+- `uv run python run.py run-day` simulates one day end to end; `run-days 30` simulates
+  thirty (about 15 seconds a day, then a closing pipeline run with all tests).
+- **Play catalog as config**: seven plays in `config/plays.yaml`, each with trigger,
+  audience, exclusions, intervention ladder (digital, agentic, human, and the rule for
+  moving up), holdout, rollout stage (slice or full), success metric, owner, version.
+  Journeys in `config/journeys.yaml`. A broken configuration is refused at start-up.
+- **Rules engine**: daily, by priority, with a plain-word reason for every decision in
+  the audit log (entered, held out, or kept out and why).
+- **Holdout and rollout by hash**: deterministic, cannot be nudged, reshuffled only by a
+  version bump. Holdouts are logged as "would have entered" and receive nothing.
+- **Consent and frequency caps enforced in the engine**: opted-in and valid address only,
+  opt-outs learned by the system honoured at once, two touches per contact per seven
+  days across all plays, emails paused for accounts with no reachable admin.
+- **Journey runner**: email (rendered to `data/outbox/`), in-app, agent, wait, branch,
+  CTA, exit; goals that end a journey early; highest ladder tier recorded per enrolment.
+- **Handoffs**: a typed handoff packet on every CTA (who, why, what was tried, the
+  customer's own words, account snapshot, recommended next step, brief for Sales),
+  routed to a queue with an SLA; capacity alerts when a queue overflows.
+- **Return signal**: resolving a CTA resumes, ends or hands over the journey. "The agent
+  should have handled this" lands in an evaluation review queue.
+- **Closed loop**: simulated customers react to yesterday's touches; opens of journey
+  emails flow back through the pipeline. After 12 days, 34% of treated stalled accounts
+  had completed setup against 0% of the holdout.
+- **Operational store** on SQLAlchemy (SQLite now, Postgres by URL), copied into
+  `bronze.ops_*` on every pipeline run.
+- **Scale the pattern**: adding `pooled` to `config/rollout.yaml` runs the same plays on
+  that segment (tested).
+- 64 pytest tests pass.
+
+### Not yet there
+
+- The agent step has no agent behind it until Phase 5. Until then it takes the documented
+  fallback: an agent that cannot run hands off to a human.
+- Postgres has not been run against (needs a `DATABASE_URL`).
+
+### How to run
+
+```
+uv run python run.py data && uv run python run.py pipeline && uv run python run.py train
+uv run python run.py run-days 30
+```
+
+### The three decisions to defend
+
+1. *Plays are config; guardrails are code.* A play owner changes a threshold, an audience
+   or a holdout by editing a file. Consent, frequency caps and exclusivity are enforced by
+   the engine for every play, so no journey can forget them.
+2. *Holdout by hash, and a holdout is a real enrolment.* Deterministic assignment cannot be
+   gamed and never reshuffles. Holdout accounts are reserved for the measurement window so
+   another play cannot contaminate the comparison. 50% in the pilot, because a pilot exists
+   to learn.
+3. *Live state in an operational store, analysis in the warehouse.* Enrolments and CTAs
+   change one row at a time and have several writers; that is not what a warehouse is for.
+   The store is copied into bronze daily, so metrics are still computed in one place.
+
+### More to be able to explain
+
+- **Why every exclusion is logged.** "Why did this account not get the play?" is the
+  question a CSM, a seller or a privacy officer will ask. The audit log answers it.
+- **Why the frequency cap sits above plays.** Each play looks reasonable on its own; the
+  customer experiences the sum.
+- **What the return signal is.** The human's outcome and reason code decide what happens
+  next (re-enter, exit, Sales owns it). Without it a handoff is a dead end and the system
+  never learns which handoffs were unnecessary.
+- **Why the simulated effect sizes are in a config file.** Any lift this demo shows comes
+  from `config/sim_effects.yaml`. Saying so plainly is the difference between a demo of a
+  measurement system and a fake result.
+- **A bug the loop found.** The warehouse loader guessed the CSV format from the first
+  rows. It failed on the first email subject containing a comma. The format is now stated
+  explicitly.
+
+### Decisions recorded
+
+ADRs 0013 (operational store), 0014 (plays as config, deterministic holdouts, guardrails).

@@ -5,7 +5,8 @@ Synthetic data, fictional company.
 Run with:  uv run python run.py pipeline
 
 Steps:
-  1. ingest      validate and load the landing files into bronze (bad rows to dead letter)
+  1. ingest      validate and load the landing files into bronze (bad rows to dead letter),
+                 and copy the operational store (enrolments, touches, CTAs) into bronze
   2. dbt stage 1 build silver and the gold facts (usage, setup, health score), with tests
   3. score       apply the churn and expansion models, write scores back to gold
   4. dbt stage 2 build what depends on scores: account_daily (lifecycle), signals
@@ -30,17 +31,32 @@ from common.settings import load_settings
 from common.warehouse import open_warehouse
 from contracts.check import check_contract
 from ingest.load import run_ingest
+from ingest.load_ops import sync_operational_store
 from ingest.transform import run_dbt, save_freshness, save_test_results
 
 SCORED = "tag:scored"  # dbt models that need the model scores
 
 
 def run_pipeline(
-    data_dir: Path = DATA_DIR, verbose: bool = True, model_dir: Path = MODEL_DIR
+    data_dir: Path = DATA_DIR,
+    verbose: bool = True,
+    model_dir: Path = MODEL_DIR,
+    checks: bool = True,
 ) -> bool:
-    """Run every step. Returns True when all tests and contract checks pass."""
+    """Run every step. Returns True when all tests and contract checks pass.
+
+    checks=False builds the tables but skips the data tests, the freshness check and
+    the contract check. The day-by-day simulation uses it to stay fast, and runs the
+    full version once at the end.
+    """
     quiet = [] if verbose else ["--quiet"]
     ingest(data_dir, verbose)
+    sync_operational_store(data_dir)
+
+    if not checks:
+        facts_ok = run_dbt([*quiet, "run", "--exclude", SCORED], data_dir)
+        score_accounts(data_dir, model_dir)
+        return facts_ok and run_dbt([*quiet, "run", "--select", SCORED], data_dir)
 
     facts_ok = run_dbt([*quiet, "build", "--exclude", SCORED], data_dir)
     save_test_results(data_dir)

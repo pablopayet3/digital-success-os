@@ -116,9 +116,9 @@ def test_contacts_are_deduplicated_and_personas_normalised(warehouse, issues):
     assert rows == people
 
 
-def test_gold_table_measures_what_really_happened(small_world, warehouse):
+def test_gold_table_measures_what_really_happened(current_world, warehouse):
     """Seats and setup progress in gold match the simulator's own state."""
-    world, _ = small_world
+    world = current_world
     rows = warehouse.execute(
         """
         SELECT account_id, seats_assigned, prerequisite_closure_pct

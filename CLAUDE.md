@@ -117,7 +117,10 @@ dbt cross-database macros and the project's own dispatch macros in `dbt/macros/`
 1. Skeleton and synthetic data: **done**
 2. Pipeline and data quality (ingest, dbt bronze/silver/gold, tests, contract): **done**
 3. Signals, health score, segmentation, churn and expansion models: **done**
-3b. Environments, secrets, CI, Databricks `prod` target, portable SQL: **next**
+3b. Environments, secrets, CI, Databricks `prod` target, portable SQL: **done** (not yet
+    run against Databricks or GitHub Actions)
+4. Rules engine, journeys, consent, holdouts, daily loop: **done**
+5. Agents and human fallback, with LLM cost controls: **next**
 4. Rules engine, journeys, consent, holdout assignment
 5. Agents and human fallback
 6. Evals and experiments
@@ -158,8 +161,29 @@ What works after each phase, and what to be able to explain, is in `docs/phase-n
 - `tests/test_synth.py` (Phase 1), `tests/test_pipeline.py` (Phase 2),
   `tests/test_models.py` (Phase 3).
 
-Pipeline order: ingest -> dbt (exclude tag:scored) -> score -> dbt (select tag:scored) ->
-freshness -> contract check. dbt is always run through `run.py` / `ingest/transform.py`,
+Phase 3b and 4 additions:
+
+- `common/settings.py` (DSO_ENV, secrets), `common/warehouse.py` (DuckDB or Databricks),
+  `common/store.py` (operational store: SQLite or Postgres via SQLAlchemy).
+- `config/plays.yaml`, `config/journeys.yaml`, `config/routing.yaml`: the play catalog.
+  `config/sim_effects.yaml`: simulator assumptions (never read by engine, models, agents).
+- `engine/catalog.py` (load and validate config), `engine/assignment.py` (hash holdout and
+  rollout), `engine/context.py` (the day's data), `engine/consent.py`, `engine/rules.py`,
+  `engine/journeys.py`, `engine/channels.py`, `engine/handoff.py` (packet, create, resolve,
+  capacity), `engine/humans.py` (simulated staff), `engine/run.py` (run-day, run-days),
+  `engine/templates/` (email and in-app templates).
+- `agents/briefs.py`: template account-owner brief (Phase 5 adds the LLM version).
+- `synth/reactions.py`: how simulated customers react to touches.
+- `ingest/load_ops.py`: copies the operational store into `bronze.ops_*`.
+- `ingest/load_databricks.py`: prod loader (not yet run).
+- Tests: `test_environments.py`, `test_engine.py`. The test session simulates six days.
+
+A simulated day: world steps (reacting to yesterday's touches) -> pipeline (checks=False)
+-> staff work queues -> rules engine -> journey runner -> capacity check. The world is
+saved after every day. Regenerating data deletes the warehouse and the operational store.
+
+Pipeline order: ingest (+ copy ops store) -> dbt (exclude tag:scored) -> score -> dbt
+(select tag:scored) -> freshness -> contract check. dbt is always run through `run.py` / `ingest/transform.py`,
 which passes the health weights as dbt vars.
 
 Warehouse schemas: `bronze` (raw, loaded by ingest), `silver` (dbt staging), `gold` (dbt

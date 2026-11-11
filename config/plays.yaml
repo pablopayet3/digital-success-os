@@ -1,0 +1,207 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# The play catalog: what we do, for whom, when, and how we will know it worked.
+# Plays are config, not code. Changing a threshold, an audience or a holdout is an
+# edit to this file, reviewed through change control (docs/change-control.md).
+#
+# Every play declares:
+#   trigger              the signals that make an account a candidate
+#   audience             who may enter (lifecycle stages, editions)
+#   exclusions           named rules that keep an account out (engine/rules.py)
+#   intervention_ladder  the tiers digital -> agentic -> human, and the rule for
+#                        moving up a rung. A play does not have to use every tier.
+#   holdout_pct          share of eligible accounts held back for comparison
+#   rollout_stage        slice = 10% of eligible accounts; full = full test with holdout
+#   exclusive            true = an account can be in only one such play at a time
+#   success_metric       decided before launch; measured against the holdout (Phase 6)
+#
+# The segments a play may run on are set once, in config/rollout.yaml.
+
+defaults:
+  cooldown_days: 60          # do not re-enter the same play sooner than this
+  measurement_window_days: 30
+
+plays:
+  - id: find_the_admin
+    name: Find the admin
+    owner: CS Operations lead
+    objective: Make sure every account has an admin we are allowed to email.
+    trigger: [no_valid_admin]
+    audience: {}
+    exclusions: [already_in_this_play]
+    intervention_ladder:
+      - tier: human
+        action: Research task to identify the right admin and update the CRM.
+        move_up_when: This play starts at the human tier. There is nobody to email.
+    channel_sequence: [cta]
+    journey: find_the_admin
+    priority: 1
+    exclusive: false         # runs alongside other plays, and pauses their emails
+    holdout_pct: 0.0         # data hygiene, not an experiment
+    rollout_stage: full
+    success_metric:
+      id: valid_admin_restored
+      description: Account has an emailable admin within 30 days.
+    version: 1
+
+  - id: detractor_save
+    name: Detractor save
+    owner: Scaled CS team lead
+    objective: Talk to an unhappy customer within 48 hours, with full context.
+    trigger: [detractor]
+    audience: {}
+    exclusions: [already_in_this_play, renewal_in_negotiation, in_another_play]
+    intervention_ladder:
+      - tier: human
+        action: CTA to the pooled CS team with the NPS comment, usage and open tickets.
+        move_up_when: Straight to a human. A detractor should not get an automated reply.
+    channel_sequence: [cta]
+    journey: detractor_save
+    priority: 2
+    exclusive: true
+    holdout_pct: 0.2         # small holdout: withholding help from detractors has a cost
+    rollout_stage: full
+    success_metric:
+      id: retained_30d
+      description: Account is still active 30 days after entering the play.
+    version: 1
+
+  - id: usage_recovery
+    name: Usage recovery
+    owner: Digital Success Portfolio Lead
+    objective: Reverse a drop in usage before it becomes churn.
+    trigger: [usage_drop]
+    audience:
+      lifecycle: [adopting, mature, at_risk, expansion, renewal]
+    exclusions: [already_in_this_play, renewal_in_negotiation, in_another_play, open_escalation]
+    intervention_ladder:
+      - tier: digital
+        action: Re-engagement email, then an in-app nudge.
+        move_up_when: >
+          Skip this tier when sentiment is already negative (a detractor score or support
+          friction): go straight to a human.
+      - tier: human
+        action: CTA to the pooled CS team with usage trend, sentiment and tickets.
+        move_up_when: Usage is still falling 12 days after the first email.
+    channel_sequence: [email, in_app, cta]
+    journey: usage_recovery
+    priority: 4
+    exclusive: true
+    holdout_pct: 0.5
+    rollout_stage: full
+    success_metric:
+      id: usage_recovered
+      description: Monthly active users back to at least 90% of the pre-drop level within 30 days.
+    version: 1
+
+  - id: onboarding_rescue
+    name: Onboarding rescue
+    owner: Digital Success Portfolio Lead
+    objective: Get stalled accounts through setup (board, five users, integration, SSO).
+    trigger: [activation_stalled]
+    audience:
+      # at_risk is included because a stalled account the churn model flags is shown as
+      # at_risk (it takes precedence), and finishing setup is still what it needs first.
+      lifecycle: [onboarding, at_risk]
+    exclusions: [already_in_this_play, in_another_play, open_escalation, no_emailable_admin]
+    intervention_ladder:
+      - tier: digital
+        action: Email with the setup guide for the steps still missing.
+        move_up_when: Still stalled 3 days after the email.
+      - tier: agentic
+        action: The onboarding agent offers the admin a conversation to finish setup.
+        move_up_when: >
+          The agent escalates (asked for a person, pricing or contract question, frustration,
+          no answer in the docs, a tool failed), or the account is still stalled 4 days later.
+      - tier: human
+        action: CTA to the pooled CS team with what was tried and what is still missing.
+        move_up_when: Last rung.
+    channel_sequence: [email, agent, cta]
+    journey: onboarding_rescue
+    priority: 3              # ahead of usage recovery: finish setup first
+    exclusive: true
+    holdout_pct: 0.5
+    rollout_stage: full
+    success_metric:
+      id: setup_completed
+      description: Prerequisite closure reaches 75% or more within 30 days.
+    version: 1
+
+  - id: edition_upgrade
+    name: Edition upgrade
+    owner: Digital Success Portfolio Lead, with Sales
+    objective: Help accounts that have outgrown their edition see the value of the next one.
+    trigger: [edition_fit]
+    audience:
+      lifecycle: [adopting, mature, expansion]
+      editions: [free, standard, premium]
+    exclusions: [already_in_this_play, renewal_in_negotiation, in_another_play, open_escalation, no_emailable_contact]
+    intervention_ladder:
+      - tier: digital
+        action: Value email showing the limit the account has reached and what lifts it.
+        move_up_when: The contact replies with a question.
+      - tier: agentic
+        action: The agent answers product questions from the docs.
+        move_up_when: Any pricing or buying question. Always a human.
+      - tier: human
+        action: Sales CTA for the account owner, with a brief.
+        move_up_when: Last rung.
+    channel_sequence: [email, agent, cta]
+    journey: edition_upgrade
+    priority: 5
+    exclusive: true
+    holdout_pct: 0.5
+    rollout_stage: slice     # still on the 10% slice
+    success_metric:
+      id: expanded_30d
+      description: A closed-won expansion opportunity within 30 days.
+    version: 1
+
+  - id: expansion_seats
+    name: Seat expansion
+    owner: Sales lead, with Digital Success
+    objective: Give account owners a ready brief when an account is running out of seats.
+    trigger: [seat_pressure, expansion_ready]
+    audience:
+      lifecycle: [adopting, mature, expansion, renewal, onboarding]
+    exclusions: [already_in_this_play, renewal_in_negotiation, open_escalation]
+    intervention_ladder:
+      - tier: agentic
+        action: An AI-written brief for the account owner, grounded in the account's data.
+        move_up_when: The brief always goes to a person. AI drafts, a human sells.
+      - tier: human
+        action: Sales CTA. The account owner decides whether and how to reach out.
+        move_up_when: Last rung.
+    channel_sequence: [cta]
+    journey: expansion_seats
+    priority: 6
+    exclusive: false         # a Sales CTA may sit alongside another play
+    holdout_pct: 0.5
+    rollout_stage: full
+    success_metric:
+      id: expanded_30d
+      description: A closed-won expansion opportunity within 30 days.
+    version: 1
+
+  - id: cross_product_docs
+    name: Cross-product (Docs)
+    owner: Digital Success Portfolio Lead
+    objective: Show teams that use boards as documents what Relay Docs would give them.
+    trigger: [cross_product]
+    audience:
+      lifecycle: [adopting, mature, expansion]
+    exclusions: [already_in_this_play, in_another_play, open_escalation, no_emailable_contact]
+    intervention_ladder:
+      - tier: digital
+        action: In-app prompt on board creation, plus one email.
+        move_up_when: This play stays digital. Adoption is tracked, nobody is chased.
+    channel_sequence: [in_app, email]
+    journey: cross_product_docs
+    priority: 7
+    exclusive: true
+    holdout_pct: 0.5
+    rollout_stage: slice     # still on the 10% slice
+    success_metric:
+      id: docs_adopted
+      description: The account publishes its first doc within 30 days.
+    version: 1

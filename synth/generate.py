@@ -71,11 +71,12 @@ def generate(profile: str | None = None, data_dir: Path = DATA_DIR, verbose: boo
     issues = mess.new_issue_log()
 
     landing, truth = data_dir / "landing", data_dir / "ground_truth"
-    for folder in (landing, truth, data_dir / "dead_letter"):
+    for folder in (landing, truth, data_dir / "dead_letter", data_dir / "outbox"):
         if folder.exists():
             shutil.rmtree(folder)  # always start from a clean slate
-    # A new world makes the old warehouse stale, so it is rebuilt by the next pipeline run.
+    # A new world makes the old warehouse and the engine's state stale: both start again.
     (data_dir / "warehouse.duckdb").unlink(missing_ok=True)
+    (data_dir / "ops.db").unlink(missing_ok=True)
     (landing / "events").mkdir(parents=True)
     (landing / "mailbox").mkdir()
     truth.mkdir(parents=True)
@@ -92,9 +93,8 @@ def generate(profile: str | None = None, data_dir: Path = DATA_DIR, verbose: boo
     for day_index in range(cfg["calendar"]["history_days"]):
         out = world.step()
         n_events += len(out.events)
+        lines = _event_lines(world, out, day_index, issues)
         if rates["enabled"]:
-            mess_rng = np.random.default_rng([world.seed, 2, day_index])
-            lines = mess.messy_event_lines(out.events, mess_rng, rates, issues)
             # One day's events mostly arrive late, inside the file of a later day.
             if day_index == late["day_index"]:
                 keep = round(len(lines) * (1 - late["share_late"]))
@@ -106,8 +106,6 @@ def generate(profile: str | None = None, data_dir: Path = DATA_DIR, verbose: boo
                 }
             elif day_index == late["day_index"] + late["delay_days"]:
                 lines += held_back
-        else:
-            lines = [mess.to_line(event) for event in out.events]
         _write_lines(landing / "events" / f"{out.date}.jsonl", lines)
 
     row_counts = {"product events (incl. backfill)": n_events}
@@ -122,6 +120,34 @@ def generate(profile: str | None = None, data_dir: Path = DATA_DIR, verbose: boo
     return world
 
 
+def advance_one_day(world: World, data_dir: Path, interventions: dict | None = None):
+    """Simulate the next day and add its files to the landing zone.
+
+    Used by `run-day` (Phase 4): the engine passes in the touches it delivered,
+    the world reacts, and a new day of telemetry and CRM snapshots lands.
+    """
+    landing, truth = data_dir / "landing", data_dir / "ground_truth"
+    issues_path = truth / "injected_issues.json"
+    issues = json.loads(issues_path.read_text(encoding="utf-8"))
+    day_index = world.day_index
+
+    out = world.step(interventions)
+    lines = _event_lines(world, out, day_index, issues)
+    _write_lines(landing / "events" / f"{out.date}.jsonl", lines)
+    write_snapshots(world, landing, issues)
+    issues_path.write_text(json.dumps(issues, indent=2), encoding="utf-8")
+    return out
+
+
+def _event_lines(world: World, out, day_index: int, issues: dict) -> list[str]:
+    """One day of events as JSON lines, with the deliberate data problems mixed in."""
+    rates = world.cfg["messy_data"]
+    if not rates["enabled"]:
+        return [mess.to_line(event) for event in out.events]
+    mess_rng = np.random.default_rng([world.seed, 2, day_index])
+    return mess.messy_event_lines(out.events, mess_rng, rates, issues)
+
+
 def write_snapshots(world: World, landing: Path, issues: dict) -> dict[str, int]:
     """Write the CRM, licence, support, NPS, email and mailbox files as they stand today."""
     today = world.last_day
@@ -133,6 +159,8 @@ def write_snapshots(world: World, landing: Path, issues: dict) -> dict[str, int]
     ]
     contact_rows = [vars(c) for a in live_accounts for c in a.contacts]
     if rates["enabled"]:
+        # The contact file is rewritten in full each time, so its issue counts start afresh.
+        issues["duplicate_contact_email"], issues["messy_persona"] = [], 0
         contact_rows = mess.messy_contact_rows(contact_rows, rates, issues)
 
     # A ticket is resolved once its resolution time has passed; until then it is waiting.
@@ -156,8 +184,10 @@ def write_snapshots(world: World, landing: Path, issues: dict) -> dict[str, int]
     _write_csv(landing / "nps.csv", world.nps, NPS_COLUMNS)
     _write_csv(landing / "email_engagement.csv", world.email_sends, EMAIL_COLUMNS)
     for message in world.mailbox:
-        payload = {field: _fmt(message[field]) for field in MAILBOX_FIELDS}
         path = landing / "mailbox" / f"{message['message_id']}.json"
+        if path.exists():
+            continue  # a reply never changes once it has arrived
+        payload = {field: _fmt(message[field]) for field in MAILBOX_FIELDS}
         path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     return {

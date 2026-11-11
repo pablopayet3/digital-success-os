@@ -1,0 +1,57 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# Where a handoff goes, how fast it must be picked up, and how much a team can take.
+# A handoff is a CTA (call to action): a task for a human, carrying a full packet of
+# context. See docs/human-fallback.md.
+
+queues:
+  pooled_csm:
+    name: Scaled CS team
+    sla_hours: 48            # must be picked up within this time
+    capacity_per_day: 12     # CTAs the team can work in a day
+  sales:
+    name: Account owners (Sales)
+    sla_hours: 72
+    capacity_per_day: 15
+  support:
+    name: Support
+    sla_hours: 24
+    capacity_per_day: 10
+  admin_research:
+    name: CS Operations (contact research)
+    sla_hours: 120
+    capacity_per_day: 8
+  human_review:
+    name: Mailbox review (low-confidence replies)
+    sla_hours: 48
+    capacity_per_day: 20
+
+priorities: [urgent, high, normal, low]   # worked in this order, then by SLA
+
+# Why a handoff was created. Used to count what humans are asked to do, and why.
+reason_codes:
+  onboarding_stalled: Setup still stalled after digital and agent help
+  usage_drop_needs_human: Usage is falling; digital touches have not helped, or sentiment is negative
+  expansion_signal: Seat pressure or a high expansion score
+  buying_intent: The customer asked about pricing, seats or a higher edition
+  detractor: An NPS score of 6 or lower
+  no_valid_admin: No admin we are allowed to email
+  customer_asked_for_person: The customer asked the agent for a human
+  frustration: The agent detected frustration
+  pricing_contract_legal: A pricing, contract, refund or legal question (always a human)
+  not_in_docs: The agent could not find an answer in the docs
+  low_confidence: The agent or the classifier was not confident enough
+  tool_failure: A tool failed or timed out (hand off, never guess)
+  repeated_question: The same question came up twice
+  agent_unavailable: The agent could not run (offline with no cached answer)
+  complaint: A complaint arrived in the shared mailbox
+  meeting_request: The customer asked for a meeting
+
+# How a human closes a CTA. This is the return signal: it decides what happens next.
+outcomes:
+  resolved: {description: Problem solved, next_state: re_enter_journey}
+  saved: {description: At-risk account retained, next_state: re_enter_journey}
+  expansion_opportunity: {description: Real opportunity; Sales takes it from here, next_state: sales_owns}
+  not_a_fit: {description: No opportunity or no way to help, next_state: exit}
+  no_response: {description: Could not reach the customer, next_state: exit}
+  agent_should_have_handled: {description: A human was not needed; becomes an eval case, next_state: re_enter_journey}

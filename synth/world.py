@@ -18,7 +18,8 @@ from pathlib import Path
 import numpy as np
 from faker import Faker
 
-from synth import behavior, interactions
+from common.config import load_yaml
+from synth import behavior, interactions, reactions
 from synth.accounts import build_population
 
 
@@ -65,9 +66,15 @@ class World:
         self.ticket_labels: list[dict] = []
         self.interventions_log: list[dict] = []
 
+        self.help_decay: float = load_yaml("sim_effects.yaml")["help_decay_per_day"]
+
         fake = Faker("en_US")
         fake.seed_instance(self.seed)
         build_population(self, np.random.default_rng([self.seed, 0]), fake)
+        self._by_id = {account.account_id: account for account in self.accounts}
+
+    def account(self, account_id: str):
+        return self._by_id.get(account_id)
 
     # --- Time ------------------------------------------------------------------------
 
@@ -85,8 +92,8 @@ class World:
         """Simulate one day and return its product events.
 
         `interventions` maps account_id to the touches the engine delivered the
-        day before (emails, agent conversations, human calls). Phase 1 only
-        records them; Phase 4 makes customers react to them.
+        day before (emails, in-app prompts, agent conversations, human follow-ups).
+        Customers react to them first (synth/reactions.py), then live their day.
         """
         today = self.today
         # The randomness for a day depends only on (seed, day number), so any day can be
@@ -95,6 +102,7 @@ class World:
         out = DayOutput(today)
         if interventions:
             self.interventions_log.append({"date": today, "interventions": interventions})
+            reactions.apply_interventions(self, interventions, today, rng)
 
         for account in self.accounts:
             if account.contract_start > today or account.status != "active":

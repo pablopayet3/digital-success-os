@@ -119,12 +119,19 @@ def load_event_file(con: duckdb.DuckDBPyConnection, path: Path, data_dir: Path) 
 
 
 def load_snapshot(con: duckdb.DuckDBPyConnection, table: str, path: Path) -> int:
-    """Replace a bronze table with the current contents of a CSV file, unchanged."""
+    """Replace a bronze table with the current contents of a CSV file, unchanged.
+
+    The CSV format is stated explicitly (comma, double quotes). Letting the database
+    guess it from the first rows works until the first value that contains a comma.
+    """
     con.execute(
         f"""
         CREATE OR REPLACE TABLE bronze.{table} AS
         SELECT *, now()::TIMESTAMP AS _ingested_at, '{path.name}' AS _source_file
-        FROM read_csv('{path.as_posix()}', header = true, all_varchar = true)
+        FROM read_csv(
+            '{path.as_posix()}', header = true, all_varchar = true,
+            delim = ',', quote = '"', escape = '"'
+        )
         """
     )
     return con.execute(f"SELECT count(*) FROM bronze.{table}").fetchone()[0]

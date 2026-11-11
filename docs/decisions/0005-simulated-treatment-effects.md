@@ -1,6 +1,7 @@
 # 0005: A day-by-day simulated world, with treatment effects as a stated assumption
 
-Status: accepted (Phase 1). The effect sizes are set in Phase 4. Synthetic data, fictional company.
+Status: accepted (Phase 1); effect sizes added in Phase 4 in `config/sim_effects.yaml`,
+applied by `synth/reactions.py`. Synthetic data, fictional company.
 
 ## Context
 
@@ -41,6 +42,24 @@ How the hidden world works, in short:
   usage really does drop before churn, and the models have a true pattern to find.
 - Seat growth follows `growth`; expansion becomes likely when nearly all seats are taken.
 - Randomness for a day depends only on (seed, day number), so every run is identical.
+
+## The assumptions, as built in Phase 4
+
+All in `config/sim_effects.yaml`. The engine, the models and the agents never read it.
+
+- An email does something only if the simulated contact opens it.
+- Help with setup fades by 15% a day. An opened setup email gives a little, a resolved
+  agent conversation more, a resolved human call the most.
+- A human follow-up on a usage drop removes half of the lasting damage of the shock.
+- When an account owner finds a real opportunity, the account converts about one time in
+  three over the next two weeks.
+- Simulated staff resolve CTAs within each queue's daily capacity, with fixed outcome odds.
+
+A first version multiplied the small organic chance of expanding by three. Across 75
+treated accounts that added about one expansion, which no test could ever detect. The
+assumption was replaced by the direct conversion chance above. This is worth saying out
+loud: in a simulation the effect size is a choice, and a measurement system can only show
+what the world gives it.
 
 ## Consequences
 

@@ -15,6 +15,7 @@ dependencies = [
     "scikit-learn>=1.9.1",
     "python-dotenv>=1.2.4",
     "dbt-databricks>=1.11.0",
+    "sqlalchemy>=2.1.8",
 ]
 
 [dependency-groups]

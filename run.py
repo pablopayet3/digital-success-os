@@ -5,6 +5,8 @@ Usage:
     uv run python run.py data --profile small
     uv run python run.py pipeline          ingest, build silver and gold, run data tests
     uv run python run.py train             train the churn and expansion models
+    uv run python run.py run-day           simulate one day: world, pipeline, engine
+    uv run python run.py run-days 30       simulate thirty days
     uv run python run.py test              run the tests
     uv run python run.py lint              check code style
 
@@ -17,13 +19,14 @@ import subprocess
 import sys
 
 # Commands that later phases will deliver, and the phase that delivers them.
-LATER = {"run-day": 4, "run-days": 4, "demo": 7, "app": 7}
+LATER = {"demo": 7, "app": 7}
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Digital Success OS task runner")
-    commands = ["data", "pipeline", "train", "test", "lint", *LATER]
+    commands = ["data", "pipeline", "train", "run-day", "run-days", "test", "lint", *LATER]
     parser.add_argument("command", choices=commands)
+    parser.add_argument("days", nargs="?", type=int, default=30, help="for run-days: how many")
     parser.add_argument("--profile", default=None, help="config profile, for example: small")
     args = parser.parse_args()
 
@@ -43,6 +46,14 @@ def main() -> None:
         # Run the pipeline again so the new scores reach account_daily and the signals.
         print("\nRefreshing scores, lifecycle stages and signals with the new models...")
         sys.exit(0 if run_pipeline(verbose=False) else 1)
+    elif args.command == "run-day":
+        from engine.run import run_day
+
+        run_day()
+    elif args.command == "run-days":
+        from engine.run import run_days
+
+        run_days(args.days)
     elif args.command == "test":
         sys.exit(subprocess.call([sys.executable, "-m", "pytest", "-q"]))
     elif args.command == "lint":

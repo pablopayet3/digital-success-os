@@ -158,19 +158,23 @@ def _maybe_nps(world, account, today, age: int, rng) -> None:
 # --- Emails and the replies they trigger -------------------------------------------------
 
 
-def send_email(world, account, contact, campaign: str, today, rng) -> None:
-    """Send one email and decide what the recipient does with it."""
+def send_email(world, account, contact, campaign: str, today, rng, subject: str | None = None):
+    """Send one email and decide what the recipient does with it.
+
+    Returns the row recorded for the email, or None when it may not be sent.
+    Emails from plays pass their own subject; lifecycle campaigns use the fixed ones.
+    """
     is_onboarding = campaign.startswith("onboarding")
     if contact.consent_status == "opted_out":
-        return
+        return None
     if not is_onboarding and contact.consent_status != "opted_in":
-        return  # marketing email needs explicit consent; onboarding email is transactional
+        return None  # marketing email needs explicit consent; onboarding email is transactional
 
     sent_at = at_time(today, rng, 13, 15)
     send = {
         "send_id": world.next_id("S"),
         "campaign": campaign,
-        "subject": CAMPAIGN_SUBJECTS[campaign],
+        "subject": subject or CAMPAIGN_SUBJECTS[campaign],
         "contact_id": contact.contact_id,
         "account_id": account.account_id,
         "sent_at": sent_at,
@@ -184,18 +188,18 @@ def send_email(world, account, contact, campaign: str, today, rng) -> None:
 
     if not contact.email_valid:
         send["delivered"], send["bounced"] = False, True
-        return
+        return send
     if contact.has_left:
         # Delivered to a mailbox nobody reads. Sometimes an auto-reply says so.
         if rng.random() < 0.05:
             _add_reply(world, account, contact, send, "left_company", sent_at, rng)
-        return
+        return send
     if rng.random() < 0.0025:
         _add_reply(world, account, contact, send, "out_of_office", sent_at, rng)
 
     opened = rng.random() < 0.10 + 0.55 * contact.affinity * min(account.momentum, 1.0)
     if not opened:
-        return
+        return send
     opened_at = sent_at + timedelta(minutes=int(rng.integers(2, 480)))
     send["opened_at"] = opened_at
     contact.last_engaged_at = opened_at
@@ -205,10 +209,11 @@ def send_email(world, account, contact, campaign: str, today, rng) -> None:
     if not is_onboarding and rng.random() < 0.006:
         send["unsubscribed"] = True  # used the unsubscribe link: consent is updated properly
         contact.consent_status = "opted_out"
-        return
+        return send
 
     if rng.random() < 0.04 * world.cfg["volumes"]["mailbox_reply_scale"]:
         _add_reply(world, account, contact, send, _reply_intent(account, rng), opened_at, rng)
+    return send
 
 
 def _reply_intent(account, rng) -> str:

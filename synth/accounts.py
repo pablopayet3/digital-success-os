@@ -116,6 +116,8 @@ class Account:
     n_integrations: int = 0
     contacts: list = field(default_factory=list)
     open_renewal: dict | None = None
+    # Hidden: the fading effect of touches from plays (see synth/reactions.py)
+    help: dict = field(default_factory=dict)
     # Short histories kept for the generation report
     dau_log: list = field(default_factory=list)
     credits_log: list = field(default_factory=list)

@@ -21,8 +21,9 @@ Built in phases. This README is a stub until Phase 8.
 | 1 | Skeleton and synthetic data | done |
 | 2 | Pipeline and data quality | done |
 | 3 | Signals, health, models | done |
-| 4 | Rules engine, journeys, consent | next |
-| 5 | Agents and human fallback | |
+| 3b | Environments, secrets, CI, Databricks target | done (not yet run against Databricks) |
+| 4 | Rules engine, journeys, consent | done |
+| 5 | Agents and human fallback | next |
 | 6 | Evals and experiments | |
 | 7 | App and API | |
 | 8 | Docs, demo, portfolio | |
@@ -36,6 +37,7 @@ uv sync
 uv run python run.py data      # generate the synthetic world (about 25 seconds)
 uv run python run.py pipeline  # ingest, build silver and gold, run the data tests
 uv run python run.py train     # train the churn and expansion models, refresh signals
+uv run python run.py run-days 30   # simulate 30 days: world, pipeline, engine, each day
 uv run python run.py test      # run the tests
 ```
 

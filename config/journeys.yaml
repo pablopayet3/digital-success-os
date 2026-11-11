@@ -1,0 +1,123 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# Journey definitions: the steps an enrolled account goes through.
+#
+# Step types
+#   email   render a template to outbox/ (never actually sent) and count a touch
+#   in_app  an in-product prompt; counts a touch
+#   agent   hand the contact to an AI agent (Phase 5); the agent may escalate
+#   wait    do nothing for `days`
+#   branch  check a condition against today's data and jump to another step
+#   cta     create a task for a human; the journey waits for the outcome
+#   exit    leave the journey with a reason
+#
+# Every step that touches a customer has a `tier` (digital, agentic or human), so
+# results can be reported per rung of the intervention ladder.
+#
+# Branch conditions (engine/journeys.py):
+#   signal:<id>          that signal is firing for the account today
+#   negative_sentiment   a detractor score or support friction right now
+#   contact_replied      the contact has replied since the journey started
+# `then` and `else` name the step to go to.
+#
+# goal: when true, the journey ends at once with "goal_reached", whatever step it is on.
+
+journeys:
+  onboarding_rescue:
+    goal: {metric: prerequisite_closure_pct, at_least: 0.75}
+    steps:
+      - {id: setup_guide, type: email, template: setup_guide, tier: digital}
+      - {id: wait_for_progress, type: wait, days: 3}
+      - {id: still_stalled, type: branch, if: "signal:activation_stalled", then: agent_help, else: progressing}
+      - {id: agent_help, type: agent, agent: onboarding, tier: agentic}
+      - {id: wait_after_agent, type: wait, days: 4}
+      - {id: stalled_after_agent, type: branch, if: "signal:activation_stalled", then: csm_handoff, else: progressing}
+      - id: csm_handoff
+        type: cta
+        tier: human
+        queue: pooled_csm
+        priority: normal
+        reason_code: onboarding_stalled
+        title: Onboarding stalled after email and agent
+        next_step: Call the admin; walk through the missing setup steps.
+      - {id: progressing, type: exit, reason: no_longer_stalled}
+
+  usage_recovery:
+    goal: {metric: signal_cleared, signal: usage_drop}
+    steps:
+      - {id: check_sentiment, type: branch, if: negative_sentiment, then: csm_handoff, else: whats_new}
+      - {id: whats_new, type: email, template: usage_reengagement, tier: digital}
+      - {id: wait_5, type: wait, days: 5}
+      - {id: nudge, type: in_app, template: usage_nudge, tier: digital}
+      - {id: wait_7, type: wait, days: 7}
+      - {id: still_dropping, type: branch, if: "signal:usage_drop", then: csm_handoff, else: recovered}
+      - id: csm_handoff
+        type: cta
+        tier: human
+        queue: pooled_csm
+        priority: high
+        reason_code: usage_drop_needs_human
+        title: Usage is falling and digital touches have not helped
+        next_step: Find out what changed (champion left, reorganisation, competitor trial).
+      - {id: recovered, type: exit, reason: usage_recovered}
+
+  expansion_seats:
+    steps:
+      - id: sales_brief
+        type: cta
+        tier: human
+        queue: sales
+        priority: normal
+        reason_code: expansion_signal
+        title: Account is running out of seats
+        next_step: Review the brief and decide whether to reach out about more seats.
+        with_brief: true
+
+  edition_upgrade:
+    steps:
+      - {id: value_email, type: email, template: edition_value, tier: digital}
+      - {id: wait_4, type: wait, days: 4}
+      - {id: replied, type: branch, if: contact_replied, then: sales_handoff, else: nudge}
+      - id: sales_handoff
+        type: cta
+        tier: human
+        queue: sales
+        priority: normal
+        reason_code: buying_intent
+        title: Account at an edition limit replied to the value email
+        next_step: Follow up on the reply; the contact is asking about the next edition.
+        with_brief: true
+      - {id: nudge, type: in_app, template: edition_nudge, tier: digital}
+      - {id: done, type: exit, reason: sequence_finished}
+
+  cross_product_docs:
+    goal: {metric: docs_published_30d, at_least: 1}
+    steps:
+      - {id: in_app_prompt, type: in_app, template: docs_prompt, tier: digital}
+      - {id: docs_email, type: email, template: docs_intro, tier: digital}
+      - {id: watch, type: wait, days: 14}
+      - {id: done, type: exit, reason: sequence_finished}
+
+  detractor_save:
+    steps:
+      - id: csm_handoff
+        type: cta
+        tier: human
+        queue: pooled_csm
+        priority: high
+        reason_code: detractor
+        title: Detractor NPS score
+        next_step: Call within 48 hours. Acknowledge the score, ask what went wrong.
+
+  find_the_admin:
+    goal: {metric: has_valid_admin, at_least: 1}
+    steps:
+      - id: research_task
+        type: cta
+        tier: human
+        queue: admin_research
+        priority: low
+        reason_code: no_valid_admin
+        title: No admin we can email
+        next_step: Identify the current admin, confirm consent, update the CRM.
+        pause_account: true      # other plays' emails wait until this is fixed

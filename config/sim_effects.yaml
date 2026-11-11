@@ -1,0 +1,56 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# ASSUMPTIONS about how simulated customers and simulated staff respond to plays.
+# This file belongs to the simulator. The rules engine, the models and the agents
+# never read it. Any lift measured in this demo comes from the numbers below; it
+# shows that the measurement works, not that the plays work
+# (docs/decisions/0005-simulated-treatment-effects.md).
+
+# A touch leaves the account "helped" for a while. The help fades by this factor a day.
+help_decay_per_day: 0.85
+
+# What a touch does, per play. Keys are the kind of touch as the customer sees it.
+#   setup_help      0 to 1: how much easier finishing setup becomes
+#   setback_relief  share of the lasting damage from a shock that is removed
+#   momentum        direct lift to the account's hidden momentum
+#   expansion_push  extra daily chance of expanding (more seats, or the next edition)
+#   upgrade_push    extra daily chance of moving to the next edition
+#   docs_trial      daily chance of adding Relay Docs
+#   new_admin       a reachable admin contact is added to the CRM
+# Daily chances fade with the help decay above. A push of 0.06 adds up to roughly a
+# one-in-three chance of the outcome over the following two weeks.
+effects:
+  onboarding_rescue:
+    email_opened: {setup_help: 0.15}
+    agent_resolved: {setup_help: 0.50}
+    human_resolved: {setup_help: 0.80}
+  usage_recovery:
+    email_opened: {setback_relief: 0.10}
+    in_app: {setback_relief: 0.05}
+    human_resolved: {setback_relief: 0.50, momentum: 0.10}
+  expansion_seats:
+    human_resolved: {expansion_push: 0.06}    # only when the owner found a real opportunity
+  edition_upgrade:
+    email_opened: {upgrade_push: 0.004}
+    in_app: {upgrade_push: 0.002}
+    human_resolved: {upgrade_push: 0.06}
+  cross_product_docs:
+    in_app: {docs_trial: 0.010}
+    email_opened: {docs_trial: 0.020}
+  detractor_save:
+    human_resolved: {setback_relief: 0.30, momentum: 0.08}
+  find_the_admin:
+    human_resolved: {new_admin: 1}
+
+# The simulated staff who work the queues during `run-day`. In the live demo a real
+# person does this in the Human console instead.
+# For each queue: the chance of each outcome when a CTA is worked.
+simulated_humans:
+  pooled_csm: {resolved: 0.55, saved: 0.15, no_response: 0.22, agent_should_have_handled: 0.08}
+  sales: {expansion_opportunity: 0.45, not_a_fit: 0.25, no_response: 0.30}
+  support: {resolved: 0.80, no_response: 0.15, agent_should_have_handled: 0.05}
+  admin_research: {resolved: 0.75, no_response: 0.25}
+  human_review: {resolved: 0.85, agent_should_have_handled: 0.15}
+
+# Chance that an admin invited to talk to the onboarding agent takes up the offer.
+agent_conversation_uptake: 0.6

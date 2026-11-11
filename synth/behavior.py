@@ -33,6 +33,10 @@ def simulate_account_day(world, account, today, rng, out) -> None:
     if age == 0:
         _sign_up(world, account, today, out)
 
+    # Help from a play (an email that was read, an agent conversation, a call) fades daily.
+    for name in account.help:
+        account.help[name] *= world.help_decay
+
     update_momentum(account, age, rng)
     active_users = _daily_usage(account, today, rng, out)
     _feature_usage(world, account, today, active_users, rng, out)
@@ -241,6 +245,11 @@ def _setup_progress(account, today, age: int, rng, out) -> None:
     board_chance = (0.05 + 0.5 * drive) * fade
     integration_chance = (0.002 + 0.05 * unaided * drive) * fade
     sso_chance = (0.001 + 0.035 * unaided * drive) * fade
+    # Help from the onboarding play makes each step more likely while it lasts.
+    helped = account.help.get("setup_help", 0.0)
+    board_chance += 0.30 * helped
+    integration_chance += 0.12 * helped
+    sso_chance += 0.08 * helped
 
     if "board_created" not in done and rng.random() < board_chance:
         account.n_boards += 1
@@ -272,8 +281,9 @@ def _invite_users(account, today, age: int, rng, out) -> None:
     if room > 0:
         early_burst = (0.03 + 1.6 * unaided) * math.exp(-age / 20)
         steady = (0.002 + 0.03 * unaided) * room
+        helped = 1.2 * account.help.get("setup_help", 0.0)  # a helped admin invites the team
         admin = user_id(account, 0)
-        for _ in range(min(room, rng.poisson(early_burst + steady))):
+        for _ in range(min(room, rng.poisson(early_burst + steady + helped))):
             new_user = user_id(account, account.seats_assigned)
             account.seats_assigned += 1
             out.add(
@@ -320,6 +330,8 @@ def _commercial_changes(world, account, today, age: int, rng) -> None:
         if rng.random() < 0.005 * account.fit:
             _upgrade_edition(world, account, today, rng)
 
+    _respond_to_plays(world, account, today, rng)
+
     if rng.random() < churn_hazard(account, today):
         account.status = "churned"
         account.churned_at = today
@@ -327,6 +339,34 @@ def _commercial_changes(world, account, today, age: int, rng) -> None:
             account.open_renewal["stage"] = "closed_lost"
             account.open_renewal["close_date"] = today
             account.open_renewal = None
+
+
+def _respond_to_plays(world, account, today, rng) -> None:
+    """Commercial moves a play made more likely (see config/sim_effects.yaml).
+
+    Runs only for accounts a play has reached, so history is untouched by it.
+    """
+    can_upgrade = account.edition != "enterprise"
+
+    # An account owner followed up on a real opportunity: more seats if they are nearly
+    # out of them, otherwise the next edition.
+    push = account.help.get("expansion_push", 0.0)
+    if push and rng.random() < push:
+        if seat_utilisation(account) >= 0.85 or not can_upgrade:
+            _expand_seats(world, account, today, rng)
+        else:
+            _upgrade_edition(world, account, today, rng)
+        account.help["expansion_push"] = 0.0  # one deal, not one a day
+
+    push = account.help.get("upgrade_push", 0.0)
+    if push and can_upgrade and rng.random() < push:
+        _upgrade_edition(world, account, today, rng)
+        account.help["upgrade_push"] = 0.0
+
+    # Trying Relay Docs after the cross-product play showed it to them.
+    docs_trial = account.help.get("docs_trial", 0.0)
+    if docs_trial and "docs" not in account.products and rng.random() < docs_trial:
+        account.products.append("docs")
 
 
 def _expand_seats(world, account, today, rng) -> None:

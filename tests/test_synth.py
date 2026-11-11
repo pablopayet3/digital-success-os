@@ -4,7 +4,6 @@ They run on the "small" profile (250 accounts, 120 days) so the whole file takes
 a few seconds.
 """
 
-import hashlib
 import json
 import re
 from collections import Counter
@@ -12,6 +11,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from conftest import file_hashes
 
 from synth.generate import (
     ACCOUNT_COLUMNS,
@@ -76,19 +76,10 @@ def events(event_lines) -> list[dict]:
     return parsed
 
 
-def _file_hashes(folder: Path) -> dict[str, str]:
-    return {
-        str(path.relative_to(folder)): hashlib.sha256(path.read_bytes()).hexdigest()
-        for path in sorted(folder.rglob("*"))
-        if path.is_file() and path.suffix != ".pkl"
-    }
-
-
-def test_same_seed_gives_identical_files(small_world, tmp_path):
-    _, first_dir = small_world
+def test_same_seed_gives_identical_files(generated_hashes, tmp_path):
     generate(profile="small", data_dir=tmp_path, verbose=False)
     for folder in ("landing", "ground_truth"):
-        assert _file_hashes(first_dir / folder) == _file_hashes(tmp_path / folder)
+        assert file_hashes(tmp_path / folder) == generated_hashes[folder]
 
 
 def test_files_have_expected_columns(landing):
@@ -177,8 +168,8 @@ def test_hidden_traits_drive_outcomes(truth):
     assert churned["fit"].mean() < stayed["fit"].mean()
 
 
-def test_injected_problems_match_the_issue_log(small_world, landing, truth, event_lines, events):
-    world, _ = small_world
+def test_injected_problems_match_the_issue_log(current_world, landing, truth, event_lines, events):
+    world = current_world
     issues = json.loads((truth / "injected_issues.json").read_text())
 
     assert len(event_lines) - len(events) == issues["malformed_lines"] > 0
@@ -235,15 +226,13 @@ def test_churned_accounts_stop_sending_events(landing, events):
     assert all(day <= churned[account] for account, day in last_event.items())
 
 
-def test_world_can_be_saved_and_continued(small_world, truth):
-    """Phase 4 moves the world forward one day at a time; check that this works."""
-    world, _ = small_world
+def test_world_can_be_saved_and_continued(truth):
+    """The world moves forward one day at a time from wherever it was saved."""
     resumed = World.load(truth / "world_state.pkl")
-    assert resumed.day_index == world.day_index
+    days_so_far, next_day = resumed.day_index, resumed.today
 
-    next_day = resumed.today
     out = resumed.step()
     assert out.date == next_day
     assert len(out.events) > 0
     assert all(event["occurred_at"].startswith(next_day.isoformat()) for event in out.events)
-    assert resumed.day_index == world.day_index + 1
+    assert resumed.day_index == days_so_far + 1

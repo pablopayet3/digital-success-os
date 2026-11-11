@@ -109,21 +109,24 @@ def test_features_never_use_hidden_ground_truth():
 
 def test_models_train_on_observed_outcomes_and_test_later_in_time(trained, scored_warehouse):
     metrics, data_dir, _ = trained
+    for name in ("churn", "expansion"):
+        test_day, train_days = metrics[name]["test_day"], metrics[name]["train_days"]
+        assert train_days and all(day < test_day for day in train_days)
+        unobserved = scored_warehouse.execute(
+            """
+            SELECT count(*) FROM gold.fct_outcome_labels
+            WHERE snapshot_date = CAST(? AS DATE) AND NOT outcome_observed
+            """,
+            [test_day],
+        ).fetchone()[0]
+        assert unobserved == 0
+        assert metrics[name]["logistic"]["auc"] > 0.55  # clearly better than a coin flip
+
+    # Whenever training runs, the test day it picks is one whose outcome is fully observed.
     warehouse = open_warehouse(data_dir)
     test_day, train_days = pick_snapshot_days(warehouse, load_yaml("models.yaml"))
     warehouse.close()
     assert all(day < test_day for day in train_days)
-    unobserved = scored_warehouse.execute(
-        """
-        SELECT count(*) FROM gold.fct_outcome_labels
-        WHERE snapshot_date = ? AND NOT outcome_observed
-        """,
-        [test_day],
-    ).fetchone()[0]
-    assert unobserved == 0
-    for name in ("churn", "expansion"):
-        assert metrics[name]["test_day"] == str(test_day)
-        assert metrics[name]["logistic"]["auc"] > 0.55  # clearly better than a coin flip
 
 
 def test_flags_follow_team_capacity(scored_warehouse):
