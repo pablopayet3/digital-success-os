@@ -1,9 +1,9 @@
 # Synthetic data, fictional company (Lumen Labs / Relay).
-# Where the plays are allowed to run, and how the demo behaves.
+# Where the plays are allowed to run.
 
 # The pilot runs on accounts with no human coverage.
 # Scale the pattern by adding a segment: [uncovered, pooled]
 segments: [uncovered]
 
-# true = replay cached LLM responses from cache/, so the demo works with no internet.
-offline_mode: false
+# Offline mode (replay cached LLM responses, never call the API) is an environment
+# setting, not a rollout setting: see config/environments.yaml and DSO_OFFLINE_MODE.

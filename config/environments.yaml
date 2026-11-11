@@ -1,0 +1,28 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# Two environments, same code and the same dbt models. Choose one with the DSO_ENV
+# environment variable (default: dev). Nothing secret lives in this file: keys and
+# passwords come from environment variables (.env locally, GitHub Secrets in CI).
+
+dev:
+  description: A laptop. DuckDB file, SQLite operational store, no network needed.
+  warehouse: duckdb
+  dbt_target: dev
+  operational_store: sqlite:///data/ops.db
+  offline_mode: true          # replay cached LLM responses; never call the API
+
+prod:
+  description: Real services. Databricks SQL warehouse, Postgres operational store.
+  warehouse: databricks
+  dbt_target: prod
+  catalog: relay                              # Unity Catalog: relay.bronze / silver / gold
+  landing_volume: /Volumes/relay/bronze/landing
+  operational_store: env:DATABASE_URL         # read from the DATABASE_URL variable
+  offline_mode: true          # still the default; set DSO_OFFLINE_MODE=false to call the API
+
+# Limits on the only paid service (the LLM API). Environment variables with the same
+# names, in capitals, override these.
+llm_limits:
+  max_llm_calls_per_run: 400
+  llm_budget_usd: 5.00
+  max_agent_conversations_per_run: 50

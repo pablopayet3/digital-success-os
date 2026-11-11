@@ -1,9 +1,10 @@
 """Run dbt from Python and keep its test results in the warehouse.
 
 Synthetic data, fictional company. dbt does the transformation work (bronze to
-silver to gold) and runs the data tests. This module starts it, then copies
-the test results into the table `gold.dq_test_results`, so the app can show
-them next to the other data-quality numbers.
+silver to gold) and runs the data tests. This module starts it against the
+warehouse of the current environment (DuckDB in dev, Databricks in prod), then
+copies the test results into `gold.dq_test_results`, so the app can show them
+next to the other data-quality numbers.
 """
 
 from __future__ import annotations
@@ -12,11 +13,12 @@ import json
 import os
 from pathlib import Path
 
-import duckdb
 import pandas as pd
 
 from common.config import load_yaml
 from common.paths import DATA_DIR, ROOT
+from common.settings import load_settings
+from common.warehouse import open_warehouse
 from ingest.load import warehouse_path
 
 DBT_DIR = ROOT / "dbt"
@@ -46,6 +48,7 @@ def run_dbt(command: list[str], data_dir: Path = DATA_DIR) -> bool:
         *command,
         "--project-dir", str(DBT_DIR),
         "--profiles-dir", str(DBT_DIR),
+        "--target", load_settings().dbt_target,
         "--vars", dbt_variables(),
     ]  # fmt: skip
     return dbtRunner().invoke(arguments).success
@@ -69,13 +72,12 @@ def save_test_results(data_dir: Path = DATA_DIR, append: bool = False) -> pd.Dat
         if result["unique_id"].startswith("test.")
     ]
     frame = pd.DataFrame(rows)
-    con = duckdb.connect(str(warehouse_path(data_dir)))
+    warehouse = open_warehouse(data_dir)
     if append:
-        con.execute("INSERT INTO gold.dq_test_results SELECT * FROM frame")
-        frame = con.execute("SELECT * FROM gold.dq_test_results").df()
-    else:
-        con.execute("CREATE OR REPLACE TABLE gold.dq_test_results AS SELECT * FROM frame")
-    con.close()
+        earlier = warehouse.query("SELECT * FROM gold.dq_test_results")
+        frame = pd.concat([earlier, frame], ignore_index=True)
+    warehouse.write_table("gold.dq_test_results", frame)
+    warehouse.close()
     return frame
 
 
@@ -93,7 +95,7 @@ def save_freshness(data_dir: Path = DATA_DIR) -> pd.DataFrame:
         for result in results["results"]
     ]
     frame = pd.DataFrame(rows)
-    con = duckdb.connect(str(warehouse_path(data_dir)))
-    con.execute("CREATE OR REPLACE TABLE gold.dq_freshness AS SELECT * FROM frame")
-    con.close()
+    warehouse = open_warehouse(data_dir)
+    warehouse.write_table("gold.dq_freshness", frame)
+    warehouse.close()
     return frame

@@ -23,7 +23,7 @@ signals_today as (
 
     select
         account_id,
-        list(signal_id order by signal_id) as signals_firing
+        {{ sorted_text_list('signal_id') }} as signals_firing
     from {{ ref('signals') }}
     where snapshot_date = {{ as_of_date() }}
     group by account_id
@@ -44,7 +44,8 @@ select
         else 'high'
     end as value_tier,
     clusters.cluster_name as behaviour_cluster,
-    coalesce(signals_today.signals_firing, cast([] as varchar[])) as signals_firing
+    -- comma-separated, in alphabetical order; empty text when nothing is firing
+    coalesce(signals_today.signals_firing, '') as signals_firing
 from today
 inner join {{ ref('dim_account') }} as accounts
     on today.account_id = accounts.account_id

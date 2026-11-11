@@ -42,18 +42,21 @@ steps as (
     left join first_events on accounts.account_id = first_events.account_id
     left join five_users on accounts.account_id = five_users.account_id
 
+),
+
+counted as (
+
+    select
+        *,
+        case when board_created_on is not null then 1 else 0 end
+            + case when users_invited_on is not null then 1 else 0 end
+            + case when integration_connected_on is not null then 1 else 0 end
+            + case when sso_configured_on is not null then 1 else 0 end as steps_done
+    from steps
+
 )
 
 select
     *,
-    (board_created_on is not null)::integer
-        + (users_invited_on is not null)::integer
-        + (integration_connected_on is not null)::integer
-        + (sso_configured_on is not null)::integer as steps_done,
-    (
-        (board_created_on is not null)::integer
-        + (users_invited_on is not null)::integer
-        + (integration_connected_on is not null)::integer
-        + (sso_configured_on is not null)::integer
-    ) / 4.0 as prerequisite_closure_pct
-from steps
+    cast(steps_done / 4.0 as double) as prerequisite_closure_pct
+from counted

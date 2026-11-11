@@ -26,7 +26,7 @@ daily_counts as (
         count(*) filter (where event_name = 'board_created') as boards_created,
         count(*) filter (
             where event_name = 'board_created'
-              and json_extract_string(properties, '$.template')
+              and {{ json_text('properties', 'template') }}
                   in ('meeting_notes', 'wiki', 'knowledge_base')
         ) as doc_like_boards_created,
         count(*) filter (where event_name = 'doc_published') as docs_published,
@@ -34,7 +34,7 @@ daily_counts as (
         count(*) filter (where event_name = 'integration_connected') as integrations_connected,
         count(*) filter (where event_name = 'assist_invoked') as assist_invocations,
         coalesce(
-            sum(cast(json_extract_string(properties, '$.credits_used') as integer))
+            sum(cast({{ json_text('properties', 'credits_used') }} as integer))
                 filter (where event_name = 'assist_invoked'),
             0
         ) as assist_credits,
@@ -61,7 +61,8 @@ monthly_active as (
     from spine
     left join user_days
         on spine.account_id = user_days.account_id
-        and user_days.event_date between spine.snapshot_date - 29 and spine.snapshot_date
+        and user_days.event_date
+            between {{ days_before('spine.snapshot_date', 29) }} and spine.snapshot_date
     group by spine.account_id, spine.snapshot_date
 
 )

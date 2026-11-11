@@ -13,6 +13,8 @@ dependencies = [
     "dbt-duckdb>=1.11.1",
     "pydantic>=2.14.3",
     "scikit-learn>=1.9.1",
+    "python-dotenv>=1.2.4",
+    "dbt-databricks>=1.11.0",
 ]
 
 [dependency-groups]

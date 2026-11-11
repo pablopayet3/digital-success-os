@@ -1,9 +1,19 @@
-# Connection to the local DuckDB warehouse. No secrets in here.
-# run.py sets DSO_WAREHOUSE to the full path of data/warehouse.duckdb.
+# Warehouse connections. No secrets in here: they are read from environment variables.
+# Two targets, same models:
+#   dev   local DuckDB file. run.py sets DSO_WAREHOUSE to data/warehouse.duckdb.
+#   prod  Databricks SQL warehouse, Unity Catalog `relay` (relay.bronze / silver / gold).
 digital_success_os:
   target: dev
   outputs:
     dev:
       type: duckdb
       path: "{{ env_var('DSO_WAREHOUSE', '../data/warehouse.duckdb') }}"
+      threads: 4
+    prod:
+      type: databricks
+      catalog: relay
+      schema: gold
+      host: "{{ env_var('DATABRICKS_HOST', '') }}"
+      http_path: "{{ env_var('DATABRICKS_HTTP_PATH', '') }}"
+      token: "{{ env_var('DATABRICKS_TOKEN', '') }}"
       threads: 4

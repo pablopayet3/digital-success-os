@@ -9,6 +9,7 @@ from analytics.features import FEATURE_PHRASES, FEATURES
 from analytics.score import NOT_A_REASON
 from analytics.train import pick_snapshot_days
 from common.config import load_yaml
+from common.warehouse import open_warehouse
 
 LIFECYCLE_STAGES = {"onboarding", "adopting", "mature", "expansion", "renewal", "at_risk"}
 HIDDEN_NAMES = {"engagement", "fit", "growth", "momentum", "setup_drive", "team_size", "setback"}
@@ -107,8 +108,10 @@ def test_features_never_use_hidden_ground_truth():
 
 
 def test_models_train_on_observed_outcomes_and_test_later_in_time(trained, scored_warehouse):
-    metrics, _, _ = trained
-    test_day, train_days = pick_snapshot_days(scored_warehouse, load_yaml("models.yaml"))
+    metrics, data_dir, _ = trained
+    warehouse = open_warehouse(data_dir)
+    test_day, train_days = pick_snapshot_days(warehouse, load_yaml("models.yaml"))
+    warehouse.close()
     assert all(day < test_day for day in train_days)
     unobserved = scored_warehouse.execute(
         """

@@ -14,19 +14,22 @@ Steps:
 
 Results of the tests, the freshness check and the contract check are kept in the
 warehouse (gold.dq_*) so the app can show them.
+
+The same steps run in both environments. With DSO_ENV=dev the warehouse is a local
+DuckDB file; with DSO_ENV=prod it is Databricks (same dbt models, target `prod`).
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
-import duckdb
-
 from analytics.score import score_accounts
 from analytics.train import MODEL_DIR
 from common.paths import DATA_DIR
+from common.settings import load_settings
+from common.warehouse import open_warehouse
 from contracts.check import check_contract
-from ingest.load import run_ingest, warehouse_path
+from ingest.load import run_ingest
 from ingest.transform import run_dbt, save_freshness, save_test_results
 
 SCORED = "tag:scored"  # dbt models that need the model scores
@@ -37,7 +40,7 @@ def run_pipeline(
 ) -> bool:
     """Run every step. Returns True when all tests and contract checks pass."""
     quiet = [] if verbose else ["--quiet"]
-    run_ingest(data_dir, verbose=verbose)
+    ingest(data_dir, verbose)
 
     facts_ok = run_dbt([*quiet, "build", "--exclude", SCORED], data_dir)
     save_test_results(data_dir)
@@ -53,33 +56,48 @@ def run_pipeline(
     return facts_ok and signals_ok and all(check["passed"] for check in contract)
 
 
+def ingest(data_dir: Path, verbose: bool) -> None:
+    """Load the landing files into bronze, in the warehouse of the current environment."""
+    if load_settings().warehouse == "databricks":
+        from ingest.load_databricks import run_ingest_databricks
+
+        warehouse = open_warehouse(data_dir)
+        summary = run_ingest_databricks(warehouse, data_dir)
+        warehouse.close()
+        if verbose:
+            print("Ingest to Databricks finished:", summary)
+    else:
+        run_ingest(data_dir, verbose=verbose)
+
+
 def print_summary(data_dir: Path, tests, contract: list[dict]) -> None:
-    con = duckdb.connect(str(warehouse_path(data_dir)))
+    warehouse = open_warehouse(data_dir)
     print("\nData quality summary")
-    for stage, measure, row_count in con.execute(
+    quality = warehouse.query(
         "SELECT stage, measure, row_count FROM gold.dq_summary ORDER BY sort_order, measure"
-    ).fetchall():
-        print(f"  [{stage}] {measure}: {row_count:,}")
-    for source, status, hours in con.execute(
-        "SELECT source, status, round(hours_since_load, 1) FROM gold.dq_freshness"
-    ).fetchall():
-        print(f"  [freshness] {source}: {status} (loaded {hours} hours ago)")
+    )
+    for row in quality.itertuples():
+        print(f"  [{row.stage}] {row.measure}: {int(row.row_count):,}")
+    freshness = warehouse.query("SELECT source, status, hours_since_load FROM gold.dq_freshness")
+    for row in freshness.itertuples():
+        print(f"  [freshness] {row.source}: {row.status} ({row.hours_since_load:.1f}h since load)")
 
     print("\nSignals firing today in the pilot segment (uncovered accounts)")
-    for signal_id, accounts in con.execute(
+    firing = warehouse.query(
         """
-        SELECT signals.signal_id, count(*)
+        SELECT signals.signal_id, count(*) AS accounts
         FROM gold.signals AS signals
         INNER JOIN gold.account_current AS today
             ON signals.account_id = today.account_id
             AND signals.snapshot_date = today.snapshot_date
         WHERE today.coverage_tier = 'uncovered'
         GROUP BY signals.signal_id
-        ORDER BY count(*) DESC
+        ORDER BY accounts DESC
         """
-    ).fetchall():
-        print(f"  {signal_id}: {accounts}")
-    con.close()
+    )
+    for row in firing.itertuples():
+        print(f"  {row.signal_id}: {row.accounts}")
+    warehouse.close()
 
     passed = int((tests["status"] == "pass").sum())
     print(f"\ndbt tests: {passed} of {len(tests)} passed")

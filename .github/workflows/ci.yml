@@ -1,0 +1,41 @@
+# Runs on every pull request and on every push to main.
+# Synthetic data, fictional company. No secrets are needed: CI runs in dev, offline.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  DSO_ENV: dev
+  DSO_OFFLINE_MODE: "true"
+
+jobs:
+  secret-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # scan the whole history, not just the last commit
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test:
+    name: Lint, tests, dbt build on DuckDB
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install dependencies (exact versions from uv.lock)
+        run: uv sync --frozen
+      - name: Lint
+        run: uv run ruff check .
+      - name: Tests (generate a small world, run the pipeline, train, check everything)
+        run: uv run pytest -q
+      - name: dbt build against DuckDB
+        run: |
+          uv run python run.py data --profile small
+          uv run python run.py pipeline

@@ -23,7 +23,6 @@ import json
 from datetime import date, timedelta
 from pathlib import Path
 
-import duckdb
 import joblib
 import numpy as np
 import pandas as pd
@@ -38,7 +37,7 @@ from analytics.features import FEATURES, SOURCE_TABLE, build_features
 from analytics.model_card import CARD_DIR, write_model_card
 from common.config import load_yaml
 from common.paths import DATA_DIR, ROOT
-from ingest.load import warehouse_path
+from common.warehouse import open_warehouse
 
 MODEL_DIR = ROOT / "analytics" / "models"
 CLUSTER_FEATURES = [
@@ -56,16 +55,16 @@ def train_all(
     """Train both models and the behaviour clusters. Returns the metrics of each model."""
     cfg = load_yaml("models.yaml")
     model_dir.mkdir(parents=True, exist_ok=True)
-    con = duckdb.connect(str(warehouse_path(data_dir)))
-    test_day, train_days = pick_snapshot_days(con, cfg)
-    rows = load_snapshots(con, [*train_days, test_day])
-    today_rows = con.execute(
+    warehouse = open_warehouse(data_dir)
+    test_day, train_days = pick_snapshot_days(warehouse, cfg)
+    rows = load_snapshots(warehouse, [*train_days, test_day])
+    today_rows = warehouse.query(
         f"""
         SELECT * FROM {SOURCE_TABLE}
         WHERE snapshot_date = (SELECT max(snapshot_date) FROM {SOURCE_TABLE})
         """
-    ).df()
-    con.close()
+    )
+    warehouse.close()
 
     results = {}
     for name in ("churn", "expansion"):
@@ -77,16 +76,19 @@ def train_all(
     return results
 
 
-def pick_snapshot_days(con, cfg: dict) -> tuple[date, list[date]]:
+def pick_snapshot_days(warehouse, cfg: dict) -> tuple[date, list[date]]:
     """The test day is the latest day whose outcome is fully observed."""
-    first_day, test_day = con.execute(
+    days = warehouse.query(
         """
-        SELECT min(snapshot_date), max(snapshot_date) FILTER (WHERE outcome_observed)
+        SELECT min(snapshot_date) AS first_day,
+               max(snapshot_date) FILTER (WHERE outcome_observed) AS test_day
         FROM gold.fct_outcome_labels
         """
-    ).fetchone()
-    if test_day is None:
+    ).iloc[0]
+    if pd.isna(days["test_day"]):
         raise ValueError("History is too short: no day has a fully observed 90-day outcome.")
+    first_day = pd.Timestamp(days["first_day"]).date()
+    test_day = pd.Timestamp(days["test_day"]).date()
     train_days = [test_day - timedelta(days=n) for n in cfg["train_days_before_test"]]
     train_days = [day for day in train_days if day >= first_day + timedelta(days=14)]
     if not train_days:
@@ -94,10 +96,10 @@ def pick_snapshot_days(con, cfg: dict) -> tuple[date, list[date]]:
     return test_day, sorted(train_days)
 
 
-def load_snapshots(con, days: list[date]) -> pd.DataFrame:
+def load_snapshots(warehouse, days: list[date]) -> pd.DataFrame:
     """Gold rows for the chosen days, with their outcome labels."""
     day_list = ", ".join(f"DATE '{day}'" for day in days)
-    return con.execute(
+    return warehouse.query(
         f"""
         SELECT facts.*, labels.churned_within_90d, labels.expanded_within_90d
         FROM {SOURCE_TABLE} AS facts
@@ -106,7 +108,7 @@ def load_snapshots(con, days: list[date]) -> pd.DataFrame:
             AND facts.snapshot_date = labels.snapshot_date
         WHERE facts.snapshot_date IN ({day_list})
         """
-    ).df()
+    )
 
 
 def train_one(

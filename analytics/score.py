@@ -13,13 +13,16 @@ Writes two tables:
 
 If the models have not been trained yet, the tables are still written (with empty
 scores), so the rest of the pipeline keeps working.
+
+The models run here, in Python, in both environments. In prod the features are read
+from Databricks and the scores are written back to it; the model itself never runs
+inside the warehouse.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
-import duckdb
 import joblib
 import numpy as np
 import pandas as pd
@@ -28,7 +31,7 @@ from analytics.features import FEATURE_PHRASES, FEATURES, SOURCE_TABLE, build_fe
 from analytics.train import CLUSTER_FEATURES, MODEL_DIR
 from common.config import load_yaml
 from common.paths import DATA_DIR
-from ingest.load import warehouse_path
+from common.warehouse import open_warehouse
 
 # model name -> (score column, flag column, reasons column)
 OUTPUT_COLUMNS = {
@@ -41,8 +44,9 @@ NOT_A_REASON = ["has_assist", "has_docs", "seats_licensed_log", "account_age_log
 
 def score_accounts(data_dir: Path = DATA_DIR, model_dir: Path = MODEL_DIR) -> int:
     """Score all account-days. Returns the number of rows scored."""
-    con = duckdb.connect(str(warehouse_path(data_dir)))
-    rows = con.execute(f"SELECT * FROM {SOURCE_TABLE}").df()
+    warehouse = open_warehouse(data_dir)
+    rows = warehouse.query(f"SELECT * FROM {SOURCE_TABLE}")
+    rows["snapshot_date"] = pd.to_datetime(rows["snapshot_date"]).dt.date
     features = build_features(rows)
     scores = rows[["account_id", "snapshot_date"]].copy()
 
@@ -56,42 +60,23 @@ def score_accounts(data_dir: Path = DATA_DIR, model_dir: Path = MODEL_DIR) -> in
             scores[flag_column] = flag_by_capacity(
                 scores, score_column, in_pilot, capacity[name]["capacity_accounts"]
             )
-            scores[reasons_column] = top_reasons(model, features)
+            reasons = top_reasons(model, features)
         else:
-            scores[score_column], scores[flag_column], scores[reasons_column] = np.nan, False, None
-
-    con.execute(
-        """
-        CREATE OR REPLACE TABLE gold.account_scores AS
-        SELECT
-            account_id,
-            CAST(snapshot_date AS DATE) AS snapshot_date,
-            CAST(churn_risk_score AS DOUBLE) AS churn_risk_score,
-            CAST(churn_risk_high AS BOOLEAN) AS churn_risk_high,
-            CAST(churn_top_reasons AS VARCHAR) AS churn_top_reasons,
-            CAST(expansion_score AS DOUBLE) AS expansion_score,
-            CAST(expansion_ready AS BOOLEAN) AS expansion_ready,
-            CAST(expansion_top_reasons AS VARCHAR) AS expansion_top_reasons
-        FROM scores
-        """
-    )
+            scores[score_column], scores[flag_column], reasons = np.nan, False, None
+        scores[reasons_column] = pd.Series(reasons, index=scores.index, dtype="string")
+    warehouse.write_table("gold.account_scores", scores)
 
     today = rows[rows["snapshot_date"] == rows["snapshot_date"].max()]
     clusters = today[["account_id"]].copy()
+    names = None
     cluster_path = model_dir / "clusters.joblib"
     if cluster_path.exists():
         saved = joblib.load(cluster_path)
         labels = saved["model"].predict(build_features(today)[CLUSTER_FEATURES])
-        clusters["cluster_name"] = [saved["names"][int(label)] for label in labels]
-    else:
-        clusters["cluster_name"] = None
-    con.execute(
-        """
-        CREATE OR REPLACE TABLE gold.account_clusters AS
-        SELECT account_id, CAST(cluster_name AS VARCHAR) AS cluster_name FROM clusters
-        """
-    )
-    con.close()
+        names = [saved["names"][int(label)] for label in labels]
+    clusters["cluster_name"] = pd.Series(names, index=clusters.index, dtype="string")
+    warehouse.write_table("gold.account_clusters", clusters)
+    warehouse.close()
     return len(scores)
 
 

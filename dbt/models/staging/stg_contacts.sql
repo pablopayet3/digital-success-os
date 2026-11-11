@@ -35,6 +35,17 @@ ranked as (
 
 )
 
-select * exclude (copy_number)
+select
+    contact_id,
+    account_id,
+    full_name,
+    email,
+    persona,
+    persona_raw,
+    role,
+    consent_status,
+    email_valid,
+    product_user_id,
+    last_engaged_at
 from ranked
 where copy_number = 1

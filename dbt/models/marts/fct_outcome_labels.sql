@@ -30,7 +30,7 @@ expanded as (
     left join expansions
         on spine.account_id = expansions.account_id
         and expansions.close_date > spine.snapshot_date
-        and expansions.close_date <= spine.snapshot_date + 90
+        and expansions.close_date <= {{ days_after('spine.snapshot_date', 90) }}
     group by spine.account_id, spine.snapshot_date
 
 )
@@ -38,10 +38,10 @@ expanded as (
 select
     spine.account_id,
     spine.snapshot_date,
-    (spine.snapshot_date + 90 <= {{ as_of_date() }}) as outcome_observed,
+    ({{ days_after('spine.snapshot_date', 90) }} <= {{ as_of_date() }}) as outcome_observed,
     coalesce(
         accounts.churned_at > spine.snapshot_date
-        and accounts.churned_at <= spine.snapshot_date + 90,
+        and accounts.churned_at <= {{ days_after('spine.snapshot_date', 90) }},
         false
     ) as churned_within_90d,
     expanded.expanded_within_90d

@@ -216,3 +216,55 @@ uv run python -m analytics.eda
 
 ADR 0004 (cut-off by capacity, explainable model in production). Definitions in
 `docs/metrics.md`. Model cards in `docs/model-cards/`.
+
+## Phase 3b: environments, secrets, CI, Databricks target (brief update v1.2, items 8, 10, 11)
+
+### What works
+
+- **Two environments, one codebase.** `DSO_ENV=dev` (default): DuckDB, SQLite, offline.
+  `DSO_ENV=prod`: Databricks, Postgres. Described in `config/environments.yaml`, read by
+  `common/settings.py`.
+- **Secrets only from the environment.** `.env` locally (git-ignored), GitHub Secrets in
+  CI. `.env.example` lists every variable with no values. A missing secret fails with a
+  message naming the variable.
+- **gitleaks** configured as a pre-commit hook and as a CI job over the full history.
+- **CI workflow** (`.github/workflows/ci.yml`): on every pull request and push to main,
+  secret scan, ruff, pytest, and `dbt build` against DuckDB. Runs offline, needs no secrets.
+- **Portable SQL.** No DuckDB-only functions in any model. Differences are in
+  `dbt/macros/portable.sql`. All 98 dbt nodes still pass on DuckDB, and a test scans the
+  models for DuckDB-only syntax.
+- **dbt `prod` target** for Databricks (`relay.bronze / silver / gold`), a loader that
+  uploads landing files to a Unity Catalog volume, and a warehouse layer
+  (`common/warehouse.py`) so scoring and the contract check run against either warehouse.
+- 45 pytest tests pass.
+
+### Not yet verified
+
+- **Nothing has run against Databricks.** The adapter refuses to load without
+  credentials. Expect small fixes on the first real run.
+- **The CI workflow has not run.** It runs when the repo is pushed to GitHub.
+- gitleaks itself is not installed on this machine; the hook installs it on first use.
+
+### How to run
+
+```
+uv run python run.py pipeline                      # dev (default)
+DSO_ENV=prod uv run python run.py pipeline         # prod, once the Databricks values are in .env
+```
+
+### The three decisions to defend
+
+1. *Two environments, selected by one variable.* The live demo cannot depend on a network
+   or a credential, and the system must also run on real services. One switch, one file
+   that says what each environment uses, no flags scattered through the code.
+2. *One set of dbt models for both warehouses.* Differences between DuckDB and Databricks
+   live in a handful of macros. A test fails if a model uses DuckDB-only SQL. The
+   alternative, two sets of models, guarantees they drift apart.
+3. *The warehouse does SQL; Python runs outside it.* Free Edition restricts outbound
+   internet, so LLM calls cannot run inside Databricks. Scoring and agents run in the app
+   or the CI runner and read and write warehouse tables. That is also how it would be
+   deployed at scale: an agent service next to the lakehouse, not inside it.
+
+### Decisions recorded
+
+ADRs 0011 (environments and secrets), 0012 (Databricks Free Edition, portable SQL).

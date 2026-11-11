@@ -13,8 +13,8 @@ with open_renewals as (
 
 select
     accounts.*,
-    date_diff('day', accounts.contract_start, {{ as_of_date() }}) as account_age_days,
-    date_diff('day', {{ as_of_date() }}, accounts.renewal_date) as days_to_renewal,
+    {{ days_between('accounts.contract_start', as_of_date()) }} as account_age_days,
+    {{ days_between(as_of_date(), 'accounts.renewal_date') }} as days_to_renewal,
     -- plays must stay away from an account whose renewal is being negotiated
     coalesce(open_renewals.renewal_in_negotiation, false) as renewal_in_negotiation
 from {{ ref('stg_accounts') }} as accounts

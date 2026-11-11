@@ -1,0 +1,16 @@
+# Checks that run before every commit. Set up once with:
+#   uv tool install pre-commit
+#   pre-commit install
+# Update the pinned versions with: pre-commit autoupdate
+repos:
+  # Refuse a commit that contains something that looks like a key or password.
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks
+
+  # Code style.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
