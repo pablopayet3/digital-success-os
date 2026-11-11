@@ -1,0 +1,9 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+# Where the plays are allowed to run, and how the demo behaves.
+
+# The pilot runs on accounts with no human coverage.
+# Scale the pattern by adding a segment: [uncovered, pooled]
+segments: [uncovered]
+
+# true = replay cached LLM responses from cache/, so the demo works with no internet.
+offline_mode: false

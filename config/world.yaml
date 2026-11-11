@@ -1,0 +1,89 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+# Settings for the world simulator in synth/. Change the seed and you get a
+# different but equally plausible world; keep it and every run is identical.
+
+seed: 42
+
+calendar:
+  start_date: 2026-04-01   # first simulated day
+  history_days: 180        # generated up front by `run.py data`
+  pilot_days: 30           # generated one day at a time from Phase 4 (`run.py run-day`)
+
+volumes:
+  accounts: 1200
+  share_established: 0.40  # share of accounts that signed up before the first simulated day
+  mailbox_reply_scale: 1.0 # raise or lower how often contacts reply to emails
+
+# share = share of all accounts; seats = range of licensed seats;
+# coverage = who looks after the account (the pilot runs on `uncovered`).
+segments:
+  smb:
+    share: 0.68
+    seats: [6, 25]
+    coverage: {uncovered: 0.88, pooled: 0.12, high_touch: 0.0}
+  mid:
+    share: 0.24
+    seats: [25, 80]
+    coverage: {uncovered: 0.35, pooled: 0.55, high_touch: 0.10}
+  enterprise:
+    share: 0.08
+    seats: [80, 200]
+    coverage: {uncovered: 0.0, pooled: 0.15, high_touch: 0.85}
+
+# Edition limits. Reaching a limit is what makes an account a fit for the next edition up.
+editions:
+  free:
+    price_per_seat_year: 0
+    max_seats: 10
+    automation_rules: 5
+    integrations: 2
+    assist_credits_per_seat: 0
+  standard:
+    price_per_seat_year: 96
+    automation_rules: 15
+    integrations: 3
+    assist_credits_per_seat: 10
+  premium:
+    price_per_seat_year: 180
+    automation_rules: 60
+    integrations: 10
+    assist_credits_per_seat: 40
+  enterprise:
+    price_per_seat_year: 300
+    automation_rules: 100000
+    integrations: 100
+    assist_credits_per_seat: 150
+
+edition_mix:
+  smb: {free: 0.18, standard: 0.52, premium: 0.27, enterprise: 0.03}
+  mid: {free: 0.03, standard: 0.40, premium: 0.45, enterprise: 0.12}
+  enterprise: {free: 0.0, standard: 0.05, premium: 0.35, enterprise: 0.60}
+
+# Deliberate data problems, so the data-quality checks in Phase 2 have something to catch.
+messy_data:
+  enabled: true
+  missing_account_id_rate: 0.010
+  duplicate_event_rate: 0.005
+  future_timestamp_rate: 0.002
+  unknown_event_name_rate: 0.003
+  malformed_line_rate: 0.0005
+  duplicate_contact_email_rate: 0.010
+  messy_persona_rate: 0.08
+  late_arriving_day:
+    day_index: 150    # this day's events mostly arrive late...
+    delay_days: 3     # ...inside the file of three days later
+    share_late: 0.8
+
+# Smaller worlds for fast tests: `run.py data --profile small`
+profiles:
+  small:
+    calendar:
+      history_days: 120
+      pilot_days: 10
+    volumes:
+      accounts: 250
+    messy_data:
+      late_arriving_day:
+        day_index: 60
+        delay_days: 3
+        share_late: 0.8

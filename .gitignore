@@ -1,0 +1,16 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Generated data: rebuilt from the seed with `uv run python run.py data`
+data/
+outbox/
+traces/
+*.duckdb
+
+# Secrets and private notes
+.env
+BRIEF.md
