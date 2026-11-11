@@ -78,7 +78,7 @@ messy_data:
 profiles:
   small:
     calendar:
-      history_days: 120
+      history_days: 150   # long enough for one 90-day outcome window plus training snapshots
       pilot_days: 10
     volumes:
       accounts: 250

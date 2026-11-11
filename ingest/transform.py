@@ -15,6 +15,7 @@ from pathlib import Path
 import duckdb
 import pandas as pd
 
+from common.config import load_yaml
 from common.paths import DATA_DIR, ROOT
 from ingest.load import warehouse_path
 
@@ -30,17 +31,31 @@ def dbt_target_dir() -> Path:
     return Path(os.environ.get("DBT_TARGET_PATH", DBT_DIR / "target"))
 
 
+def dbt_variables() -> str:
+    """Settings that live in config/ and that the SQL models need (health weights and bands)."""
+    health = load_yaml("health.yaml")
+    return json.dumps({"health_weights": health["weights"], "health_bands": health["bands"]})
+
+
 def run_dbt(command: list[str], data_dir: Path = DATA_DIR) -> bool:
     """Run a dbt command, for example ["build"]. Returns True when it succeeded."""
     from dbt.cli.main import dbtRunner  # imported here because it is slow to load
 
     os.environ["DSO_WAREHOUSE"] = str(warehouse_path(data_dir))
-    arguments = [*command, "--project-dir", str(DBT_DIR), "--profiles-dir", str(DBT_DIR)]
+    arguments = [
+        *command,
+        "--project-dir", str(DBT_DIR),
+        "--profiles-dir", str(DBT_DIR),
+        "--vars", dbt_variables(),
+    ]  # fmt: skip
     return dbtRunner().invoke(arguments).success
 
 
-def save_test_results(data_dir: Path = DATA_DIR) -> pd.DataFrame:
-    """Copy the outcome of the last dbt run's tests into gold.dq_test_results."""
+def save_test_results(data_dir: Path = DATA_DIR, append: bool = False) -> pd.DataFrame:
+    """Copy the outcome of the last dbt run's tests into gold.dq_test_results.
+
+    The pipeline runs dbt in two stages; the second stage appends to the first.
+    """
     results = json.loads((dbt_target_dir() / "run_results.json").read_text(encoding="utf-8"))
     rows = [
         {
@@ -55,7 +70,11 @@ def save_test_results(data_dir: Path = DATA_DIR) -> pd.DataFrame:
     ]
     frame = pd.DataFrame(rows)
     con = duckdb.connect(str(warehouse_path(data_dir)))
-    con.execute("CREATE OR REPLACE TABLE gold.dq_test_results AS SELECT * FROM frame")
+    if append:
+        con.execute("INSERT INTO gold.dq_test_results SELECT * FROM frame")
+        frame = con.execute("SELECT * FROM gold.dq_test_results").df()
+    else:
+        con.execute("CREATE OR REPLACE TABLE gold.dq_test_results AS SELECT * FROM frame")
     con.close()
     return frame
 

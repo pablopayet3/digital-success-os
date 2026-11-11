@@ -41,12 +41,82 @@ models:
   - name: int_account_daily_base
     description: Building block for account_daily. Every fact about an account on a day.
 
+  - name: int_account_daily_health
+    description: >
+      The daily facts plus the explainable health score and its five components.
+      This is the table the models read their features from.
+    columns:
+      - name: health_score
+        description: Weighted average of the five components, 0 to 100. Weights in config/health.yaml.
+        data_tests: [not_null]
+      - name: health_band
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [green, yellow, red]
+
+  - name: fct_outcome_labels
+    description: >
+      Whether each account churned or expanded in the 90 days after each day, taken from
+      the CRM. The labels the models learn from.
+    columns:
+      - name: churned_within_90d
+        data_tests: [not_null]
+      - name: expanded_within_90d
+        data_tests: [not_null]
+
+  - name: signals
+    description: One row per account, per day, per signal that is firing. Read by the rules engine.
+    columns:
+      - name: account_id
+        data_tests: [not_null]
+      - name: signal_id
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - activation_stalled
+                  - usage_drop
+                  - seat_pressure
+                  - edition_fit
+                  - cross_product
+                  - detractor
+                  - support_friction
+                  - no_valid_admin
+                  - churn_risk_high
+                  - expansion_ready
+      - name: evidence
+        description: The reason in words, for a human or an agent.
+        data_tests: [not_null]
+
+  - name: account_current
+    description: Every active account as it stands today, with segmentation and the signals firing.
+    columns:
+      - name: account_id
+        data_tests: [unique, not_null]
+      - name: value_tier
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [free, low, mid, high]
+
   - name: account_daily
     description: >
       The production table. One row per account per day, joining usage, seats, setup,
-      support, sentiment, contact engagement and commercial data.
+      support, sentiment, contact engagement and commercial data, with the health score,
+      the model scores and the lifecycle stage.
       Contract in contracts/account_daily.yaml.
     columns:
+      - name: lifecycle_stage
+        description: Where the account is in its life. Rules and precedence in docs/metrics.md.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [onboarding, adopting, mature, expansion, renewal, at_risk]
+      - name: health_score
+        description: Explainable health score, 0 to 100.
+        data_tests: [not_null]
       - name: account_id
         description: The account. Joins to every other table.
         data_tests:

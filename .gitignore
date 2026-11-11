@@ -11,6 +11,9 @@ dbt/logs/
 dbt/dbt_packages/
 logs/
 
+# Trained models: rebuilt with `uv run python run.py train`
+analytics/models/
+
 # Generated data: rebuilt from the seed with `uv run python run.py data`
 data/
 outbox/

@@ -71,11 +71,53 @@ Flagged for later phases: operational state in SQLite rather than the DuckDB fil
 (Phase 4), JSON traces only (Phase 5), 50% holdout and leading-indicator metrics for the
 pilot (Phase 6).
 
+## Brief update (v1.1 + v1.2 + cost rules), received during Phase 3
+
+Full text is appended to `BRIEF.md`. Rules: do not redo finished work, finish the current
+phase first, then fold the changes into the remaining phases.
+
+**Part A (v1.1)**: every item was already in the brief. Intervention ladder and rollout
+stage (Phase 4), lifecycle rules in `docs/metrics.md` (Phase 3), data requirements, play
+specs, pilot plan and change control (Phases 5 and 8), Pilot page (Phase 7), README
+real-job mapping and demo script (Phase 8).
+
+**Part B (v1.2): production profile.** Two environments, same code and same dbt models:
+`dev` = local DuckDB + offline mode; `prod` = real services. Selected with `DSO_ENV`.
+
+| # | Item | Where it lands |
+|---|---|---|
+| 8 | Environments, secrets from env vars, gitleaks in pre-commit and CI | Phase 3b |
+| 9 | Dockerfile (app + API), docker-compose | Phase 9 (after the app exists) |
+| 10 | GitHub Actions: ruff, pytest, dbt build on PR; build and deploy on merge | CI in Phase 3b, deploy in Phase 9 |
+| 11 | Databricks Free Edition as prod warehouse: dbt `prod` target, `relay.bronze/silver/gold`, landing files in a volume, portable SQL | Portable SQL and target in Phase 3b; live run when credentials exist |
+| 12 | Daily scheduled pipeline as a GitHub Actions cron, failure alerts | Phase 9 |
+| 13 | Hosted app and API (Render or Streamlit Community Cloud, never Railway), offline mode, login with roles CSM / Sales / Admin on the Human console | Login in Phase 7, deploy in Phase 9 |
+| 14 | Structured JSON logs, LangSmith traces with PII masking, `/health` | Phases 5 and 7 |
+| 15 | `docs/production-architecture.md` with real-vs-simulated table | Phase 8 |
+| 16 | Postgres operational store (if time) | Phase 4 builds the store on SQLAlchemy: SQLite in dev, Postgres in prod by URL |
+| 17 | Salesforce Developer Edition sync (if time) | After Phase 9 |
+| 18 | Tableau Public dashboard (if time) | After Phase 9: extracts and build guide |
+| 19 | Gainsight-shaped export (if time) | Phase 7, with the CRM export |
+
+**Part C: cost rules.** Free tiers only. The Claude API is the only paid service: a small
+model for classification, simulation and the judge, a stronger one only for the agent's
+customer-facing replies; model names in config; every response cached;
+`MAX_LLM_CALLS_PER_RUN` and `LLM_BUDGET_USD` stop a run cleanly and log the spend; at most
+50 simulated agent conversations per run; offline mode is the default (demos, CI and the
+hosted app never call the API).
+
+**Part D.** After each phase: what works, how to run it, the three design decisions to
+defend, commit. All names stay fictional; "Synthetic data" banner on every page.
+
+**SQL portability rule (from Phase 3b on):** no DuckDB-only functions in dbt models. Use
+dbt cross-database macros and the project's own dispatch macros in `dbt/macros/`.
+
 ## Phases
 
 1. Skeleton and synthetic data: **done**
 2. Pipeline and data quality (ingest, dbt bronze/silver/gold, tests, contract): **done**
-3. Signals, health score, segmentation, churn and expansion models: **next**
+3. Signals, health score, segmentation, churn and expansion models: **done**
+3b. Environments, secrets, CI, Databricks `prod` target, portable SQL: **next**
 4. Rules engine, journeys, consent, holdout assignment
 5. Agents and human fallback
 6. Evals and experiments
@@ -103,8 +145,22 @@ What works after each phase, and what to be able to explain, is in `docs/phase-n
   the production table; `int_account_daily_base` holds the joins.
 - `dbt/seeds/edition_limits.csv`: edition limits (must match `config/world.yaml`; tested).
 - `contracts/account_daily.yaml` and `contracts/check.py`: the data contract and its checker.
-- `tests/conftest.py`: one small world and one pipeline run shared by all tests.
-- `tests/test_synth.py` (Phase 1), `tests/test_pipeline.py` (Phase 2).
+- `config/health.yaml` (weights, bands) and `config/models.yaml` (snapshots, capacity).
+- `analytics/features.py`: model features and their plain-word phrases.
+  `analytics/train.py`: trains churn, expansion and clusters, writes metrics and cards.
+  `analytics/score.py`: scores all account-days, flags by capacity, writes reasons.
+  `analytics/eda.py`: writes `docs/eda-report.md`.
+- dbt marts added in Phase 3: `int_account_daily_health`, `fct_outcome_labels`,
+  `account_daily` (now with scores and lifecycle), `signals`, `account_current`.
+  Models tagged `scored` are built in a second dbt stage, after `analytics/score.py`.
+- `tests/conftest.py`: one small world, one pipeline run and one training run shared by
+  all tests. Tests never touch the real `analytics/models/` or `docs/model-cards/`.
+- `tests/test_synth.py` (Phase 1), `tests/test_pipeline.py` (Phase 2),
+  `tests/test_models.py` (Phase 3).
+
+Pipeline order: ingest -> dbt (exclude tag:scored) -> score -> dbt (select tag:scored) ->
+freshness -> contract check. dbt is always run through `run.py` / `ingest/transform.py`,
+which passes the health weights as dbt vars.
 
 Warehouse schemas: `bronze` (raw, loaded by ingest), `silver` (dbt staging), `gold` (dbt
 marts, plus `dq_test_results`, `dq_freshness`, `dq_contract_checks` written by Python).

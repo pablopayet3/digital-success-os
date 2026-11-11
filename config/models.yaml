@@ -1,0 +1,21 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+# Settings for the churn-risk and expansion-propensity models (analytics/).
+
+# Time-based split. The test snapshot is the latest day whose 90-day outcome is fully
+# observed. Training snapshots are taken this many days before it.
+train_days_before_test: [30, 45, 60]
+outcome_window_days: 90
+random_state: 7
+
+# Thresholds come from what people can act on, not from accuracy alone
+# (docs/decisions/0004-churn-threshold-by-capacity.md). "capacity_accounts" is how many
+# flagged accounts in the pilot segment the team can work at one time.
+churn:
+  label: churned_within_90d
+  capacity_accounts: 40     # pooled CS team: churn-save CTAs they can carry
+expansion:
+  label: expanded_within_90d
+  capacity_accounts: 60     # account owners: expansion briefs they can follow up
+
+# Behavioural clustering (k-means) used for segmentation.
+clusters: 4

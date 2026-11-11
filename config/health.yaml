@@ -1,0 +1,14 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+# The health score is a weighted average of five components, each from 0 to 100.
+# Change a weight here and the next pipeline run uses it. Definitions: docs/metrics.md
+
+weights:        # must add up to 1.0
+  adoption: 0.35      # are the seats used, and is setup finished?
+  engagement: 0.15    # do contacts read our email, does the admin log in?
+  sentiment: 0.20     # latest NPS answer
+  support: 0.15       # open and recent high-priority tickets
+  commercial: 0.15    # seats in use, and whether they are growing
+
+bands:          # health_score at or above the value
+  green: 70
+  yellow: 50    # below yellow is red

@@ -20,8 +20,8 @@ Built in phases. This README is a stub until Phase 8.
 |---|---|---|
 | 1 | Skeleton and synthetic data | done |
 | 2 | Pipeline and data quality | done |
-| 3 | Signals, health, models | next |
-| 4 | Rules engine, journeys, consent | |
+| 3 | Signals, health, models | done |
+| 4 | Rules engine, journeys, consent | next |
 | 5 | Agents and human fallback | |
 | 6 | Evals and experiments | |
 | 7 | App and API | |
@@ -35,8 +35,13 @@ Needs [uv](https://docs.astral.sh/uv/) and Python 3.12.
 uv sync
 uv run python run.py data      # generate the synthetic world (about 25 seconds)
 uv run python run.py pipeline  # ingest, build silver and gold, run the data tests
+uv run python run.py train     # train the churn and expansion models, refresh signals
 uv run python run.py test      # run the tests
 ```
+
+Definitions of every metric, the health score and the lifecycle stages are in
+[docs/metrics.md](docs/metrics.md). Model cards are in [docs/model-cards](docs/model-cards/).
+What the data shows is in [docs/eda-report.md](docs/eda-report.md).
 
 `uv run python run.py data --profile small` builds a smaller world in about 5 seconds.
 

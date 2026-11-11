@@ -6,7 +6,14 @@
 # pipeline run, and a test fails if they disagree.
 
 table: gold.account_daily
-version: 1
+version: 2
+changelog:
+  - version: 1
+    change: First version (Phase 2). Usage, seats, setup, support, sentiment, engagement, commercial.
+  - version: 2
+    change: >
+      Additive (Phase 3). Health score with its five components and band, churn and
+      expansion scores with flags and reasons, lifecycle stage. No existing column changed.
 owner: Digital Success Portfolio Lead (accountable). Built and run by Data Engineering.
 purpose: >
   The single daily view of every account: usage, seats, setup, support, sentiment,
@@ -62,6 +69,12 @@ quality_rules:
     sql: >
       select 1 from gold.account_daily
       where snapshot_date > (select max(snapshot_date) from silver.stg_licenses)
+  - name: health_score_between_0_and_100
+    sql: select 1 from gold.account_daily where health_score < 0 or health_score > 100
+  - name: scores_are_probabilities
+    sql: >
+      select 1 from gold.account_daily
+      where churn_risk_score not between 0 and 1 or expansion_score not between 0 and 1
 
 # type is one of: text, integer, number, boolean, date.
 columns:
@@ -134,3 +147,23 @@ columns:
   - {name: arr, type: integer, nullable: false, description: "Annual recurring revenue today, in dollars."}
   - {name: days_to_renewal, type: integer, nullable: false, description: "Days until the next contract anniversary, counted from that day."}
   - {name: renewal_in_negotiation, type: boolean, nullable: false, description: "True when an open renewal opportunity is in negotiation today."}
+
+  # health score (added in version 2). Weights in config/health.yaml, definitions in docs/metrics.md
+  - {name: health_adoption, type: number, nullable: false, description: "0 to 100. 60% share of assigned seats active this month, 40% setup completion."}
+  - {name: health_engagement, type: number, nullable: false, description: "0 to 100. 70% email open rate, 30% admin logins."}
+  - {name: health_sentiment, type: number, nullable: false, description: "0 to 100. Latest NPS score times ten; 60 if never surveyed."}
+  - {name: health_support, type: number, nullable: false, description: "0 to 100. Falls with open and recent high-priority tickets."}
+  - {name: health_commercial, type: number, nullable: false, description: "0 to 100. Seat utilisation and the 30-day seat trend."}
+  - {name: health_score, type: number, nullable: false, description: "Weighted average of the five components, 0 to 100."}
+  - {name: health_band, type: text, nullable: false, description: "green, yellow or red, from the bands in config/health.yaml."}
+
+  # model scores (added in version 2). Empty until the models are trained.
+  - {name: churn_risk_score, type: number, nullable: true, description: "Modelled chance of churning in the next 90 days (0 to 1)."}
+  - {name: churn_risk_high, type: boolean, nullable: false, description: "True when the churn score is above the capacity-based threshold."}
+  - {name: churn_top_reasons, type: text, nullable: true, description: "The features pushing the churn score up, in plain words."}
+  - {name: expansion_score, type: number, nullable: true, description: "Modelled chance of expanding in the next 90 days (0 to 1)."}
+  - {name: expansion_ready, type: boolean, nullable: false, description: "True when the expansion score is above the capacity-based threshold."}
+  - {name: expansion_top_reasons, type: text, nullable: true, description: "The features pushing the expansion score up, in plain words."}
+
+  # lifecycle (added in version 2)
+  - {name: lifecycle_stage, type: text, nullable: false, description: "onboarding, adopting, mature, expansion, renewal or at_risk. First matching rule wins; see docs/metrics.md."}

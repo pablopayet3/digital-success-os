@@ -26,3 +26,13 @@ sources:
       - name: nps
       - name: email_engagement
       - name: mailbox
+
+  # Tables written by Python (analytics/score.py) between the two dbt stages.
+  - name: analytics
+    schema: gold
+    description: Model scores and behaviour clusters, written back to the warehouse.
+    tables:
+      - name: account_scores
+        description: Churn-risk and expansion scores per account per day, with top reasons.
+      - name: account_clusters
+        description: Behaviour cluster (k-means) per account, as of today.
