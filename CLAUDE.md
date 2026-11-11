@@ -4,7 +4,7 @@
 
 ## What this is
 
-A portfolio demo for a hiring-manager interview. It turns raw customer signals into plays,
+A portfolio demo. It turns raw customer signals into plays,
 AI-agent actions and human handoffs, with a return signal, measured against a holdout.
 The full brief is in `BRIEF.md` (kept out of git).
 
@@ -26,8 +26,8 @@ human's outcome comes back into the system. Every play has a holdout.
   `docs/demo-script.md` and the ADRs about the production profile (the brief update asked
   for those). The app does not list those two documents. The employer is never named.
 - Every file and screen says "Synthetic data, fictional company".
-- Simple, readable code over clever code. The owner is not a software engineer and will
-  walk through this code live. Short functions, plain names, comments that say why.
+- Simple, readable code over clever code. This code is walked through live, line by line.
+  Short functions, plain names, comments that say why.
 - Every design decision gets an ADR in `docs/decisions/` (context, options, decision,
   consequences, revisit if).
 - Tests as we go: pytest for Python, dbt tests for data.
