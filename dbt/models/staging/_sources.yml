@@ -26,6 +26,18 @@ sources:
       - name: nps
       - name: email_engagement
       - name: mailbox
+      # The operational store (what the engine, the agents and the staff did), copied
+      # as it is on every pipeline run by ingest/load_ops.py.
+      - name: ops_enrollments
+        description: Who is in which play, and in which arm (treatment or holdout).
+      - name: ops_touches
+        description: Every email, in-app prompt and agent conversation delivered.
+      - name: ops_ctas
+        description: Tasks handed to people, with their outcome.
+      - name: ops_conversations
+        description: Conversations the onboarding agent had.
+      - name: ops_mailbox_triage
+        description: What the mailbox triage agent did with each reply.
 
   # Tables written by Python (analytics/score.py) between the two dbt stages.
   - name: analytics

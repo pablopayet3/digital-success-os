@@ -70,6 +70,7 @@ Goal (ends the journey at once when reached): `has_valid_admin >= 1`.
 
 - tests/test_engine.py (plays enter the right accounts; a paused account gets no email)
 - evals/cases/mailbox.yaml: left_company cases (a departed admin opens this task)
+- `evals/cases/mailbox.yaml` (1 cases): mbx-04-left-company
 
 ## Success metric
 

@@ -1,0 +1,502 @@
+{
+ "as_of": "2026-10-09",
+ "pilot_segments": [
+  "uncovered"
+ ],
+ "min_days_observed": 7,
+ "plays": [
+  {
+   "play_id": "find_the_admin",
+   "play_name": "Find the admin",
+   "owner": "CS Operations lead",
+   "metric": "valid_admin_restored",
+   "metric_description": "Account has an emailable admin within 30 days.",
+   "rollout_stage": "full",
+   "holdout_pct": 0.0,
+   "entered_total": 59,
+   "n_treatment": 57,
+   "n_holdout": 0,
+   "successes_treatment": 43,
+   "successes_holdout": 0,
+   "median_days_observed": 11.0,
+   "ladder": [
+    {
+     "tier": "human",
+     "accounts": 57,
+     "successes": 43,
+     "rate": 0.7543859649122807
+    }
+   ],
+   "cohorts": [
+    {
+     "week_starting": "2026-09-28",
+     "n_treatment": 57,
+     "rate_treatment": 0.7543859649122807,
+     "n_holdout": 0,
+     "rate_holdout": null
+    }
+   ],
+   "money": {
+    "treatment": {
+     "arr_at_entry": 95886.0,
+     "retained_arr": 95886.0,
+     "retained_arr_share": 1.0,
+     "expansion_won": 0.0,
+     "expansion_per_account": 0.0
+    },
+    "holdout": {
+     "arr_at_entry": 0.0,
+     "retained_arr": 0.0,
+     "retained_arr_share": null,
+     "expansion_won": 0.0,
+     "expansion_per_account": null
+    }
+   },
+   "rate_treatment": 0.7543859649122807,
+   "verdict": "Not an experiment (no holdout): 75% reached the goal.",
+   "recommendation": "Keep running; track the rate."
+  },
+  {
+   "play_id": "detractor_save",
+   "play_name": "Detractor save",
+   "owner": "Scaled CS team lead",
+   "metric": "retained_30d",
+   "metric_description": "Account is still active 30 days after entering the play.",
+   "rollout_stage": "full",
+   "holdout_pct": 0.2,
+   "entered_total": 54,
+   "n_treatment": 25,
+   "n_holdout": 7,
+   "successes_treatment": 25,
+   "successes_holdout": 7,
+   "median_days_observed": 11.0,
+   "ladder": [
+    {
+     "tier": "human",
+     "accounts": 25,
+     "successes": 25,
+     "rate": 1.0
+    }
+   ],
+   "cohorts": [
+    {
+     "week_starting": "2026-09-28",
+     "n_treatment": 25,
+     "rate_treatment": 1.0,
+     "n_holdout": 7,
+     "rate_holdout": 1.0
+    }
+   ],
+   "money": {
+    "treatment": {
+     "arr_at_entry": 64016.0,
+     "retained_arr": 64016.0,
+     "retained_arr_share": 1.0,
+     "expansion_won": 1842.0,
+     "expansion_per_account": 73.68
+    },
+    "holdout": {
+     "arr_at_entry": 17491.0,
+     "retained_arr": 17491.0,
+     "retained_arr_share": 1.0,
+     "expansion_won": 0.0,
+     "expansion_per_account": 0.0
+    }
+   },
+   "rate_treatment": 1.0,
+   "rate_holdout": 1.0,
+   "lift": 0.0,
+   "ci_low": 0.0,
+   "ci_high": 0.0,
+   "z": 0.0,
+   "p_value": 1.0,
+   "srm": {
+    "expected_holdout_share": 0.2,
+    "observed_holdout_share": 0.2037037037037037,
+    "p_value": 0.9457526927267955,
+    "ok": true
+   },
+   "detectable_lift": 0.26095210288480153,
+   "guardrail_retention": {
+    "rate_treatment": 1.0,
+    "rate_holdout": 1.0
+   },
+   "verdict": "Too early: fewer than 20 accounts in a group.",
+   "recommendation": "Keep testing."
+  },
+  {
+   "play_id": "onboarding_rescue",
+   "play_name": "Onboarding rescue",
+   "owner": "Digital Success Portfolio Lead",
+   "metric": "setup_completed",
+   "metric_description": "Prerequisite closure reaches 75% or more within 30 days.",
+   "rollout_stage": "full",
+   "holdout_pct": 0.5,
+   "entered_total": 89,
+   "n_treatment": 34,
+   "n_holdout": 43,
+   "successes_treatment": 11,
+   "successes_holdout": 0,
+   "median_days_observed": 11.0,
+   "ladder": [
+    {
+     "tier": "digital",
+     "accounts": 1,
+     "successes": 0,
+     "rate": 0.0
+    },
+    {
+     "tier": "human",
+     "accounts": 33,
+     "successes": 11,
+     "rate": 0.3333333333333333
+    }
+   ],
+   "cohorts": [
+    {
+     "week_starting": "2026-09-28",
+     "n_treatment": 34,
+     "rate_treatment": 0.3235294117647059,
+     "n_holdout": 43,
+     "rate_holdout": 0.0
+    }
+   ],
+   "money": {
+    "treatment": {
+     "arr_at_entry": 75091.0,
+     "retained_arr": 75091.0,
+     "retained_arr_share": 1.0,
+     "expansion_won": 0.0,
+     "expansion_per_account": 0.0
+    },
+    "holdout": {
+     "arr_at_entry": 76776.0,
+     "retained_arr": 76776.0,
+     "retained_arr_share": 1.0,
+     "expansion_won": 0.0,
+     "expansion_per_account": 0.0
+    }
+   },
+   "rate_treatment": 0.3235294117647059,
+   "rate_holdout": 0.0,
+   "lift": 0.3235294117647059,
+   "ci_low": 0.16627676772784217,
+   "ci_high": 0.48078205580156963,
+   "z": 4.028696086435753,
+   "p_value": 5.608706851045753e-05,
+   "srm": {
+    "expected_holdout_share": 0.5,
+    "observed_holdout_share": 0.5280898876404494,
+    "p_value": 0.5961126657233238,
+    "ok": true
+   },
+   "detectable_lift": 0.1400478714324129,
+   "guardrail_retention": {
+    "rate_treatment": 1.0,
+    "rate_holdout": 1.0
+   },
+   "verdict": "Working: +32% on the success metric, unlikely to be chance (p = 0.000).",
+   "recommendation": "Scale: move to the next rollout stage or the next segment, and keep a holdout."
+  },
+  {
+   "play_id": "usage_recovery",
+   "play_name": "Usage recovery",
+   "owner": "Digital Success Portfolio Lead",
+   "metric": "usage_recovered",
+   "metric_description": "Monthly active users back to at least 90% of the pre-drop level within 30 days.",
+   "rollout_stage": "full",
+   "holdout_pct": 0.5,
+   "entered_total": 43,
+   "n_treatment": 22,
+   "n_holdout": 12,
+   "successes_treatment": 3,
+   "successes_holdout": 1,
+   "median_days_observed": 11.0,
+   "ladder": [
+    {
+     "tier": "digital",
+     "accounts": 18,
+     "successes": 3,
+     "rate": 0.16666666666666666
+    },
+    {
+     "tier": "human",
+     "accounts": 2,
+     "successes": 0,
+     "rate": 0.0
+    },
+    {
+     "tier": "none",
+     "accounts": 2,
+     "successes": 0,
+     "rate": 0.0
+    }
+   ],
+   "cohorts": [
+    {
+     "week_starting": "2026-09-28",
+     "n_treatment": 22,
+     "rate_treatment": 0.13636363636363635,
+     "n_holdout": 12,
+     "rate_holdout": 0.08333333333333333
+    }
+   ],
+   "money": {
+    "treatment": {
+     "arr_at_entry": 40793.0,
+     "retained_arr": 40793.0,
+     "retained_arr_share": 1.0,
+     "expansion_won": 0.0,
+     "expansion_per_account": 0.0
+    },
+    "holdout": {
+     "arr_at_entry": 17733.0,
+     "retained_arr": 17733.0,
+     "retained_arr_share": 1.0,
+     "expansion_won": 0.0,
+     "expansion_per_account": 0.0
+    }
+   },
+   "rate_treatment": 0.13636363636363635,
+   "rate_holdout": 0.08333333333333333,
+   "lift": 0.053030303030303025,
+   "ci_low": -0.15914690491396954,
+   "ci_high": 0.26520751097457557,
+   "z": 0.45864314597902295,
+   "p_value": 0.6464904476724707,
+   "srm": {
+    "expected_holdout_share": 0.5,
+    "observed_holdout_share": 0.3953488372093023,
+    "p_value": 0.16991184173149204,
+    "ok": true
+   },
+   "detectable_lift": 0.27772221666555524,
+   "guardrail_retention": {
+    "rate_treatment": 1.0,
+    "rate_holdout": 1.0
+   },
+   "verdict": "Too early: fewer than 20 accounts in a group.",
+   "recommendation": "Keep testing."
+  },
+  {
+   "play_id": "edition_upgrade",
+   "play_name": "Edition upgrade",
+   "owner": "Digital Success Portfolio Lead, with Sales",
+   "metric": "expanded_30d",
+   "metric_description": "A closed-won expansion opportunity within 30 days.",
+   "rollout_stage": "slice",
+   "holdout_pct": 0.5,
+   "entered_total": 6,
+   "n_treatment": 4,
+   "n_holdout": 2,
+   "successes_treatment": 0,
+   "successes_holdout": 0,
+   "median_days_observed": 11.0,
+   "ladder": [
+    {
+     "tier": "digital",
+     "accounts": 2,
+     "successes": 0,
+     "rate": 0.0
+    },
+    {
+     "tier": "human",
+     "accounts": 2,
+     "successes": 0,
+     "rate": 0.0
+    }
+   ],
+   "cohorts": [
+    {
+     "week_starting": "2026-09-28",
+     "n_treatment": 4,
+     "rate_treatment": 0.0,
+     "n_holdout": 2,
+     "rate_holdout": 0.0
+    }
+   ],
+   "money": {
+    "treatment": {
+     "arr_at_entry": 7455.0,
+     "retained_arr": 7455.0,
+     "retained_arr_share": 1.0,
+     "expansion_won": 0.0,
+     "expansion_per_account": 0.0
+    },
+    "holdout": {
+     "arr_at_entry": 2642.0,
+     "retained_arr": 2642.0,
+     "retained_arr_share": 1.0,
+     "expansion_won": 0.0,
+     "expansion_per_account": 0.0
+    }
+   },
+   "rate_treatment": 0.0,
+   "rate_holdout": 0.0,
+   "lift": 0.0,
+   "ci_low": 0.0,
+   "ci_high": 0.0,
+   "z": 0.0,
+   "p_value": 1.0,
+   "srm": {
+    "expected_holdout_share": 0.5,
+    "observed_holdout_share": 0.3333333333333333,
+    "p_value": 0.41421617824252516,
+    "ok": true
+   },
+   "detectable_lift": 0.5284884104689525,
+   "guardrail_retention": {
+    "rate_treatment": 1.0,
+    "rate_holdout": 1.0
+   },
+   "verdict": "Too early: fewer than 20 accounts in a group.",
+   "recommendation": "Keep the slice running."
+  },
+  {
+   "play_id": "expansion_seats",
+   "play_name": "Seat expansion",
+   "owner": "Sales lead, with Digital Success",
+   "metric": "expanded_30d",
+   "metric_description": "A closed-won expansion opportunity within 30 days.",
+   "rollout_stage": "full",
+   "holdout_pct": 0.5,
+   "entered_total": 125,
+   "n_treatment": 64,
+   "n_holdout": 35,
+   "successes_treatment": 1,
+   "successes_holdout": 5,
+   "median_days_observed": 11.0,
+   "ladder": [
+    {
+     "tier": "human",
+     "accounts": 64,
+     "successes": 1,
+     "rate": 0.015625
+    }
+   ],
+   "cohorts": [
+    {
+     "week_starting": "2026-09-28",
+     "n_treatment": 64,
+     "rate_treatment": 0.015625,
+     "n_holdout": 35,
+     "rate_holdout": 0.14285714285714285
+    }
+   ],
+   "money": {
+    "treatment": {
+     "arr_at_entry": 121567.0,
+     "retained_arr": 121567.0,
+     "retained_arr_share": 1.0,
+     "expansion_won": 239.0,
+     "expansion_per_account": 3.734375
+    },
+    "holdout": {
+     "arr_at_entry": 92738.0,
+     "retained_arr": 92738.0,
+     "retained_arr_share": 1.0,
+     "expansion_won": 3986.0,
+     "expansion_per_account": 113.88571428571429
+    }
+   },
+   "rate_treatment": 0.015625,
+   "rate_holdout": 0.14285714285714285,
+   "lift": -0.12723214285714285,
+   "ci_low": -0.24707886197779452,
+   "ci_high": -0.007385423736491176,
+   "z": -2.536421049358985,
+   "p_value": 0.011199199208711486,
+   "srm": {
+    "expected_holdout_share": 0.5,
+    "observed_holdout_share": 0.4,
+    "p_value": 0.025347318677468256,
+    "ok": true
+   },
+   "detectable_lift": 0.2059819686976785,
+   "guardrail_retention": {
+    "rate_treatment": 1.0,
+    "rate_holdout": 1.0
+   },
+   "verdict": "Harmful: -13% on the success metric (p = 0.011).",
+   "recommendation": "Stop the play and review the journey."
+  },
+  {
+   "play_id": "cross_product_docs",
+   "play_name": "Cross-product (Docs)",
+   "owner": "Digital Success Portfolio Lead",
+   "metric": "docs_adopted",
+   "metric_description": "The account publishes its first doc within 30 days.",
+   "rollout_stage": "slice",
+   "holdout_pct": 0.5,
+   "entered_total": 8,
+   "n_treatment": 4,
+   "n_holdout": 3,
+   "successes_treatment": 0,
+   "successes_holdout": 0,
+   "median_days_observed": 11.0,
+   "ladder": [
+    {
+     "tier": "digital",
+     "accounts": 4,
+     "successes": 0,
+     "rate": 0.0
+    }
+   ],
+   "cohorts": [
+    {
+     "week_starting": "2026-09-28",
+     "n_treatment": 4,
+     "rate_treatment": 0.0,
+     "n_holdout": 3,
+     "rate_holdout": 0.0
+    }
+   ],
+   "money": {
+    "treatment": {
+     "arr_at_entry": 21220.0,
+     "retained_arr": 21220.0,
+     "retained_arr_share": 1.0,
+     "expansion_won": 1842.0,
+     "expansion_per_account": 460.5
+    },
+    "holdout": {
+     "arr_at_entry": 5517.0,
+     "retained_arr": 5517.0,
+     "retained_arr_share": 1.0,
+     "expansion_won": 585.0,
+     "expansion_per_account": 195.0
+    }
+   },
+   "rate_treatment": 0.0,
+   "rate_holdout": 0.0,
+   "lift": 0.0,
+   "ci_low": 0.0,
+   "ci_high": 0.0,
+   "z": 0.0,
+   "p_value": 1.0,
+   "srm": {
+    "expected_holdout_share": 0.5,
+    "observed_holdout_share": 0.375,
+    "p_value": 0.4795001221869534,
+    "ok": true
+   },
+   "detectable_lift": 0.4660829682935575,
+   "guardrail_retention": {
+    "rate_treatment": 1.0,
+    "rate_holdout": 1.0
+   },
+   "verdict": "Too early: fewer than 20 accounts in a group.",
+   "recommendation": "Keep the slice running."
+  }
+ ],
+ "handoffs": {
+  "handoffs": 225,
+  "closed": 216,
+  "open_now": 9,
+  "sla_breach_rate": 0.16,
+  "escalation_conversion": 0.6111111111111112,
+  "unnecessary_handoff_rate": 0.041666666666666664,
+  "agent_handoffs": 37,
+  "docs_gap_share": 0.0
+ }
+}

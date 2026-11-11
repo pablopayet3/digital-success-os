@@ -82,3 +82,63 @@ the evidence in words.
 | Expanded within 90 days | A closed-won expansion opportunity in the 90 days after the day | account × day | `gold.fct_outcome_labels` | RevOps |
 
 "Today" always means the latest licence snapshot date in the warehouse, never the clock.
+
+## Play outcomes (success metrics)
+
+One row per enrolment in `gold.metrics_play_outcomes`, treatment and holdout alike. The
+measurement window is the 30 days after the account entered the play
+(`measurement_window_days` in `config/plays.yaml`). Each play names one of these as its
+success metric before launch; the others are available as guardrails.
+
+| Metric | Definition | Success metric of |
+|---|---|---|
+| `setup_completed` | Prerequisite closure reached 75% or more on any day in the window | Onboarding rescue |
+| `usage_recovered` | Monthly active users reached 90% or more of the level before the drop (the prior-30-day figure on the day of entry) | Usage recovery |
+| `retained_30d` | The account had not churned by the end of the window | Detractor save; guardrail for every play |
+| `valid_admin_restored` | The account had an admin we may email on any day in the window | Find the admin |
+| `expanded_30d` | An expansion opportunity was closed-won in the window | Seat expansion, Edition upgrade |
+| `docs_adopted` | At least one doc was published in the window | Cross-product (Docs) |
+
+Also on each row: `arr_at_entry`, `retained_arr` (ARR at entry if the account was
+retained, else 0), `expansion_amount` (closed-won expansion in the window),
+`highest_tier` (the highest ladder rung reached), `days_observed`, `window_complete`.
+
+## Experiment results
+
+Computed by `experiments/analyze.py` from the table above, per play version.
+
+| Term | Definition |
+|---|---|
+| Treatment rate, holdout rate | Accounts that reached the success metric, divided by accounts in the group. Only accounts observed for 7 days or more count. |
+| Lift | Treatment rate minus holdout rate, in percentage points. |
+| 95% interval | Lift plus or minus 1.96 standard errors, each group using its own rate. |
+| p-value | Two-sided two-proportion z-test with a pooled rate. Below 0.05 counts as a real difference. |
+| Sample-ratio check | Chi-square test of the observed split against the designed holdout share. Below 0.01, the result is not read. |
+| Smallest detectable lift | The lift the sample would catch 80% of the time at the 5% level. |
+| Retained ARR share | Sum of `retained_arr` divided by sum of `arr_at_entry`, per group. |
+| Expansion per account | Sum of `expansion_amount` divided by accounts, per group. |
+| Verdict | Working (p < 0.05, positive), Harmful (p < 0.05, negative), No effect detected, Too early (fewer than 20 accounts in a group), or Not an experiment (no holdout). |
+
+## Human-fallback metrics
+
+From `gold.metrics_handoffs` (one row per queue, reason and source).
+
+| Metric | Definition |
+|---|---|
+| Handoff rate | Agent conversations that ended in a handoff, divided by all agent conversations (`gold.metrics_agent`) |
+| Time to pickup | Days from task created to picked up |
+| SLA breach rate | Tasks picked up after their due date, or still open past it, divided by all tasks |
+| Escalation conversion | Tasks closed as resolved, saved or expansion opportunity, divided by tasks closed |
+| Unnecessary handoff rate | Tasks closed as "the agent should have handled this", divided by tasks closed |
+| Docs gap share | Agent handoffs with reason `not_in_docs`, divided by agent handoffs |
+
+## Agent evaluation metrics
+
+From `evals/reports/eval-report.md`.
+
+| Metric | Definition |
+|---|---|
+| Pass rate | Cases where every code check passed (and the judge, where one applies), divided by cases run. Skipped cases are left out. |
+| Judge score | 1 to 5 on grounding, answering the question, clarity and no promises. 4 or more passes. |
+| Classifier accuracy | Replies whose predicted intent equals the simulator's label, divided by replies scored |
+| Costly misses | Unsubscribes or complaints classified as anything else |

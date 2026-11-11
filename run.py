@@ -7,6 +7,8 @@ Usage:
     uv run python run.py train             train the churn and expansion models
     uv run python run.py run-day           simulate one day: world, pipeline, engine
     uv run python run.py run-days 30       simulate thirty days
+    uv run python run.py evals             score the agents on the evaluation cases
+    uv run python run.py experiments       compare every play with its holdout
     uv run python run.py specs             rebuild docs/play-specs/ from the play config
     uv run python run.py test              run the tests
     uv run python run.py lint              check code style
@@ -25,7 +27,8 @@ LATER = {"demo": 7, "app": 7}
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Digital Success OS task runner")
-    commands = ["data", "pipeline", "train", "run-day", "run-days", "specs", "test", "lint"]
+    commands = ["data", "pipeline", "train", "run-day", "run-days", "evals", "experiments"]
+    commands += ["specs", "test", "lint"]
     commands += list(LATER)
     parser.add_argument("command", choices=commands)
     parser.add_argument("days", nargs="?", type=int, default=30, help="for run-days: how many")
@@ -56,6 +59,14 @@ def main() -> None:
         from engine.run import run_days
 
         run_days(args.days)
+    elif args.command == "evals":
+        from evals.run import run_evals
+
+        run_evals()
+    elif args.command == "experiments":
+        from experiments.analyze import analyse
+
+        analyse()
     elif args.command == "specs":
         from engine.specs import write_play_specs
 

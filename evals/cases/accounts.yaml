@@ -1,0 +1,132 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# The accounts the evaluation cases talk about. Each case names one of the variants
+# below; a variant is the base account with a few fields changed. They are made up for
+# the evals, so the cases give the same result on any machine, with or without data.
+
+base:
+  account_id: EVAL-0001
+  account_name: Harbour Lane Studio
+  segment: smb
+  coverage_tier: uncovered
+  edition: standard
+  lifecycle_stage: onboarding
+  arr: 4200
+  renewal_date: "2027-03-01"
+  days_to_renewal: 150
+  account_owner: Morgan Ellis
+  account_age_days: 12
+  seats_licensed: 15
+  seats_assigned: 4
+  seats_assigned_30d_ago: 3
+  seat_utilisation: 0.27
+  mau_30d: 3
+  mau_prior_30d: 2
+  has_first_board: true
+  has_five_users: false
+  has_integration: false
+  has_sso: false
+  prerequisite_closure_pct: 0.25
+  automation_rules_total: 2
+  automation_rule_limit: 15
+  integrations_total: 0
+  integration_limit: 3
+  assist_credits_30d: 0
+  assist_credits_included: 10
+  health_score: 48.0
+  health_band: red
+  health_adoption: 30.0
+  health_engagement: 45.0
+  health_sentiment: 60.0
+  health_support: 80.0
+  health_commercial: 50.0
+  tickets_30d: 1
+  high_priority_tickets_30d: 0
+  open_high_priority_tickets: 0
+  latest_nps_score: null
+  lowest_nps_14d: null
+  churn_risk_score: 0.22
+  churn_top_reasons: setup is not finished
+  expansion_score: 0.08
+  expansion_top_reasons: ""
+  contacts_total: 3
+  emailable_contacts: 2
+  has_valid_admin: true
+  signals_firing: activation_stalled
+
+variants:
+  nothing_set_up:
+    has_first_board: false
+    prerequisite_closure_pct: 0.0
+  team_not_invited: {}          # the base account: a board, but fewer than five users
+  no_integration:
+    has_five_users: true
+    seats_assigned: 9
+    seat_utilisation: 0.6
+    prerequisite_closure_pct: 0.5
+  only_sso_missing:
+    has_five_users: true
+    has_integration: true
+    integrations_total: 1
+    seats_assigned: 11
+    seat_utilisation: 0.73
+    prerequisite_closure_pct: 0.75
+  free_edition:
+    edition: free
+    seats_licensed: 10
+    arr: 0
+    automation_rule_limit: 5
+    integration_limit: 2
+    assist_credits_included: 0
+  seats_nearly_full:
+    lifecycle_stage: expansion
+    has_five_users: true
+    has_integration: true
+    integrations_total: 2
+    prerequisite_closure_pct: 0.75
+    seats_licensed: 25
+    seats_assigned: 24
+    seats_assigned_30d_ago: 19
+    seat_utilisation: 0.96
+    mau_30d: 22
+    mau_prior_30d: 18
+    health_score: 81.0
+    health_band: green
+    expansion_score: 0.64
+    expansion_top_reasons: seats are nearly full; usage is growing
+    signals_firing: seat_pressure
+  at_rule_limit:
+    lifecycle_stage: mature
+    has_five_users: true
+    has_integration: true
+    integrations_total: 3
+    prerequisite_closure_pct: 0.75
+    seats_assigned: 11
+    seat_utilisation: 0.73
+    mau_30d: 10
+    automation_rules_total: 15
+    health_score: 74.0
+    health_band: green
+    expansion_score: 0.41
+    expansion_top_reasons: at the automation rule limit
+    signals_firing: edition_fit
+  growing_but_unhappy:
+    lifecycle_stage: expansion
+    has_five_users: true
+    has_integration: true
+    integrations_total: 2
+    prerequisite_closure_pct: 0.75
+    seats_licensed: 40
+    seats_assigned: 37
+    seats_assigned_30d_ago: 31
+    seat_utilisation: 0.93
+    mau_30d: 33
+    open_high_priority_tickets: 2
+    high_priority_tickets_30d: 3
+    latest_nps_score: 4
+    health_score: 58.0
+    health_band: yellow
+    days_to_renewal: 40
+    expansion_score: 0.55
+    expansion_top_reasons: seats are nearly full
+    signals_firing: seat_pressure, support_friction

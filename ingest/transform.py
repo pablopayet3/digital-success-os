@@ -34,9 +34,19 @@ def dbt_target_dir() -> Path:
 
 
 def dbt_variables() -> str:
-    """Settings that live in config/ and that the SQL models need (health weights and bands)."""
+    """Settings that live in config/ and that the SQL models need.
+
+    Health weights and bands, and the length of a play's measurement window.
+    """
     health = load_yaml("health.yaml")
-    return json.dumps({"health_weights": health["weights"], "health_bands": health["bands"]})
+    window = load_yaml("plays.yaml")["defaults"]["measurement_window_days"]
+    return json.dumps(
+        {
+            "health_weights": health["weights"],
+            "health_bands": health["bands"],
+            "measurement_window_days": window,
+        }
+    )
 
 
 def run_dbt(command: list[str], data_dir: Path = DATA_DIR) -> bool:

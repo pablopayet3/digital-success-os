@@ -166,3 +166,50 @@ models:
       - name: account_id
         description: Found through the email the message replies to.
         data_tests: [not_null]
+
+  - name: stg_ops_enrollments
+    description: Play enrolments from the operational store, treatment and holdout. One row per account per play version.
+    columns:
+      - name: enrollment_id
+        data_tests: [unique, not_null]
+      - name: enrolled_on
+        data_tests: [not_null]
+
+  - name: stg_ops_touches
+    description: Every touch a play delivered to a customer.
+    columns:
+      - name: touch_id
+        data_tests: [unique, not_null]
+      - name: tier
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [digital, agentic, human]
+
+  - name: stg_ops_ctas
+    description: Tasks handed to people, with queue, reason, SLA date and outcome.
+    columns:
+      - name: cta_id
+        data_tests: [unique, not_null]
+      - name: status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [open, in_progress, resolved]
+
+  - name: stg_ops_conversations
+    description: Conversations the onboarding agent had, and how each one ended.
+    columns:
+      - name: conversation_id
+        data_tests: [unique, not_null]
+      - name: outcome
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [resolved, escalated]
+
+  - name: stg_ops_mailbox_triage
+    description: What the mailbox triage agent did with each reply.
+    columns:
+      - name: message_id
+        data_tests: [unique, not_null]

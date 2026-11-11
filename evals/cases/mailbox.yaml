@@ -1,0 +1,72 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# Evaluation cases for the mailbox classifier: replies that are easy to get wrong.
+# The expected action is not written here: it follows from the intent through
+# config/routing.yaml, and the report shows it.
+#
+# Separately, the eval scores the classifier on a sample of the generated mailbox
+# against the simulator's labels (a confusion matrix).
+
+defaults: {}
+
+cases:
+  - id: mbx-01-out-of-office-german
+    play: null
+    subject: "Automatische Antwort: Ihr Relay-Setup"
+    body: "Vielen Dank für Ihre Nachricht. Ich bin bis zum 14.10. nicht im Büro und habe keinen Zugriff auf meine E-Mails."
+    expect: {intent: out_of_office}
+
+  - id: mbx-02-unsubscribe-polite
+    play: null
+    subject: "Re: Three steps to finish your Relay setup"
+    body: "Please take me off this list, thanks."
+    expect: {intent: unsubscribe}
+
+  - id: mbx-03-complaint-outranks-unsubscribe
+    play: detractor_save
+    subject: "Re: What your team is missing in Relay"
+    body: "Stop sending me these. We lost a day of work last week because of your outage and nobody replied to our ticket."
+    expect: {intent: complaint}
+
+  - id: mbx-04-left-company
+    play: find_the_admin
+    subject: "Re: Three steps to finish your Relay setup"
+    body: "Dana no longer works here. Please contact Lee Park instead."
+    expect: {intent: left_company}
+
+  - id: mbx-05-buying-outranks-question
+    play: edition_upgrade
+    subject: "Re: You have reached your automation limit"
+    body: "Does Relay Docs work with our boards? If it does, we would want it, and about 30 more seats."
+    expect: {intent: buying_intent}
+
+  - id: mbx-06-meeting
+    play: null
+    subject: "Re: Three steps to finish your Relay setup"
+    body: "Could we book a session next week to walk our admins through this?"
+    expect: {intent: meeting_request}
+
+  - id: mbx-07-product-question
+    play: null
+    subject: "Re: What your team is missing in Relay"
+    body: "Is there a way to export a board to a spreadsheet?"
+    expect: {intent: product_question}
+
+  - id: mbx-08-too-short-to-tell
+    play: null
+    subject: "Re: Three steps to finish your Relay setup"
+    body: "ok"
+    expect: {intent: other, max_confidence: 0.6}
+
+  - id: mbx-09-sarcastic-complaint
+    play: detractor_save
+    needs_model: true
+    subject: "Re: What your team is missing in Relay"
+    body: "Great, another email. Maybe repair the invitations that have been broken for two weeks before you write again."
+    expect: {intent: complaint}
+
+  - id: mbx-10-on-leave-not-gone
+    play: null
+    subject: "Automatic reply: Three steps to finish your Relay setup"
+    body: "I am on annual leave until 3 November. For anything urgent please contact Sam Reyes."
+    expect: {intent: out_of_office}

@@ -1,0 +1,29 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# Evaluation cases for the account-owner brief. The first check is always the same and
+# is the one that matters: every number in the brief must be in the account's data.
+
+defaults:
+  play: expansion_seats
+
+cases:
+  - id: brf-01-seats-nearly-full
+    account: seats_nearly_full
+    trigger: {play_id: expansion_seats, trigger_signal: seat_pressure, trigger_evidence: 24 of 25 seats assigned}
+    expect: {must_contain: ["24", "25"]}
+
+  - id: brf-02-at-the-rule-limit
+    play: edition_upgrade
+    account: at_rule_limit
+    trigger: {play_id: edition_upgrade, trigger_signal: edition_fit, trigger_evidence: At the automation rule limit (15) of standard}
+    expect: {must_contain: ["15"]}
+
+  - id: brf-03-growing-but-unhappy
+    account: growing_but_unhappy
+    trigger: {play_id: expansion_seats, trigger_signal: seat_pressure, trigger_evidence: 37 of 40 seats assigned}
+    expect: {must_contain: ["37", "40"]}
+
+  - id: brf-04-renewal-is-close
+    account: growing_but_unhappy
+    trigger: {play_id: expansion_seats, trigger_signal: expansion_ready, trigger_evidence: Expansion likelihood 55%}
+    expect: {must_contain: ["40"]}

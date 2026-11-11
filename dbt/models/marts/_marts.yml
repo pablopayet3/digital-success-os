@@ -146,6 +146,51 @@ models:
       - name: measure
         data_tests: [unique, not_null]
 
+  - name: metrics_play_outcomes
+    description: >
+      What happened to every account that entered a play, treatment and holdout alike.
+      One row per enrolment, with six yes/no outcomes over the measurement window.
+    columns:
+      - name: enrollment_id
+        data_tests: [unique, not_null]
+      - name: arm
+        description: treatment (received the play) or holdout (held back for comparison).
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [treatment, holdout]
+      - name: account_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_account')
+                field: account_id
+      - name: highest_tier
+        description: The highest rung of the intervention ladder the account reached.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [none, digital, agentic, human]
+      - name: retained_30d
+        data_tests: [not_null]
+
+  - name: metrics_play_summary
+    description: Each play's results by arm and metric. The play config names the success metric.
+    columns:
+      - name: accounts
+        data_tests: [not_null]
+
+  - name: metrics_play_ladder
+    description: Results per rung of the intervention ladder (digital, agentic, human).
+
+  - name: metrics_handoffs
+    description: Handoffs to people by queue, reason and source, with pickup time, SLA breaches and outcomes.
+
+  - name: metrics_agent
+    description: How the onboarding agent's conversations ended, by origin, prompt version and reason.
+
 seeds:
   - name: edition_limits
     description: What each edition includes. Reaching a limit is a signal that the next edition fits.

@@ -439,3 +439,68 @@ From then on offline mode replays the real responses for free.
 
 ADRs 0002 (BM25 retrieval), 0003 (escalation rules in code), 0015 (LLM cost controls,
 model choice and the stand-in).
+
+---
+
+## Phase 6: evals and experiments
+
+### What works
+
+- **Outcome tables in the warehouse**: `gold.metrics_play_outcomes` (one row per
+  enrolment, treatment and holdout, six yes/no outcomes over the 30-day window),
+  `metrics_play_summary`, `metrics_play_ladder` (per rung: digital, agentic, human),
+  `metrics_handoffs` (pickup time, SLA breaches, outcomes), `metrics_agent`.
+- **Experiment analysis** (`experiments/analyze.py`): per play, treatment against
+  holdout on the metric declared in the play config; lift with a 95% interval, a
+  two-proportion z-test, a sample-ratio check, the smallest detectable lift, weekly
+  cohorts, results per ladder rung, revenue retained and expansion won per group, and a
+  written recommendation. Results also land in `gold.experiment_results` for the app.
+- **Evaluation suite** (`evals/`): 44 cases (30 agent conversations, 10 mailbox replies,
+  4 briefs). Code checks first, LLM judge second. Each agent case runs with both prompt
+  versions. The mailbox classifier is scored against the simulator's labels with a
+  confusion matrix.
+- **Play specs now list their own eval cases**, read from the case files.
+- Reports: `experiments/reports/experiment-report.md`, `evals/reports/eval-report.md`.
+
+### Not yet there
+
+- The eval report was produced with the stand-in model. It proves the harness and the
+  rules. The prompt comparison and the judge need one live run with an API key.
+
+### How to run
+
+```
+uv run python run.py experiments
+uv run python run.py evals
+```
+
+### The three decisions to defend
+
+1. *A 50% holdout and leading indicators for the pilot.* With a few dozen accounts and
+   30 days, a 10% holdout and a churn metric would show nothing. A pilot exists to learn,
+   so half are held back and each play is judged on something that can move in 30 days.
+   Retention is a guardrail. After the pilot the holdout drops to 10% and stays.
+2. *Three protections against fooling ourselves.* A check that the split is the one
+   designed; a minimum sample before any verdict; and the smallest lift the sample could
+   have detected, printed next to every "no effect".
+3. *Code checks first, judge second.* Anything that must always happen is checked by
+   code, for free, the same way every time. The judge only scores the wording of answers
+   that already passed. A safety behaviour never depends on a model's opinion.
+
+### More to be able to explain
+
+- **The z-test in one sentence.** If the play did nothing, how often would two groups of
+  this size differ by this much? If the answer is under 5%, we call it working.
+- **Sample ratio mismatch.** Assignment is by hash, so a 50% design should give about
+  50%. If it gives 60/40 on a thousand accounts, something is filtering one group (for
+  example an exclusion applied after assignment) and the comparison is void.
+- **Why outcomes are computed for both groups in dbt.** Same definition, same data, same
+  code path. The only difference between the groups is the play.
+- **Reading the ladder table.** Accounts that reached the human rung are the hard cases.
+  A lower rate there is selection, not a verdict on people.
+- **What the stand-in eval does and does not show.** It shows every hard rule fires and
+  routes correctly. It cannot show answer quality.
+
+### Decisions recorded
+
+ADRs 0016 (experiment design for the pilot), 0017 (evals: code checks first, judge second).

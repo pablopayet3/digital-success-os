@@ -170,9 +170,7 @@ def _step(step: Step) -> str:
     if step.type == "wait":
         return f"{name}: Wait {step.days} days."
     if step.type == "branch":
-        return (
-            f"{name}: If `{step.condition}` go to `{step.then}`, otherwise `{step.otherwise}`."
-        )
+        return f"{name}: If `{step.condition}` go to `{step.then}`, otherwise `{step.otherwise}`."
     if step.type == "cta":
         brief = " With an account brief." if step.with_brief else ""
         return (

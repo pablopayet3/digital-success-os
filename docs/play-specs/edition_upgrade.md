@@ -82,6 +82,8 @@ Show an account at an edition limit what the next edition lifts, with its own nu
 
 - evals/cases/onboarding_agent.yaml: pricing and upgrade cases (always handed to Sales)
 - evals/cases/mailbox.yaml: buying_intent cases
+- `evals/cases/briefs.yaml` (1 cases): brf-02-at-the-rule-limit
+- `evals/cases/mailbox.yaml` (1 cases): mbx-05-buying-outranks-question
 
 ## Success metric
 

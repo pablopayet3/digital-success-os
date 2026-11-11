@@ -44,5 +44,8 @@ select = ["E", "F", "I", "B", "UP"]
 # Template sentences are easier to read on one line each.
 "synth/text.py" = ["E501"]
 "agents/simulated_customer.py" = ["E501"]
+# Report writers: a table row or a sentence of the report is clearer on one line.
+"evals/run.py" = ["E501"]
+"experiments/analyze.py" = ["E501"]
 # Tests read better with each case on one line.
 "tests/*.py" = ["E501"]

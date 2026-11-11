@@ -73,6 +73,7 @@ Put the unhappy customer in front of a person within 48 hours. The task carries 
 
 - tests/test_engine.py (the handoff packet carries the customer's quote)
 - evals/cases/mailbox.yaml: complaint cases (same route, from the mailbox)
+- `evals/cases/mailbox.yaml` (2 cases): mbx-03-complaint-outranks-unsubscribe, mbx-09-sarcastic-complaint
 
 ## Success metric
 
