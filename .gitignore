@@ -25,7 +25,8 @@ cache/stand_in/
 
 # Secrets and private notes
 .env
-BRIEF.md
+# Anchored to the top folder: on Windows an unanchored rule also hid prompts/brief.md.
+/BRIEF.md
 
 # Local tool settings
 .claude/
