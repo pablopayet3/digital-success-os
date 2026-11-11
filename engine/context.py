@@ -32,6 +32,7 @@ class DayContext:
     signals: dict[str, dict[str, str]]  # account id -> {signal id: evidence}
     contacts: dict[str, list[dict]]  # account id -> contacts (gold.dim_contact)
     opted_out: set[str] = field(default_factory=set)  # contacts who opted out since the CRM sync
+    left_company: set[str] = field(default_factory=set)  # contacts the mailbox told us have left
     paused: set[str] = field(default_factory=set)  # accounts whose emails are on hold
 
     @property
@@ -93,5 +94,8 @@ def load_day(
         signals=signals_by_account,
         contacts=contacts_by_account,
         opted_out={row["contact_id"] for row in opt_outs},
+        left_company={
+            row["contact_id"] for row in store.rows("SELECT contact_id FROM contact_flags")
+        },
         paused={row["account_id"] for row in store.rows("SELECT account_id FROM paused_accounts")},
     )

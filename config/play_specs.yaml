@@ -1,0 +1,117 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# The parts of a play specification that are words, not settings.
+# Everything else in docs/play-specs/<play_id>.md (trigger, audience, exclusions,
+# ladder, journey steps, holdout, success metric, owner) is read from
+# config/plays.yaml and config/journeys.yaml, so the spec cannot drift from what runs.
+#
+# Rebuild the specs with:  uv run python run.py specs
+
+# What each trigger signal means, with its threshold (dbt/models/marts/signals.sql).
+signals:
+  activation_stalled: Account is 7 or more days old and fewer than 50% of setup steps are done.
+  usage_drop: Monthly active users are down 30% or more on the previous 30 days (at least 3 users before).
+  seat_pressure: 90% or more of licensed seats are assigned.
+  edition_fit: At the automation-rule or integration limit of the edition, or 90% of included Assist credits used in 30 days. Not for the top edition.
+  cross_product: 3 or more document-style boards created in 60 days, and the account does not own Relay Docs.
+  detractor: An NPS score of 6 or lower in the last 14 days.
+  support_friction: 3 or more high-priority tickets in 30 days.
+  no_valid_admin: No admin contact with a working email address and consent.
+  churn_risk_high: The churn model's score is above today's capacity cut-off (top 40 accounts in the pilot segment).
+  expansion_ready: The expansion model's score is above today's capacity cut-off (top 60 accounts in the pilot segment).
+
+# What each exclusion means (engine/rules.py).
+exclusions:
+  already_in_this_play: In this play now, or left it less than 60 days ago (cooldown).
+  in_another_play: Already in another exclusive play. One conversation at a time.
+  open_escalation: A person is already working an open task on this account.
+  renewal_in_negotiation: An open renewal opportunity is in negotiation. Sales owns the conversation.
+  no_emailable_admin: No admin we are allowed to email. The "Find the admin" play handles it first.
+  no_emailable_contact: Nobody at the account we are allowed to email.
+
+# Guardrails every play gets from the engine, whatever its config says.
+guardrails:
+  - Consent. Only contacts with a valid address who have not opted out are emailed. An opt-out in the mailbox takes effect the same day.
+  - Frequency cap. At most 2 automated touches per account in any 7 days, across all plays.
+  - Holdout. Assigned by a hash of the account id, the play and its version. A holdout account gets nothing from this play and is reserved for the measurement window.
+  - Audit. Every decision (entered, held out, excluded and why) is written to the audit log.
+  - Pause. A complaint or a missing admin pauses every play's emails for the account.
+
+plays:
+  find_the_admin:
+    job: >
+      Find a person. Open a research task for the contact-research queue with what we know
+      about the account, and pause other plays' emails until an admin we may contact exists.
+    automation_may_use: [CRM contacts and their consent status, product activity by user (who is active)]
+    must_not: [Email anyone at the account to ask who the admin is.]
+    test_cases:
+      - tests/test_engine.py (plays enter the right accounts; a paused account gets no email)
+      - "evals/cases/mailbox.yaml: left_company cases (a departed admin opens this task)"
+
+  detractor_save:
+    job: >
+      Put the unhappy customer in front of a person within 48 hours. The task carries the
+      score, the comment in the customer's own words, usage trend and open tickets.
+    automation_may_use: [NPS score and comment, usage trend, open tickets, health score and components]
+    must_not: [Send an automated reply to a detractor., Let the agent talk to the customer.]
+    test_cases:
+      - tests/test_engine.py (the handoff packet carries the customer's quote)
+      - "evals/cases/mailbox.yaml: complaint cases (same route, from the mailbox)"
+
+  usage_recovery:
+    job: >
+      Remind an account whose usage is falling of what it is not using, twice, digitally.
+      If sentiment is already negative, or usage is still falling 12 days later, a person
+      takes over with the trend and the context.
+    automation_may_use: [Usage trend (monthly active users), features used, NPS band, high-priority tickets]
+    must_not: [Email an account whose sentiment is negative. It goes straight to a person.]
+    test_cases:
+      - tests/test_engine.py (branch on negative sentiment; the journey waits for the outcome)
+
+  onboarding_rescue:
+    job: >
+      Get a stalled account through setup. First the setup guide for the steps still
+      missing. Then the onboarding agent offers a conversation and answers how-to questions
+      from the help centre. Then a person.
+    automation_may_use:
+      - "The agent's tools: setup status (the four steps), account context (edition, seats, health band), help-centre search."
+      - The tools are bound to the one account in the conversation. They take no account id.
+    must_not:
+      - Quote a price, discuss a contract, a refund or a legal matter.
+      - Answer a product question that no help article covers.
+      - Promise a date, a discount or a feature.
+    test_cases:
+      - "evals/cases/onboarding_agent.yaml: every case with play onboarding_rescue"
+      - tests/test_agents.py (each hard escalation rule; a pricing message never reaches the agent model)
+
+  edition_upgrade:
+    job: >
+      Show an account at an edition limit what the next edition lifts, with its own
+      numbers. A reply with a question is a buying signal and goes to Sales with a brief.
+    automation_may_use: [Edition and its limits, automation rules and integrations in use, Assist credits used]
+    must_not: [State a price. The email names the limit and what lifts it, never what it costs.]
+    test_cases:
+      - "evals/cases/onboarding_agent.yaml: pricing and upgrade cases (always handed to Sales)"
+      - "evals/cases/mailbox.yaml: buying_intent cases"
+
+  expansion_seats:
+    job: >
+      Hand the account owner a brief when an account is running out of seats: the signal,
+      the evidence, the likely need, a suggested opener and the risks. AI drafts; a person
+      decides whether and how to reach out.
+    automation_may_use: [Seats licensed and assigned, usage trend, expansion score and its reasons, renewal date, open tickets, NPS band]
+    must_not:
+      - Contact the customer.
+      - Put a number in the brief that is not in the account's data (checked by code; the brief falls back to a template if it does).
+    test_cases:
+      - "evals/cases/briefs.yaml: every case"
+      - tests/test_agents.py (a brief with an invented number is replaced by the template)
+
+  cross_product_docs:
+    job: >
+      Show teams that write documents on boards what Relay Docs would give them: one
+      in-app prompt and one email. Nobody is chased.
+    automation_may_use: [Document-style boards created in 60 days, whether the account owns Relay Docs]
+    must_not: [Escalate to a person. This play stays digital.]
+    test_cases:
+      - tests/test_engine.py (the frequency cap holds across plays)

@@ -20,7 +20,10 @@ PERSONA_PREFERENCE = ["admin", "champion", "end_user", "billing"]
 
 
 def can_email(ctx: DayContext, contact: dict) -> bool:
-    return bool(contact["can_email"]) and contact["contact_id"] not in ctx.opted_out
+    """Opted in with a working address, and nothing learned since then says otherwise."""
+    contact_id = contact["contact_id"]
+    learned_otherwise = contact_id in ctx.opted_out or contact_id in ctx.left_company
+    return bool(contact["can_email"]) and not learned_otherwise
 
 
 def emailable_contacts(ctx: DayContext, account_id: str, admins_only: bool = False) -> list[dict]:

@@ -136,6 +136,63 @@ TABLES = {
         human_notes TEXT,
         packet TEXT NOT NULL
     """,
+    # Every conversation an AI agent had: what was said, which tools ran, how it ended.
+    "conversations": """
+        conversation_id TEXT PRIMARY KEY,
+        day TEXT NOT NULL,
+        account_id TEXT NOT NULL,
+        contact_id TEXT,
+        play_id TEXT,
+        enrollment_id TEXT,
+        scenario TEXT,
+        prompt_version TEXT,
+        outcome TEXT NOT NULL,
+        reason_code TEXT,
+        escalated_by TEXT,
+        queue TEXT,
+        customer_turns INTEGER,
+        transcript TEXT NOT NULL,
+        tool_calls TEXT,
+        searches TEXT,
+        llm_calls INTEGER,
+        cached_llm_calls INTEGER,
+        cost_usd REAL,
+        latency_ms INTEGER,
+        trace_file TEXT,
+        cta_id TEXT,
+        feedback TEXT
+    """,
+    # What the mailbox triage agent decided for each reply in the shared mailbox.
+    "mailbox_triage": """
+        message_id TEXT PRIMARY KEY,
+        processed_on TEXT NOT NULL,
+        account_id TEXT,
+        contact_id TEXT,
+        intent TEXT NOT NULL,
+        sentiment TEXT,
+        confidence REAL,
+        action TEXT NOT NULL,
+        cta_id TEXT,
+        details TEXT
+    """,
+    # Contacts the system has learned something about that the CRM does not know yet.
+    "contact_flags": """
+        contact_id TEXT PRIMARY KEY,
+        account_id TEXT NOT NULL,
+        flag TEXT NOT NULL,
+        flagged_on TEXT NOT NULL,
+        source TEXT NOT NULL
+    """,
+    # Sentiment and theme of NPS comments and ticket texts, from the classifier.
+    "text_classifications": """
+        text_id TEXT PRIMARY KEY,
+        kind TEXT NOT NULL,
+        account_id TEXT,
+        sentiment TEXT NOT NULL,
+        theme TEXT,
+        confidence REAL,
+        classified_on TEXT NOT NULL
+    """,
 }
 
 

@@ -22,6 +22,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+# Importing the agents also plugs the onboarding agent into the journey runner.
+from agents import feedback, mailbox
+from agents.llm import get_llm
 from analytics.train import MODEL_DIR
 from common.paths import DATA_DIR
 from common.store import Store, open_store
@@ -51,11 +54,14 @@ def run_day(
     # 2. The pipeline runs (without the slower checks; `run-days` runs them at the end).
     run_pipeline(data_dir, verbose=False, model_dir=model_dir, checks=False)
 
-    # 3. The engine acts.
+    # 3. The engine acts: staff first (their outcomes are yesterday's return signals),
+    #    then the shared mailbox, then new enrolments, then today's journey steps.
     ctx = load_day(data_dir, store, catalog)
     summary = {
         "date": ctx.day,
         "resolved_by_staff": sum(humans.work_queues(ctx).values()),
+        "mailbox_replies_triaged": sum(mailbox.triage_new_replies(ctx).values()),
+        "feedback_classified": feedback.classify_new_feedback(ctx),
         **rules.evaluate_plays(ctx),
         **journeys.advance_journeys(ctx),
         "queue_alerts": len(handoff.check_queue_capacity(ctx)),
@@ -79,7 +85,8 @@ def run_days(
     write_ground_truth(world, truth, issues)
     # A last full run copies the final engine state into the warehouse and runs every check.
     if verbose:
-        print("\nClosing the books: full pipeline run with all tests...")
+        print("\n" + get_llm().summary())
+        print("Closing the books: full pipeline run with all tests...")
     run_pipeline(data_dir, verbose=False, model_dir=model_dir)
     return summaries
 
@@ -116,6 +123,7 @@ def print_day(summary: dict) -> None:
         f"excluded {summary['excluded']} | emails {summary['emails']}, "
         f"in-app {summary['in_app']}, agent {summary['agent_conversations']}, "
         f"new CTAs {summary['ctas']}, deferred {summary['deferred']} | "
+        f"mailbox {summary['mailbox_replies_triaged']}, "
         f"staff resolved {summary['resolved_by_staff']}, goals {summary['goal_reached']}, "
         f"alerts {summary['queue_alerts']}"
     )

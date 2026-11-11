@@ -32,6 +32,7 @@ class Settings:
     dbt_target: str
     operational_store: str  # a database URL, or "env:NAME" to read it from a variable
     offline_mode: bool  # True = replay cached LLM responses, never call the API
+    llm_stand_in: bool  # True = a rule-based stand-in plays the model (agents/stand_in.py)
     catalog: str | None  # Unity Catalog name (prod)
     landing_volume: str | None  # where landing files are uploaded (prod)
     max_llm_calls_per_run: int
@@ -59,6 +60,7 @@ def load_settings() -> Settings:
         dbt_target=chosen["dbt_target"],
         operational_store=chosen["operational_store"],
         offline_mode=_flag("DSO_OFFLINE_MODE", chosen["offline_mode"]),
+        llm_stand_in=_flag("DSO_LLM_STAND_IN", chosen.get("llm_stand_in", False)),
         catalog=chosen.get("catalog"),
         landing_volume=chosen.get("landing_volume"),
         max_llm_calls_per_run=int(_override("MAX_LLM_CALLS_PER_RUN", limits)),

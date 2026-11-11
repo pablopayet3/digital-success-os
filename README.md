@@ -23,7 +23,7 @@ Built in phases. This README is a stub until Phase 8.
 | 3 | Signals, health, models | done |
 | 3b | Environments, secrets, CI, Databricks target | done (not yet run against Databricks) |
 | 4 | Rules engine, journeys, consent | done |
-| 5 | Agents and human fallback | next |
+| 5 | Agents and human fallback | done (stand-in model until an API key exists) |
 | 6 | Evals and experiments | |
 | 7 | App and API | |
 | 8 | Docs, demo, portfolio | |

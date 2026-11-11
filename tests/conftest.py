@@ -11,7 +11,9 @@ from pathlib import Path
 
 import duckdb
 import pytest
+from fake_llm import fake_llm
 
+from agents.llm import set_llm
 from analytics.train import train_all
 from common.store import Store, open_store
 from engine.run import run_days
@@ -19,6 +21,15 @@ from ingest.load import warehouse_path
 from ingest.pipeline import run_pipeline
 from synth.generate import generate
 from synth.world import World
+
+
+@pytest.fixture(scope="session", autouse=True)
+def stand_in_llm(tmp_path_factory):
+    """Every test talks to a stand-in model: no key, no network, no cost."""
+    llm = fake_llm(tmp_path_factory.mktemp("llm_cache"))
+    set_llm(llm)
+    yield llm
+    set_llm(None)
 
 
 def file_hashes(folder: Path) -> dict[str, str]:

@@ -120,10 +120,9 @@ dbt cross-database macros and the project's own dispatch macros in `dbt/macros/`
 3b. Environments, secrets, CI, Databricks `prod` target, portable SQL: **done** (not yet
     run against Databricks or GitHub Actions)
 4. Rules engine, journeys, consent, holdouts, daily loop: **done**
-5. Agents and human fallback, with LLM cost controls: **next**
-4. Rules engine, journeys, consent, holdout assignment
-5. Agents and human fallback
-6. Evals and experiments
+5. Agents and human fallback, with LLM cost controls: **done** (stand-in model; no real
+   API call yet, there is no key on the build machine)
+6. Evals and experiments: **next**
 7. App and API
 8. Docs, demo, portfolio
 
@@ -188,3 +187,26 @@ which passes the health weights as dbt vars.
 
 Warehouse schemas: `bronze` (raw, loaded by ingest), `silver` (dbt staging), `gold` (dbt
 marts, plus `dq_test_results`, `dq_freshness`, `dq_contract_checks` written by Python).
+
+Phase 5 additions:
+
+- `config/llm.yaml` (model per job, prompt version, prices), `config/play_specs.yaml`
+  (the wording of play specs). `llm_stand_in` in `config/environments.yaml`.
+- `agents/llm.py` (the only caller of the LLM API: cache, offline, limits),
+  `agents/stand_in.py` (rule-based stand-in, labelled, used when `llm_stand_in` is true
+  and by the tests), `agents/retrieval.py` (BM25 over `kb/`), `agents/escalation.py`
+  (hard rules), `agents/tools.py`, `agents/onboarding.py` (`converse()`; no side effects),
+  `agents/runner.py` (journey agent step, handoff, stores conversations and traces),
+  `agents/simulated_customer.py`, `agents/classify.py`, `agents/mailbox.py` (triage and
+  routing), `agents/feedback.py` (NPS and ticket themes), `agents/briefs.py`,
+  `agents/tracing.py` (masked JSON traces in `data/traces/`).
+- `prompts/` (versioned agent prompts with a changelog, classifier prompts), `kb/` (23
+  fictional help articles).
+- `engine/specs.py` writes `docs/play-specs/<play_id>.md` from the config
+  (`run.py specs`); a test fails when they are out of date.
+- LLM modes: stand-in (dev default for now), offline replay of `cache/llm/` (real
+  responses, committed), live (`DSO_OFFLINE_MODE=false` and `DSO_LLM_STAND_IN=false`
+  with `ANTHROPIC_API_KEY`).
+- A simulated day is now: world -> pipeline -> staff -> mailbox triage -> feedback
+  classification -> rules -> journeys (agent steps) -> capacity check.
+- Tests: `tests/test_agents.py`, `tests/fake_llm.py`.

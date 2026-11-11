@@ -347,3 +347,95 @@ uv run python run.py run-days 30
 ### Decisions recorded
 
 ADRs 0013 (operational store), 0014 (plays as config, deterministic holdouts, guardrails).
+
+---
+
+## Phase 5: agents and human fallback, with LLM cost controls
+
+### What works
+
+- **Onboarding agent** (`agents/onboarding.py`): a conversation with a customer admin. It
+  has three read tools (setup status, account context, help-centre search) and two
+  write tools (hand off, log outcome), all bound to the one account in the conversation.
+- **Retrieval** (`agents/retrieval.py`): BM25 keyword search over 23 fictional help
+  articles in `kb/`, with a rule that says whether any article covers the question.
+- **Hard escalation rules in code** (`agents/escalation.py`): asks for a person,
+  frustration, pricing (to Sales), contract or refund or legal, not in the docs, tool
+  failure, repeated question, model unavailable. Pricing and "I want a person" never
+  reach the agent model.
+- **Mailbox triage agent** (`agents/mailbox.py`): a small model classifies every reply
+  (eight intents, sentiment, confidence); rules in `config/routing.yaml` decide the action.
+  An unsubscribe takes effect the same day; a complaint opens a high-priority task and
+  pauses the account's emails; an unsure classification goes to a person.
+- **Account briefs for Sales** (`agents/briefs.py`): written by the model from the
+  account's facts; code rejects any brief containing a number that is not in the data
+  and falls back to a template.
+- **Feedback classification** (`agents/feedback.py`): sentiment and theme of recent NPS
+  comments and high-priority tickets.
+- **Cost controls** (`agents/llm.py`): every response cached; offline by default; a run
+  stops at `MAX_LLM_CALLS_PER_RUN` or `LLM_BUDGET_USD` and prints the spend; at most 50
+  agent conversations per run; models chosen in `config/llm.yaml`.
+- **Traces** (`agents/tracing.py`): one JSON file per conversation in `data/traces/`
+  (messages, tool calls, retrieved articles, decision, cost, latency) with names and
+  email addresses masked.
+- **Stand-in mode** (`agents/stand_in.py`): a rule-based stand-in plays the model so the
+  whole flow runs with no key. It is labelled "stand-in" in every trace and on screen.
+- **Docs**: `docs/human-fallback.md`, and one generated spec per play in
+  `docs/play-specs/` (a test fails if a spec no longer matches the config).
+- 115 pytest tests pass.
+
+### Not yet there
+
+- **No real model call has been made.** There is no API key on the build machine. The
+  request shapes follow the API reference; the first live run may need small fixes.
+  Until then the demo uses the stand-in, which shows the flow but says nothing about
+  answer quality.
+- LangSmith export is written but not run (needs a key). JSON traces work.
+
+### How to run
+
+```
+uv run python run.py run-days 30     # agents and mailbox triage run inside each day
+uv run python run.py specs           # rebuild docs/play-specs/
+```
+
+For a live run that fills the cache with real responses (about 1 to 3 dollars, stops
+at 5): put `ANTHROPIC_API_KEY` in `.env`, set `DSO_OFFLINE_MODE=false` and
+`DSO_LLM_STAND_IN=false`, run the simulation and the evals once, then set both back.
+From then on offline mode replays the real responses for free.
+
+### The three decisions to defend
+
+1. *The rules that matter are code, not prompt.* A prompt asks; code guarantees. The
+   agent cannot quote a price because a pricing message never reaches it. Each rule has a
+   test that runs without a model. The cost is over-escalation, which is measured by the
+   outcome "the agent should have handled this".
+2. *The LLM proposes, rules decide.* In the mailbox the model only labels a reply. What
+   happens to an "unsubscribe" or a complaint is the same every time and is written in a
+   config file a non-engineer can read. Low confidence goes to a person.
+3. *Cost is designed in, not monitored afterwards.* One module calls the API. It caches
+   everything, refuses to call when offline, and stops at a budget. The demo, CI and the
+   hosted app hold no key. Small model for labelling, stronger model only where a
+   customer reads the output.
+
+### More to be able to explain
+
+- **Why BM25 and not embeddings.** 23 articles; free, offline, and you can read why a
+  match happened. The important part is not the ranking but the "does anything cover
+  this question" rule, because that is what triggers a handoff (ADR 0002).
+- **Why `converse()` has no side effects.** The same function serves the journey runner,
+  the mailbox, the evals and the live demo. Only the caller creates a task or writes to
+  the database.
+- **Why the brief is checked for numbers.** A model that invents "they will add 40
+  seats" in a sales brief does real damage. Every number in a brief must be found in
+  the account's data, or the template is used.
+- **What the stand-in is and is not.** It is keyword rules in the model's seat so the
+  flow can run. It proves the plumbing, the rules and the handoffs. It proves nothing
+  about how well a real model answers, and every screen says which one produced the output.
+- **Prompt versions.** `prompts/onboarding_agent/v1.md` and `v2.md` with a changelog;
+  the version in use is config, and every conversation records it. Phase 6 compares them.
+
+### Decisions recorded
+
+ADRs 0002 (BM25 retrieval), 0003 (escalation rules in code), 0015 (LLM cost controls,
+model choice and the stand-in).

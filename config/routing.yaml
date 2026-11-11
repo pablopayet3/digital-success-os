@@ -47,6 +47,23 @@ reason_codes:
   complaint: A complaint arrived in the shared mailbox
   meeting_request: The customer asked for a meeting
 
+# What happens to each reply in the shared mailbox (agents/mailbox.py). The classifier
+# proposes an intent; these rules decide. Routing is deterministic: the same intent
+# always leads to the same action.
+mailbox:
+  min_confidence: 0.6        # below this, a person looks at the reply
+  routes:
+    out_of_office: {action: ignore}
+    unsubscribe: {action: opt_out}                 # consent updated, journeys for the contact end
+    left_company: {action: mark_contact_gone}      # may leave the account with no admin
+    product_question: {action: agent_or_cta, queue: pooled_csm, priority: normal, act_within_days: 7}
+    buying_intent: {action: cta, queue: sales, priority: high, with_brief: true, act_within_days: 45}
+    complaint: {action: cta, queue: pooled_csm, priority: high, pause_account: true, act_within_days: 30}
+    meeting_request: {action: cta, queue: pooled_csm, priority: normal, act_within_days: 14}
+    other: {action: review}
+  # A reply older than its act_within_days when it is first read is recorded as "missed":
+  # too old to act on, but counted, because it shows what an unread mailbox costs.
+
 # How a human closes a CTA. This is the return signal: it decides what happens next.
 outcomes:
   resolved: {description: Problem solved, next_state: re_enter_journey}

@@ -1,0 +1,47 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# Which model does which job, and what each costs. Model names live here, not in code.
+# The LLM API is the only paid service in this project, so three rules apply everywhere:
+#   1. Every response is cached on disk (cache/llm/). A re-run reads the cache and costs nothing.
+#   2. A run stops cleanly when it reaches MAX_LLM_CALLS_PER_RUN or LLM_BUDGET_USD
+#      (config/environments.yaml), and logs what it spent.
+#   3. Offline mode is the default: demos, CI and the hosted app never call the API.
+
+# One entry per job ("role"). effort controls how much the model thinks: low is enough for
+# short support replies and classification, and it is the cheapest.
+roles:
+  # The onboarding agent's replies to customers: the only job that gets the stronger model.
+  # To halve the cost, change the model to claude-sonnet-5-5.
+  agent:
+    model: claude-opus-5-5
+    effort: low
+    max_tokens: 4000
+    refusal_fallback: true    # if the model declines, the API retries on a fallback model
+  # Everything else uses the small, cheap model.
+  classifier:
+    model: claude-haiku-5-5
+    effort: low
+    max_tokens: 2000
+  simulator:              # plays the customer in simulated conversations
+    model: claude-haiku-5-5
+    effort: low
+    max_tokens: 1000
+  judge:                  # scores agent answers in the evals (Phase 6)
+    model: claude-haiku-5-5
+    effort: low
+    max_tokens: 2000
+  brief:                  # account-owner briefs for Sales
+    model: claude-haiku-5-5
+    effort: low
+    max_tokens: 1500
+
+# Which version of each prompt is in use (files in prompts/, history in prompts/CHANGELOG.md).
+prompt_versions:
+  onboarding_agent: v2
+
+# US dollars per million tokens, used to track spend against the budget.
+# Source: Anthropic's published API prices (checked November 2026). Update when they change.
+prices_per_million_tokens:
+  claude-opus-5-5: {input: 4.00, output: 20.00}
+  claude-sonnet-5-5: {input: 2.00, output: 10.00}
+  claude-haiku-5-5: {input: 0.10, output: 0.50}

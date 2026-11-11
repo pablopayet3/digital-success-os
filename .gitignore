@@ -20,6 +20,9 @@ outbox/
 traces/
 *.duckdb
 
+# Answers from the rule-based stand-in (cache/llm/ holds real model responses and IS committed)
+cache/stand_in/
+
 # Secrets and private notes
 .env
 BRIEF.md
