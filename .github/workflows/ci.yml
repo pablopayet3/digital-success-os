@@ -39,3 +39,38 @@ jobs:
         run: |
           uv run python run.py data --profile small
           uv run python run.py pipeline
+
+  store-on-postgres:
+    name: Operational store on a real Postgres
+    runs-on: ubuntu-latest
+    # A throwaway database that exists only for this job. Its password is not a secret.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: dso
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      DSO_TEST_POSTGRES_URL: postgresql+psycopg://postgres:postgres@localhost:5432/dso
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/dso
+      DSO_LLM_STAND_IN: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - name: The same store tests on SQLite and on Postgres
+        run: uv run pytest -q tests/test_store.py
+      - name: Three simulated days with the engine's store on Postgres
+        env:
+          DSO_OPERATIONAL_STORE: env:DATABASE_URL
+        run: |
+          uv run python run.py data --profile small
+          uv run python run.py pipeline
+          uv run python run.py train
+          uv run python run.py run-days 3
+          uv run python run.py experiments
+          uv run python scripts/check_store.py postgresql

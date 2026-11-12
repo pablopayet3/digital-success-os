@@ -61,7 +61,9 @@ def load_settings() -> Settings:
         env=env,
         warehouse=chosen["warehouse"],
         dbt_target=chosen["dbt_target"],
-        operational_store=chosen["operational_store"],
+        # DSO_OPERATIONAL_STORE lets one part be swapped alone, for example DuckDB as the
+        # warehouse with Postgres as the store (the CI job that tests Postgres does this).
+        operational_store=os.environ.get("DSO_OPERATIONAL_STORE", chosen["operational_store"]),
         offline_mode=_flag("DSO_OFFLINE_MODE", chosen["offline_mode"]),
         llm_stand_in=_flag("DSO_LLM_STAND_IN", chosen.get("llm_stand_in", False)),
         catalog=catalog,

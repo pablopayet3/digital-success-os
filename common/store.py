@@ -197,9 +197,16 @@ TABLES = {
 }
 
 
+# One database engine per URL for the whole process. Without this every open_store()
+# call would open a new pool of connections, which SQLite forgives and Postgres does not.
+_engines: dict = {}
+
+
 class Store:
     def __init__(self, url: str):
-        self.engine = create_engine(url)
+        if url not in _engines:
+            _engines[url] = create_engine(url)
+        self.engine = _engines[url]
         with self.engine.begin() as con:
             for name, columns in TABLES.items():
                 con.execute(text(f"CREATE TABLE IF NOT EXISTS {name} ({columns})"))
