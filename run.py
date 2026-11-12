@@ -32,6 +32,7 @@ import os
 import subprocess
 import sys
 
+APP_URL = "http://localhost:8501"
 COMMANDS = [
     "data", "pipeline", "train", "run-day", "run-days", "evals", "experiments", "review",
     "extracts", "specs", "app", "api", "demo", "test", "lint",
@@ -45,6 +46,7 @@ def main() -> None:
     parser.add_argument("--profile", default=None, help="config profile, for example: small")
     parser.add_argument("--live", action="store_true", help="call the API when not cached")
     parser.add_argument("--stand-in", action="store_true", help="keyword rules play the model")
+    parser.add_argument("--no-browser", action="store_true", help="for app: do not open a tab")
     args = parser.parse_args()
     if args.live and args.stand_in:
         parser.error("choose --live or --stand-in, not both")
@@ -101,12 +103,29 @@ def main() -> None:
     elif args.command == "lint":
         sys.exit(subprocess.call([sys.executable, "-m", "ruff", "check", "."]))
     elif args.command == "app":
-        sys.exit(subprocess.call([sys.executable, "-m", "streamlit", "run", "app/main.py"]))
+        start_app(open_browser=not args.no_browser)
     elif args.command == "api":
         command = [sys.executable, "-m", "uvicorn", "api.main:app", "--port", "8000"]
         sys.exit(subprocess.call(command))
     elif args.command == "demo":
         build_demo(args.days, args.profile)
+
+
+def start_app(open_browser: bool = True) -> None:
+    """Start the app and open it in the browser.
+
+    Streamlit is started "headless" so that a first run does not stop in the terminal to
+    ask for an email address. We open the browser tab ourselves a few seconds later.
+    """
+    import threading
+    import webbrowser
+
+    if open_browser:
+        threading.Timer(4, lambda: webbrowser.open(APP_URL)).start()
+    print(f"Starting the app at {APP_URL} (press Ctrl+C here to stop it)")
+    command = [sys.executable, "-m", "streamlit", "run", "app/main.py"]
+    command += ["--server.headless", "true", "--browser.gatherUsageStats", "false"]
+    sys.exit(subprocess.call(command))
 
 
 def choose_who_answers(live: bool, stand_in: bool) -> None:
