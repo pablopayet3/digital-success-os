@@ -249,7 +249,7 @@ Stand-in eval runs write to `evals/reports/stand-in/`, never over the real repor
 
 CRM sync: `integrations/crm_sync.py` (`run.py crm-sync`, dry run by default, `--push`
 to send; standard Account and Task objects; safe to run twice; ADR 0019). The live push
-has not been run (needs `SALESFORCE_*` credentials in `.env`). 151 tests in total.
+has not been run (needs `SALESFORCE_*` credentials in `.env`). 155 tests in total.
 
 Hosting: a Render blueprint from the public repository. Render redeploys both services
 on every push to `main` (seen in its deploy list as "Auto-Deploy"); a change to
@@ -264,7 +264,10 @@ SQLite file.
 Postgres: the operational store is tested on a real Postgres in CI (job
 `store-on-postgres`: `tests/test_store.py` on both databases, then three simulated days
 with `DSO_OPERATIONAL_STORE=env:DATABASE_URL`). `scripts/check_store.py` prints what a
-run left in the store. A hosted Postgres has not been connected.
+run left in the store. The hosted app and API share a hosted Postgres created by
+`render.yaml`; `scripts/seed_store.py` fills it once at start-up (`scripts/start-app.sh`,
+`scripts/start-api.sh`), with a fallback to the local file. Trace export is tested
+with a stand-in client (masking, and a failing service cannot break a run).
 
 Ignore rules: anchor file names to the top folder (`/BRIEF.md`). Git on Windows matches
 without regard to case, and an unanchored `BRIEF.md` once hid `prompts/brief.md`.

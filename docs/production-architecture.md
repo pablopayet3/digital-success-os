@@ -96,7 +96,7 @@ flowchart TB
 | Agent answers | **Stand-in** until one live run | Rule-based and labelled as such. With an API key, real model responses are cached and replayed offline. |
 | Emails | **Not sent** | Written to an outbox folder. |
 | Databricks warehouse | **Real** | The whole pipeline ran on a Free Edition workspace: 100 of 100 data tests and the contract pass, and the numbers match DuckDB (ADR 0012). |
-| Postgres operational store | **Real, in CI** | Every push runs the store tests and three simulated days of the engine on a Postgres service. A hosted Postgres has not been connected. |
+| Postgres operational store | **Real** | The hosted app and API share a hosted Postgres database, seeded once at start-up. Every push also runs the store tests, the seeding and a day of the engine on a Postgres service in CI. |
 | CRM and CS platform sync | **Export only** | Endpoints return import-ready shapes. No live sync. |
 | CI, image build, daily scheduled run | **Real** | They run on GitHub Actions: tests on every push, an image with a demo world built in, a daily pipeline run that opens an issue on failure. |
 | Hosting | **Real** | The app and the API run on a free host from the repository's blueprint, in stand-in mode. |

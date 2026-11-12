@@ -68,8 +68,15 @@ was needed beforehand: the store now keeps one database engine per URL for the w
 process. Opening a new one on every call was harmless on SQLite and would have leaked
 connections on Postgres.
 
-Not done: a hosted Postgres (a free managed database) has not been connected. That is
-a connection string in `DATABASE_URL`, nothing else.
+**Hosted, too.** The host's blueprint (`render.yaml`) creates a free Postgres database
+and passes its address to the app and the API, so both share one operational store and
+nobody types a connection string. When a service starts it copies the demo state into
+the hosted store once (`scripts/seed_store.py`), under a database lock because two
+services start together; if the database cannot be reached, the service falls back to
+its local file and still comes up. CI proves the seeding on a real Postgres (649 rows
+copied the first time, nothing touched the second), and the hosted API's `/health`
+reports `operational_store: ok (postgresql)`. A free hosted database expires after a
+period set by the host; the fallback covers that.
 
 ## Revisit if
 

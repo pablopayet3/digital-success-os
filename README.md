@@ -65,7 +65,7 @@ From `uv run python run.py demo` (180 days of history, then 30 simulated days of
 | Seat expansion: expansion closed, treatment against holdout | 19% against 21%: **no effect detected** (the sample could only have shown 20 points or more) |
 | Agent evaluation, real model, 44 cases | Onboarding agent 30 of 30 with prompt v3 (v1: 29, v2: 25); mailbox 10 of 10; briefs 4 of 4; classifier 96% on 160 labelled replies |
 | Cost of every real model call behind this (817 calls) | about $3 |
-| Automated tests | 151 |
+| Automated tests | 155 |
 
 Three honest notes. The lift comes from assumptions in `config/sim_effects.yaml`: this
 demonstrates a measurement system, not a result. The agent answers are real: one live
@@ -218,7 +218,7 @@ What each phase delivered, and three decisions to defend for each, is in
 
 ## What runs for real, and what has not been run yet
 
-Running on GitHub Actions: CI on every push (lint, 151 tests on Linux, the dbt build, a
+Running on GitHub Actions: CI on every push (lint, 155 tests on Linux, the dbt build, a
 secret scan), the container image build (it generates a demo world inside the image and
 publishes it), and the daily pipeline schedule, which opens an issue when a run fails.
 
@@ -229,13 +229,13 @@ through the browser, so no access token is stored.
 
 Run on a real Postgres on every push: the operational store. CI starts a Postgres
 service, runs the same store tests as on SQLite, and runs the engine for three simulated
-days with its live state there (ADR 0013).
+days with its live state there (ADR 0013). The hosted app and API share a hosted
+Postgres database as their store; the API's `/health` says which store is in use.
 
 Written but not yet run against the real thing. Each needs an account or a key.
 
 | What | Needs |
 |---|---|
-| A hosted Postgres for the operational store | A database URL (the code is tested on Postgres in CI) |
 | Trace export | A tracing key (JSON traces work without one) |
 | The live CRM push | A Salesforce Developer Edition org and its credentials (the dry run and the tests are verified) |
 
@@ -265,5 +265,5 @@ experiments/  play results against holdouts
 api/ app/     FastAPI endpoints; the Streamlit app
 integrations/ the CRM sync
 docs/         operating documents, decision records, play specs, model cards
-tests/        151 tests; they generate a small world and run everything on it
+tests/        155 tests; they generate a small world and run everything on it
 ```
