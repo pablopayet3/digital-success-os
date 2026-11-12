@@ -29,11 +29,11 @@ from common.store import TABLES, Store, open_store  # noqa: E402
 SEED_LOCK = 4242  # any fixed number: it only has to be the same in every service
 
 
-def seed() -> str:
-    target = open_store()
+def seed(data_dir: Path = DATA_DIR) -> str:
+    target = open_store(data_dir)
     if target.engine.url.get_backend_name() == "sqlite":
         return "the store is the local file: nothing to seed"
-    source_file = DATA_DIR / "ops.db"
+    source_file = data_dir / "ops.db"
     if not source_file.exists():
         return "no demo state in this image: the hosted store stays empty"
     source = Store(f"sqlite:///{source_file.as_posix()}")

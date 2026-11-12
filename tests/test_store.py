@@ -102,7 +102,7 @@ def test_a_host_supplied_postgres_address_is_rewritten_for_our_driver(monkeypatc
     assert local.operational_store_url == "sqlite:///data/ops.db"
 
 
-def test_seeding_does_nothing_when_the_store_is_the_local_file(monkeypatch):
+def test_seeding_does_nothing_when_the_store_is_the_local_file(monkeypatch, tmp_path):
     import importlib.util
     from pathlib import Path
 
@@ -111,4 +111,4 @@ def test_seeding_does_nothing_when_the_store_is_the_local_file(monkeypatch):
     spec = importlib.util.spec_from_file_location("seed_store", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    assert "nothing to seed" in module.seed()
+    assert "nothing to seed" in module.seed(tmp_path)

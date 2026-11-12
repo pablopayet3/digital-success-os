@@ -491,3 +491,40 @@ def test_the_answer_written_before_logging_the_outcome_reaches_the_customer(acco
     replies = [turn["text"] for turn in conversation.transcript if turn["role"] == "agent"]
     assert replies[0] == answer
     assert conversation.outcome == "resolved" and len(replies) == 2
+
+
+def test_what_is_exported_to_the_tracing_service_is_already_masked(tmp_path, monkeypatch):
+    """No tracing account is contacted: a stand-in client records what would be sent."""
+    import sys
+    import types
+
+    sent = []
+
+    class Client:
+        def create_run(self, **kwargs):
+            sent.append(kwargs)
+
+    monkeypatch.setitem(sys.modules, "langsmith", types.SimpleNamespace(Client=Client))
+    monkeypatch.setenv("LANGSMITH_API_KEY", "stand-in")
+    trace = Trace("onboarding_agent", "A0001", "2026-09-28", ["Dana Lopez", "Dana"])
+    trace.step("customer", text="I'm Dana Lopez, write to dana.lopez@acme.example please.")
+    trace.finish("resolved", None, [], tmp_path)
+    exported = json.dumps(sent)
+    assert sent, "with a key set, the trace is exported"
+    assert "Dana" not in exported and "@acme.example" not in exported
+    assert "<name>" in exported and "<email>" in exported
+
+
+def test_a_tracing_service_that_is_down_never_breaks_a_run(tmp_path, monkeypatch):
+    import sys
+    import types
+
+    class Client:
+        def create_run(self, **kwargs):
+            raise RuntimeError("the tracing service is down")
+
+    monkeypatch.setitem(sys.modules, "langsmith", types.SimpleNamespace(Client=Client))
+    monkeypatch.setenv("LANGSMITH_API_KEY", "stand-in")
+    trace = Trace("onboarding_agent", "A0001", "2026-09-28", [])
+    trace.step("customer", text="Hello")
+    assert trace.finish("resolved", None, [], tmp_path).exists()
