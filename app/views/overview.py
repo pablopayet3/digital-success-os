@@ -1,5 +1,6 @@
 """Overview: the whole loop on one page. Synthetic data, fictional company."""
 
+import altair as alt
 import streamlit as st
 
 from app import ui
@@ -69,12 +70,21 @@ with left:
         "SELECT coverage_tier, health_band, count(*) AS accounts FROM gold.account_current "
         "GROUP BY coverage_tier, health_band"
     )
-    st.bar_chart(
-        health,
-        x="coverage_tier",
-        y="accounts",
-        color="health_band",
-        horizontal=True,
+    # Health bands are drawn in their own colours: green must look green, red must look red.
+    bands, colours = list(ui.BAND_COLOURS), list(ui.BAND_COLOURS.values())
+    st.altair_chart(
+        alt.Chart(health)
+        .mark_bar()
+        .encode(
+            y=alt.Y("coverage_tier:N", title=None),
+            x=alt.X("accounts:Q", title="accounts"),
+            color=alt.Color(
+                "health_band:N", title="health", scale=alt.Scale(domain=bands, range=colours)
+            ),
+            order=alt.Order("health_band:N"),
+            tooltip=["coverage_tier", "health_band", "accounts"],
+        ),
+        use_container_width=True,
     )
 with right:
     st.subheader("Signals firing today (pilot segment)")

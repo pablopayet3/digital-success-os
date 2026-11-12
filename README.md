@@ -29,6 +29,23 @@ flowchart LR
     I -->|scale, fix or stop| E
 ```
 
+## What it looks like
+
+The loop on one page: signals, plays, touches, agent conversations, handoffs, outcomes.
+
+![Overview page](docs/screenshots/overview.jpg)
+
+The onboarding agent answers a setup question from the help centre, naming the article
+and the account's own setup status. The next message asks for a price: a rule in code
+hands it to Sales before the model is asked, and a task with full context is created.
+
+![A live conversation ending in a handoff](docs/screenshots/live-demo-handoff.jpg)
+
+Every play against its holdout: the lift with its 95% interval, and a verdict from a
+written rule. An interval that crosses zero is reported as not proven.
+
+![Plays and experiments](docs/screenshots/plays-and-experiments.jpg)
+
 ## What a clean run produces
 
 From `uv run python run.py demo` (180 days of history, then 30 simulated days of the pilot):
