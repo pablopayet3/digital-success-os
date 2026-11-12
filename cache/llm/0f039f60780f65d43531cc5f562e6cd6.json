@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.\n- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"Is single sign-on available on the edition we are on?\"}, {\"role\": \"agent\", \"text\": \"No, single sign-on isn't available on your edition. You're on **Free**, and it only comes with **Standard, Premium and Enterprise**. (See the help centre articles \\\"Set up single sign-on (SSO)\\\" and \\\"Compare editions\\\".)\\n\\nTo change edition, talk to your account owner, Morgan Ellis. I can also pass you to a colleague.\\n\\nYou can still finish these two steps on Free:\\n1. **Invite at least one more person.** You have 4 people so far, and the setup target is 5.\\n2. **Connect an integration.** Free includes up to 2. Chat or calendar are the quickest to set up.\\n\\nDo you want help with either of these?\"}], \"articles\": [{\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}, {\"title\": \"Setup checklist: the four steps to get started\", \"text\": \"# Setup checklist: the four steps to get started\\n\\nNew to Relay, or stuck on setup? These four steps get a workspace ready. Teams that finish them in the first weeks get far more out of Relay.\\n\\n1. Create your first board. Pick a template and add a few real cards. See \\\"Create your first board\\\".\\n2. Invite at least five people. Boards are only useful with your team on them. See \\\"Invite your team\\\" or \\\"Invite many users at once\\\".\\n3. Connect an integration. Chat or calendar are the quickest wins. See \\\"Connect an integration\\\".\\n4. Configure single sign-on (Standard, Premium and Enterprise). See \\\"Set up single sign-on (SSO)\\\".\\n\\nAdmins can see which steps are done under Admin settings, Setup progress. If you are not sure what to do next, start with the first step on this list that is not done yet.\\n\\nSearch keywords: getting started onboarding stuck setup next step what should I do begin start first steps\\n\"}, {\"title\": \"Set up single sign-on (SSO)\", \"text\": \"# Set up single sign-on (SSO)\\n\\nSSO lets your team sign in to Relay with your company identity provider. It is available on the Standard, Premium and Enterprise editions. It is not available on Free.\\n\\nSteps (admins only):\\n1. Open Admin settings, then Security, then Single sign-on.\\n2. Choose the protocol your identity provider uses: SAML or OIDC.\\n3. For SAML, upload the identity provider metadata file (XML). For OIDC, paste the client ID, client secret and issuer URL.\\n4. Click Test connection. Relay signs you in through the provider in a new window.\\n5. When the test succeeds, click Enable for everyone.\\n\\nKeep one admin account with password sign-in until you have confirmed SSO works for the whole team. SSO setup usually takes ten to fifteen minutes.\\n\\nSearch keywords: single sign-on sign in login identity provider IT team configure enable SAML OIDC\\n\"}], \"account_facts\": {\"setup_status\": {\"completed_steps\": [\"create a first board\"], \"missing_steps\": [\"invite at least five users\", \"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.25, \"seats_assigned\": 4, \"seats_licensed\": 10, \"edition\": \"free\"}, \"account_context\": {\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"free\", \"lifecycle_stage\": \"onboarding\", \"arr\": 0, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 10, \"assigned\": 4, \"utilisation\": 0.27, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.25, \"missing_steps\": [\"invite at least five users\", \"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}}}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx5yWuuU8Eguzki6keTC",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQS4w4KEAgTGAI4AUIIdGhpbmtpbmcSDMkdBXWV8UUeyu9u5BoM6hUONoHBC1/ZOYT/IjD5X4YQuWhHzrvJSf46E6YAXdGHnfERFkaTEkWAhIksz+DdgZa+VSyBndYhpzSPJ+IqgA4b1cXquaeneaTIb6sCsO8z0d48eL4bvzsfzQZCSnuGhdn7kbf+RKzhzkOsx6gjzSW5vbohQNpKeJKe5GX/OP8m2OjPimjyR6lqrV4zBvCP8pbhwUgbnRVQNVEftEnvJ1Z0mNBcBtMl9uQsASrqueULxhXXggD3vuXESMP5TgZ/W9KVNgcYczkhBXDHXO/Pi6ObBzSI+vWQSSkRAE8aN3BFYvUPWzHe0MoPoPcg0w6Dc04htrAbaB4nZg3Y3aC6mbdvn8eSrFHXlbYoM0Ic/wCeOhqCKm8lI8rQ+RaE7qPFMaPOTb0FPzhuxTSreSlRKWj+GDHQS1wwa8Bzsl4enmvjG72fML9f8qDH9pA4jGcKGyCFZGO2mJCfW/AZeKT15V1iS+goJz9D8KbzL7OBQD6II/XYkNkDfEBG9/Us7icMt5SjktSn2NDrelxL6QYnMH7qKoZ98Ae+Pso0ZPeQx3jOsfT60O6ZfQmkhlaeI4W0gTrjj6txz/Ph42dotIgHU79KKMa+V84BoxUtRn3LE0YsVVs54PgxTbrwtB/2E9IrHQOaE4oiVwlJT9T9BCgzdd5EcbhQPcd/4KpVZNVStB3TVA25vzTTm2cSupvvZOshs0At3z3VvFyd0IhRaWynrGlkdae1bVi+Bjc5h4dXQqNdgf2oFy7+sKvdnr6PAy++l4aYj8xhpL4TlTXmyvQT/LJUf/cXmneS8HzV5gk5OUbXb3l7cIvePIIlvZUCAOH+fVtgzxKrfJlKNS1Ug5cKAA++PUC7dI8RJHUr/moH+m7N4Nfv157R7jv+aoImQKx0Tklu+4Yyb3z5fB68/VRAVvXV6WJjQl1faERa6jqGNFVVHDjngv4uy0EpFN8jIFYL+lS5OnsjXKjqhvA1Z+7lDnfGNQ6L4E9l1HyFqSsAY5KLYulhGUWiev8GfIZ8tRb4hk9tTVjPHVJA+O4p03Ov71JI6ULI23PWDNGRrxtcEjNrJTwUktVkhLdRFEq2l74wpGy1M60lGJCNcDgIdbxAwJq53P4Rn4maWsg6XMsyWZUEl1oscYr+dtxVE9+S9FRIZtXz7fh0LKxLBL1yctYiv73Fww6kbTxye0cJYqhgpait+I9Z9WKQxMceVtgc7B6cw01i6j1yqjMpXmMx1FVwHgdzROOcCKaLISd7G/NtySaQe8S1fyXt8R5Y+kfmXGxC/LWJlL0VRZ14Vp/ZRZh01hRID7mZjQWW/clMd/DDWJu3hlepoeoucpwIcuQ5QPtdlfJChNx/OvdQv+FECHYwPa4qOHnCeGST37lnet0xSRCrWmSEwE6oSRxz7MCYWWa5Cey+O0dM6jjQvcaNrsXBCfRqURM3GehjjFknOg8KUiDvSIQS16aXayH/M9T+dRPjPmAvnD3b9ia2J1D4veikX7oy2K3G8J+/ecVNnG3VsgBw780itWrdKsqR0KWr32WSkN7ZdVfrxxknj3eSxJzxaO39sSnu03kk2r+S6hFiaLEPOwoC+IlvsJWO96eh8anroOad/mzDMFHHdqh/hhwy0NAaS8dgtOsA6KF/hljYJpWxWNrv9LSQaX/m1NdgzY5lwxUYqnUenalGYj10UAm3Eq5Z3fRN1s4kOgF2EQEWQWfJ9lokG+DuUB0NYH59BatDP7qOppKsFsps14rd+Gfidn2Qj5TgrAPpXSOSLfQA6sJGBkPwctmJe5xDl+ra7V/sYnlvWnQioX08/+JxEtxx+/7aIJ2kFUCHhM1l4RHD18B72e0iWDnFTWsDrNRaxHw40p5wT5h6ml32j0Xw8swia3JLi7I4c88koEKFyw4wWkc2ST3doviarZT0zm/Tb8CEyhuLjFhZPYBDAtUzzSIsY+rD82L55JFkKSVd/apthb+mS55WpMqqt7xHOcwtsNN/DH060T8hNqXN+C13pVOIAG4jmIIlrgSsfOE6R3WVWRig7J0SuB88KqFbQJYkn3lIfFmmxXwDNpM9KdDYNQsIiWT0bZdLU/SFD/LwmoKc0wPFB3J+u40lJdbjOV98aoL3zujzKN7JK470VgB2F/FqeEYvnla5idB+1+lNGAWjorMYOdMPlNnLy2f1/eI6FdJcneOYgEa1WhVN0DJ7NrM9RWZsB+ZdV5ECg33wWqkX+UjDJL/XkQ7gFN8aiyflbCytBsZ78dneI+wnYReLD2n79o6sIFJ2zTOEr9B5gtDlQxDq9L5nodvDxF+97M1mSHEXmy323/G9jYHzx+e7r4lX/VOjZiUSODVRm8mN4Fn/HvxyrvtD45dAJIV+p7I5sSU2ZFCxAaJ+FAeZA2ZDmZqTJTG2jnZkGJuR2Cvp/M7OUXQtVPAMS2x7rFr3t4zUyOZgnIDK4uzU6omsaAMXBtF3vnoP4ZpqGe2zUmM8YzTeexYlGAE=",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\": \"pass\", \"score\": 4, \"reason\": \"The reply is grounded in the articles and account facts (Free has no SSO, 4 of 5 people invited, 2-integration limit, owner Morgan Ellis), answers the question directly, and makes no promises; the only weakness is the unsupported offer to pass the customer to a colleague, which slightly reduces clarity.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 782,
+   "inference_geo": "global",
+   "input_tokens": 1832,
+   "output_tokens": 581,
+   "output_tokens_details": {
+    "thinking_tokens": 453
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

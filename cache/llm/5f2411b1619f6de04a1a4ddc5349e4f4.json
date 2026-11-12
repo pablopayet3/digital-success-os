@@ -1,0 +1,52 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Harbour Lane Studio\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 4200, \"seats_licensed\": 15, \"seats_assigned\": 11, \"seats_assigned_30_days_ago\": 3, \"seat_utilisation_pct\": 73, \"monthly_active_users\": 10, \"automation_rules\": 15, \"automation_rule_limit\": 15, \"integrations\": 3, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 10, \"health_score\": 74.0, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 150, \"trigger_signal\": \"edition_fit\", \"trigger_evidence\": \"At the automation rule limit (15) of standard\", \"expansion_score_pct\": 41, \"expansion_reasons\": \"at the automation rule limit\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx52UzYGAk2vi6gymw7U",
+  "container": null,
+  "content": [
+   {
+    "text": "Signal: Harbour Lane Studio has hit the automation rule limit on the Standard edition, which points to a possible fit for Premium.\n\nEvidence: They are using 15 of 15 automation rules, and 15 of 15 integrations are also at their limit (integration_limit 3, integrations 3). Seats assigned rose from 3 to 11 over the last 30 days, with 11 of 15 licensed seats in use (73%).\n\nLikely need: The next edition, Premium, most likely. The rule cap is the one limit they have reached, and they are still adding users, so they will probably need more room to automate without deleting existing rules. Seat growth is real but they still have 4 unused licensed seats, so more seats alone would not address the stated limit.\n\nSuggested opener: \"Your team has grown fast and you've used all 15 automation rules on Standard, so I wanted to walk through what Premium would give you before you hit a wall.\"\n\nRisks: Monthly active users are 10 of 11 assigned seats, which is healthy. Health is green at 74.0, with no open high-priority tickets. Latest NPS is not recorded. Renewal is 150 days away, so there is time to plan. Assist credits used in the last 30 days are 0 of 10 included, so avoid leading with AI features.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 688,
+   "output_tokens": 417,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

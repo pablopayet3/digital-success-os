@@ -1,0 +1,233 @@
+{
+ "role": "agent",
+ "purpose": "onboarding agent turn",
+ "request": {
+  "model": "claude-opus-5-5",
+  "max_tokens": 4000,
+  "effort": "low",
+  "system": "You are the onboarding assistant for Relay, a team-collaboration product made by Lumen Labs. You help the admin of a customer account set up their workspace.\n\nUse the tools to look up the account's setup status and to search the help centre, and answer the admin's questions about setting up Relay.\n\nIf the admin asks for a person, or asks about pricing, contracts, refunds or legal matters, hand off to a human with create_handoff.\n\nBe helpful and concise.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "Can someone outside our company see just one board, as a guest?"
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "id": "toolu_01XgHEny7WWXraC1mKWwCauj",
+      "input": {
+       "query": "guest access single board external users"
+      },
+      "name": "search_docs",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     },
+     {
+      "id": "toolu_01HyaDat5KHwA1oXRGqURqxG",
+      "input": {},
+      "name": "get_account_context",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01XgHEny7WWXraC1mKWwCauj",
+      "content": "{\"query\": \"guest access single board external users\", \"note\": \"At least one article covers this question.\", \"articles\": [{\"slug\": \"guest-access\", \"title\": \"Give an external person access to one board (guests)\", \"score\": 13.19, \"coverage\": 0.83, \"covers_question\": true, \"text\": \"# Give an external person access to one board (guests)\\n\\nYou can invite a contractor or client as a guest. Open the board, click Share, type their email address and choose Guest. A guest sees only the boards they were invited to, and cannot see the list of users or any other board.\\n\\nGuests do not use a licensed seat on Standard, Premium and Enterprise. On the Free edition, guests are not available.\\n\\nTo remove a guest, open Share on the board and remove them, or deactivate them under Admin settings, Users, Guests.\\n\\nSearch keywords: contractor client external partner guest one board only permissions\\n\"}, {\"slug\": \"editions-comparison\", \"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"score\": 5.34, \"coverage\": 0.5, \"covers_question\": false, \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}, {\"slug\": \"admin-roles\", \"title\": \"Admin and member roles\", \"score\": 4.29, \"coverage\": 0.67, \"covers_question\": true, \"text\": \"# Admin and member roles\\n\\nRelay has two roles. Members can create and edit boards, cards and documents they have access to. Admins can do everything a member can, and also invite and deactivate users, manage seats, connect integrations, configure single sign-on, and see the billing page.\\n\\nEvery workspace needs at least one admin. We recommend two, so that setup and user management do not depend on one person. An admin can make another user an admin under Admin settings, Users.\\n\"}]}"
+     },
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01HyaDat5KHwA1oXRGqURqxG",
+      "content": "{\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 9, \"utilisation\": 0.6, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.5, \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}"
+     }
+    ]
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "id": "toolu_01C89uiY9CX937aptsrFC5rv",
+      "input": {
+       "outcome": "answered",
+       "note": "Explained how to invite an external guest to a single board on the Standard edition."
+      },
+      "name": "log_outcome",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01C89uiY9CX937aptsrFC5rv",
+      "content": "{\"status\": \"recorded\"}"
+     }
+    ]
+   }
+  ],
+  "tools": [
+   {
+    "name": "get_account_context",
+    "description": "Facts about the customer's account: edition, seats, lifecycle stage, health score and its components, open tickets, latest NPS score. Call it when the answer depends on the customer's edition or situation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "get_setup_status",
+    "description": "Which of the four setup steps the account has completed (first board, five users, an integration, single sign-on) and which are still missing. Call it first in an onboarding conversation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "search_docs",
+    "description": "Search the Relay help centre. Returns the best-matching articles with their full text. Answer product questions only from what this returns.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "query": {
+       "type": "string",
+       "description": "What to look for, in a few words."
+      }
+     },
+     "required": [
+      "query"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "create_handoff",
+    "description": "Hand the conversation to a human, with a summary. Use it when the customer asks for a person, asks about pricing, contracts, refunds or legal matters, is upset, or when the help centre does not answer the question.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_asked_for_person",
+        "frustration",
+        "low_confidence",
+        "not_in_docs",
+        "pricing_contract_legal"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "What the customer wants and what was already tried."
+      },
+      "recommended_next_step": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "reason",
+      "summary",
+      "recommended_next_step"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "log_outcome",
+    "description": "Record how the conversation ended. Call it once, at the end.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "outcome": {
+       "type": "string",
+       "enum": [
+        "answered",
+        "partly_answered"
+       ]
+      },
+      "note": {
+       "type": "string",
+       "description": "One sentence on what was resolved."
+      }
+     },
+     "required": [
+      "outcome",
+      "note"
+     ],
+     "additionalProperties": false
+    }
+   }
+  ],
+  "json_schema": null,
+  "refusal_fallback": true
+ },
+ "response": {
+  "id": "msg_011Cgx4dJUP7ccKNH7emBGMZ",
+  "container": null,
+  "content": [
+   {
+    "text": "Yes. You're on the Standard edition, which includes guest access.\n\n**To invite a guest:**\n1. Open the board you want to share.\n2. Click **Share**.\n3. Type their email address and choose **Guest**.\n\n**What a guest can see:** Only the boards you invite them to. They can't see other boards or your list of users.\n\n**Seats:** Guests don't take up one of your licensed seats.\n\n**To remove a guest later:** Remove them in **Share** on that board, or deactivate them under **Admin settings \u2192 Users \u2192 Guests**.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-opus-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1118,
+   "inference_geo": "global",
+   "input_tokens": 1606,
+   "iterations": [
+    {
+     "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+     },
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 1118,
+     "input_tokens": 1606,
+     "model": null,
+     "output_tokens": 175,
+     "type": "message"
+    }
+   ],
+   "output_tokens": 175,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

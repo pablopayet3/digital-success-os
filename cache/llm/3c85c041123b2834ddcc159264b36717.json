@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Tevolo Energy\", \"segment\": \"smb\", \"edition\": \"enterprise\", \"next_edition\": \"enterprise\", \"arr\": 2349, \"seats_licensed\": 9, \"seats_assigned\": 9, \"seats_assigned_30_days_ago\": 8, \"seat_utilisation_pct\": 100, \"monthly_active_users\": 7, \"automation_rules\": 17, \"automation_rule_limit\": 100000, \"integrations\": 0, \"integration_limit\": 100, \"assist_credits_used_30d\": 253, \"assist_credits_included\": 1350, \"health_score\": 76.2, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 10, \"days_to_renewal\": 236, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"9 of 9 seats assigned\", \"expansion_score_pct\": 18, \"expansion_reasons\": \"nearly all seats assigned, most seats active, few support tickets\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx8GMwsLLgvz5abRALDj",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSkwsKEAgTGAI4AUIIdGhpbmtpbmcSDLzs1ecleknJlQZ3HxoMAKGlSgUa7UntawpeIjB46EzuKq8USvJd54T3ZeRqzV4f7oM1Apn9uGGMiqLlkfjs7fc5Aym1AiFBvAvm2XMqsAoE2j0YyJVup16NI1exMRzEhiKFyu61vaV61rwrOPtgzA9Jbv/oVks+smwoKXQ6TgGf9qnF+pTXpcURT2tNZrYx3Y9LV3NALslQFz3zrNP1Z+OsyoKNFEELPZoibwaqXRLloDdYi4R1cEzxCqxKEEGZJJXHvj68a4+4uh/8hm2hQdIGZihZu+WvtAFASrjPcXd1kt25f6s0FCeE9S0ztOhE9zjoAp0Y1fdutyyyt3zQ9F33dpIPk8Exp5bbWyd34dnTi3UqEdrmevUCb71m0urfK6kCMgOvS/hHVj2vfy1mpJyWESjRkVdrWXUcwbewa6VcVecMb3v0WNjL/Ft3MQPIXEoqMKfcqk1h2j1g/oc/NqsN/AX85bkka1jihEUFJHB81J1y0J61Ibhtrpg9ogsj408wgqxeaclziyMC5gLkPF0BOfFE/gx9wwr65Ztv9By0Hy2u8/C7Y1oFLxDEYRdSY8GdH/rKTFe1lUMvC4PtjIYsHaRlSbqujZeDeSb9yuB4KFQBP3idrPdDrtegyzr/27IJ6bReoC/PcXNyVIbVSQmMJeJeweVD/j2NkgUvk75GZ8HPhCtDmLdaWoykNyllIsPh2aJjzqjFuCW1U7L/bRZYff27L/iq1vYigFuTrAI01+9W/mX/oWpsKr+0djdIAAN3D7Ot8E7IkSmqHC5GjmWmcnklwmTN8pdeHHlkn9JAyfyPIw9vnf3110uugNaSVo4Pm7/oUJq8n9sT3mZmwJINjq77q0vp4RSFNq5w4jqDHcBckbu4kfb/UigMTV9ZSylEMkc9ddbnnHC16nYWFxfxdQdh1Akm/r0jI1iFQZIaQIZ8jd1jO0JnF6leaoMztDrMKC9NeGk2fdav2FXTI7pWk8IR1T/7H/5EhyB0dse0aAN4ZBhIK20NcWQMrg1H2CWyhNyQCtwosXwGWXTGg1QjXj5B+7EELmujPNnGxpmtzPjVdqr1P6cAIKiJPeM1s/+IyWklieQbx1Mbhjh3VJSAFI/sgIsLMm2AOsRrNTV2blwryj2SQXBIntIOg1PmcgoYTbeKGRmrnD10j0MmoE3Dp9FRZy4umCxe+D+dDaQnatijse3IjZ2BiQmM6iy8KYWhPCr1pLbuhrx3FWKByM+JHnk6/QuECoE7JwuOYFQYBQgvlDv2WpAtm61z0+unFLPn5C0GG3AbrdW9OPpD2AF9LWixc2iJm/2gx4RN9W8un1v2edkIEasBaB8cKM2U3h4NpFHb5BKj0GeZoSib0JzsZbzkbPyoDiCpzKWd/2UeS9CH+xN+BOIIy1XN6Z+cYqbPRHgCktf/jaNNfxY+5LbIDiitvOz3a4Exp+iXLvZPchmvIiec5Qub9U1eTdjvzDaTjnwrNjwmfbyqb0fQGqvgcVADuz/Hl4R4xQs6xRQ0gjFSBc7edEx46pQoF14ihyHOeAt9H7Nzp5C/EqlDzChTjDBHEQq7dA77n540frmPX0kKSTE4Px38dbrXct5j5e1879jIkZYS+cKDaoBjCGyVnriEWi5PPj2qVz3+XkY50xR/a5UFoqXloHAYyGDvV64YCad/3bZcHfhrZYkjnlHiT1iOa+j0qaU/0PXWI8VBGr09bUW8p1SRScGrUJsXVZ34N9QQfhdpnuONxSAnp+2CGu0l7V+ChnrL3gQZzFDIh/m4o+13JGMK2tGWrgxegk2l55tc/xemndr3wyzku75zH0km+O6RL6Si3aj8JGISyMg+Zl0oorpcGlvIaxim+TiD4S+P1BUQn1JpnGMyWxgB",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Seat pressure. All 9 licensed seats are now assigned, up from 8 thirty days ago, so the account has no room for new users.\n\nEvidence: 9 of 9 seats assigned, seat utilisation at 100, and 7 monthly active users. Health is green at 76.2 and the latest NPS is 10.\n\nLikely need: More seats. The seats are full and still growing, so the next step is adding seats to the current Enterprise edition, not an edition change. Only 7 of the 9 assigned seats were active in the last month, so confirm the new users are real demand before quoting a large increase.\n\nSuggested opener: \"Tevolo's team has grown to fill all 9 seats, so I wanted to check whether you'd like to add a few more before new people are left waiting.\"\n\nRisks: Two assigned seats are not active (7 monthly active users against 9 assigned), so part of the pressure may be seats sitting unused. Renewal is 236 days away, so there is no urgency on the contract. No open high-priority tickets were found.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 703,
+   "output_tokens": 661,
+   "output_tokens_details": {
+    "thinking_tokens": 324
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

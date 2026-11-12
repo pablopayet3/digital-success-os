@@ -30,3 +30,6 @@ cache/stand_in/
 
 # Local tool settings
 .claude/
+
+# Extracts for a BI tool: rebuilt with `uv run python run.py extracts`
+exports/

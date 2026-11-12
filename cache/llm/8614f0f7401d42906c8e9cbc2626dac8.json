@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Fenenta Systems\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 7, \"seats_assigned\": 5, \"seats_assigned_30_days_ago\": 5, \"seat_utilisation_pct\": 71, \"monthly_active_users\": 5, \"automation_rules\": 2, \"automation_rule_limit\": 5, \"integrations\": 1, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 86.3, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 324, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 53%: nearly all seats assigned, most seats active, free edition\", \"expansion_score_pct\": 53, \"expansion_reasons\": \"nearly all seats assigned, most seats active, free edition\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx73HK5nLy69tTuR35wt",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Fenenta Systems has fired an expansion-ready signal. Its expansion likelihood is 53%, driven by nearly all seats being assigned, most seats being active, and the account being on the free edition.\n\nEvidence: 5 seats are assigned against 7 licensed, and that was also 5 thirty days ago, so assignment is flat. Monthly active users are 5, and seat utilisation is 71%. The account is on the free edition, with standard as the next edition, and ARR is 0.\n\nLikely need: The next edition (standard) is the more likely need. Seat assignment has not grown in 30 days, and 2 licensed seats are still unassigned, so more seats are not clearly needed yet. The free edition is the main pull, since the signal points to a team that is actively using the product and has no paid tier.\n\nSuggested opener: \"Your team has been using Lumen consistently, and I'd like to understand what you'd need from a standard plan to get more from it, if that's useful.\"\n\nRisks: No open high-priority tickets, and health is green at 86.3. No NPS score is recorded, so customer sentiment is unmeasured. ARR is 0, so this is a conversion conversation rather than an existing revenue relationship. Renewal is 324 days away, so there is no time pressure.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 711,
+   "output_tokens": 923,
+   "output_tokens_details": {
+    "thinking_tokens": 506
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

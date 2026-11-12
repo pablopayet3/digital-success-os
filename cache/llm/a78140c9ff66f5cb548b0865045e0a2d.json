@@ -1,0 +1,52 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Ravexo Finance\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 6, \"seats_assigned\": 5, \"seats_assigned_30_days_ago\": null, \"seat_utilisation_pct\": 83, \"monthly_active_users\": 5, \"automation_rules\": 0, \"automation_rule_limit\": 5, \"integrations\": 0, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 82.6, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 347, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 56%: nearly all seats assigned, most seats active, free edition\", \"expansion_score_pct\": 56, \"expansion_reasons\": \"nearly all seats assigned, most seats active, free edition\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6tdtLRdDya4rWbL5nX",
+  "container": null,
+  "content": [
+   {
+    "text": "Signal: Ravexo Finance has been flagged as expansion-ready, with an expansion likelihood of 56%. The account is on the free edition and is nearly full on seats.\n\nEvidence: 5 of 6 licensed seats are assigned (83% utilisation), 5 monthly active users, and the health score is 82.6 (green) with no open high-priority tickets.\n\nLikely need: More seats or a move to the Standard edition. Seats are almost all taken and nearly everyone assigned is active, so the team is using the product and will soon run out of room. The free edition also includes no automation rules and no integrations, though the limits are 5 and 2, so the team may hit a wall on what the product can do for them.\n\nSuggested opener: \"Your team is using Lumen Labs well and is close to using all six seats, so I wanted to see whether adding seats or moving to Standard would make sense for how you're working.\"\n\nRisks: No assigned ARR (arr is 0), no latest NPS score, and renewal is 347 days away, so there is no near-term deadline pushing the conversation. The account has zero automation rules and zero integrations, so the team may not yet be using the features that Standard would add, and the upgrade case should be built on what they need next.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 710,
+   "output_tokens": 396,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

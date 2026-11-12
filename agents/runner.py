@@ -98,6 +98,11 @@ def record_conversation(
     folder = ctx.data_dir / "traces"
     trace_path = trace.finish(conversation.outcome, reason, conversation.llm_log, folder)
 
+    # Which model wrote the agent's replies. Recorded per conversation, so a stored answer
+    # is never mistaken for another model's (a real model's, or the rule-based stand-in's).
+    models = sorted({call["model"] for call in conversation.llm_log if call["role"] == "agent"})
+    answered_by = ", ".join(models) or "no agent model: a hard rule stopped it first"
+
     conversation_id = ctx.store.next_id("conversations", "CNV")
     ctx.store.insert(
         "conversations",
@@ -125,6 +130,7 @@ def record_conversation(
             "trace_file": trace_path.name,
             "cta_id": cta_id,
             "feedback": None,
+            "answered_by": answered_by,
         },
     )
     return conversation_id

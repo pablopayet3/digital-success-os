@@ -1,0 +1,89 @@
+{
+ "role": "classifier",
+ "purpose": "classify customer message",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read one message that a customer admin wrote to an onboarding assistant for Relay, a team-collaboration product. Describe the message so that routing rules can act on it. You do not answer the customer.\n\nReturn:\n\n- asks_for_human: true if the customer asks to talk to a person (in any wording), false otherwise.\n- frustration: a number from 0 to 1. 0 is calm, 0.5 is mildly annoyed, 0.7 and above means the customer is clearly upset, has run out of patience, or threatens to leave.\n- topic: what the message is mainly about.\n  - setup: setting up the workspace (boards, inviting users, integrations, single sign-on)\n  - product: how a feature works, or what an edition includes\n  - pricing: prices, quotes, discounts, buying seats, upgrading\n  - contract: contracts, invoices, billing, renewal terms, cancellation\n  - refund: asking for money back\n  - legal: legal or data-protection terms\n  - other: anything else\n- confidence: a number from 0 to 1 for how sure you are of the topic.\n\nA question about what an edition includes is \"product\". A question about what it costs is \"pricing\".\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "This is the last straw for us."
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "asks_for_human": {
+     "type": "boolean"
+    },
+    "frustration": {
+     "type": "number"
+    },
+    "topic": {
+     "type": "string",
+     "enum": [
+      "setup",
+      "product",
+      "pricing",
+      "contract",
+      "refund",
+      "legal",
+      "other"
+     ]
+    },
+    "confidence": {
+     "type": "number"
+    }
+   },
+   "required": [
+    "asks_for_human",
+    "frustration",
+    "topic",
+    "confidence"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx4jbjruiysS3KRoezqs",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQS7wYKEAgTGAI4AUIIdGhpbmtpbmcSDFE/S94yiN4M47jEBRoM73Rb8ToxPnxBnDkrIjAv+VSTkY1sJ9O3SMuyNWMhvxj7zo9bKtUEh3Y5yCYuutE199e8fxu5fdMqksBFTx8qjAbvxzIl0jlX8aVMAexm9AOIvXk2/p1KpkPG17P+1oQoZAqtfe6GZgJlgc95ZBExvZipQzK3bLJaqmn+YrPirVt/IiwscvN+A3ls0WCYpyhWcZ/RWRleOZlm3uxu/SMfrvHZlieet5JbmMIajzAzg8Vlm4r/mLmnclxhDieV6FaaJB8fjZJoIVSNgywXdcGqY1F76H/zBU7r3GjpX0LY0RxnMYJESvNkS1HeIL0IPZbxaD/tXttKrhd0qlEvrwRWtuuQchgQL0KgL+vjSMcilkrUBlni37x5NH6kt9Ngx/anGg2sKUKTl16nJIdTc9St25TcXnCqrptIJRf5Gm+p8492Cy+XUKxlUCfq2Mfc1ZBquUCSjCcBQ7IvmbSvDJk/ZzlkuiJBr9smTPMqU6xonEUqYmp5FEGIRjn+GjPEJ2dHCux90dKCCUbkCth5Q25Q9ec4TDPIVkOdx2uLKpUDcHSXTinpDIqi8WZTq7/OCRVytY3LxssYyW1OZpuYJwnssMNjoYKplyFZt2psrZI8PHcDY0LUH+8FUWyXlymGBVUhWLQJq6ZQnOq1lgoU6mN8IZcasvXEypzDQtRocixxnK6y+05Nj4l+m3GIMLTQKAeggr3p3hLiYNMNaEwFYGjeZL4rSLbJ7ZaFWuMZEjioqWwZVZELPblmA+L8t1PD6aIg2pnlOogu7EuwMvJztOe4SLYMdkXvmdx2I03h/ec2zgLp42pc6Wm6ZF7H/Z2UE4nbJ+dU3ZfVWHTGQHIK+8PuffICVNtpvKMM8gdu3MQj+UZbBJ9JiumZo9f4+YsPTVgh2qEFXVEG6IZw+fEwW4+VL34fO1o4j6g9A1nEZ2rVcQeaGdNLXGDR2P4XGxq/W8fg1GLbEam3Iru3Keoy7qAVQmKQQUYEg6BVvNVdIf4gP+oJ/RvnSubeYqAwtqIj0v+LFX9i78MNdYy4W8IK/j1g294nck0iZd79sn6RMo/Wai3MRKO6i43RbPpUM1+BXK3F2/scm2IatWt1ZW38neQi/wqkN6A4A+FIQjvxr34YAQ==",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"asks_for_human\": false, \"frustration\": 0.8, \"topic\": \"other\", \"confidence\": 0.2}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 702,
+   "inference_geo": "global",
+   "input_tokens": 15,
+   "output_tokens": 135,
+   "output_tokens_details": {
+    "thinking_tokens": 95
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

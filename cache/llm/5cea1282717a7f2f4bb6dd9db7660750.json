@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Garrium Health\", \"segment\": \"smb\", \"edition\": \"premium\", \"next_edition\": \"enterprise\", \"arr\": 3802, \"seats_licensed\": 24, \"seats_assigned\": 24, \"seats_assigned_30_days_ago\": 24, \"seat_utilisation_pct\": 100, \"monthly_active_users\": 14, \"automation_rules\": 22, \"automation_rule_limit\": 60, \"integrations\": 2, \"integration_limit\": 10, \"assist_credits_used_30d\": 547, \"assist_credits_included\": 960, \"health_score\": 71.2, \"health_band\": \"green\", \"open_high_priority_tickets\": 1, \"latest_nps_score\": 7, \"days_to_renewal\": 338, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"24 of 24 seats assigned\", \"expansion_score_pct\": 61, \"expansion_reasons\": \"nearly all seats assigned, many high-priority tickets, heavy Assist use\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6yUrzbexTiV7NvJe31",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Garrium Health has used every seat on its Premium plan, which is the kind of pressure that often leads to a seat expansion conversation.\nEvidence: All 24 licensed seats are assigned, unchanged from 24 thirty days ago. Only 14 monthly active users are on the account, and the expansion score is 61.\nLikely need: More seats is the most direct fit, since every seat is assigned. Enterprise is less clearly supported: automation rules (22 of 60) and integrations (2 of 10) are well below their limits, and the expansion note cites heavy Assist use and many high-priority tickets, but the data shows 547 of 960 Assist credits used and only 1 open high-priority ticket. Check actual usage before proposing Enterprise.\nSuggested opener: \"Your team is using all 24 seats, so I wanted to check whether adding a few more would help more people get set up before your next cycle.\"\nRisks: The latest NPS is 7, and there is 1 open high-priority ticket. Health is green at 71.2, and renewal is 338 days out, so there is no urgency. Only 14 of 24 seats are active, so ask whether the assigned seats are being used before adding more.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 703,
+   "output_tokens": 856,
+   "output_tokens_details": {
+    "thinking_tokens": 465
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

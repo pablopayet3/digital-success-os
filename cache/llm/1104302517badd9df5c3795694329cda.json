@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.\n- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"How do automation rules work with recurring cards?\"}, {\"role\": \"agent\", \"text\": \"Automation rules work with recurring cards. Each time Relay creates a new copy of a recurring card, the rule runs on that copy.\\n\\n**Setting up a rule:** On any board, click the **Automation** button. Pick a trigger, add conditions if you want them, and choose one or more actions. For example: when a card moves to Done, notify the reporter.\\n\\n**Rule limits by edition:** Free allows 5 rules per workspace, Standard 15, Premium 60, and Enterprise has no practical limit. If you hit the limit, your current rules keep running, but you can't add new ones.\\n\\n**If a rule doesn't run or runs twice:** Open the Automation panel on the board and look at the rule's run history.\\n- **It didn't run:** the rule may be switched off, the trigger may be set on a different list, or a condition (like a label or assignee) may not have matched.\\n- **It runs twice:** two rules probably have the same trigger. The copy may be on the board or in the workspace template the board came from. Switch one of them off.\"}], \"articles\": [{\"title\": \"Automation rules\", \"text\": \"# Automation rules\\n\\nAn automation rule does something for you when something happens on a board. Example: when a card moves to Done, notify the reporter. Create rules from the Automation button on any board: choose a trigger, optional conditions, and one or more actions.\\n\\nRules also work with recurring cards: the rule runs each time a new copy of the card is created.\\n\\nThe number of rules per workspace depends on your edition: 5 on Free, 15 on Standard, 60 on Premium, and no practical limit on Enterprise. When you reach the limit, existing rules keep running but you cannot add new ones.\\n\\nSearch keywords: automate automation rule rules trigger action limit\\n\"}, {\"title\": \"An automation rule did not run, or runs twice\", \"text\": \"# An automation rule did not run, or runs twice\\n\\nIf a rule did not run, open the Automation panel on the board and look at the rule's run history. The most common causes are: the rule is switched off; the trigger is on a different list than the one the card moved to; or a condition (label, assignee) did not match.\\n\\nIf a rule sends two notifications for every card, two rules have the same trigger. Check for a copy of the rule on the board and in the workspace template the board was created from. Switch one of them off.\\n\"}, {\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}], \"account_facts\": {\"setup_status\": {\"completed_steps\": [\"create a first board\", \"invite at least five users\"], \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.5, \"seats_assigned\": 9, \"seats_licensed\": 15, \"edition\": \"standard\"}, \"account_context\": {\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 9, \"utilisation\": 0.6, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.5, \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}}}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx5ToVirpdohZVztTUQD",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\":\"pass\",\"score\":4,\"reason\":\"Every product step, edition limit and troubleshooting cause the reply states is supported by the Automation rules and run-history articles, the reply answers the recurring-card question with actionable steps, and it makes no promises or price statements; it loses a point only because the opening sentence restates the question and the reply is somewhat long.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 782,
+   "inference_geo": "global",
+   "input_tokens": 1667,
+   "output_tokens": 435,
+   "output_tokens_details": {
+    "thinking_tokens": 315
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

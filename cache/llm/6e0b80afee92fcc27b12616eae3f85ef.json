@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Zanora Media\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1992, \"seats_licensed\": 25, \"seats_assigned\": 17, \"seats_assigned_30_days_ago\": null, \"seat_utilisation_pct\": 68, \"monthly_active_users\": 13, \"automation_rules\": 3, \"automation_rule_limit\": 15, \"integrations\": 1, \"integration_limit\": 3, \"assist_credits_used_30d\": 231, \"assist_credits_included\": 250, \"health_score\": 74.4, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 353, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 44%: heavy Assist use, nearly all seats assigned, most seats active\", \"expansion_score_pct\": 44, \"expansion_reasons\": \"heavy Assist use, nearly all seats assigned, most seats active\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7q6v3VLbYqKPphSiXx",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Zanora Media, a Standard-edition SMB account, has an expansion-ready signal, with a 44% expansion likelihood driven by heavy Assist use and seat activity.\n\nEvidence: 231 of 250 included Assist credits were used in the last 30 days. 17 of 25 licensed seats are assigned, and 13 users are monthly active. Health is 74.4 (green).\n\nLikely need: Premium looks like the more relevant conversation than more seats, since Assist usage is close to the 250 included and seat assignment is only 17 of 25. Automations (3 of 15) and integrations (1 of 3) are well under their limits, so I would not lead with those. This is a sizing inference from the data, not a confirmed need.\n\nSuggested opener: \"I noticed your team has been using Assist heavily this month, so I wanted to check whether the Premium edition would give you more room as usage grows.\"\n\nRisks: The expansion likelihood is 44%, below even odds, and the seat assignment (17 of 25) does not clearly support a seat expansion. There is no NPS score, so there is no direct read on sentiment. Renewal is 353 days away, so there is no time pressure. There are no open high-priority tickets.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 718,
+   "output_tokens": 936,
+   "output_tokens_details": {
+    "thinking_tokens": 537
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

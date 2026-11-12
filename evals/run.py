@@ -39,12 +39,14 @@ from agents.classify import classify_replies
 from agents.llm import LLMUnavailable, get_llm
 from agents.onboarding import Conversation, converse, scripted
 from agents.retrieval import knowledge_base
+from agents.tools import AgentTools
 from common.config import load_yaml
 from common.paths import DATA_DIR, ROOT
+from engine.handoff import account_snapshot
 
 CASE_DIR = ROOT / "evals" / "cases"
 REPORT_DIR = ROOT / "evals" / "reports"
-PROMPT_VERSIONS = ("v1", "v2")
+PROMPT_VERSIONS = ("v1", "v2", "v3")
 MAILBOX_SAMPLE = 160  # labelled replies scored for the confusion matrix
 JUDGE_PASS_SCORE = 4
 BRIEF_SECTIONS = ("Signal", "Evidence", "Likely need", "Suggested opener", "Risks")
@@ -99,7 +101,7 @@ def run_agent_case(case: dict, prompt_version: str) -> dict:
     checks = check_conversation(case["expect"], conversation)
     judge = None
     if case.get("judge") and conversation.outcome == "resolved" and all(c[1] for c in checks):
-        judge = judge_conversation(conversation)
+        judge = judge_conversation(conversation, eval_account(case["account"]))
         if judge is not None:
             passed = judge["verdict"] == "pass" and judge["score"] >= JUDGE_PASS_SCORE
             checks.append(("judge", passed, f"{judge['score']}/5: {judge['reason']}"))
@@ -142,7 +144,7 @@ def check_conversation(expect: dict, conversation: Conversation) -> list[tuple[s
         wanted = set(expect["retrieved"])
         checks.append(("retrieval", bool(found & wanted), f"found {sorted(found) or 'nothing'}"))
     if expect.get("first_reply_is_question"):
-        ok = bool(replies) and replies[0].rstrip().endswith("?")
+        ok = bool(replies) and "?" in replies[0]  # a question, wherever it sits in the reply
         checks.append(
             ("asks to clarify first", ok, f"first reply: {replies[0][:80] if replies else '-'}")
         )
@@ -152,8 +154,12 @@ def check_conversation(expect: dict, conversation: Conversation) -> list[tuple[s
     return checks
 
 
-def judge_conversation(conversation: Conversation) -> dict | None:
-    """Ask the judge model to score the answer against the articles the agent found."""
+def judge_conversation(conversation: Conversation, account: dict) -> dict | None:
+    """Ask the judge model to score the answer against everything the agent could see.
+
+    That is the articles its search returned and what its tools told it about the
+    account. A judge shown only the articles marks correct account facts as invented.
+    """
     articles = {article.slug: article for article in knowledge_base().articles}
     found = {result["slug"] for search in conversation.searches for result in search["results"]}
     payload = {
@@ -161,6 +167,10 @@ def judge_conversation(conversation: Conversation) -> dict | None:
         "articles": [
             {"title": articles[slug].title, "text": articles[slug].text} for slug in sorted(found)
         ],
+        "account_facts": {
+            "setup_status": AgentTools(account).setup_status(),
+            "account_context": account_snapshot(account),
+        },
     }
     try:
         response = get_llm().call(
@@ -308,12 +318,15 @@ def run_brief_case(case: dict) -> dict:
 
 def run_evals(
     data_dir: Path = DATA_DIR,
-    report_dir: Path = REPORT_DIR,
+    report_dir: Path | None = None,
     versions: tuple[str, ...] = PROMPT_VERSIONS,
     verbose: bool = True,
 ) -> dict:
     """Run every suite, write the report, and return the results."""
     llm = get_llm()
+    # A stand-in run never overwrites the report produced with the real model.
+    if report_dir is None:
+        report_dir = REPORT_DIR / "stand-in" if llm.settings.llm_stand_in else REPORT_DIR
     agent_cases = load_cases("onboarding_agent")
     results = {
         "llm_mode": llm.mode,
@@ -345,7 +358,8 @@ def run_evals(
             accuracy = results["mailbox_accuracy"]
             print(f"mailbox accuracy: {accuracy['accuracy']:.0%} on {accuracy['scored']} replies")
         print(results["llm_summary"])
-        print("Report: evals/reports/eval-report.md")
+        shown = report_dir.relative_to(ROOT) if report_dir.is_relative_to(ROOT) else report_dir
+        print(f"Report: {(shown / 'eval-report.md').as_posix()}")
     return results
 
 

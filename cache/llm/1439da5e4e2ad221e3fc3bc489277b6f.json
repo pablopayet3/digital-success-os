@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Garromi Builders\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1382, \"seats_licensed\": 16, \"seats_assigned\": 13, \"seats_assigned_30_days_ago\": 12, \"seat_utilisation_pct\": 81, \"monthly_active_users\": 10, \"automation_rules\": 2, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 160, \"health_score\": 86.2, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 10, \"days_to_renewal\": 307, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 57%: nearly all seats assigned, reads our emails, most seats active\", \"expansion_score_pct\": 57, \"expansion_reasons\": \"nearly all seats assigned, reads our emails, most seats active\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7fuyxtTzEv8nQcrrGa",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: The expansion-readiness signal fired on Garromi Builders, with an expansion likelihood of 57%.\nEvidence: 13 of 16 licensed seats are assigned, up from 12 thirty days ago, and seat utilisation is 81%. Health is 86.2 (green), with NPS 10.\nLikely need: The data points more to additional seats than to the Premium edition. Seats are nearly full and still growing, but automation rules (2 of 15), integrations (0 of 3) and Assist credits (0 used of 160) are all low, so the data doesn't show a Premium need yet.\nSuggested opener: \"Garromi, your team has been steadily adding people to Lumen, so I wanted to check whether your current seat count still fits your plans for the next few months.\"\nRisks: Only 10 monthly active users against 13 assigned seats, so some assigned seats may be idle. Renewal is 307 days away, so there is no near-term pressure. No open high-priority tickets.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 717,
+   "output_tokens": 884,
+   "output_tokens_details": {
+    "thinking_tokens": 560
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

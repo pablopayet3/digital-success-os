@@ -1,0 +1,118 @@
+{
+ "role": "classifier",
+ "purpose": "classify mailbox",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You sort replies that arrived in a shared mailbox. Each one answers an email that the customer success team of Lumen Labs sent about its product, Relay. The input is a JSON list of replies, each with an id, a subject and a body. Routing rules act on your answer; you do not reply to anyone.\n\nFor each reply return:\n\n- id: the id you were given.\n- intent: the main thing the sender wants.\n  - out_of_office: an automatic reply saying the person is away\n  - unsubscribe: the person wants to stop receiving these emails\n  - left_company: the person no longer works there, or the mailbox is closed\n  - product_question: a question about how the product works\n  - buying_intent: wants more seats, a higher edition, another product, or pricing\n  - complaint: unhappy about the product or the service\n  - meeting_request: wants a call or a meeting\n  - other: none of the above\n- sentiment: positive, neutral or negative.\n- confidence: a number from 0 to 1. Use a low number when two intents fit about equally, or when the message is too short or vague to tell.\n- seats_requested: the number of seats asked for, as text, or an empty string.\n- edition_mentioned: the edition named (free, standard, premium, enterprise), or an empty string.\n- return_date: when the person says they are back, as written, or an empty string.\n- new_contact: the name of the person to contact instead, or an empty string.\n\nReplies can be in any language. Ignore quoted text from the original email and signatures. When a reply has two intents, choose the one that needs action first: a complaint outranks an unsubscribe, and buying intent outranks a product question.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"M000097\", \"subject\": \"Re: Welcome to Relay: your first three steps\", \"body\": \"How do automation rules work with recurrnig cards?\\n\\n--\\nEdward Prince\\nOperations Lead | Kelolo Foods\\n\\nOn 12 May 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Welcome to Relay: your first three steps\\n> Hi Edward, here is the latest from the Relay team...\"}, {\"id\": \"M000100\", \"subject\": \"Re: Welcome to Relay: your first three steps\", \"body\": \"Hello team,\\n\\nHappy to chat. Do you have a calendar link?\"}, {\"id\": \"M000103\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Hi there,\\n\\nCan someone walk our admins through the setup? Thursday afternoon works for us.\\n\\nSent from my phone\"}, {\"id\": \"M000106\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"This is the third email I get about features while our boards have been slow for two weeks. Fix that first.\\n\\nSent from my phone\\n\\nOn 18 May 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Live session: automation rules in 30 minutes\\n> Hi Danielle, here is the latest from the Relay team...\"}, {\"id\": \"M000109\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"hello team,\\n\\nplease take me off this list. also, the last update broke our board filters and nobody has replied to my ticket.\\n\\nThanks,\\nTim\\n\\nOn 18 May 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Live session: automation rules in 30 minutes\\n> Hi Tim, here is the latest from the Relay team...\"}, {\"id\": \"M000112\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Hi there,\\n\\nI do not need these emails anymore, please take me off the list. Thanks.\\n\\n--\\nKrystal Gibson\\nTeam Lead | Sorune Works\"}, {\"id\": \"M000115\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"hi there,\\n\\nis there a way to bulk invite users? we have about 8 people to add.\\n\\nSent from my phone\"}, {\"id\": \"M000118\", \"subject\": \"Re: Connect your tools: integrations and SSO\", \"body\": \"Hello team,\\n\\nstop sending me these\\n\\n--\\nIan Roberts\\nHead of IT | Arvexo Analytics\\n\\nOn 22 May 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Connect your tools: integrations and SSO\\n> Hi Ian, here is the latest from the Relay team...\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "intent": {
+        "type": "string",
+        "enum": [
+         "out_of_office",
+         "unsubscribe",
+         "left_company",
+         "product_question",
+         "buying_intent",
+         "complaint",
+         "meeting_request",
+         "other"
+        ]
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       },
+       "seats_requested": {
+        "type": "string"
+       },
+       "edition_mentioned": {
+        "type": "string"
+       },
+       "return_date": {
+        "type": "string"
+       },
+       "new_contact": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "intent",
+       "sentiment",
+       "confidence",
+       "seats_requested",
+       "edition_mentioned",
+       "return_date",
+       "new_contact"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx4yPDSAdtRNGXtnKUhu",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\": [{\"id\": \"M000097\", \"intent\": \"product_question\", \"sentiment\": \"neutral\", \"confidence\": 0.9, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000100\", \"intent\": \"meeting_request\", \"sentiment\": \"positive\", \"confidence\": 0.85, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000103\", \"intent\": \"meeting_request\", \"sentiment\": \"positive\", \"confidence\": 0.85, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000106\", \"intent\": \"complaint\", \"sentiment\": \"negative\", \"confidence\": 0.9, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000109\", \"intent\": \"complaint\", \"sentiment\": \"negative\", \"confidence\": 0.9, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000112\", \"intent\": \"unsubscribe\", \"sentiment\": \"negative\", \"confidence\": 0.95, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000115\", \"intent\": \"product_question\", \"sentiment\": \"neutral\", \"confidence\": 0.8, \"seats_requested\": \"8\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000118\", \"intent\": \"unsubscribe\", \"sentiment\": \"negative\", \"confidence\": 0.9, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1079,
+   "inference_geo": "global",
+   "input_tokens": 994,
+   "output_tokens": 621,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

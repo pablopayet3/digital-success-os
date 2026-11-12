@@ -21,7 +21,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pandas as pd
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, inspect, text
 
 from common.paths import DATA_DIR
 from common.settings import load_settings
@@ -160,7 +160,8 @@ TABLES = {
         latency_ms INTEGER,
         trace_file TEXT,
         cta_id TEXT,
-        feedback TEXT
+        feedback TEXT,
+        answered_by TEXT
     """,
     # What the mailbox triage agent decided for each reply in the shared mailbox.
     "mailbox_triage": """
@@ -202,6 +203,16 @@ class Store:
         with self.engine.begin() as con:
             for name, columns in TABLES.items():
                 con.execute(text(f"CREATE TABLE IF NOT EXISTS {name} ({columns})"))
+        self._add_new_columns()
+
+    def _add_new_columns(self) -> None:
+        """A store made by an older version gains any column added since. Nothing is removed."""
+        inspector = inspect(self.engine)
+        for name, columns in TABLES.items():
+            existing = {column["name"] for column in inspector.get_columns(name)}
+            for definition in columns.split(","):
+                if definition.split()[0] not in existing:
+                    self.execute(f"ALTER TABLE {name} ADD COLUMN {' '.join(definition.split())}")
 
     def rows(self, sql: str, **params) -> list[dict]:
         """Run a SELECT. Returns a list of rows, each a dictionary."""

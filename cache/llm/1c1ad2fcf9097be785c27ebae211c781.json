@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Zanune Studios\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 10, \"seats_assigned\": 9, \"seats_assigned_30_days_ago\": 8, \"seat_utilisation_pct\": 90, \"monthly_active_users\": 7, \"automation_rules\": 4, \"automation_rule_limit\": 5, \"integrations\": 0, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 79.6, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 303, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"9 of 10 seats assigned\", \"expansion_score_pct\": 82, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, free edition\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6vSdUcGnv2fPtCQwNL",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Zanune Studios has nearly all of its licensed seats in use, and seat assignment rose recently.\n\nEvidence: 9 of 10 seats are assigned (90% utilisation), up from 8 thirty days ago. The account is at 4 of 5 automation rules, and the expansion score is 82%.\n\nLikely need: More seats first, since assignment is almost full and still climbing. The account is also close to its automation rule limit on the free edition, so Standard may be the better fit if they want room to grow. The data shows the pressure, but not which of these they want.\n\nSuggested opener: \"Your team has nearly filled its 10 seats, so I wanted to check whether you'd like to talk about adding seats or what Standard would give you.\"\n\nRisks: none visible in the data. There are no open high-priority tickets, health is green at 79.6, and renewal is 303 days away. The account is on the free edition with ARR of 0, so there is no paid revenue to protect yet.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 693,
+   "output_tokens": 838,
+   "output_tokens_details": {
+    "thinking_tokens": 524
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -20,7 +20,7 @@ GROUPS = {
         "pilot-plan.md",
     ],
     "What it is": ["prd.md", "roadmap.md", "metrics.md", "data-requirements.md"],
-    "Evidence": ["eda-report.md", "phase-notes.md"],
+    "Evidence": ["operating-review.md", "eda-report.md", "phase-notes.md"],
 }
 group = st.radio(
     "Section", [*GROUPS, "Play specs", "Decisions (ADRs)", "Model cards"], horizontal=True

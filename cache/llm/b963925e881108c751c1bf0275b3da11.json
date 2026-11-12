@@ -1,0 +1,75 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to answer from.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every step, limit or feature the assistant states can be found in the articles. Anything stated that is not in the articles is a failure, even if it happens to be true.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"How do I deactivate a user who left, so they stop using a seat?\"}, {\"role\": \"agent\", \"text\": \"To deactivate someone who left:\\n\\n1. Go to **Admin settings \u2192 Users**.\\n2. Find the person, open the **menu at the end of their row**, and choose **Deactivate**.\\n\\nWhat happens next:\\n- **The seat is freed right away**, so you can give it to someone else.\\n- **Their cards, comments and documents stay where they are.** Any cards assigned to them will show as unassigned, so you may want to give those to someone else.\\n- **You can undo this.** If you reactivate them later, they get their history back.\\n\\nIf you want to delete the user permanently instead, only support can do that, because it can't be undone. For freeing a seat, deactivating is enough.\"}], \"articles\": [{\"title\": \"Remove or deactivate a user\", \"text\": \"# Remove or deactivate a user\\n\\nWhen someone leaves, an admin can deactivate them under Admin settings, Users. Find the person, open the menu at the end of the row and choose Deactivate.\\n\\nDeactivating frees the seat at once. The person's cards, comments and documents stay where they are, and cards assigned to them show as unassigned. You can reactivate a user later and they get their history back.\\n\\nDeleting a user permanently is only possible on request to support, because it cannot be undone.\\n\"}, {\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}, {\"title\": \"Invite your team\", \"text\": \"# Invite your team\\n\\nAdmins invite people from Admin settings, Users, Invite. Type one email address per line or paste a list. Each invited person receives an email with a link that is valid for seven days.\\n\\nYou can invite as many people as you have licensed seats. A seat is used as soon as the invitation is sent, and freed again if you cancel the invitation or deactivate the user.\\n\\nTip: teams that invite at least five people in their first week are far more likely to keep using Relay, because boards are only useful when the work of several people is on them.\\n\\nSearch keywords: add people colleagues members team teammates new users invite invitation\\n\"}]}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx4e1jqfyGvzUbd3zRJQ",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"verdict\":\"pass\",\"score\":4,\"reason\":\"All steps, the seat-freeing behaviour, card handling and reactivation are grounded in the 'Remove or deactivate a user' article, and the reply directly answers how to free a seat without price or date commitments; the only minor weakness is the slightly extra note about permanent deletion, which is also in the article, so clarity is nearly full.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 671,
+   "inference_geo": "global",
+   "input_tokens": 1061,
+   "output_tokens": 129,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

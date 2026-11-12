@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Quinessa Robotics\", \"segment\": \"smb\", \"edition\": \"premium\", \"next_edition\": \"enterprise\", \"arr\": 918, \"seats_licensed\": 6, \"seats_assigned\": 5, \"seats_assigned_30_days_ago\": 5, \"seat_utilisation_pct\": 83, \"monthly_active_users\": 4, \"automation_rules\": 1, \"automation_rule_limit\": 60, \"integrations\": 0, \"integration_limit\": 10, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 240, \"health_score\": 80.1, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 323, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"Hi there, Our Assist credits keep running out. Is there a bigger package? -- Stephanie Ray Team Lead | Quinessa Robotics\", \"expansion_score_pct\": 33, \"expansion_reasons\": \"nearly all seats assigned, most seats active, reads our emails\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx8FJr4a6A5tHkKHk8B9",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQS9BAKEAgTGAI4AUIIdGhpbmtpbmcSDG4FVRG3YuQMKq4tVBoM8z89rzI3R39w3MqrIjCmuosGgX5q5x3GWMCasm+I0TQw6FGumpx6zCsGj9J7NBrNtzV6UYufL2SDqypYEvUqkRAEHz4WxRHnSFvD4f12gg7q1JkZxRIqPTsXc/U4n4jgYz3Wnvds9uRb72cuJ6ksJE9RChrXj9levEilE4QnFI/wD5PfiaFPlU9YHeSkoqKxCjBNZdapQhJAxiJNGJDPBeiw+xZ8u7WQ/McbOzBiWBfjVyP0N/pETtOEy8sa9zWri/zHMMV0sM+zs67QP3KoUsIqKnBZa3ZWjgzP6ZTDDEKzlsAbhsoN68Rs+5gMG9NzrALguwQV5PsTS9JPUW9L6Ns0qEuXyJrKus0bvnmP3yjRZrOxdjK5NLGPBQuyfdmGrF6e7lqaCKmR/BNm7qssp9NfH60/uUNDtDn3wYjgmxmzRwWMYhmWTDUVlmtq546AT5Gx3VMTomsNcxvkr6elN5p7ObX7tjk2pnIOL91weZOZIUbsrvT5/FwP6Tn2Dzv0qEQvtclft6xmoDRaL+2sbkfGcMMfxkA/1BdGCsSAWlkNOQazxKMafUkjgk1rNe4uhom+NByH50GKZ7enNvr2SDsguE9dXM/sMPLSw6RSDrjEVRuknwALGcw4iISBNnwAspzvUDlN7jXgClLy4JWj7hPTAqqFTtNs1uKMZR3lXa7qVvnYGcGBlstyh2+snjHJIZuQsWGgJZWrjeLRSM6CwVAUDdggxPAv4n1gB7rHyVhGJmIdxcCegxAoq9BOzL5KXeTcsm4TGdHOxOB+F/4ayzncqTE4ZpYrCfCEuavfzBHKUzHw0/1OX0lYYSEZr0GEXMUKwOm41+KZrNqLnty4O31HQcQy8Le4Y1/y5gFTG9ibYxAAnGK3IceUZ8LtGfYQ90Y6JIJNEczRce51imTwxMFDGPtVYg8LdXG+dMEILAfe+Bm5icILCz7X+wDyscvjEUojfm/3xcFHDQVZgPVbCsiqD9Byg6PCvUms5XQb1FFvNAZsLzSk8qG0wNpKuyE+bLCTILMGUZx3zNDmpoGK733R1xSvFYEXxn9AJ8B6DIcHn6ft2ihYoKaQSLvGCmCcDcdg5IOOMSJpbNT5ckjajHtE9Mx7hBWAko2nBCfkP9MuF+vWc87M0VHPy5Y7QXczKDeryea0XTHAQA5aay+Vryquoqoj+xjKstSDmxc28I7vk5iMF88NQzljZzuTI20VdLF27lboQLhbQsfemaVOTs4gw11MWHAAFcgqsxMIcQee43pFAuzJsCxuq+Px+5BmyazP/5Vuba+FZ7L+1BzX8fSOmmhQZ8sY+hgGSzzORLTiihwK6LShxdpARxVo3PhcdSmXGUbbhim16IaqVOKUCoAILmSRA0aDolycfwk7cbYHX4uHOrE2SdJFdgCH0JoH/n46xD3IqxGGhBtbvEfWqzUaJY1x9+UZOlTkZR0ciEIbF0eaiH9vD7TEVrVwXfBtPpl+cYZQxhaFU4cxIpqBos/akSHYEo+HR3mKC5UzWXjHWJ+ew37K39JVF0X5spL8eCMkfuDfMkYzjnhqXWrZh2WUI3l1atGvTiQLCpOZgGaElMRljjL/LRvuJF5ezEb5t7o/q8nauge3cPStELIZyERs33kwY2ALkorveMyFP6m5bLR1552SPiWXWA8cc0hJStgnhUTW1Wv6R8d419qDFitIEVWiKJsOlgqFh1c2jfcK97DT22DSet3iTiVEH7MArk44cM8TZlCPx0RXBfF5NKgXQ2gU81eGO1LrayyQ6SL5X6CBACFdF3Gnin5NTwq0PQb2kPHi+pSgF8nWq3JXRpubQyJ0ihkIUnkx3d7pKu3WP+IO481uXwPzWazSf6Z6YvqomI4CPux+tRHVs2AmmZFVTZQD3S0w2JYSdXL7ODd77JN4alyA7YeLXqBXYBRbhOnPeHB1wqlxEv85hu4YROZHqtJENDmv+dFY0+jC2p/bX5FV+ZJZpJPksiPM5BUSjYLMSq82EGPSL4XBqsYx9FEoMAGaVjE5eYrC2qO74AyvcpHG0kG6d5TeA0YbN4BU6DtKK3ahpcIvnKM5OoPYjsMmNFKmeyOoEa7zs4WYI1obnERTxHgGzOXozHA0UrhUSKgx/yR/UgqPnVTsZMVvyhVjlW1HzBVG3xhf+sQjniVANqf5QD9zLL5KQScXGkNQJ1bnZUo1r8Y9e2MEXWjuUj4PyGg77GTUmeiPcVWCGxmIpevxTzeSJHlWs0dYOdUMwenMTQ8mtN0FUTxISp2uGwSqwBbs7yWb0c7VejV2wM1RM4SbrQeI25DUNR7x/5kUaavguSIE8jm9XQrLOeSwJjihoEWM3sPzcnOWWihn0NwA34nWFyFgPWrSVyxaXypCgoe0JQ8iAG6xxSEE1DPz1nWuiiXeptKn6ZGMNK3kUA2s0NwORSmOOSN3hD2e9gtQ6l5OC9LveLdWVxeIF2mwkGpCdrHn0R5fPJmncoWi101U2NVEzDLJwKFTTxcB4w4Jk+OiWQSWf/BZqyprphzS2p41YuESPM5SyJdt4AhXWIym7bGiTnqqCAiCrCASPiyzvhDZDpTdwCSFxEipCESbxkjqk2ALTx3txmyeqmvtSCxvpjO2fq7l+my71M1zAH2C7WAXNOOIJH3aYfwzJKZtyXciXUKkqwcefxI2Lc9APW6S2KF2RZ6j748wYXvk0XnVCYkUw4WPUaaG3WtP82OZcnfZCNM5rBfwqx5LBxd4MunjqKVT07Wu05UUsQW0Eab0lA5QaYki2fNdzGti+GfzG0SAsEA3v8ZSBYuM9jsEbs/qZyKM0fOo5OpLTNhw6GEPMk/4bNXBML9bcImiHuImhvNwGAE=",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Stephanie Ray, Team Lead at Quinessa Robotics, wrote in to say their Assist credits keep running out and to ask whether a bigger package exists. This is buying intent.\nEvidence: Assist credits used in the last 30 days are 0 against 240 included, which doesn't match the claim that credits keep running out. Seats are 5 assigned of 6 licensed (83% utilisation), with 4 monthly active users. Health is green at 80.1.\nLikely need: She is asking about a bigger package, and the next edition is enterprise. Seat use is close to full, so more seats are a possible ask too, but one licensed seat is still unassigned. Before proposing a larger package, confirm what she means by credits running out, because the usage data shows none consumed in the last 30 days.\nSuggested opener: \"Hi Stephanie, thanks for getting in touch about Assist credits. Could you tell me a little about what your team is running into so I can point you to the right option?\"\nRisks: Only 1 of 60 automation rules and 0 of 10 integrations are in use, so premium capacity is largely unused and an upgrade may not solve the problem she describes. The credit complaint conflicts with the usage data. Renewal is 323 days away, so there is no time pressure.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 737,
+   "output_tokens": 996,
+   "output_tokens_details": {
+    "thinking_tokens": 576
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

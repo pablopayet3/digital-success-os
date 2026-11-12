@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.\n- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"What does the Premium edition include that Standard does not?\"}, {\"role\": \"agent\", \"text\": \"Premium gives you higher limits than Standard. Both editions have the same features otherwise.\\n\\n| | Standard (your edition) | Premium |\\n|---|---|---|\\n| Automation rules | 15 | 60 |\\n| Integrations | 3 | 10 |\\n| Relay Assist credits per seat per month | 10 (if you add Relay Assist) | 40 |\\n| Single sign-on | Yes | Yes |\\n| Guests | Yes | Yes |\\n\\nThis comes from the help centre article **\\\"Compare editions: Free, Standard, Premium, Enterprise.\\\"** For prices or to change edition, talk to your account owner, Morgan Ellis.\\n\\nStandard already covers your two remaining setup steps. You can connect up to 3 integrations, and single sign-on is included. If you'd like, I can walk you through connecting your first integration now.\"}], \"articles\": [{\"title\": \"Automation rules\", \"text\": \"# Automation rules\\n\\nAn automation rule does something for you when something happens on a board. Example: when a card moves to Done, notify the reporter. Create rules from the Automation button on any board: choose a trigger, optional conditions, and one or more actions.\\n\\nRules also work with recurring cards: the rule runs each time a new copy of the card is created.\\n\\nThe number of rules per workspace depends on your edition: 5 on Free, 15 on Standard, 60 on Premium, and no practical limit on Enterprise. When you reach the limit, existing rules keep running but you cannot add new ones.\\n\\nSearch keywords: automate automation rule rules trigger action limit\\n\"}, {\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}, {\"title\": \"Connect an integration\", \"text\": \"# Connect an integration\\n\\nIntegrations connect Relay to the other tools your team uses. Available integrations: chat, calendar, code repository, cloud drive, CRM and video meetings.\\n\\nTo connect one (admins only), open Admin settings, Integrations, choose the tool and click Connect. You are sent to that tool to approve access, then returned to Relay. The integration is live straight away for the whole workspace.\\n\\nHow many integrations you can connect depends on your edition: 2 on Free, 3 on Standard, 10 on Premium, and no practical limit on Enterprise. Connecting at least one integration is one of the four setup steps we recommend in the first week.\\n\\nSearch keywords: connect tools apps integration integrations link\\n\"}], \"account_facts\": {\"setup_status\": {\"completed_steps\": [\"create a first board\", \"invite at least five users\"], \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.5, \"seats_assigned\": 9, \"seats_licensed\": 15, \"edition\": \"standard\"}, \"account_context\": {\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 9, \"utilisation\": 0.6, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.5, \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}}}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx5X2vSfUeq5VKJXv95P",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\":\"pass\",\"score\":4,\"reason\":\"All product limits and features stated (rules, integrations, Assist credits, SSO, guests) match the edition comparison article, the account facts are stated accurately, pricing is correctly deferred to the account owner, and the reply answers the question, with only a slightly long table as a clarity weakness.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 782,
+   "inference_geo": "global",
+   "input_tokens": 1699,
+   "output_tokens": 653,
+   "output_tokens_details": {
+    "thinking_tokens": 540
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

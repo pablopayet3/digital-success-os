@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to answer from.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every step, limit or feature the assistant states can be found in the articles. Anything stated that is not in the articles is a failure, even if it happens to be true.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"How do I invite my whole team at once? There are about a dozen of us.\"}, {\"role\": \"agent\", \"text\": \"You can invite everyone in one go. There are two ways:\\n\\n**Option A: Paste a list** (from the help centre article \\\"Invite your team\\\")\\n1. Go to **Admin settings \u2192 Users \u2192 Invite**.\\n2. Type or paste the email addresses, one per line.\\n\\n**Option B: Upload a file** (from the help centre article \\\"Invite many users at once (bulk invite)\\\")\\n1. Make a CSV file with one column named **email**. If you like, add a second column named **role** and put **member** or **admin** in it for each person.\\n2. Go to **Admin settings \u2192 Users \u2192 Invite \u2192 Upload a file**.\\n3. Relay checks the list first and shows you any addresses it can't use. Nothing is sent until you confirm.\\n\\n**Check your seats first:** You have 15 seats and 4 are already taken, so you can invite 11 more people. If your dozen includes people who already have an account, you're fine. If it doesn't, one person won't fit. A seat counts as taken as soon as an invite is sent. Invite links stop working after 7 days.\\n\\nInviting your team will also finish the \\\"invite at least five people\\\" setup step. After that, the remaining steps are connecting an integration and setting up single sign-on.\"}], \"articles\": [{\"title\": \"Invite many users at once (bulk invite)\", \"text\": \"# Invite many users at once (bulk invite)\\n\\nTo add many people at once, go to Admin settings, Users, Invite, and choose Upload a file. Upload a CSV file with one column named email. You can add an optional column named role with the value member or admin.\\n\\nRelay checks the file first and shows you any addresses it cannot use (wrong format, already a user, or more rows than free seats). Nothing is sent until you confirm.\\n\\nThere is no limit on the size of the file other than the number of seats you have free.\\n\\nSearch keywords: add whole team everyone all at once many people dozen dozens hundreds list import upload\\n\"}, {\"title\": \"Invite your team\", \"text\": \"# Invite your team\\n\\nAdmins invite people from Admin settings, Users, Invite. Type one email address per line or paste a list. Each invited person receives an email with a link that is valid for seven days.\\n\\nYou can invite as many people as you have licensed seats. A seat is used as soon as the invitation is sent, and freed again if you cancel the invitation or deactivate the user.\\n\\nTip: teams that invite at least five people in their first week are far more likely to keep using Relay, because boards are only useful when the work of several people is on them.\\n\\nSearch keywords: add people colleagues members team teammates new users invite invitation\\n\"}, {\"title\": \"Setup checklist: the four steps to get started\", \"text\": \"# Setup checklist: the four steps to get started\\n\\nNew to Relay, or stuck on setup? These four steps get a workspace ready. Teams that finish them in the first weeks get far more out of Relay.\\n\\n1. Create your first board. Pick a template and add a few real cards. See \\\"Create your first board\\\".\\n2. Invite at least five people. Boards are only useful with your team on them. See \\\"Invite your team\\\" or \\\"Invite many users at once\\\".\\n3. Connect an integration. Chat or calendar are the quickest wins. See \\\"Connect an integration\\\".\\n4. Configure single sign-on (Standard, Premium and Enterprise). See \\\"Set up single sign-on (SSO)\\\".\\n\\nAdmins can see which steps are done under Admin settings, Setup progress. If you are not sure what to do next, start with the first step on this list that is not done yet.\\n\\nSearch keywords: getting started onboarding stuck setup next step what should I do begin start first steps\\n\"}]}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx4najS6KqJQQVNnjJTA",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\":\"fail\",\"score\":2,\"reason\":\"The reply fails the grounding point: it states the customer's seat count (15 total, 4 taken, 11 free) and says people who already have an account are fine to include, which the bulk invite article contradicts by listing 'already a user' addresses as ones Relay will not accept.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 671,
+   "inference_geo": "global",
+   "input_tokens": 1275,
+   "output_tokens": 602,
+   "output_tokens_details": {
+    "thinking_tokens": 495
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

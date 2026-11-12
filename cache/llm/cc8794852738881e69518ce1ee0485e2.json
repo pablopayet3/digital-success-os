@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T003706\", \"text\": \"Users locked out after enabling SSO. Good morning, We switched on SSO this morning and now several people cannot log in at all. Any help appreciated.\\n\\nThomas\"}, {\"id\": \"T003707\", \"text\": \"Rule runs twice. Hello, One of our automation rules sends two notifications for every card. How do we stop the duplicate? Thank you.\\n\\nRonald\"}, {\"id\": \"T003708\", \"text\": \"Permissions for guests. Hi, Can we give an external contractor access to one board only? Could you point me in the right direction?\\n\\nAmanda\"}, {\"id\": \"T003711\", \"text\": \"Export a board. Not happy at all. Is it possible to export a board to a spreadsheet for a monthly report? Frankly we are considering cancelling.\\n\\nAlicia\"}, {\"id\": \"T003712\", \"text\": \"Cards disappearing from board. Hi, Two cards vanished from our sprint board. They are not in the archive either. Any help appreciated.\\n\\nBrittney\"}, {\"id\": \"T003715\", \"text\": \"Notifications sent to the wrong person. Good morning, A colleague is getting notifications for cards assigned to someone else. Thanks in advance.\\n\\nAshlee\"}, {\"id\": \"T003716\", \"text\": \"Is there an integration for our code repository?. Hi team, We would like commits to show on cards. I could not find the setup guide. Any help appreciated.\\n\\nDavid\"}, {\"id\": \"T003718\", \"text\": \"Docs editor loses formatting. Hi team, When we paste a table into Relay Docs the formatting is lost every time. Thank you.\\n\\nSandra\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7w5nV7YSdmcbDMmL1z",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"T003706\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.8},{\"id\":\"T003707\",\"sentiment\":\"neutral\",\"theme\":\"performance\",\"confidence\":0.7},{\"id\":\"T003708\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.8},{\"id\":\"T003711\",\"sentiment\":\"negative\",\"theme\":\"value\",\"confidence\":0.85},{\"id\":\"T003712\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.85},{\"id\":\"T003715\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.7},{\"id\":\"T003716\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.85},{\"id\":\"T003718\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.75}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 558,
+   "output_tokens": 275,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

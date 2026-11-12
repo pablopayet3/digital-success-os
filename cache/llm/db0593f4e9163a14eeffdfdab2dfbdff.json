@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to answer from.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every step, limit or feature the assistant states can be found in the articles. Anything stated that is not in the articles is a failure, even if it happens to be true.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"Bonjour, comment inviter toute mon \u00e9quipe en une seule fois ?\"}, {\"role\": \"agent\", \"text\": \"Bonjour ! Pour inviter toute votre \u00e9quipe en une seule fois, envoyez un fichier CSV :\\n\\n1. Cr\u00e9ez un fichier CSV avec une colonne nomm\u00e9e **email**, avec une adresse par ligne. Vous pouvez ajouter une colonne **role** avec la valeur `member` ou `admin`.\\n2. Allez dans **Admin settings \u2192 Users \u2192 Invite**, puis choisissez **Upload a file**.\\n3. Relay v\u00e9rifie d'abord le fichier. Il vous signale les adresses qu'il ne peut pas utiliser : format incorrect, personne d\u00e9j\u00e0 inscrite, ou plus de lignes que de places libres. Rien n'est envoy\u00e9 tant que vous n'avez pas confirm\u00e9.\\n\\nVous avez 15 places sur votre licence et 4 sont d\u00e9j\u00e0 utilis\u00e9es. Vous pouvez donc inviter jusqu'\u00e0 **11 personnes**. Une place est prise d\u00e8s que l'invitation part.\\n\\nAutre option : sur le m\u00eame \u00e9cran Invite, vous pouvez aussi coller une liste d'adresses, une par ligne, sans passer par un fichier.\\n\\nSource : article \u00ab Invite many users at once (bulk invite) \u00bb du centre d'aide.\\n\\nUne fois les invitations envoy\u00e9es, il vous restera deux \u00e9tapes : connecter une int\u00e9gration et configurer l'authentification unique (SSO). Je peux vous guider pour l'une ou l'autre si vous le souhaitez.\"}], \"articles\": [{\"title\": \"Invite many users at once (bulk invite)\", \"text\": \"# Invite many users at once (bulk invite)\\n\\nTo add many people at once, go to Admin settings, Users, Invite, and choose Upload a file. Upload a CSV file with one column named email. You can add an optional column named role with the value member or admin.\\n\\nRelay checks the file first and shows you any addresses it cannot use (wrong format, already a user, or more rows than free seats). Nothing is sent until you confirm.\\n\\nThere is no limit on the size of the file other than the number of seats you have free.\\n\\nSearch keywords: add whole team everyone all at once many people dozen dozens hundreds list import upload\\n\"}, {\"title\": \"Invite your team\", \"text\": \"# Invite your team\\n\\nAdmins invite people from Admin settings, Users, Invite. Type one email address per line or paste a list. Each invited person receives an email with a link that is valid for seven days.\\n\\nYou can invite as many people as you have licensed seats. A seat is used as soon as the invitation is sent, and freed again if you cancel the invitation or deactivate the user.\\n\\nTip: teams that invite at least five people in their first week are far more likely to keep using Relay, because boards are only useful when the work of several people is on them.\\n\\nSearch keywords: add people colleagues members team teammates new users invite invitation\\n\"}, {\"title\": \"Invitation emails are not arriving\", \"text\": \"# Invitation emails are not arriving\\n\\nIf an invited colleague did not receive the invitation:\\n1. Ask them to check their spam or junk folder.\\n2. Check the address under Admin settings, Users, Pending invitations. A typo is the most common cause.\\n3. Click Resend next to the invitation. The old link stops working.\\n4. If your company filters external email, ask your IT team to allow mail from relay-mail.lumenlabs.example.\\n\\nInvitations expire after seven days. An expired invitation still holds a seat until you cancel or resend it.\\n\\nSearch keywords: invite invites invitation not received missing did not arrive email never came\\n\"}]}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx4wfebY5KeNy4SdiF4s",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSkgoKEAgTGAI4AUIIdGhpbmtpbmcSDK520Dr5xPMSr8mseRoMVQozGBCbKtsqMO2pIjD+93wQEdevmEOVh8wyxxX5g36uJhRjL7lcnvMQPfI+YJ3QNleSovai3zHNT1p4Xjwqrwk8dDUDdHtR3Okg8D2TcPkp/4zl4lkLAX6fMYG3z4d4XKbN5FuC7Iv7AoBpOvurpzfznU4wQXvSW1DDUo48gRXVaEDcJxqgoiJOx55QSkHxBJp9WBoOLuf1wobgpGNG+c040ygquVL/o6/v7NL/ozihF135kRi3L4KK7BHzOL/f6kyDJXso5QXT09aiUO6r/zYMQB0BGhtaoFD/sJdOKxlsSQcnaVaveP/P+5944gIeEf5YG70v48Jf/0lpL10wDkxdRK5yhOTEy19VdQ/iKdlK+0B9AoEA9FOyigicvk/lati1y6hPL0i9KSVLJ4eB4qW7F683RTV0gxYxO379J6iPZfd4EgZ3p8txiKzm+G9Cu+7aJT8S0WwI1zUyyPZ/4J1uhDvPokKiUGm08jIHHtrWgWX7Y4iwK2srfi4Hmhw4LK9YcRp3kf+wjMFKUsa5FoVCGYp0zm+NFyoQu8XlWDaSeB9mYgv1fQ5lkZ8IVBWY4aqJxSaOjctZN0mWlI+GhOD9XM3oAj+w+VrIJu+0uuGhrlsD/RbcusEMWYerZoO67sKYXDDzTs/ER9pzDWSKF53M2KeG47vDadQXb+nnVQSsw3W5+1qqHFExhR7dnb86FzUmGjYPv4GXsaZdQQBPs2Uf2HGJfu1GKSECqaTIkFeF9ftILoU3RUHP/Lc/n82gwiE/xok96TdYnm2y3VZ8rIC3IAlfS3hJk3rDkpoRlRMWbgEL386DcjnGmPl7ZXQj976fJmNcvJBceKyxn+kWX61HbrHQ1dGIjW9oS3FB2Aolp9pcFcxre+EQQgk8ak0OvYQA+cAT8JXEgjmoqRlhob3rJ1yuxM29RhJEJ5e7PTsrdIfJMEGmAopmpZ3nELYdILTHJYhkVuZ7ehC17XOTb5HvY+hVvTbzEvH4xHqiBPoh0CgLzSU/f27lVqw3xAikDyERhN/EgbvXdkRaoR2FeKs9GAlPrmJ25uJxnin5FD04nRMEv1OMMOq6LmECAwv3DTEixaVz8xniHUjvwWO63+ln0RoOJbRf24r9M93YtHGf9qPyeNfaezlOQUps1Xwhzabh1paU+3KgVx+iRGJhqtROMqtVaqGGDODAUQNcaETiQh5pZ6HWHllBx2ThDU59Hgt6Itlp1ZtlKyxAXebKNU7Mi2ceyTj+EnOT031lqLGLjR0PgO956UOpzVFnDGqQnvFLJpdJYPL8EvrTIsGFMrt3LU+zp5ToWac8U0ym3Sh12JO2rFI9Vudi59Grk20YpXGVH7mlNmHul+pfpJqrDAJivOjGeeFiGGlPxv+IUEICrbuAKI0TYsT7cM26AKvGQ+H1D5c80eSMrmoY7C7Erebjck45PIfl7k356HMt70PxvAcRItRSMmC7ctoXfuLq19LTr3WOjagy3gus86EM7aWkSU1ugcI1LiWYFmL0iqwjn3JK7UID6rHcaf4SuDMkshea2qojksONIHjY2cGrYHufjYsnXgwK81GfPd13YqAkopUyQKGYuTbix01hslLoHTY4TwQZN+f1MZwzBua9Gw1e5Bajcy5dEyo+215Dubpj9ABQhqBwlTVb498rxjw2BN0FF7v7iZKKMSXH8b8nUxgB",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\":\"fail\",\"score\":2,\"reason\":\"The reply is not grounded: it states the customer's licence has 15 seats with 4 in use, which no article supports, and it mentions connecting an integration and configuring SSO as next steps, which the articles do not cover.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 671,
+   "inference_geo": "global",
+   "input_tokens": 1264,
+   "output_tokens": 331,
+   "output_tokens_details": {
+    "thinking_tokens": 241
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

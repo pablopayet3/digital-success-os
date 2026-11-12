@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T003446\", \"text\": \"Permissions for guests. Hello, Can we give an external contractor access to one board only? Could you point me in the right direction?\\n\\nKimberly\"}, {\"id\": \"T003447\", \"text\": \"Notifications sent to the wrong person. This is the third time I am writing about this. A colleague is getting notifications for cards assigned to someone else. I need someone to call me today.\\n\\nErin\"}, {\"id\": \"T003448\", \"text\": \"Docs editor loses formatting. Hi, When we paste a table into Relay Docs the formatting is lost every time. Could you point me in the right direction?\\n\\nPaul\"}, {\"id\": \"T003450\", \"text\": \"SEARCH TIMES OUT. I am honestly fed up. Searching across Relay Docs often times out for our team in the afternoon. I need someone to call me today.\\n\\nRoberto\"}, {\"id\": \"T003453\", \"text\": \"How do I bulk invite users?. Hi, We need to add around 30 people. Is there a way to invite them in bulk instead of one by one? Thank you.\\n\\nTammy\"}, {\"id\": \"T003455\", \"text\": \"Is there an integration for our code repository?. This is the third time I am writing about this. We would like commits to show on cards. I could not find the setup guide. This is blocking the whole team.\\n\\nMolly\"}, {\"id\": \"T003456\", \"text\": \"Is there an integration for our code repository?. Hello, We would like commits to show on cards. I could not find the setup guide. Thank you.\\n\\nKaitlyn\"}, {\"id\": \"T003458\", \"text\": \"DOCS EDITOR LOSES FORMATTING. Not happy at all. When we paste a table into Relay Docs the formatting is lost every time. If this is not fixed this week we will look at alternatives.\\n\\nRachel\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7f9ubL2SgJgvusGdmN",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"T003446\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.8},{\"id\":\"T003447\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.8},{\"id\":\"T003448\",\"sentiment\":\"neutral\",\"theme\":\"usability\",\"confidence\":0.7},{\"id\":\"T003450\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9},{\"id\":\"T003453\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.85},{\"id\":\"T003455\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.7},{\"id\":\"T003456\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.8},{\"id\":\"T003458\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.85}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 608,
+   "output_tokens": 277,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

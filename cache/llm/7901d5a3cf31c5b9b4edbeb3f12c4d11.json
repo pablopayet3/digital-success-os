@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Quinessa Robotics\", \"segment\": \"smb\", \"edition\": \"premium\", \"next_edition\": \"enterprise\", \"arr\": 918, \"seats_licensed\": 6, \"seats_assigned\": 5, \"seats_assigned_30_days_ago\": null, \"seat_utilisation_pct\": 83, \"monthly_active_users\": 4, \"automation_rules\": 1, \"automation_rule_limit\": 60, \"integrations\": 0, \"integration_limit\": 10, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 240, \"health_score\": 80.1, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 343, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 41%: nearly all seats assigned, reads our emails, most seats active\", \"expansion_score_pct\": 41, \"expansion_reasons\": \"nearly all seats assigned, reads our emails, most seats active\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6xUAoEHQeTLJsniuff",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: The account is flagged expansion-ready, with an expansion likelihood of 41%.\nEvidence: 5 of 6 licensed seats are assigned, seat utilisation is 83%, and 4 monthly active users are on the account. Health is green at 80.1 with 0 open high-priority tickets.\nLikely need: More seats is the better-supported expansion, since the team is nearly at its seat limit with one seat free. The upgrade to Enterprise is less supported: automation rules are at 1 of 60, integrations at 0 of 10, and Assist credits used are 0 of 240, so the Enterprise-level features are not yet in use.\nSuggested opener: \"Your team has nearly filled its seats, so I wanted to check whether you'd like to add a few more before you run short, and what you're hoping to get out of the platform over the next few months.\"\nRisks: Premium features are largely unused (0 integrations, 0 Assist credits used, 1 automation rule), so an edition conversation may land poorly until the team is getting value from what they already have. The expansion score of 41% is moderate, and renewal is 343 days away, so there is no urgency on the timing.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 718,
+   "output_tokens": 860,
+   "output_tokens_details": {
+    "thinking_tokens": 480
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

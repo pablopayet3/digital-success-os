@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T003939\", \"text\": \"Is there an integration for our code repository?. Not happy at all. We would like commits to show on cards. I could not find the setup guide. This is blocking the whole team.\\n\\nCurtis\"}, {\"id\": \"T003941\", \"text\": \"How to set up a board template. Hello, We want every new project to start from the same board layout. What is the best way to do this? Any help appreciated.\\n\\nNancy\"}, {\"id\": \"T003942\", \"text\": \"Charged for seats we do not use. This is the third time I am writing about this. Our last invoice shows more seats than we have people. Can you explain the charge? Frankly we are considering cancelling.\\n\\nJose\"}, {\"id\": \"T003944\", \"text\": \"Cannot remove a former employee. This is the third time I am writing about this. Someone left our company and I cannot find how to deactivate their seat. This is blocking the whole team.\\n\\nRyan\"}, {\"id\": \"T003946\", \"text\": \"NOTIFICATIONS SENT TO THE WRONG PERSON. We are paying for this product and it does not work. A colleague is getting notifications for cards assigned to someone else. This is blocking the whole team.\\n\\nNicholas\"}, {\"id\": \"T003948\", \"text\": \"Is there an integration for our code repository?. Good morning, We would like commits to show on cards. I could not find the setup guide. Thanks in advance.\\n\\nKevin\"}, {\"id\": \"T003949\", \"text\": \"Invites not arriving. This is the third time I am writing about this. I invited six colleagues yesterday and none of them received the invitation email. I need someone to call me today.\\n\\nMichael\"}, {\"id\": \"T003953\", \"text\": \"CARDS DISAPPEARING FROM BOARD. I am honestly fed up. Two cards vanished from our sprint board. They are not in the archive either. This is blocking the whole team.\\n\\nArthur\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx8NLD6uy7Yv5hqqfUZA",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"T003939\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.8},{\"id\":\"T003941\",\"sentiment\":\"neutral\",\"theme\":\"usability\",\"confidence\":0.85},{\"id\":\"T003942\",\"sentiment\":\"negative\",\"theme\":\"pricing\",\"confidence\":0.95},{\"id\":\"T003944\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.8},{\"id\":\"T003946\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.85},{\"id\":\"T003948\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.8},{\"id\":\"T003949\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.85},{\"id\":\"T003953\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 633,
+   "output_tokens": 276,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

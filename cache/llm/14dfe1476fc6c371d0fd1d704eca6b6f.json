@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Noruvia Freight\", \"segment\": \"smb\", \"edition\": \"premium\", \"next_edition\": \"enterprise\", \"arr\": 2754, \"seats_licensed\": 17, \"seats_assigned\": 15, \"seats_assigned_30_days_ago\": 13, \"seat_utilisation_pct\": 88, \"monthly_active_users\": 10, \"automation_rules\": 11, \"automation_rule_limit\": 60, \"integrations\": 2, \"integration_limit\": 10, \"assist_credits_used_30d\": 341, \"assist_credits_included\": 680, \"health_score\": 84.6, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 8, \"days_to_renewal\": 207, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 42%: nearly all seats assigned, reads our emails, heavy Assist use\", \"expansion_score_pct\": 42, \"expansion_reasons\": \"nearly all seats assigned, reads our emails, heavy Assist use\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx78iXn5SbJia3XfjmUg",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Noruvia Freight's expansion score fired at 42%, based on nearly all seats being assigned, strong engagement with our emails, and heavy Assist use.\n\nEvidence: Seats assigned rose from 13 to 15 over the last 30 days, against 17 licensed, and Assist used 341 of 680 included credits in the last 30 days. Health is green at 84.6.\n\nLikely need: More seats, since only 2 of 17 licensed seats are still open and assignments are climbing. Enterprise is the next edition option, but the data shows no limit being hit: automation rules are at 11 of 60 and integrations at 2 of 10, so the case for Enterprise is weaker than the case for seats.\n\nSuggested opener: \"Your team has grown into most of its seats, so I wanted to check whether you'd like to talk about adding a few more before you run out.\"\n\nRisks: Only 10 monthly active users against 15 assigned seats, so adoption may not match assignment, and the NPS score is 8. Renewal is 207 days out, so there is no urgent deadline. There are no open high-priority tickets and health is green.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 726,
+   "output_tokens": 744,
+   "output_tokens_details": {
+    "thinking_tokens": 377
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

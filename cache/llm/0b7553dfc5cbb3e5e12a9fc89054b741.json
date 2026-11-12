@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Quinivo Works\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1368, \"seats_licensed\": 15, \"seats_assigned\": 8, \"seats_assigned_30_days_ago\": 8, \"seat_utilisation_pct\": 53, \"monthly_active_users\": 3, \"automation_rules\": 0, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 150, \"health_score\": 59.5, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 6, \"days_to_renewal\": 221, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"Hello team, We would like to add Relay Docs for the whole company. Who do I talk to? Thanks, Carrie On 05 Sep 2026, Lumen Labs Success <success@lumenlabs.example> wrote: > Relay monthly: what is new > Hi Carrie, here is the latest from the Relay team...\", \"expansion_score_pct\": 2, \"expansion_reasons\": \"creating few boards, many high-priority tickets, reads our emails\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6iYqTRM8jsuE5SF8VD",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Carrie at Quinivo Works wrote asking to add Relay Docs for the whole company and asked who to talk to. This is a direct buying-intent signal.\n\nEvidence: 8 of 15 licensed seats are assigned, unchanged from 30 days ago. Only 3 monthly active users, and 0 of 15 automation rules and 0 of 3 integrations are in use. The account is on Standard, with Premium listed as the next edition.\n\nLikely need: The request is for Relay Docs company-wide, not for more seats. Seat use is already low, so a seat expansion would be hard to justify from the data. Her email is the stated need, so respond to that and find out whether the whole company means a wider rollout or a different edition.\n\nSuggested opener: \"Hi Carrie, thanks for getting in touch about Relay Docs. I'd be glad to walk you through what it would take to roll it out across the company and what fits your team best.\"\n\nRisks: Health is yellow at 59.5, NPS is 6, and renewal is 221 days away. Expansion score is 2. Adoption is thin, with 3 active users out of 8 assigned seats, so a company-wide rollout could stall if the current team is not using the product much. No open high-priority tickets.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 793,
+   "output_tokens": 854,
+   "output_tokens_details": {
+    "thinking_tokens": 447
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

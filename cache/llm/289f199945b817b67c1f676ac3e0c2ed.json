@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Joruvia Systems\", \"segment\": \"smb\", \"edition\": \"premium\", \"next_edition\": \"enterprise\", \"arr\": 1895, \"seats_licensed\": 13, \"seats_assigned\": 12, \"seats_assigned_30_days_ago\": 11, \"seat_utilisation_pct\": 92, \"monthly_active_users\": 5, \"automation_rules\": 7, \"automation_rule_limit\": 60, \"integrations\": 0, \"integration_limit\": 10, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 520, \"health_score\": 64.4, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 6, \"days_to_renewal\": 355, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"12 of 13 seats assigned\", \"expansion_score_pct\": 18, \"expansion_reasons\": \"nearly all seats assigned, creating few boards, few support tickets\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6w6VYS6k6c2Dc7FvTU",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Seat pressure. Nearly all licensed seats are now assigned, and the count rose over the last 30 days.\nEvidence: 12 of 13 seats assigned (seat_utilisation_pct 92), up from 11 assigned 30 days ago. Only 5 monthly active users, and 0 of 10 integrations and 0 of 520 Assist credits used in 30 days.\nLikely need: More seats on the current Premium edition, since the assignment trend is the clearest signal. The next edition (Enterprise) is not well supported by the data: automation use is 7 of 60 and integrations are at 0 of 10, so there is no visible sign they have outgrown Premium's capacity.\nSuggested opener: \"Hi, I noticed your team has nearly filled its licensed seats, so I wanted to check whether you need a few more or whether anything about how seats are being used would be useful to talk through.\"\nRisks: Health is yellow at 64.4, NPS is 6, and only 5 of the 12 assigned seats are active, so extra seats may not be needed yet. Renewal is 355 days out, and there are no open high-priority tickets.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 702,
+   "output_tokens": 785,
+   "output_tokens_details": {
+    "thinking_tokens": 409
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

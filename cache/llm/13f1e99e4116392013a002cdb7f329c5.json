@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T003339\", \"text\": \"CANNOT REMOVE A FORMER EMPLOYEE. I am honestly fed up. Someone left our company and I cannot find how to deactivate their seat. This is blocking the whole team.\\n\\nStephen\"}, {\"id\": \"T003340\", \"text\": \"Need a copy of our invoice. Hello, Finance is asking for last month's invoice and I cannot find it in the admin settings. Thanks in advance.\\n\\nWanda\"}, {\"id\": \"T003342\", \"text\": \"Cannot remove a former employee. Not happy at all. Someone left our company and I cannot find how to deactivate their seat. This is blocking the whole team.\\n\\nMichelle\"}, {\"id\": \"T003344\", \"text\": \"Permissions for guests. This is the third time I am writing about this. Can we give an external contractor access to one board only? If this is not fixed this week we will look at alternatives.\\n\\nJohn\"}, {\"id\": \"T003346\", \"text\": \"USERS LOCKED OUT AFTER ENABLING SSO. We are paying for this product and it does not work. We switched on SSO this morning and now several people cannot log in at all. Frankly we are considering cancelling.\\n\\nAlex\"}, {\"id\": \"T003348\", \"text\": \"HOW TO SET UP A BOARD TEMPLATE. We are paying for this product and it does not work. We want every new project to start from the same board layout. What is the best way to do this? This is blocking the whole team.\\n\\nTeresa\"}, {\"id\": \"T003351\", \"text\": \"Hit the automation rule limit. Hi, We tried to add a new rule and got a message saying we reached the limit for our plan. Thanks in advance.\\n\\nJustin\"}, {\"id\": \"T003353\", \"text\": \"Need a copy of our invoice. Good morning, Finance is asking for last month's invoice and I cannot find it in the admin settings. Could you point me in the right direction?\\n\\nHailey\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7U8A7A2m71xxtzNqcB",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"T003339\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.85},{\"id\":\"T003340\",\"sentiment\":\"neutral\",\"theme\":\"usability\",\"confidence\":0.8},{\"id\":\"T003342\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.85},{\"id\":\"T003344\",\"sentiment\":\"negative\",\"theme\":\"support\",\"confidence\":0.7},{\"id\":\"T003346\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.9},{\"id\":\"T003348\",\"sentiment\":\"neutral\",\"theme\":\"usability\",\"confidence\":0.75},{\"id\":\"T003351\",\"sentiment\":\"neutral\",\"theme\":\"pricing\",\"confidence\":0.75},{\"id\":\"T003353\",\"sentiment\":\"neutral\",\"theme\":\"usability\",\"confidence\":0.8}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 654,
+   "output_tokens": 277,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

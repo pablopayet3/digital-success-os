@@ -30,8 +30,8 @@ four.metric(
     "LLM cost so far", f"${conversations['cost_usd'].sum():.2f}" if len(conversations) else "$0.00"
 )
 
-tab_conversations, tab_mailbox, tab_evals, tab_prompts = st.tabs(
-    ["Conversations", "Mailbox triage", "Evaluation", "Prompts"]
+tab_conversations, tab_mailbox, tab_feedback, tab_evals, tab_prompts = st.tabs(
+    ["Conversations", "Mailbox triage", "Customer feedback", "Evaluation", "Prompts"]
 )
 
 with tab_conversations:
@@ -60,6 +60,9 @@ with tab_conversations:
             conversations["conversation_id"]
             == labels[st.selectbox("Open a conversation", list(labels))]
         ].iloc[0]
+        who = chosen.get("answered_by")
+        who = who if isinstance(who, str) and who else "not recorded"
+        st.caption(f"The agent's replies in this conversation were written by: **{who}**")
         for turn in json.loads(chosen["transcript"]):
             with st.chat_message("user" if turn["role"] == "customer" else "assistant"):
                 st.write(turn["text"])
@@ -90,6 +93,38 @@ with tab_mailbox:
         )
         st.caption(
             "An unsubscribe takes effect the same day. A complaint opens a high-priority task and pauses the account's emails. An unsure label goes to a person."
+        )
+
+with tab_feedback:
+    st.write(
+        "A score says how unhappy a customer is. The comment says why. A small model reads "
+        "each recent NPS comment and high-priority ticket once and labels its sentiment and theme."
+    )
+    feedback = ui.rows(
+        "SELECT kind, sentiment, theme, count(*) AS texts FROM text_classifications GROUP BY kind, sentiment, theme"
+    )
+    if feedback.empty:
+        st.info("Nothing classified yet.")
+    else:
+        left, right = st.columns(2)
+        with left:
+            st.write("**What customers write about, and how they feel**")
+            by_theme = feedback.groupby(["theme", "sentiment"], as_index=False)["texts"].sum()
+            st.bar_chart(by_theme, x="theme", y="texts", color="sentiment", horizontal=True)
+        with right:
+            st.write("**What the unhappy ones are unhappy about**")
+            negative = feedback[feedback["sentiment"] == "negative"]
+            ranked = (
+                negative.groupby("theme", as_index=False)["texts"]
+                .sum()
+                .sort_values("texts", ascending=False)
+            )
+            st.dataframe(ranked, hide_index=True, width="stretch")
+            st.caption(
+                "This is the list a play owner reads before writing the next play, and the list Product hears about."
+            )
+        st.caption(
+            f"{int(feedback['texts'].sum())} texts classified: NPS comments and high-priority tickets from the last 30 days of each run."
         )
 
 with tab_evals:

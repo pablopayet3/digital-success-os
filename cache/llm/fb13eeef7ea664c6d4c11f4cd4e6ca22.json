@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to answer from.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every step, limit or feature the assistant states can be found in the articles. Anything stated that is not in the articles is a failure, even if it happens to be true.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"How do I connect our calendar so due dates show up there?\"}, {\"role\": \"agent\", \"text\": \"Here's how to connect your calendar:\\n\\n1. Go to **Admin settings \u2192 Integrations \u2192 Calendar**. Only admins can do this.\\n2. Click **Connect**. Your calendar tool will ask you to allow access. After you allow it, you'll be sent back to Relay, and the connection works for everyone straight away.\\n\\n**When due dates show up:** a card appears in a person's calendar only if it has **both a due date and someone assigned to it**. It shows up in the calendar of the person it's assigned to.\\n\\n**If due dates don't show up, check:**\\n- The card has a due date and someone assigned to it.\\n- That person has accepted the calendar permission request they got by email.\\n- The board isn't archived.\\n- New or changed dates can take up to 15 minutes to appear.\\n\\nConnecting the calendar also completes your \\\"connect an integration\\\" setup step. After that, the only step left is setting up single sign-on.\\n\\nSource: help centre articles \\\"Show due dates in your calendar\\\" and \\\"Connect an integration.\\\"\"}], \"articles\": [{\"title\": \"Show due dates in your calendar\", \"text\": \"# Show due dates in your calendar\\n\\nWith the calendar integration, every card that has a due date and an assignee appears in that person's calendar. Connect it under Admin settings, Integrations, Calendar.\\n\\nIf due dates do not show up after connecting, check three things: the card has both a due date and an assignee; the assignee has accepted the calendar permission request they received by email; and the board is not archived. New and changed dates can take up to fifteen minutes to appear.\\n\"}, {\"title\": \"Create your first board\", \"text\": \"# Create your first board\\n\\nA board holds the cards for one project or one team. To create one, click New board on the home page and pick a template: Kanban for a simple to-do, doing, done flow; Sprint for teams working in iterations; Roadmap for planning by quarter; Project plan for work with dates and owners.\\n\\nAdd a few cards, assign each to a person and give it a due date. Then share the board with your team from the Share button. A board with real work on it is the fastest way to get colleagues to start using Relay.\\n\"}, {\"title\": \"Connect an integration\", \"text\": \"# Connect an integration\\n\\nIntegrations connect Relay to the other tools your team uses. Available integrations: chat, calendar, code repository, cloud drive, CRM and video meetings.\\n\\nTo connect one (admins only), open Admin settings, Integrations, choose the tool and click Connect. You are sent to that tool to approve access, then returned to Relay. The integration is live straight away for the whole workspace.\\n\\nHow many integrations you can connect depends on your edition: 2 on Free, 3 on Standard, 10 on Premium, and no practical limit on Enterprise. Connecting at least one integration is one of the four setup steps we recommend in the first week.\\n\\nSearch keywords: connect tools apps integration integrations link\\n\"}]}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx4oGJwDT3CxvZabbfsG",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSwwoKEAgTGAI4AUIIdGhpbmtpbmcSDA2hZiqN1D481KH5bBoMz0EEmO5dqvb4Azj8IjB/7XJPth/gTTIQ8vabBQ0I/gfuXnmRM+yEn5Fks68rnIl/hZwiRKtRlp6YqJl5fvUq4Alvq3F6+f71VB/dg+wOucr/SMbzX08xskjneUsL60p/omZNjhcut0nI+phaq8P7v34xWyys6iZR1w1eLJ9mgVcEbqvSaP/7HpmbDF+wdjWABXWZ9Iq9i417GeI+uVUW8+/A1A63lwmqttPO253VVXbTxWrLM3L1Bub6wQ/lyu7UkzJ3TOjTW9zOwf5SvuO3T18jnXAeEi4qcrfJH+bkiwNwsb1KAb9140OREybN58NH833efW4s6UZs1eycmQi+S90aRR6o3n43Kz+2V7hHkZbhrCdDto/odAwuBW1+s0mMK4sbCqilna9ZrW2GQMY287AiUnN3Fkjo2RV97DZJ7NlSLjT5Ww2TOLjDVtxKWIO5nUArSVt6bpVSwpX8AVVmVCvohp2gFbEeE8eWfZa3+Nx5bXICdp5lUHf6MbuWrNmpFL7XDGQ3dWT/FTsGWqUeFxBv17q0swj8124GA8ZV0cI/oCD0tsK6Aeuy5kebu48/EFIjjZ55fjzlZnsJsURvRfHmsuEtb53S6iSEbXd4HlafYwRhPCyvU47XBNd9uuFbf+NUGoO7+iXYiTatqc4bQ3wYhUw0A6zYF1rEexgsTnvFhFv+ScrBh6VGIWDjIxoj1y7I1Ub+WA1/7vZFvd6ZCJbB9z8dlIyz7B4zSx9V54y8vYlbq9w/3D3wcr0A03msHzCQO96QvJbP7Z80qD9cC9iAG3dH7mtwXOM7A169tYugtpS85j5AATqpvrfHi54kPeozv1d5X9RvZTcwdYT01IE5AtnCFYE6a4OdWSiujdegjPa4PO9pGKoGnRDgzSjrvvqWBpSNiriOSQ3CtzgbmmcDEkwI1YjWV2LP2b6FZOrD7Z93L9Ktdn2lD9hM13zZPpMjTUTUpeq9mbwEcuJKbKtyBnz6R1feS8xsP4GQcGEOlyQcapBWHiCghwJEq+baEq22cJ7cxnLedYfXFfoHHOrM/XbwY45ni9vfcF8Vzlw2IqyG2sRY2mQQw5aSAKLlEluccekRBU2qRYGgwtrxAAsRBvebjXgPDIJ/geutJdD2u/a2c2OvIwvg4qigqKr4BrNkPcgDCuPMrzRkJUT3+l2Rz0pBgTRM3pvozeQbMuGOmy93CDbllxNePAFEckDz7yI+2iyMZKf+sp0LOSg559WLodOeS8BSyckCSdabDSq+SVI4Vv1QUvV8C+CEPiu+Ofk8C9SWoDqhZ7S4fqth7hkgp07VHZOVzWcNwvCTUeu0TMxWT+ngKeE1XeDPufGWKbmpIgJ/C65yXx3vk7ZAuOWxo8CJoUkCgGNUJPYG1pCRHpD4/FeVLo9BgnE/s1VFDmSO3X1EFhG2FrPu25hovtabjoMBySZ8jHThS7KLQq8iEryMOVlYe3g6Tmf6s6oOdnadrJLIoK4HyJZD6wiMbTpaqMu8LQ5vBa50Uvjqsh9qLpnIrFSKdBQh/8TxHVyrcJ4Gzo6fxyo84lVUC/ZGDZOgdb6ea716v2a14n1C3qkqzkQ5E7qsyIib3Q7WITHUXdfUVsqG1z/Rv7gOJF96Ozfvmz0Whp2yM9WSG0YxDKSyIgURZHPoPeO6OzzAw6PjJ81DI4meQ3ve1Fa051CgCiYJphGh1SsszrBcys4N4msR7uqtiJdTgtTzaGrb21yVU3nvAe3ocmWzTNCMeu4+oxUYAQ==",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\": \"fail\", \"score\": 2, \"reason\": \"The reply fails the grounding point: its claim that connecting the calendar completes the 'connect an integration' setup step and that single sign-on is the only step left appears nowhere in the articles, which only say integrations are one of four recommended setup steps.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 671,
+   "inference_geo": "global",
+   "input_tokens": 1032,
+   "output_tokens": 333,
+   "output_tokens_details": {
+    "thinking_tokens": 232
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

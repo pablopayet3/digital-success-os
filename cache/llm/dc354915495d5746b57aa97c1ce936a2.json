@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Lorarro Analytics\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1935, \"seats_licensed\": 24, \"seats_assigned\": 21, \"seats_assigned_30_days_ago\": 20, \"seat_utilisation_pct\": 88, \"monthly_active_users\": 13, \"automation_rules\": 3, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 240, \"health_score\": 77.3, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 308, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 42%: nearly all seats assigned, reads our emails, creating few boards\", \"expansion_score_pct\": 42, \"expansion_reasons\": \"nearly all seats assigned, reads our emails, creating few boards\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx81dvdoFa9A2Jh2xafr",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSxg0KEAgTGAI4AUIIdGhpbmtpbmcSDPNDp22IZIJOsehA3RoMSU4l4CZUQ11yId2IIjAyQgFlmHxatFksmB7/WZl8kZmnl+UWf3E8vwIV3a7Wvqd5C1zDSZy/1+xnsUhd7Jcq4wztQ0hYPDnb3KI4X7AIQJrhQh9zdEXNnAG/5mmatn2tONT1tsmIS7E/lHk9YujqYme6MZfFws+6dr0aCX4SFN6ED+19UKCl8W6s9LsU6tDC1vpxojB1Hn57BvneFK4sa3o18hpmpNpsPPQJvL0g1rWwsscZoqGH66cK/qIg8tH04mxBQSDIhYBS2cY4BR0OY3ArZxzYm6IDDNxivBRkwIAz+L9vLf/3AQCUAzGegMoQ/WIwH6RtolPjAZxNLPrQCdzSC5ddmdEvPudaLjkBHDKVNo2xifdmib9ovMxrSqcieNoXf/M2Or3B8tB7Qixp/DTC5O8HLcDnJdd0TSyiKojUV2jIhvVQWRHi+HuvAfeGaS5mmP26jTs1iKoqfHnu78PNI/+vEiLx20He4GpQIfnvGf/hyUjiei7uMqIgME8h+5GqvMq1w5YjZJelT7NQb+JVBma6EvuiPn1pjgpX/elNkGV5ckUz7g4TRSvASZqE/f0ts4vXT77ShxCILzJsycjSYqM9sesvkslPLVO4MZ3Nc2W9ol7CZpEQx/bfNoCizHt+H/k8Xk+NUMYqMKaD/FjLW443YsETMVnwekCYBT6zG5vXD8xPSKk6I4A/dWLuzQenQ/zQrTQghM+xJH33BzZaQu5Kr0t1xqU8M28Hb5SV2D2kNr5yKTJQZ5HuktWdfLu0uqTj50s6EtlQkg7c00SNEibW4EFoVYI4iLNeWMmTmE+tmuZfukW2p4+5m2WwwOEnUMFrtFuHr+5Z5WX95DL2yiSyCjyCw24LReR/lKazJJ71WaffTeKe3xjugAFUpYPw45l7yUFrKhi4LS/fuS+IhJZRADoWFwniskplLJ24YXaLYC9XTw152bcOodRFNW1nUviwRi/bKFLcWrvn2DtadOQpVjZ/r/NLD4TGhdgZS6zbMP1AASkSXtOHWVN2EW5OBsWIIvp01pRo1/idHmwsCoCd6F/YKKlxigOXPeIhTS/aXvz8h7p/9/sqT2ci59YtE/N5tDC7RQL/s57GsWLN+TOU6qs84w+assNCkwOH1f0p0mbqKC4Jdd15CPjA9nUzz9mcsfopA2xx4PwjdnIy/f/CKz/FsQft/UjE7Laz/FGywgIcm/iSOFUigdJpeemujS5M57jlG8N2vCuKWyIXBBnU6bySHRkuZGv8NX0Fs95EtzfEwaN90s2LukLBXYhClNtIhWjBstwopgVXIOmJ+Tq4PhZ/hvy/59H/xY/xBTYHljgXfyXbKCCZk6v8E4dpn3Hq0jQBhT3o95q/EC+/IKwYF/zZR+Kw0Fa0ccMrandeBOV+Ag/SV87WZr9fXipIrx/WPW/FbJCNSHt15UxGcLQ0tEZhe+S1GIcb9+moCB+nofc5S8rdmCNYTeH1yOdk1oxMRB66GqS+VaG1boFj+ST3+YsHi/4glxgfei8hZU/5z8RYULWOpRnT7tbTBSVWGy/aXs7Ph5ywW/Ur9SCklJrF2h2AGtcee+3N15OheQiNCCfN6zr7/oZDEW1mS0PFlbcCGKD4YVCJT6Bn/tyRQv5+mqYm53etQPhv6KMlnS+UlawPe/UGWp83XV20GPYzT4A5elqyOu/4Q5BqSiAX7zBClduSlpG2gHfCrOxAF2DEKumukfVTvVbscDTGntn6JVLD9exf95UfnzobLdxJPk3uduYzrNKpsP75TqGkUvBiuj2EygSMi2qM3EhhwVahuzPpSyDkGE+x6uRzKpKXnMt7ygmkmndKldtqNrpBoqRSc5IP80Ih/JXCZcb6Q3y+KRPBm3RUkWbFxJ+MnDZ5ZK4bYtEUKUVYuICEaoXgeHK1kajZSkM7ZoEtNl228Y7LIlvaUEwVx8jTAizzcLzcxdgn2LKOQw0XGLYOAUtVgzm38tqbcbdVD7z5Hn5y9A/TeOCTpEl6EWlmCJItVL4IzwplXwwEFB+ivv70jZSjmTBMbXYVyGGne2cLQv4A4NNDfoVKh3jpB1wI8+FG7Ek1U6Ku9Idsivy+I86gSgwtKF4EbdWPCB+Wf2LfshekD7AkEHdbXVOPXsosvlLNU636DEoxZJTf/9ks7xwEtA4I+cTcVd+IwGyC/4MmmPkKtzNYrs6tRAjEJuGBWqRWauPxLx2zDQHl3x0q+D1I648EEfu+Sz1ePGFuF5pyNNp79jSoM51DlsoUKGddUUsaKngbZgAYAQ==",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Lorarro Analytics has an expansion-ready signal, with an expansion likelihood of 42%.\nEvidence: 21 of 24 licensed seats are assigned (88% utilisation), up from 20 thirty days ago. Monthly active users are 13. Automation rules are at 3 of 15 and integrations at 0 of 3.\nLikely need: More seats are the clearest near-term need, since nearly all licensed seats are assigned and assignments are still rising. Premium is the next edition, but the data does not yet show that they need its features: integrations and automation are both well under their limits, so lead with seats and treat Premium as a later conversation.\nSuggested opener: \"You're using 21 of your 24 seats, so I wanted to check whether you'd like to add seats before anyone is left waiting.\"\nRisks: Only 13 of the 21 assigned seats show as monthly active users, so some assigned seats may be unused, which could weaken a seat-expansion case. Health is green at 77.3, with no open high-priority tickets. Renewal is 308 days away, so there is no time pressure. The latest NPS score is missing.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 720,
+   "output_tokens": 789,
+   "output_tokens_details": {
+    "thinking_tokens": 417
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

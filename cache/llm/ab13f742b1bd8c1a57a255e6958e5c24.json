@@ -1,0 +1,52 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Hestarro Builders\", \"segment\": \"mid\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 10, \"seats_assigned\": 6, \"seats_assigned_30_days_ago\": 6, \"seat_utilisation_pct\": 60, \"monthly_active_users\": 5, \"automation_rules\": 5, \"automation_rule_limit\": 5, \"integrations\": 0, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 76.4, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 205, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"Hi, Quick question, what happens if we go over our seat count? We are onboarding about 27 people in the next few weeks. Thanks, Crystal\", \"expansion_score_pct\": 14, \"expansion_reasons\": \"near the automation limit, most seats active, free edition\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6jEgpNP9TQdQgkcfJe",
+  "container": null,
+  "content": [
+   {
+    "text": "Signal: Buying intent. Crystal at Hestarro Builders asked what happens if they go over their seat count, and said they are onboarding about 27 people in the next few weeks.\n\nEvidence: Seats licensed is 10 and seats assigned is 6, so they are at 60% utilisation. Automation rules are at 5 of 5, which is the limit. The account is on the free edition with 0 integrations used out of 2 allowed.\n\nLikely need: More seats, and probably the standard edition. The 27 incoming people would take them well past the 10 licensed seats, and the automation rules are already at the free limit, so the move to standard looks like the natural next step. The facts show the need but not how the team plans to use the tool.\n\nSuggested opener: \"Hi Crystal, thanks for asking about seats. With about 27 people joining, let's look at a plan that fits your team and covers the automation you're already running. Can we set up a short call this week?\"\n\nRisks: The ARR is 0 and the account is on the free edition, so there is no current revenue to protect, but commercial terms are not yet set. Health is green at 76.4, there are no open high-priority tickets, and no NPS score is recorded. Renewal is 205 days away. Nothing in the data argues strongly against reaching out.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 726,
+   "output_tokens": 413,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

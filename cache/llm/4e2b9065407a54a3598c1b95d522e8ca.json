@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.\n- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"How do I deactivate a user who left, so they stop using a seat?\"}, {\"role\": \"agent\", \"text\": \"Here's how to deactivate someone who has left:\\n\\n1. Go to **Admin settings \u2192 Users**.\\n2. Find the person, open the **menu at the end of their row**, and choose **Deactivate**.\\n\\n**What happens next:**\\n- **Their seat is freed straight away.**\\n- Their cards, comments and documents stay where they are. Cards that were assigned to them now show as unassigned, so you may want to give those cards to someone else.\\n- You can **reactivate** them later, and they'll get their history back.\\n\\nIf you need to delete the user permanently, you have to ask support. Deleting can't be undone, so deactivating is usually the better choice.\\n\\n**Also:** if they had a pending invitation instead of an active account, cancelling the invitation frees the seat too.\"}], \"articles\": [{\"title\": \"Remove or deactivate a user\", \"text\": \"# Remove or deactivate a user\\n\\nWhen someone leaves, an admin can deactivate them under Admin settings, Users. Find the person, open the menu at the end of the row and choose Deactivate.\\n\\nDeactivating frees the seat at once. The person's cards, comments and documents stay where they are, and cards assigned to them show as unassigned. You can reactivate a user later and they get their history back.\\n\\nDeleting a user permanently is only possible on request to support, because it cannot be undone.\\n\"}, {\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}, {\"title\": \"Invite your team\", \"text\": \"# Invite your team\\n\\nAdmins invite people from Admin settings, Users, Invite. Type one email address per line or paste a list. Each invited person receives an email with a link that is valid for seven days.\\n\\nYou can invite as many people as you have licensed seats. A seat is used as soon as the invitation is sent, and freed again if you cancel the invitation or deactivate the user.\\n\\nTip: teams that invite at least five people in their first week are far more likely to keep using Relay, because boards are only useful when the work of several people is on them.\\n\\nSearch keywords: add people colleagues members team teammates new users invite invitation\\n\"}], \"account_facts\": {\"setup_status\": {\"completed_steps\": [\"create a first board\", \"invite at least five users\"], \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.5, \"seats_assigned\": 9, \"seats_licensed\": 15, \"edition\": \"standard\"}, \"account_context\": {\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 9, \"utilisation\": 0.6, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.5, \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}}}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx5qNDJzdnL6rCXFrV1Z",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSxgkKEAgTGAI4AUIIdGhpbmtpbmcSDJtz2uuR9QccI6NwGhoM/SlzbkPUorSY/6jrIjCyOgcQ99DYjgwzITl0k4HXUe1Bgup/ykzV4Z2I+WHFzLVBroMNlkgNhSP7EV0zeLYq4whfsvTJqA9KPp8mhu7hPE3OCrMsU3ukkFFlWHE6ncGB9m2peEl64qd0ddeJmh5cWYVgS5SpG0EfJPNz7o0rfsbXCOpYuaNG+BhLRRs5bqWIRgg3U/KCWeSTPEytWAJS1A61kRvFLYACOo7NBen5M9Zre9HZ+JYgF6SzLmwkObup4YSpmev9Zm217CPiOtHPYRnNp00gS2DSpLXrjdJbJE2TQUIibQi4WWi29kccms9ITxB0slvJeoFmQKwsFlGIqwLMeQforDXvmXZUUGIq+nLlS98/U/KQfzKhJoi6asicrnK5Qx+xx1ICod9pXQCaANKriCWnGEwyrssvqt1kUfR9byTeMKCdOTEcmh8bWiLGZazKT6+OSpUEcAgs4G7BjE1XF6Vj3RipKcPa4tkNWnRj+chjZvryQdaRghE1I2caNwrax8lUhn3ni9l3OJCl9vyv866Kb6a9Y198bkIWnGE4k+b/lkJWitRbfXhjlnWgWPL2GPRXyQlO4ywV/nwNUWiI4HpgQ38Jl8YspPWV5soZzhbfRfDzJmY4usoGXiUHGEm64LwsxBcDIhiO8/wk2BhYuP/5saM4VxrxPhanihhNtyhv0tqbd4WZOJcrxbsgQwcFh8B5WwOM0ze/sOCQOFOJf1kMLKDG7nUzkdjpDqOdpUI4QkrjQuMpMbI66t5a5eLULUDzTKPWJ5aIxd2uQkW0EAUvOD3iYper2odMHFDwpC+gPfsqKJx9JZaWAsgJXYrBEAJ/ENtNsDMMq0AFuZ8ow+MqL/WcOfmqRrQOAUdVCglJB9YN5Hbbbua4JNr4OBUCSBg1BODue9mvJEtD8RGG3sHXv6rA5bpkpFHZqXdxDsDVwYLMJoCV7iuk+t0UpaSEihtmgUcr7FTPxJd/ugS04TIelMMJ0+9f1y50IAmNSMBk9O4bB/rZhYoQeislv/ctwzsx1MReU5C56xTfSKNAz8URdCqlNlO9tY/ORcPYEZ4+4e/sPowPWO9ORXuDmpOdIx6482b7Hg/lzJ0sg++1YGLGW9yrEhhFXaOfe05QIw7ZbPStf0NM8UJlmgBTJpU1q7uSZKl8Zvz+8e/ozRkYfW+tDTK0i8e5mN3sHk8+ldyyQZx8ZaFGI0lQl0a0hatMZ8zANPmqVJQarEEGvLb+SHlwILGccMqHs2vt/zlk49AmHwRA0fFBWz9vGD+0aIzjzwk1IYR199negE5bPUH5cHchunqp47KeACkZZ3v1ZqYImF+j9/PoGzD8BNTGPe5n8fYX1EAEdSVU8BXVXBN0KSsWx303a9n/fkfqORSM7+t49fzrg2SvDNjtInKmrS15ZUST63GFUEl8uHhMmS+1ri7YbqMMu7lqB8gKOX+rRSccRivIHShLMgbKYvW3rqWLj9QTmSRrfUp+FWUarIyku0AqOXVV9rjdpYU4RtaNTTigs3A9tVH1eVYYQhhBII8t4rr8TcFmzh1TpFRFfnjfKvbvEvk5qVmh6IAn1V67WM/aGAE=",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\":\"pass\",\"score\":5,\"reason\":\"Every step, the seat-freeing behaviour, the unassigned-card effect, reactivation, the support-only permanent delete, and the pending-invitation note all match the 'Remove or deactivate a user' and 'Invite your team' articles, and the reply answers the question directly without promises.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 782,
+   "inference_geo": "global",
+   "input_tokens": 1576,
+   "output_tokens": 337,
+   "output_tokens_details": {
+    "thinking_tokens": 223
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

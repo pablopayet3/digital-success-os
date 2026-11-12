@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to answer from.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every step, limit or feature the assistant states can be found in the articles. Anything stated that is not in the articles is a failure, even if it happens to be true.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"How do I deactivate a user who left, so they stop using a seat?\"}, {\"role\": \"agent\", \"text\": \"Here's how to deactivate someone who has left:\\n\\n1. Go to **Admin settings \u2192 Users**.\\n2. Find the person, open the menu at the end of their row, and choose **Deactivate**.\\n\\nWhat happens next:\\n- Their seat is freed straight away.\\n- Their cards, comments and documents stay where they are. Cards that were assigned to them will show as unassigned.\\n- You can turn them back on later, and they'll get their history back.\\n- Deleting someone permanently can't be undone, so only support can do it. You have to ask them.\\n\\nThis is from the help centre article **\\\"Remove or deactivate a user.\\\"**\\n\\nYou still have two setup steps left: connecting an integration and setting up single sign-on. I can walk you through either one.\"}], \"articles\": [{\"title\": \"Remove or deactivate a user\", \"text\": \"# Remove or deactivate a user\\n\\nWhen someone leaves, an admin can deactivate them under Admin settings, Users. Find the person, open the menu at the end of the row and choose Deactivate.\\n\\nDeactivating frees the seat at once. The person's cards, comments and documents stay where they are, and cards assigned to them show as unassigned. You can reactivate a user later and they get their history back.\\n\\nDeleting a user permanently is only possible on request to support, because it cannot be undone.\\n\"}, {\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}, {\"title\": \"Invite your team\", \"text\": \"# Invite your team\\n\\nAdmins invite people from Admin settings, Users, Invite. Type one email address per line or paste a list. Each invited person receives an email with a link that is valid for seven days.\\n\\nYou can invite as many people as you have licensed seats. A seat is used as soon as the invitation is sent, and freed again if you cancel the invitation or deactivate the user.\\n\\nTip: teams that invite at least five people in their first week are far more likely to keep using Relay, because boards are only useful when the work of several people is on them.\\n\\nSearch keywords: add people colleagues members team teammates new users invite invitation\\n\"}]}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx4rUCdsZhanL4aaUZVi",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQS3goKEAgTGAI4AUIIdGhpbmtpbmcSDJWazeHUlxtXFwKu2RoMQMPK4p3s+AcbBBb8IjCgAHqraL7NH4qaxdSBEd+RIYGFvt3a2L3AlKEeLI2Y/KNUqa2lk9bUCnukKnJ+Z50q+wkmZlmfjiS430IPGU+OxnXLLJbS4lylHQDSMOKdhPgd1bTyG3ENnJ2+Ia/3cy5IM8NOp75346kcK738wfyLKVkF2Mb8Xa5GrvYxF7S4DVJi0O9Zxbk3uDUAwIqag50OFgjDrjvZ6fXbfne2jXSZ5UFNaZu6ese/0RNTISAZWDWCqehu9sMoFtyWS1nlwrX5b0sx5L9gNKhLdqFHtSoaUvfGjcMYd8SBjNM5ZZH5XHIs3AvyvYa48YXPxV+sRYj5Lt1X6wdy3yaFewA3FlL7lz9WqkuFx5Qc2r92h4OMPSmRgEX38depa2o7j2phjrppf6cHD30tVvD+D+3NF130SrmLnx8iC1fJOaDtsGO3Wn3kN6ij+sq9fzVTegN5DtOqolD0uAnuehGz7iV87APaxGBtsQ0QMbQAOavZV6bGp83CY3j1cTHI2FFsgoZ+2pY6jMX9b5X4do+mLklr08NRNbVJC8RT6CBntaCKHcRLAFUdNpuFRDicwpbW7oJ3m9TiwjyLiMYiyka4ZcCBrPGM0v34JJp58WfhcwosGtok2O/KAGFjCF+aBFc9J8x+NDg+xYezCQtw+cElWOGadg6fK2JRgCzkDt4vyx4loDrzUDeqL8SGcXpDTH7aqqsCED1qxhqs4TPnp8NPqD9r5H4gnUOK4Ou+epGX0J2eTv/9qipm3cU7CKCmLUZ0KydKEKcuFkdsXMghBOPgo0frkCiW+wy3574g6jTUat2FGdLPa98zQOMYugq0bfLJketm0XrEId8AkhX57j3GRGDdYUh52d08KO7YVNFN5xWTQcOukgSr2nH1gWp5hS2sNnM/QwqppHrfN55nmx3uUAWRY2lBiAP2+LbpGolvgyFVhXlqTEoqbljNmUOEztJ0zCeEfK+93D3zE1PSqwIwFnwYWaMherHi5E9pg5vn3ZrIB/LRtkbSzMHVv0hxShoCJm8E+2jmxQwpMJRaxfy+bhCKN82a2Dkc5Ogk5o+1+SQrdpLnI1UTxR3guBthrAsFH7b9bpoGUlsqettldx9mYTrSUd2NOtx1V7aglHyXk2Vqu7ALeGKmAmb/Cft96xvOMFU7STxyinCXmkrxPFT46YTs7cromC97lLBbEafLVorIfN2SM4iEJWw0kJdV+de0KqyEJb8zFWlgXd6E9EmkdOJ7qxK5KpJs65g77lLGHml3uiqiZeUw7s5abQpOmuv8X3TfWlNx2InGA4DZMO0Q8BeD58vvE3KscfivFGQ3Gr6nC67wB1tbQIL6I1YBI0QAMz+UHxChSZKIfNbw3rtRJlB8wjAUR+mXISlUlTMFBXvy5avq3ZA/5uKnVCYmmkLVynRU++UiR4x10Kc2P3hoIMXLC+YCuiJqdvyva7RSCGl9axNOL7CaGcVq/tfsWn5qlX7pQCcjz6t1Y4ql9EGPi9P3NBoqdKJ1G/mzfH2hkllHwggKBax0nppTh6JeVnC2r8OgC9jj8AVUjYzcfz2yOSmP0tnsQePu4GFdPFuel4y+1vGm4PvTiWTa45Wn0/Otjq5S+RUyfWTAQfeUN9IGGI/cVQHqVUqpXC6T9hFVxrc8Rahjh9qhtvmiHvkM+yj2pby2EngzNq8+zWY4hcNKkOgTrXYCUdiIrZOGRb0RnUAarDqZyBmr2TN+mzzlqqbwwVrv0ojRXUEM9hDmf/+9LGrmHfj4UG+r/YrDCmgbfH1SCRUYAQ==",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\": \"fail\", \"score\": 2, \"reason\": \"The reply states that two setup steps remain (connecting an integration and setting up single sign-on), which appears in none of the articles, so it fails the grounded point; the deactivation steps themselves are accurate.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 671,
+   "inference_geo": "global",
+   "input_tokens": 1089,
+   "output_tokens": 346,
+   "output_tokens_details": {
+    "thinking_tokens": 258
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

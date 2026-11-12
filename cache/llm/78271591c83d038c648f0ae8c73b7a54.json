@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T003386\", \"text\": \"Boards are very slow to load. Good morning, Since last week our larger boards take more than ten seconds to load. Thanks in advance.\\n\\nJames\"}, {\"id\": \"T003387\", \"text\": \"Cards disappearing from board. Hi team, Two cards vanished from our sprint board. They are not in the archive either. Any help appreciated.\\n\\nSandra\"}, {\"id\": \"T003392\", \"text\": \"How to set up a board template. Not happy at all. We want every new project to start from the same board layout. What is the best way to do this? This is blocking the whole team.\\n\\nShirley\"}, {\"id\": \"T003393\", \"text\": \"Cards disappearing from board. Good morning, Two cards vanished from our sprint board. They are not in the archive either. Thank you.\\n\\nStephanie\"}, {\"id\": \"T003396\", \"text\": \"Notifications sent to the wrong person. Good morning, A colleague is getting notifications for cards assigned to someone else. Any help appreciated.\\n\\nMason\"}, {\"id\": \"T003399\", \"text\": \"Permissions for guests. Hi team, Can we give an external contractor access to one board only? Any help appreciated.\\n\\nZoe\"}, {\"id\": \"T003404\", \"text\": \"Docs editor loses formatting. I am honestly fed up. When we paste a table into Relay Docs the formatting is lost every time. If this is not fixed this week we will look at alternatives.\\n\\nChristine\"}, {\"id\": \"T003407\", \"text\": \"CANNOT REMOVE A FORMER EMPLOYEE. This is the third time I am writing about this. Someone left our company and I cannot find how to deactivate their seat. If this is not fixed this week we will look at alternatives.\\n\\nRachel\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7emhcaQSyV9WUAsoA5",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"T003386\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9},{\"id\":\"T003387\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.8},{\"id\":\"T003392\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.75},{\"id\":\"T003393\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.8},{\"id\":\"T003396\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.75},{\"id\":\"T003399\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.85},{\"id\":\"T003404\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.9},{\"id\":\"T003407\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.9}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 590,
+   "output_tokens": 274,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

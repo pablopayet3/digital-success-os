@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Drinanda Education\", \"segment\": \"mid\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 3166, \"seats_licensed\": 34, \"seats_assigned\": 16, \"seats_assigned_30_days_ago\": 16, \"seat_utilisation_pct\": 47, \"monthly_active_users\": 5, \"automation_rules\": 5, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 115, \"assist_credits_included\": 340, \"health_score\": 52.2, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 6, \"days_to_renewal\": 49, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"We need 16 more seats for a new team starting next month. What is the process? Sent from my phone\", \"expansion_score_pct\": 1, \"expansion_reasons\": \"creating few boards, heavy Assist use, near the automation limit\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6k8jRRoYNbiMHNJd8V",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: The customer wrote that they need 16 more seats for a new team starting next month and asked what the process is. This is a buying-intent signal.\n\nEvidence: Seats licensed is 34 and seats assigned is 16, with utilisation at 47%. Monthly active users is 5. Their latest NPS is 6.\n\nLikely need: More seats, based on the request itself. But the licence already shows 34 seats against 16 assigned, so the new team may fit within current licensed seats. Confirm that before proposing a purchase. The expansion reasons mention a near automation limit, but the data shows 5 of 15 automation rules used, so don't lead with that.\n\nSuggested opener: \"Congratulations on the new team starting next month. Happy to walk you through how adding seats works, and I'll first check whether your current licence already covers the 16 people.\"\n\nRisks: Health is yellow at 52.2, NPS is 6, and renewal is 49 days away. Only 16 of 34 licensed seats are assigned and just 5 users are active monthly, so the customer may already be underusing what they have. Open high-priority tickets are 0.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 715,
+   "output_tokens": 908,
+   "output_tokens_details": {
+    "thinking_tokens": 544
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

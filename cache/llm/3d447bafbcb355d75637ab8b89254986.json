@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.\n- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"Where do I set up single sign-on? Our IT team is asking.\"}, {\"role\": \"agent\", \"text\": \"Your account is on the Standard edition, so single sign-on (SSO) is included. It's also the last setup step you have left.\\n\\n**Where to find it:** go to **Admin settings \u2192 Security \u2192 Single sign-on**. Only admins can change these settings.\\n\\n**Steps for your IT team:**\\n1. Choose the protocol your identity provider uses: **SAML** or **OIDC**.\\n2. Enter the provider's details:\\n   - **SAML:** upload the identity provider's metadata file (XML).\\n   - **OIDC:** paste the client ID, client secret and issuer URL.\\n3. Click **Test connection**. Relay will sign you in through your provider in a new window.\\n4. If the test works, click **Enable for everyone**.\\n\\nKeep one admin account that signs in with a password until you've confirmed SSO works for the whole team, so you can't get locked out. Setup usually takes 10\u201315 minutes.\"}], \"articles\": [{\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}, {\"title\": \"Setup checklist: the four steps to get started\", \"text\": \"# Setup checklist: the four steps to get started\\n\\nNew to Relay, or stuck on setup? These four steps get a workspace ready. Teams that finish them in the first weeks get far more out of Relay.\\n\\n1. Create your first board. Pick a template and add a few real cards. See \\\"Create your first board\\\".\\n2. Invite at least five people. Boards are only useful with your team on them. See \\\"Invite your team\\\" or \\\"Invite many users at once\\\".\\n3. Connect an integration. Chat or calendar are the quickest wins. See \\\"Connect an integration\\\".\\n4. Configure single sign-on (Standard, Premium and Enterprise). See \\\"Set up single sign-on (SSO)\\\".\\n\\nAdmins can see which steps are done under Admin settings, Setup progress. If you are not sure what to do next, start with the first step on this list that is not done yet.\\n\\nSearch keywords: getting started onboarding stuck setup next step what should I do begin start first steps\\n\"}, {\"title\": \"Set up single sign-on (SSO)\", \"text\": \"# Set up single sign-on (SSO)\\n\\nSSO lets your team sign in to Relay with your company identity provider. It is available on the Standard, Premium and Enterprise editions. It is not available on Free.\\n\\nSteps (admins only):\\n1. Open Admin settings, then Security, then Single sign-on.\\n2. Choose the protocol your identity provider uses: SAML or OIDC.\\n3. For SAML, upload the identity provider metadata file (XML). For OIDC, paste the client ID, client secret and issuer URL.\\n4. Click Test connection. Relay signs you in through the provider in a new window.\\n5. When the test succeeds, click Enable for everyone.\\n\\nKeep one admin account with password sign-in until you have confirmed SSO works for the whole team. SSO setup usually takes ten to fifteen minutes.\\n\\nSearch keywords: single sign-on sign in login identity provider IT team configure enable SAML OIDC\\n\"}], \"account_facts\": {\"setup_status\": {\"completed_steps\": [\"create a first board\", \"invite at least five users\", \"connect an integration\"], \"missing_steps\": [\"configure single sign-on\"], \"closure_pct\": 0.75, \"seats_assigned\": 11, \"seats_licensed\": 15, \"edition\": \"standard\"}, \"account_context\": {\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 11, \"utilisation\": 0.73, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.75, \"missing_steps\": [\"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}}}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx5TPnTRvymTJhHe1N5A",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\":\"pass\",\"score\":4,\"reason\":\"All four points hold: the SSO steps, Standard edition inclusion, admin-only access and last-remaining-setup-step claim are all supported by the articles and account_facts, the reply directly gives the path and steps, and it makes no promises, with only minor length in an otherwise clear answer.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 782,
+   "inference_geo": "global",
+   "input_tokens": 1903,
+   "output_tokens": 434,
+   "output_tokens_details": {
+    "thinking_tokens": 320
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to answer from.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every step, limit or feature the assistant states can be found in the articles. Anything stated that is not in the articles is a failure, even if it happens to be true.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"How do automation rules work with recurring cards?\"}, {\"role\": \"agent\", \"text\": \"Automation rules work with recurring cards. Each time Relay creates a new copy of a recurring card, the rule runs on that copy.\\n\\n**Setting up a rule:** On any board, click the **Automation** button. Pick a trigger, add conditions if you want them, and choose one or more actions. For example: when a card moves to Done, notify the reporter.\\n\\n**Rule limits by edition:** Free allows 5 rules per workspace, Standard 15, Premium 60, and Enterprise has no practical limit. If you hit the limit, your current rules keep running, but you can't add new ones.\\n\\n**If a rule doesn't run or runs twice:** Open the Automation panel on the board and look at the rule's run history.\\n- **It didn't run:** the rule may be switched off, the trigger may be set on a different list, or a condition (like a label or assignee) may not have matched.\\n- **It runs twice:** two rules probably have the same trigger. The copy may be on the board or in the workspace template the board came from. Switch one of them off.\"}], \"articles\": [{\"title\": \"Automation rules\", \"text\": \"# Automation rules\\n\\nAn automation rule does something for you when something happens on a board. Example: when a card moves to Done, notify the reporter. Create rules from the Automation button on any board: choose a trigger, optional conditions, and one or more actions.\\n\\nRules also work with recurring cards: the rule runs each time a new copy of the card is created.\\n\\nThe number of rules per workspace depends on your edition: 5 on Free, 15 on Standard, 60 on Premium, and no practical limit on Enterprise. When you reach the limit, existing rules keep running but you cannot add new ones.\\n\\nSearch keywords: automate automation rule rules trigger action limit\\n\"}, {\"title\": \"An automation rule did not run, or runs twice\", \"text\": \"# An automation rule did not run, or runs twice\\n\\nIf a rule did not run, open the Automation panel on the board and look at the rule's run history. The most common causes are: the rule is switched off; the trigger is on a different list than the one the card moved to; or a condition (label, assignee) did not match.\\n\\nIf a rule sends two notifications for every card, two rules have the same trigger. Check for a copy of the rule on the board and in the workspace template the board was created from. Switch one of them off.\\n\"}, {\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}]}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx4cpWsXAY3Wo28M53rD",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQS+QoKEAgTGAI4AUIIdGhpbmtpbmcSDK37AIQZ/K3YWVoxiRoMDG6kc9dA0mpHATFeIjCuOFmhLvSXYGG4hxfoHrtf76c3U1KKx5hK3kqQc0ZIAn/nR6eV7DR97/Agv0qJ2zEqlgqe6au8QFVXLuMWSZZLvCWZd2nqvCBNha4hcpyUOMeCDryNKJRQ1EUKlUBXjMqUOt/ZMD2BqUvwjFJECUTr4qsR0V3csPlzJylg05nWgh0F2d3j0e22KuhtkM2ABYP+arhxRAV9KsVHoBoO+B/WL2lA9ujvzwHEYrdoyUEtUGmv3nVybwlVTL8D9I9kfMEMRLFdvq9nE24a+syF7r6HMO4D2PzsVILOfCbwActhzDRKvj7asfLONW9OpH9qep226MPk1vMTX5o0CiKWDj6clp+FYGsetsM7wcI5Eh3yyg2pYFkw7M30U6IuBYN/zBGOeeNaSE010EhkyUnr4WXxkyPrPSe5ruS2FCa6G8HJa/ssrNRBfAeyVtdINqEwkR2fL8pUz30le/yaRoYAXWjsWc1pzWpq3llBXP87/5EeAyckI1t0LyfXoegMu+BhK5I6AcQtvgsLdC1H7ZdpZIGRi/mgo8ML4t3Ot3yBxGQ3s03Ro5RKZetZepSHBXixRLa82USIL8b23E1727HGk15HuBHO9sfrAPyc4jTiYF/1+1Kn/8BjVr8d/Yai1CKtd2IbLTB2gQeZhD4zS35KzSLrm2abOIS+tg+n4eNgb+C6BQoZ7RaNIdwamEj3xRjw9ryNCBxITvCL3f0Rpb4L0Q623WhNFZX6sc1/iCnKrpdWFHvGIQvuAsY8qaGGtmOgAG56gt3A60IPy0PtBsQ/b2L3gxNJt6ZxBbK4yO14VGlIxOJjrcppnyC/tSoxafQ0V/l/i8I1GNQJWysY6MaY0DpJKyEs2HSTkgayVW9LjLprm8CeiEu1Xnbj2Tv5S8Fkg88mrxRqUnqMJPCr7ECBpBqSayF65qg4DRpX6xA3YjHf9651kiGFdyX6a0JIhaW8YqhmXRIJewb4ZeOPiuz9QuIGGADr/xgAz9hsaBttQpqNquElZm6iGSpJ/sqEAtuUeyiNp/1QwfnG4oSW0Lqt9Mbw8RDa0WuzbYmvxGzXJF5RHETO7ki9pMzqOm3RoUdThA9hMgbskrk++FszAHF47DQu2+bjAPpVCv9YrmRC7Kh0qNHN0NK8FXbuMHMqh7g+co+OQT3CDaRTj3S5WXEOa3YjFXHlY0bLXMb2ZPbuINU8Q/1QAIYVsthjDdgCxtS3N5VpjF8CX3w9T7CuZ+J2WcGOuPtvre1vW5n5dc46QAvzqWv/1OPudBI/A0NThYinXiE9zgl6Td4jhb+x/f6RW5ce0TDyV9hXH/m5bhMosDLuZXB8k7HD0ZOdOfLyxuXNg5wC901l+YfzcQBDXE4uRltKeuF+2uPTW21PdEltcbPlT644YYuSDlPAbON3VkcSmYAiX7IusRratVO6f2moORTqEdLCPj49cUv4XyMwNulfgkRfOd5atUZJ5fnqmmzn3kABncURKeY9rUzn88flRL7qrYu9tOExnZ3OTJXszGdNdIkYOtDGf+tVzudKT7jU7kgjlfMihJX0XuscTrpIThQXoPSoNrWkh+d0dga7HUU0pRNTMyDbhZFgL9FUB4gzN+cEGv3dJqYIp/jbvR6GpQGJUh5rLx8wE2/WFms0DRShIyD5PkGvtjEIr1tGE8YhY6R4p5hHVVoJDpcFcwhQivNGDgAwvToFNWz/xkZwGCt7iyrweIx7slPb0rIR3vBoQ3F1qaV+JoPWAw9WJnn/vh2yJlAsGlxW9nNgIpQurCICBUobgpuoQAQRKHjlq5Jny8+N9HalYSIZoeIYAQ==",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\":\"pass\",\"score\":4,\"reason\":\"Every step, limit and troubleshooting cause stated is supported by the Automation rules and run-history articles, makes no promises, and gives a clear next step, with only a slightly redundant opening line weakening clarity.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 671,
+   "inference_geo": "global",
+   "input_tokens": 1185,
+   "output_tokens": 362,
+   "output_tokens_details": {
+    "thinking_tokens": 272
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

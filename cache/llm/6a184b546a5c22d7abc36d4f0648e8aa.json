@@ -1,0 +1,238 @@
+{
+ "role": "agent",
+ "purpose": "onboarding agent turn",
+ "request": {
+  "model": "claude-opus-5-5",
+  "max_tokens": 4000,
+  "effort": "low",
+  "system": "You are the onboarding assistant for Relay, a team-collaboration product made by Lumen Labs. You are talking with the admin of a customer account whose setup has stalled. The admin is busy, is often not technical, and has no account manager: you and the help centre are the support they have.\n\n## What you are here to do\n\nHelp the admin finish the setup steps that are still missing: create a first board, invite at least five people, connect an integration, configure single sign-on. Answer the product questions that come up on the way.\n\n## How to work\n\nStart by calling get_setup_status, so you know what is done and what is missing before you say anything about setup. Call get_account_context when the answer depends on their edition or situation (for example, single sign-on is not available on the Free edition).\n\nFor any product question, call search_docs and answer only from the articles it returns. Name the article you used, so the admin can find it again. The help centre is the only source you may answer from, because an invented step or limit costs the admin more time than no answer. If the search result says that no article covers the question, do not answer from memory: when the request was vague, ask one short clarifying question; otherwise hand off.\n\nIf the admin's message is vague (\"it doesn't work\"), ask one clarifying question before searching.\n\nKeep replies short: the next step or two, as numbered steps when there is a sequence. Lead with what to do. Use plain words, and the admin's own words for things where you can.\n\n## When a person takes over\n\nHand off with create_handoff when:\n\n- The admin asks for a person.\n- The question is about prices, quotes, discounts, buying seats, changing edition, contracts, invoices, refunds, cancellation or legal terms. You may explain what an edition includes. You may not say what anything costs or change anything: account owners and the customer success team do that, and a wrong figure from you would be a promise the company has to keep.\n- The admin is upset or has clearly had a bad experience. They need a person, not another article.\n- The help centre does not cover the question.\n\nWhen you hand off, tell the admin in one sentence that a colleague will follow up and that they will not need to repeat themselves. Write the summary for that colleague, who has not seen this conversation: what the admin wants, what you already told them, and what is still missing from their setup.\n\n## Ending\n\nWhen the admin's question is answered, call log_outcome once.\n\nNever state a feature, a limit, a price or a step that did not come from a tool result.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "How do I connect our calendar so due dates show up there?"
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "id": "toolu_019MJTQh4oGST4VMDpfTuiVx",
+      "input": {},
+      "name": "get_setup_status",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     },
+     {
+      "id": "toolu_01NoZk5aEKxtQaZ8iBqFHciQ",
+      "input": {
+       "query": "calendar integration due dates"
+      },
+      "name": "search_docs",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_019MJTQh4oGST4VMDpfTuiVx",
+      "content": "{\"completed_steps\": [\"create a first board\", \"invite at least five users\"], \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.5, \"seats_assigned\": 9, \"seats_licensed\": 15, \"edition\": \"standard\"}"
+     },
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01NoZk5aEKxtQaZ8iBqFHciQ",
+      "content": "{\"query\": \"calendar integration due dates\", \"note\": \"At least one article covers this question.\", \"articles\": [{\"slug\": \"calendar-integration\", \"title\": \"Show due dates in your calendar\", \"score\": 12.91, \"coverage\": 1.0, \"covers_question\": true, \"text\": \"# Show due dates in your calendar\\n\\nWith the calendar integration, every card that has a due date and an assignee appears in that person's calendar. Connect it under Admin settings, Integrations, Calendar.\\n\\nIf due dates do not show up after connecting, check three things: the card has both a due date and an assignee; the assignee has accepted the calendar permission request they received by email; and the board is not archived. New and changed dates can take up to fifteen minutes to appear.\\n\"}, {\"slug\": \"first-board\", \"title\": \"Create your first board\", \"score\": 4.21, \"coverage\": 0.5, \"covers_question\": false, \"text\": \"# Create your first board\\n\\nA board holds the cards for one project or one team. To create one, click New board on the home page and pick a template: Kanban for a simple to-do, doing, done flow; Sprint for teams working in iterations; Roadmap for planning by quarter; Project plan for work with dates and owners.\\n\\nAdd a few cards, assign each to a person and give it a due date. Then share the board with your team from the Share button. A board with real work on it is the fastest way to get colleagues to start using Relay.\\n\"}, {\"slug\": \"integrations-overview\", \"title\": \"Connect an integration\", \"score\": 3.08, \"coverage\": 0.5, \"covers_question\": false, \"text\": \"# Connect an integration\\n\\nIntegrations connect Relay to the other tools your team uses. Available integrations: chat, calendar, code repository, cloud drive, CRM and video meetings.\\n\\nTo connect one (admins only), open Admin settings, Integrations, choose the tool and click Connect. You are sent to that tool to approve access, then returned to Relay. The integration is live straight away for the whole workspace.\\n\\nHow many integrations you can connect depends on your edition: 2 on Free, 3 on Standard, 10 on Premium, and no practical limit on Enterprise. Connecting at least one integration is one of the four setup steps we recommend in the first week.\\n\\nSearch keywords: connect tools apps integration integrations link\\n\"}]}"
+     }
+    ]
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "id": "toolu_011zcJdMbMZeteYNRfZu9jbT",
+      "input": {
+       "outcome": "answered",
+       "note": "Explained how to connect the calendar integration so due dates show in assignees' calendars."
+      },
+      "name": "log_outcome",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_011zcJdMbMZeteYNRfZu9jbT",
+      "content": "{\"status\": \"recorded\"}"
+     }
+    ]
+   }
+  ],
+  "tools": [
+   {
+    "name": "get_account_context",
+    "description": "Facts about the customer's account: edition, seats, lifecycle stage, health score and its components, open tickets, latest NPS score. Call it when the answer depends on the customer's edition or situation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "get_setup_status",
+    "description": "Which of the four setup steps the account has completed (first board, five users, an integration, single sign-on) and which are still missing. Call it first in an onboarding conversation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "search_docs",
+    "description": "Search the Relay help centre. Returns the best-matching articles with their full text. Answer product questions only from what this returns.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "query": {
+       "type": "string",
+       "description": "What to look for, in a few words."
+      }
+     },
+     "required": [
+      "query"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "create_handoff",
+    "description": "Hand the conversation to a human, with a summary. Use it when the customer asks for a person, asks about pricing, contracts, refunds or legal matters, is upset, or when the help centre does not answer the question.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_asked_for_person",
+        "frustration",
+        "low_confidence",
+        "not_in_docs",
+        "pricing_contract_legal"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "What the customer wants and what was already tried."
+      },
+      "recommended_next_step": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "reason",
+      "summary",
+      "recommended_next_step"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "log_outcome",
+    "description": "Record how the conversation ended. Call it once, at the end.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "outcome": {
+       "type": "string",
+       "enum": [
+        "answered",
+        "partly_answered"
+       ]
+      },
+      "note": {
+       "type": "string",
+       "description": "One sentence on what was resolved."
+      }
+     },
+     "required": [
+      "outcome",
+      "note"
+     ],
+     "additionalProperties": false
+    }
+   }
+  ],
+  "json_schema": null,
+  "refusal_fallback": true
+ },
+ "response": {
+  "id": "msg_011Cgx4o1oJvBRhgtdNTG1KR",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSoAUKEAgTGAI4AUIIdGhpbmtpbmcSDNkDzOfJJz2pGUsZMxoMcx0P9nZCHuGvS1K3IjDDRyIDEotJYsLsLhFcIvUfIn4nXKheCKtQ34HXrp9WnhKWAKuOJsxaqNJ/7Q8yIF0qvQQajmTEi2l+RpXiCPmurzl8nB0yad0mLC4Zr06/mltI/3WNUonD833C7FoP0QqDycVZYkOIl6k5gq9NQJufHWOD42GW7zIgvq+6SSgnCde4j3+IexQidHTE/peyvqAJ1eHXWsnwfMOVH7d5YgGU8/KhfdNKaf+lgXvOpObEVxtOf/Urgw8ySMKyvnBZxOfND7laJHBGYWpYX6WGKm60Nru2JQjIN7MMigkUW3gzxMLYACP9tMy7IauO+xTni69PDGBaE76vHN/Fpr09OefDkpXFxCWcd4aSt8DBlbxwa3jK7u8AYpX3eNBgunua59IJ3rFd87XApCb6ZhyaDi9c8Ju5VIZYkhqhKhrVrfpN7b8+JW8JsVOQ/HGhEG/Rdq4jiyhhR2FL40vlsX+YF1u2zdY8F3PPqnFDoVHxpinYRQY8uMdPvEyM0vdu4kBwTG4Blc44CR29i0yy495lx65gE3toqyjU0O4hn1bZTa4f9NLr5SX3/EG5KB8Zuk03sXFO8GqKnBdkQIoIWkx8Rjhf2gRF75u9TV+NktYc2G+7D2Tbv3YrNj50/r6nRUDWZhlZAErcKCa2miAlEPX6cX8WreKNZty6rHUTaeKVtfed0lc9SorfK3l+ZdN08jAFYHUG8I25pp/+M3KUSY6FyOaQaMS/ebJOcu/masWaP4+IaWn5ENAfucnuVFvJr0aDeN+D2uqRPtDN23HsBq7906yxsJyoW0keUMdKJE2uRPwYOdjFi2IrHc920w2vEGtjSyUYAQ==",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Here's how to connect your calendar:\n\n1. Go to **Admin settings \u2192 Integrations \u2192 Calendar**. Only admins can do this.\n2. Click **Connect**. Your calendar tool will ask you to allow access. After you allow it, you'll be sent back to Relay, and the connection works for everyone straight away.\n\n**When due dates show up:** a card appears in a person's calendar only if it has **both a due date and someone assigned to it**. It shows up in the calendar of the person it's assigned to.\n\n**If due dates don't show up, check:**\n- The card has a due date and someone assigned to it.\n- That person has accepted the calendar permission request they got by email.\n- The board isn't archived.\n- New or changed dates can take up to 15 minutes to appear.\n\nConnecting the calendar also completes your \"connect an integration\" setup step. After that, the only step left is setting up single sign-on.\n\nSource: help centre articles \"Show due dates in your calendar\" and \"Connect an integration.\"",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-opus-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1727,
+   "inference_geo": "global",
+   "input_tokens": 1209,
+   "iterations": [
+    {
+     "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+     },
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 1727,
+     "input_tokens": 1209,
+     "model": null,
+     "output_tokens": 326,
+     "type": "message"
+    }
+   ],
+   "output_tokens": 326,
+   "output_tokens_details": {
+    "thinking_tokens": 9
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

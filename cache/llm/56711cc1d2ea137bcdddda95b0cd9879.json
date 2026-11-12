@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Norivo Analytics\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 737, \"seats_licensed\": 8, \"seats_assigned\": 6, \"seats_assigned_30_days_ago\": 5, \"seat_utilisation_pct\": 75, \"monthly_active_users\": 2, \"automation_rules\": 5, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 80, \"health_score\": 65.7, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 8, \"days_to_renewal\": 51, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"Hi, Can you send pricing for Premium? We are hitting the automation rule limit.\", \"expansion_score_pct\": 4, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, usage falling\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7bTTuqvJD5DDR7mrXa",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: The customer asked for pricing on Premium and said they are hitting the automation rule limit.\nEvidence: The request is direct and recent. The account has 5 automation rules against a limit of 15, which does not match the stated limit. Only 2 monthly active users are on 6 assigned seats.\nLikely need: The request points to Premium, but the rule count doesn't show the automation limit as the constraint. Seats are not the constraint either, since 6 of 8 are assigned (75%). Confirm which automation they mean before pitching Premium on that basis.\nSuggested opener: \"Thanks for asking about Premium. Could you tell me which automations you're running into the limit with, so I can make sure the pricing fits what you need?\"\nRisks: Health is yellow at 65.7 and expansion score is 4. Only 2 monthly active users are on 6 assigned seats, and 0 of 80 assist credits have been used in 30 days. Seats assigned rose from 5 to 6 in that period, but the expansion reasons cite falling usage. Renewal is 51 days away. The stated automation limit conflicts with the 5 of 15 rules on record.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 716,
+   "output_tokens": 1056,
+   "output_tokens_details": {
+    "thinking_tokens": 679
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

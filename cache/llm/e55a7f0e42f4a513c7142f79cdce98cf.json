@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Eldessa Travel\", \"segment\": \"mid\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 4045, \"seats_licensed\": 43, \"seats_assigned\": 9, \"seats_assigned_30_days_ago\": 6, \"seat_utilisation_pct\": 21, \"monthly_active_users\": 4, \"automation_rules\": 3, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 430, \"health_score\": 67.9, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 8, \"days_to_renewal\": 142, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"What would it cost to move from Standard to Premium for 10 users? Thanks, Tyler On 03 Sep 2026, Lumen Labs Success <success@lumenlabs.example> wrote: > New in Relay Assist: smarter summaries > Hi Tyler, here is the latest from the Relay team...\", \"expansion_score_pct\": 0, \"expansion_reasons\": \"creating few boards, few support tickets\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6iD92ES6JnajqH11xo",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Tyler at Eldessa Travel asked what it would cost to move from Standard to Premium for 10 users, in reply to a Lumen Labs Success email about Relay Assist.\n\nEvidence: Seats assigned rose from 6 to 9 in the last 30 days, but 43 are licensed (21% utilisation). Monthly active users are 4, and assist credits used in the last 30 days are 0 of 430 included.\n\nLikely need: The direct ask is Premium pricing for 10 users, so the conversation is about the edition, not more seats. The licence pool already has 43 seats, so adding seats isn't what the data points to. Premium is the next edition, but the low usage means a Premium pitch should focus on what they would use.\n\nSuggested opener: \"Thanks for asking, Tyler. I can put together Premium pricing for 10 users and walk through which features would fit how your team is using the platform today.\"\n\nRisks: Health is yellow at 67.9, latest NPS is 8, and renewal is 142 days away. Only 4 monthly active users against 9 assigned seats, and 0 assist credits used, suggest that paying for more capability may not be justified yet. Expansion score is 0%, which conflicts with the buying signal and should be checked before pricing is discussed.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 781,
+   "output_tokens": 882,
+   "output_tokens_details": {
+    "thinking_tokens": 464
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

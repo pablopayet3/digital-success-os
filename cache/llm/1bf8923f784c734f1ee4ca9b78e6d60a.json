@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"N001956\", \"text\": \"Honestly disappointed. We open tickets and wait days for an answer.\"}, {\"id\": \"T003983\", \"text\": \"SSO connection test fails. Hello, We are trying to set up single sign-on and the connection test fails at the last step with a certificate error. Thanks in advance.\\n\\nDiana\"}, {\"id\": \"T003984\", \"text\": \"CARDS DISAPPEARING FROM BOARD. I am honestly fed up. Two cards vanished from our sprint board. They are not in the archive either. I need someone to call me today.\\n\\nShannon\"}, {\"id\": \"T003985\", \"text\": \"HIT THE AUTOMATION RULE LIMIT. I am honestly fed up. We tried to add a new rule and got a message saying we reached the limit for our plan. Frankly we are considering cancelling.\\n\\nSergio\"}, {\"id\": \"T003988\", \"text\": \"Boards are very slow to load. I am honestly fed up. Since last week our larger boards take more than ten seconds to load. This is blocking the whole team.\\n\\nMichael\"}, {\"id\": \"T003989\", \"text\": \"Where do I upload SSO metadata?. Hello, Our IT team wants to turn on SSO but we cannot find where to upload the identity provider metadata file. Any help appreciated.\\n\\nJennifer\"}, {\"id\": \"T003995\", \"text\": \"INVITES NOT ARRIVING. This is the third time I am writing about this. I invited six colleagues yesterday and none of them received the invitation email. Frankly we are considering cancelling.\\n\\nKevin\"}, {\"id\": \"T003997\", \"text\": \"How do I bulk invite users?. We are paying for this product and it does not work. We need to add around 30 people. Is there a way to invite them in bulk instead of one by one? This is blocking the whole team.\\n\\nJohn\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx8SSUVtKPjkunQj4r8V",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"N001956\",\"sentiment\":\"negative\",\"theme\":\"support\",\"confidence\":0.9},{\"id\":\"T003983\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.8},{\"id\":\"T003984\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.85},{\"id\":\"T003985\",\"sentiment\":\"negative\",\"theme\":\"pricing\",\"confidence\":0.8},{\"id\":\"T003988\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9},{\"id\":\"T003989\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.9},{\"id\":\"T003995\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.85},{\"id\":\"T003997\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.75}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 623,
+   "output_tokens": 275,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -25,10 +25,11 @@
 defaults:
   play: onboarding_rescue
   # No agent reply may ever contain a price, whatever the case is about.
+  # ("per seat per month" is not on this list: the help centre uses it for credit
+  # allowances, and the first live run flagged a correct answer because of it.)
   must_not_match:
     - '[$€£]\s?\d'
     - '\b\d+\s?(dollars|euros|usd|eur)\b'
-    - '\bper (seat|user) per (month|year)\b'
 
 cases:
   # --- setup questions the help centre answers -------------------------------------------

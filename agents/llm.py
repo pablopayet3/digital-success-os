@@ -191,9 +191,15 @@ class LLM:
 
     def _cost(self, model: str, usage: dict) -> float:
         """What a response cost, from its token counts and the price list in config/llm.yaml."""
-        prices = self.config["prices_per_million_tokens"].get(model)
+        price_list = self.config["prices_per_million_tokens"]
+        prices = price_list.get(model)
         if prices is None:
-            return 0.0
+            if self.settings.llm_stand_in:
+                return 0.0  # the rule-based stand-in costs nothing
+            # A model with no listed price (for example the fallback model that answers
+            # after a refusal). Count it at the highest price we know, so the budget can
+            # be over-counted but never under-counted.
+            prices = max(price_list.values(), key=lambda price: price["output"])
         input_tokens = (
             usage.get("input_tokens", 0)
             + 1.25 * (usage.get("cache_creation_input_tokens") or 0)  # writing the prompt cache

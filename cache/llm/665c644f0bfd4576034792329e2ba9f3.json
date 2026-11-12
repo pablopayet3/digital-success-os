@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"N001268\", \"text\": \"Love the automation rules, they save us hours every week.\"}, {\"id\": \"N001270\", \"text\": \"Relay Assist summaries are surprisingly good. The team uses them daily.\"}, {\"id\": \"N001271\", \"text\": \"The automation limit on our plan makes it hard to justify.\"}, {\"id\": \"N001272\", \"text\": \"Easy to roll out to the whole company. Support answered fast when we needed them.\"}, {\"id\": \"N001273\", \"text\": \"Does the job. Pricing for extra seats feels a bit high.\"}, {\"id\": \"N001274\", \"text\": \"Love the automation rules, they save us hours every week.\"}, {\"id\": \"N001278\", \"text\": \"Could not get SSO working, so half the team gave up.\"}, {\"id\": \"N001279\", \"text\": \"Simple, fast, does what we need.\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6m4WCvj7wSVk7qM1vN",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"N001268\",\"sentiment\":\"positive\",\"theme\":\"value\",\"confidence\":0.9},{\"id\":\"N001270\",\"sentiment\":\"positive\",\"theme\":\"usability\",\"confidence\":0.8},{\"id\":\"N001271\",\"sentiment\":\"negative\",\"theme\":\"value\",\"confidence\":0.8},{\"id\":\"N001272\",\"sentiment\":\"positive\",\"theme\":\"support\",\"confidence\":0.9},{\"id\":\"N001273\",\"sentiment\":\"negative\",\"theme\":\"pricing\",\"confidence\":0.85},{\"id\":\"N001274\",\"sentiment\":\"positive\",\"theme\":\"value\",\"confidence\":0.9},{\"id\":\"N001278\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.9},{\"id\":\"N001279\",\"sentiment\":\"positive\",\"theme\":\"value\",\"confidence\":0.75}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 700
+   },
+   "cache_creation_input_tokens": 700,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 277,
+   "output_tokens": 269,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

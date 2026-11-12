@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Ulyx Travel\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1413, \"seats_licensed\": 16, \"seats_assigned\": 15, \"seats_assigned_30_days_ago\": 15, \"seat_utilisation_pct\": 94, \"monthly_active_users\": 7, \"automation_rules\": 7, \"automation_rule_limit\": 15, \"integrations\": 2, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 160, \"health_score\": 66.2, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 5, \"days_to_renewal\": 343, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"15 of 16 seats assigned\", \"expansion_score_pct\": 27, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, creating few boards\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6zLGLtZyY8xhH6LSoJ",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Ulyx Travel has nearly used up its Standard seats, with 15 of 16 assigned, which fired a seat pressure signal.\n\nEvidence: Seat utilisation is 94%, with 15 of 16 seats assigned, the same count as 30 days ago. Integrations are at 2 of a limit of 3, and automation rules are at 7 of a limit of 15.\n\nLikely need: More seats are the clearest need, since almost all licensed seats are assigned. The data doesn't show what Premium would add for this account, so it's worth asking before proposing it.\n\nSuggested opener: \"I noticed your team is close to the full 16 seats on Standard, so I wanted to check whether you're planning to add people or need anything else from the plan.\"\n\nRisks: Only 7 monthly active users against 15 assigned seats, so some assigned seats may not be in use. Health is yellow at 66.2, the latest NPS is 5, and the expansion reasons say the account is near the automation limit, which conflicts with the 7 of 15 rules shown. Renewal is 343 days away, so there is no timing pressure.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 701,
+   "output_tokens": 945,
+   "output_tokens_details": {
+    "thinking_tokens": 581
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

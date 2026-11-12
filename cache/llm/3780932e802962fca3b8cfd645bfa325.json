@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Ulexo Robotics\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 972, \"seats_licensed\": 11, \"seats_assigned\": 10, \"seats_assigned_30_days_ago\": 9, \"seat_utilisation_pct\": 91, \"monthly_active_users\": 6, \"automation_rules\": 0, \"automation_rule_limit\": 15, \"integrations\": 2, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 110, \"health_score\": 76.6, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 282, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"10 of 11 seats assigned\", \"expansion_score_pct\": 19, \"expansion_reasons\": \"nearly all seats assigned, creating few boards\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6zhqt6w8U4GLCBFaor",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Seat pressure. Nearly all of Ulexo Robotics' licensed seats are now assigned, and the assigned count rose in the last 30 days.\n\nEvidence: 10 of 11 seats assigned, up from 9 thirty days ago. Seat utilisation is 91%. Expansion score is 19%, with the reason given as \"nearly all seats assigned, creating few boards.\"\n\nLikely need: More seats is the most direct reading, since the seat count is the only thing the data shows at its limit. The case for the next edition, Premium, is weak: automation rules are at 0 of 15, integrations at 2 of 3, and assist credits at 0 of 110 used, so nothing in the data shows a need for features the Standard edition lacks. Only 6 monthly active users against 10 assigned seats also means extra seats may not be the real need, so confirm before pitching.\n\nSuggested opener: \"I noticed your team has nearly filled its Lumen Labs seats, so I wanted to check whether you're planning to add people and what would help most as you do.\"\n\nRisks: Only 6 of 10 assigned seats are active monthly, so added seats may go unused. Automation and assist credits are unused, and there is no NPS score on record. Health is green at 76.6 with no open high-priority tickets. Renewal is 282 days away.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 691,
+   "output_tokens": 887,
+   "output_tokens_details": {
+    "thinking_tokens": 454
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

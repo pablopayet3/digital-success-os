@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Ravolo Education\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 10, \"seats_assigned\": 8, \"seats_assigned_30_days_ago\": null, \"seat_utilisation_pct\": 80, \"monthly_active_users\": 3, \"automation_rules\": 0, \"automation_rule_limit\": 5, \"integrations\": 0, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 48.9, \"health_band\": \"red\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 363, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 39%: nearly all seats assigned, free edition, creating few boards\", \"expansion_score_pct\": 39, \"expansion_reasons\": \"nearly all seats assigned, free edition, creating few boards\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7DWKTBS1Fv3VKGWwp6",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: The expansion-ready signal fired, with an expansion likelihood of 39%.\nEvidence: 8 of 10 licensed seats are assigned (80% utilisation), the account is on the free edition, and only 3 monthly active users are showing up. Automation rules are at 0 of 5 and integrations at 0 of 2.\nLikely need: The data points toward moving to Standard, since the free edition is the stated next-edition path, and the nearly full seat count could also mean more seats. Usage is thin, though (3 monthly active users against 8 assigned seats), so more seats alone may not be what they need. The data doesn't show why usage is low, so ask before proposing a plan.\nSuggested opener: \"Ravolo, I noticed you've assigned 8 of your 10 seats, and I'd like to hear how the team is getting on and whether anything in Standard would help with what you're working on.\"\nRisks: Health is red at 48.9, the account has no ARR and no NPS score on record, and only 3 of 8 assigned seats are active. Seat assignment 30 days ago is null, so the trend is unknown. Renewal is 363 days away, so there is no near-term deadline.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 711,
+   "output_tokens": 916,
+   "output_tokens_details": {
+    "thinking_tokens": 529
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

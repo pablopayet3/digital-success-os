@@ -598,3 +598,62 @@ uv run python run.py api     # http://localhost:8000/docs
 ### Decisions recorded
 
 ADR 0018 (the daily run as a GitHub Actions schedule).
+
+---
+
+## The live run: the first time a real model answered
+
+Everything before this point ran against a rule-based stand-in. One run with an API key
+replaced it. Total spend for the evaluations and the 30-day rebuild is in the README.
+
+### What works
+
+- **The request formats were right first time**: plain text, structured output, the agent
+  with tools, and the refusal fallback.
+- **Real responses are cached** in `cache/llm/` and committed. Replay mode is now the
+  default: the reports and the simulation reproduce offline, with no key and at no cost.
+- **Three modes**, chosen with a flag: replay (default), `--live` (cache first, then the
+  API, up to the budget), `--stand-in` (keyword rules, no key).
+- **Every stored conversation records who wrote the agent's replies** (`answered_by`).
+- **Evaluation with the real model**: mailbox cases 10 of 10, briefs 4 of 4, mailbox
+  classifier 96% against the simulator's labels, every hard-rule category passed by every
+  prompt version. Onboarding agent: prompt v1 29 of 30, v2 25 of 30, v3 30 of 30.
+
+### What the real model exposed
+
+1. *A bug in the agent loop.* When the model wrote its answer and logged the outcome in
+   one step, the customer received only the closing remark. No stand-in test could find
+   this, because the stand-in never behaved that way.
+2. *Three faults in the evaluation harness.* The judge was not shown what the agent's
+   tools returned, so it called correct account facts invented. A check wanted a
+   clarifying question to end with a question mark. A price pattern matched an allowance
+   quoted from the help centre.
+3. *The "improved" prompt was worse.* v2 lost four cases that v1 passed. v3 was written
+   from those failures and passes all thirty.
+4. *One of my fixes was wrong.* A guard that refused to log an outcome before an answer
+   existed made the model write nothing. The transcripts showed why within one run, and
+   it was removed.
+
+### The three decisions to defend
+
+1. *A stand-in tests the plumbing; only a real model tests the product.* The stand-in
+   run was green across the board. The first real run was 21 of 30. Both statements are
+   true, and the gap between them is the reason to pay for a live run before a demo.
+2. *Evaluate the evaluation.* Most first-run failures were the harness, not the agent.
+   A judge has to see what the agent saw; a check has to test the behaviour, not its
+   punctuation. I read every failed transcript before changing anything.
+3. *The evals pick the prompt, not the author.* v2 was the version I expected to win.
+   It lost, so it was not promoted. v3 is the default because it scored highest, with the
+   caveat written down: it was tuned on these cases, so new cases must confirm it.
+
+### More to be able to explain
+
+- **Why log-then-answer happens.** The model treats logging as quick bookkeeping and does
+  it before composing the reply. The loop now accepts either order.
+- **Why not make the outcome tool refuse?** I tried. It contradicts the model's natural
+  order and the model stalled. Working with the behaviour beat fighting it.
+- **Why the fallback model mattered for cost.** On a few requests the agent model declined
+  and the API answered from its fallback. That model had no price in the config, so its
+  calls counted as free. An unpriced model is now counted at the highest listed price.
+- **What 30 of 30 does not mean.** It is a score on cases the prompt was tuned against.
+  The feedback loop from real handoffs is what produces cases it has not seen.

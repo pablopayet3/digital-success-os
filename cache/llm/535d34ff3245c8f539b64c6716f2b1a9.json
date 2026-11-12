@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T003148\", \"text\": \"SSO connection test fails. Hi, We are trying to set up single sign-on and the connection test fails at the last step with a certificate error. Could you point me in the right direction?\\n\\nChristopher\"}, {\"id\": \"T003149\", \"text\": \"Is there an integration for our code repository?. Hi, We would like commits to show on cards. I could not find the setup guide. Could you point me in the right direction?\\n\\nBrian\"}, {\"id\": \"T003151\", \"text\": \"Calendar sync not working. Hi team, Due dates from Relay Boards are not showing up in our calendar after we connected it. Could you point me in the right direction?\\n\\nDiana\"}, {\"id\": \"T003152\", \"text\": \"How to set up a board template. Good morning, We want every new project to start from the same board layout. What is the best way to do this? Thanks in advance.\\n\\nDesiree\"}, {\"id\": \"T003155\", \"text\": \"Export a board. Not happy at all. Is it possible to export a board to a spreadsheet for a monthly report? I need someone to call me today.\\n\\nNicholas\"}, {\"id\": \"T003156\", \"text\": \"Automation rule did not fire. I am honestly fed up. We created a rule to move cards when they are approved, but it has not run once. If this is not fixed this week we will look at alternatives.\\n\\nKevin\"}, {\"id\": \"T003158\", \"text\": \"Users locked out after enabling SSO. Not happy at all. We switched on SSO this morning and now several people cannot log in at all. I need someone to call me today.\\n\\nMichelle\"}, {\"id\": \"T003161\", \"text\": \"PERMISSIONS FOR GUESTS. Not happy at all. Can we give an external contractor access to one board only? If this is not fixed this week we will look at alternatives.\\n\\nBarbara\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7RpSCyLNWVfC2U2Tmt",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"T003148\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.85},{\"id\":\"T003149\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.9},{\"id\":\"T003151\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.7},{\"id\":\"T003152\",\"sentiment\":\"neutral\",\"theme\":\"usability\",\"confidence\":0.8},{\"id\":\"T003155\",\"sentiment\":\"negative\",\"theme\":\"support\",\"confidence\":0.6},{\"id\":\"T003156\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9},{\"id\":\"T003158\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.95},{\"id\":\"T003161\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.75}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 607,
+   "output_tokens": 275,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

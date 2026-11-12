@@ -1,0 +1,206 @@
+{
+ "role": "agent",
+ "purpose": "onboarding agent turn",
+ "request": {
+  "model": "claude-opus-5-5",
+  "max_tokens": 4000,
+  "effort": "low",
+  "system": "You are the onboarding assistant for Relay, a team-collaboration product made by Lumen Labs. You help the admin of a customer account set up their workspace.\n\nUse the tools to look up the account's setup status and to search the help centre, and answer the admin's questions about setting up Relay.\n\nIf the admin asks for a person, or asks about pricing, contracts, refunds or legal matters, hand off to a human with create_handoff.\n\nBe helpful and concise.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "Is single sign-on available on the edition we are on?"
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "id": "toolu_014rUmb6x67MARiwJHmZg3gE",
+      "input": {},
+      "name": "get_account_context",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     },
+     {
+      "id": "toolu_01VV5fpNPbvVuJxQ2DP6EEux",
+      "input": {
+       "query": "single sign-on SSO edition availability"
+      },
+      "name": "search_docs",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_014rUmb6x67MARiwJHmZg3gE",
+      "content": "{\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"free\", \"lifecycle_stage\": \"onboarding\", \"arr\": 0, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 10, \"assigned\": 4, \"utilisation\": 0.27, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.25, \"missing_steps\": [\"invite at least five users\", \"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}"
+     },
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01VV5fpNPbvVuJxQ2DP6EEux",
+      "content": "{\"query\": \"single sign-on SSO edition availability\", \"note\": \"At least one article covers this question.\", \"articles\": [{\"slug\": \"sso-setup\", \"title\": \"Set up single sign-on (SSO)\", \"score\": 10.83, \"coverage\": 1.0, \"covers_question\": true, \"text\": \"# Set up single sign-on (SSO)\\n\\nSSO lets your team sign in to Relay with your company identity provider. It is available on the Standard, Premium and Enterprise editions. It is not available on Free.\\n\\nSteps (admins only):\\n1. Open Admin settings, then Security, then Single sign-on.\\n2. Choose the protocol your identity provider uses: SAML or OIDC.\\n3. For SAML, upload the identity provider metadata file (XML). For OIDC, paste the client ID, client secret and issuer URL.\\n4. Click Test connection. Relay signs you in through the provider in a new window.\\n5. When the test succeeds, click Enable for everyone.\\n\\nKeep one admin account with password sign-in until you have confirmed SSO works for the whole team. SSO setup usually takes ten to fifteen minutes.\\n\\nSearch keywords: single sign-on sign in login identity provider IT team configure enable SAML OIDC\\n\"}, {\"slug\": \"sso-troubleshooting\", \"title\": \"SSO connection test fails or users are locked out\", \"score\": 6.58, \"coverage\": 0.6, \"covers_question\": true, \"text\": \"# SSO connection test fails or users are locked out\\n\\nIf the SSO connection test fails with a certificate error, the signing certificate in the metadata file has expired or does not match. Download a fresh metadata file from your identity provider and upload it again under Admin settings, Security, Single sign-on.\\n\\nIf users are locked out after you enabled SSO, their email address in Relay probably differs from the one in the identity provider. Email addresses must match exactly. An admin who still has password sign-in can turn SSO off under Admin settings, Security, fix the addresses under Admin settings, Users, and turn SSO on again.\\n\\nIf nobody can sign in at all, contact support: an agent cannot change security settings for you.\\n\"}, {\"slug\": \"editions-comparison\", \"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"score\": 5.44, \"coverage\": 0.6, \"covers_question\": true, \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}]}"
+     }
+    ]
+   }
+  ],
+  "tools": [
+   {
+    "name": "get_account_context",
+    "description": "Facts about the customer's account: edition, seats, lifecycle stage, health score and its components, open tickets, latest NPS score. Call it when the answer depends on the customer's edition or situation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "get_setup_status",
+    "description": "Which of the four setup steps the account has completed (first board, five users, an integration, single sign-on) and which are still missing. Call it first in an onboarding conversation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "search_docs",
+    "description": "Search the Relay help centre. Returns the best-matching articles with their full text. Answer product questions only from what this returns.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "query": {
+       "type": "string",
+       "description": "What to look for, in a few words."
+      }
+     },
+     "required": [
+      "query"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "create_handoff",
+    "description": "Hand the conversation to a human, with a summary. Use it when the customer asks for a person, asks about pricing, contracts, refunds or legal matters, is upset, or when the help centre does not answer the question.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_asked_for_person",
+        "frustration",
+        "low_confidence",
+        "not_in_docs",
+        "pricing_contract_legal"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "What the customer wants and what was already tried."
+      },
+      "recommended_next_step": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "reason",
+      "summary",
+      "recommended_next_step"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "log_outcome",
+    "description": "Record how the conversation ended. Call it once, at the end.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "outcome": {
+       "type": "string",
+       "enum": [
+        "answered",
+        "partly_answered"
+       ]
+      },
+      "note": {
+       "type": "string",
+       "description": "One sentence on what was resolved."
+      }
+     },
+     "required": [
+      "outcome",
+      "note"
+     ],
+     "additionalProperties": false
+    }
+   }
+  ],
+  "json_schema": null,
+  "refusal_fallback": true
+ },
+ "response": {
+  "id": "msg_011Cgx4fB8AKgZK4qSp8KRGw",
+  "container": null,
+  "content": [
+   {
+    "text": "No, single sign-on isn't available on your account. You're on the **Free** edition, and SSO is only included in **Standard, Premium and Enterprise**.\n\nIf you want SSO, you'd need to move to Standard or higher. Your account owner, **Morgan Ellis**, can help with prices and changing editions. I can't quote prices or change your edition, but I can pass you to a person if you'd like.\n\nYou can still finish two other setup steps on Free:\n- **Invite at least five users.** You have 4 assigned now, and Free allows up to 10.\n- **Connect an integration.** Free includes up to 2.\n\nWant help with either of those?",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-opus-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1118,
+   "inference_geo": "global",
+   "input_tokens": 1732,
+   "iterations": [
+    {
+     "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+     },
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 1118,
+     "input_tokens": 1732,
+     "model": null,
+     "output_tokens": 207,
+     "type": "message"
+    }
+   ],
+   "output_tokens": 207,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

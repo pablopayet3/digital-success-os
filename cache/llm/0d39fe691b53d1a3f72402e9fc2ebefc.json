@@ -1,0 +1,184 @@
+{
+ "role": "agent",
+ "purpose": "onboarding agent turn",
+ "request": {
+  "model": "claude-opus-5-5",
+  "max_tokens": 4000,
+  "effort": "low",
+  "system": "You are the onboarding assistant for Relay, a team-collaboration product made by Lumen Labs. You help the admin of a customer account set up their workspace.\n\nUse the tools to look up the account's setup status and to search the help centre, and answer the admin's questions about setting up Relay.\n\nIf the admin asks for a person, or asks about pricing, contracts, refunds or legal matters, hand off to a human with create_handoff.\n\nBe helpful and concise.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "It doesn't work."
+   }
+  ],
+  "tools": [
+   {
+    "name": "get_account_context",
+    "description": "Facts about the customer's account: edition, seats, lifecycle stage, health score and its components, open tickets, latest NPS score. Call it when the answer depends on the customer's edition or situation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "get_setup_status",
+    "description": "Which of the four setup steps the account has completed (first board, five users, an integration, single sign-on) and which are still missing. Call it first in an onboarding conversation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "search_docs",
+    "description": "Search the Relay help centre. Returns the best-matching articles with their full text. Answer product questions only from what this returns.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "query": {
+       "type": "string",
+       "description": "What to look for, in a few words."
+      }
+     },
+     "required": [
+      "query"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "create_handoff",
+    "description": "Hand the conversation to a human, with a summary. Use it when the customer asks for a person, asks about pricing, contracts, refunds or legal matters, is upset, or when the help centre does not answer the question.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_asked_for_person",
+        "frustration",
+        "low_confidence",
+        "not_in_docs",
+        "pricing_contract_legal"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "What the customer wants and what was already tried."
+      },
+      "recommended_next_step": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "reason",
+      "summary",
+      "recommended_next_step"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "log_outcome",
+    "description": "Record how the conversation ended. Call it once, at the end.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "outcome": {
+       "type": "string",
+       "enum": [
+        "answered",
+        "partly_answered"
+       ]
+      },
+      "note": {
+       "type": "string",
+       "description": "One sentence on what was resolved."
+      }
+     },
+     "required": [
+      "outcome",
+      "note"
+     ],
+     "additionalProperties": false
+    }
+   }
+  ],
+  "json_schema": null,
+  "refusal_fallback": true
+ },
+ "response": {
+  "id": "msg_011Cgx4gHd7iaWkk5wvQyBk4",
+  "container": null,
+  "content": [
+   {
+    "text": "Let me check where your setup stands so I can help narrow this down.",
+    "type": "text"
+   },
+   {
+    "id": "toolu_011vxERN3Xqy4CVVyjZyg7Qb",
+    "input": {},
+    "name": "get_setup_status",
+    "type": "tool_use",
+    "caller": {
+     "type": "direct"
+    }
+   },
+   {
+    "id": "toolu_01Q9bhy5uJU9UXD8uXe1KVng",
+    "input": {},
+    "name": "get_account_context",
+    "type": "tool_use",
+    "caller": {
+     "type": "direct"
+    }
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-opus-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1118,
+   "inference_geo": "global",
+   "input_tokens": 82,
+   "iterations": [
+    {
+     "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+     },
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 1118,
+     "input_tokens": 82,
+     "model": null,
+     "output_tokens": 75,
+     "type": "message"
+    }
+   ],
+   "output_tokens": 75,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -1,0 +1,123 @@
+{
+ "role": "classifier",
+ "purpose": "classify mailbox",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You sort replies that arrived in a shared mailbox. Each one answers an email that the customer success team of Lumen Labs sent about its product, Relay. The input is a JSON list of replies, each with an id, a subject and a body. Routing rules act on your answer; you do not reply to anyone.\n\nFor each reply return:\n\n- id: the id you were given.\n- intent: the main thing the sender wants.\n  - out_of_office: an automatic reply saying the person is away\n  - unsubscribe: the person wants to stop receiving these emails\n  - left_company: the person no longer works there, or the mailbox is closed\n  - product_question: a question about how the product works\n  - buying_intent: wants more seats, a higher edition, another product, or pricing\n  - complaint: unhappy about the product or the service\n  - meeting_request: wants a call or a meeting\n  - other: none of the above\n- sentiment: positive, neutral or negative.\n- confidence: a number from 0 to 1. Use a low number when two intents fit about equally, or when the message is too short or vague to tell.\n- seats_requested: the number of seats asked for, as text, or an empty string.\n- edition_mentioned: the edition named (free, standard, premium, enterprise), or an empty string.\n- return_date: when the person says they are back, as written, or an empty string.\n- new_contact: the name of the person to contact instead, or an empty string.\n\nReplies can be in any language. Ignore quoted text from the original email and signatures. When a reply has two intents, choose the one that needs action first: a complaint outranks an unsubscribe, and buying intent outranks a product question.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"M000017\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hey,\\n\\nI do not need these emails anymore, please take me off the list. Thanks.\\n\\nSent from my phone\"}, {\"id\": \"M000018\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Ich bin bis the 2nd nicht im B\u00fcro und habe keinen Zugriff auf meine E-Mails.\"}, {\"id\": \"M000019\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Ich bin bis next week nicht im B\u00fcro und habe keinen Zugriff auf meine E-Mails.\\n\\n--\\nJennifer Larsen\\nEngineering Manager | Noressa Education\\n\\nOn 05 Apr 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Jennifer, here is the latest from the Relay team...\"}, {\"id\": \"M000020\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Bonjour, je suis absent du bureau jusqu'au the 14th. Je r\u00e9pondrai \u00e0 votre message \u00e0 mon retour.\"}, {\"id\": \"M000021\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Quick question, what happens if we go over our seat count? We are onboarding about 25 people in the next few weeks.\\n\\nThanks,\\nKristi\"}, {\"id\": \"M000022\", \"subject\": \"Re: Welcome to Relay: your first three steps\", \"body\": \"Is there a way to bulk invite users? We have about 35 people to add.\\n\\nThanks,\\nAntonio\"}, {\"id\": \"M000023\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Hey,\\n\\nCan someone walk our admins through the setup? Thursday afternoon works for us.\\n\\nThanks,\\nJoshua\"}, {\"id\": \"M000024\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Hi, Megan moved on last month and I have picked up this inbox. I am not sure who looks after Relay for us now. What do you need?\\n\\nThanks,\\nMegan\\n\\nOn 18 Apr 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Live session: automation rules in 30 minutes\\n> Hi Megan, here is the latest from the Relay team...\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "intent": {
+        "type": "string",
+        "enum": [
+         "out_of_office",
+         "unsubscribe",
+         "left_company",
+         "product_question",
+         "buying_intent",
+         "complaint",
+         "meeting_request",
+         "other"
+        ]
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       },
+       "seats_requested": {
+        "type": "string"
+       },
+       "edition_mentioned": {
+        "type": "string"
+       },
+       "return_date": {
+        "type": "string"
+       },
+       "new_contact": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "intent",
+       "sentiment",
+       "confidence",
+       "seats_requested",
+       "edition_mentioned",
+       "return_date",
+       "new_contact"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6WPBRvYCK8wyeWrcya",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"results\":[{\"id\":\"M000017\",\"intent\":\"unsubscribe\",\"sentiment\":\"neutral\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000018\",\"intent\":\"out_of_office\",\"sentiment\":\"neutral\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"the 2nd\",\"new_contact\":\"\"},{\"id\":\"M000019\",\"intent\":\"out_of_office\",\"sentiment\":\"neutral\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"next week\",\"new_contact\":\"\"},{\"id\":\"M000020\",\"intent\":\"out_of_office\",\"sentiment\":\"neutral\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"the 14th\",\"new_contact\":\"\"},{\"id\":\"M000021\",\"intent\":\"buying_intent\",\"sentiment\":\"neutral\",\"confidence\":0.7,\"seats_requested\":\"25\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000022\",\"intent\":\"product_question\",\"sentiment\":\"neutral\",\"confidence\":0.8,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000023\",\"intent\":\"meeting_request\",\"sentiment\":\"neutral\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000024\",\"intent\":\"left_company\",\"sentiment\":\"neutral\",\"confidence\":0.8,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1079,
+   "inference_geo": "global",
+   "input_tokens": 840,
+   "output_tokens": 1167,
+   "output_tokens_details": {
+    "thinking_tokens": 597
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

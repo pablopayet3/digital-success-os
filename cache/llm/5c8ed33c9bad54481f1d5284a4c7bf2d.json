@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Velessa Health\", \"segment\": \"mid\", \"edition\": \"premium\", \"next_edition\": \"enterprise\", \"arr\": 4889, \"seats_licensed\": 28, \"seats_assigned\": 16, \"seats_assigned_30_days_ago\": 16, \"seat_utilisation_pct\": 57, \"monthly_active_users\": 9, \"automation_rules\": 3, \"automation_rule_limit\": 60, \"integrations\": 3, \"integration_limit\": 10, \"assist_credits_used_30d\": 5, \"assist_credits_included\": 1120, \"health_score\": 65.4, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 276, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"What would it cost to move from Standard to Premium for 23 users? On 05 Sep 2026, Lumen Labs Success <success@lumenlabs.example> wrote: > Relay monthly: what is new > Hi James, here is the latest from the Relay team...\", \"expansion_score_pct\": 1, \"expansion_reasons\": \"many high-priority tickets, creating few boards\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6itKUECovJA4UKxwxs",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: The account sent a buying-intent signal. A message asks what it would cost to move from Standard to Premium for 23 users.\n\nEvidence: 16 of 28 licensed seats are assigned, unchanged from 30 days ago, and only 9 monthly active users are recorded. Automation rules are at 3 of 60 and integrations at 3 of 10. Health is 65.4, yellow.\n\nLikely need: The data does not clearly support more seats or Enterprise. The account already has 12 unassigned seats and low active use, so the 23-user question may be a pricing inquiry rather than a sign of growth. Enterprise is not supported by current usage, since automation and integration limits are far from reached. Confirm what they are actually asking before proposing any change.\n\nSuggested opener: \"I saw you asked about pricing for 23 users, and I'd like to make sure I give you the right options. Could you tell me a bit more about what your team is trying to do?\"\n\nRisks: The account is already on Premium, which conflicts with the Standard-to-Premium wording in the trigger, so the request may be outdated or misdirected. The expansion score is 1%, and its stated reason, \"many high-priority tickets,\" conflicts with the 0 open high-priority tickets in the data. Health is yellow, and renewal is 276 days away.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 767,
+   "output_tokens": 872,
+   "output_tokens_details": {
+    "thinking_tokens": 445
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

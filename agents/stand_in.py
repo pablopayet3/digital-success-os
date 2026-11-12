@@ -53,8 +53,10 @@ def stand_in_transport(request: dict) -> dict:
 def _agent(request: dict) -> dict:
     """First look things up; then answer from the docs, ask to clarify, or hand off."""
     last = request["messages"][-1]["content"]
-    if isinstance(last, str):  # a customer message: look things up first
-        return _tools(request, [("get_setup_status", {}), ("search_docs", {"query": last})])
+    new_message = _customer_text(last)
+    if new_message is not None:  # a customer message: look things up first
+        lookups = [("get_setup_status", {}), ("search_docs", {"query": new_message})]
+        return _tools(request, lookups)
 
     # Tool results came back. Find the search result among them.
     search = None
@@ -85,8 +87,18 @@ def _first_steps(text: str) -> str:
     body = [part for part in paragraphs if not part.startswith(("#", "Search keywords"))]
     return body[0] if body else "Follow the steps there."
 
+
+def _customer_text(content) -> str | None:
+    """The customer's words in a message: plain text, or a text block after tool results."""
+    if isinstance(content, str):
+        return content
+    texts = [block["text"] for block in content if block.get("type") == "text"]
+    return texts[-1] if texts else None
+
+
 def _last_customer_message(messages: list[dict]) -> str:
-    return next(m["content"] for m in reversed(messages) if isinstance(m["content"], str))
+    said = (_customer_text(m["content"]) for m in reversed(messages) if m["role"] == "user")
+    return next(text for text in said if text is not None)
 
 
 # --- the stand-in classifiers ----------------------------------------------------------------

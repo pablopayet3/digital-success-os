@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T003369\", \"text\": \"Need a copy of our invoice. Hello, Finance is asking for last month's invoice and I cannot find it in the admin settings. Could you point me in the right direction?\\n\\nLori\"}, {\"id\": \"T003370\", \"text\": \"Cannot remove a former employee. Not happy at all. Someone left our company and I cannot find how to deactivate their seat. If this is not fixed this week we will look at alternatives.\\n\\nKevin\"}, {\"id\": \"T003374\", \"text\": \"Docs editor loses formatting. I am honestly fed up. When we paste a table into Relay Docs the formatting is lost every time. If this is not fixed this week we will look at alternatives.\\n\\nAudrey\"}, {\"id\": \"T003375\", \"text\": \"Permissions for guests. Not happy at all. Can we give an external contractor access to one board only? Frankly we are considering cancelling.\\n\\nBecky\"}, {\"id\": \"T003376\", \"text\": \"CANNOT REMOVE A FORMER EMPLOYEE. I am honestly fed up. Someone left our company and I cannot find how to deactivate their seat. If this is not fixed this week we will look at alternatives.\\n\\nThomas\"}, {\"id\": \"T003377\", \"text\": \"SSO connection test fails. Hi team, We are trying to set up single sign-on and the connection test fails at the last step with a certificate error. Any help appreciated.\\n\\nTyler\"}, {\"id\": \"T003380\", \"text\": \"Where do I upload SSO metadata?. Hi team, Our IT team wants to turn on SSO but we cannot find where to upload the identity provider metadata file. Thanks in advance.\\n\\nJoshua\"}, {\"id\": \"T003383\", \"text\": \"HOW DO I BULK INVITE USERS?. I am honestly fed up. We need to add around 30 people. Is there a way to invite them in bulk instead of one by one? I need someone to call me today.\\n\\nNicholas\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7efZGzZbioPM4FD3y2",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"T003369\",\"sentiment\":\"neutral\",\"theme\":\"support\",\"confidence\":0.6},{\"id\":\"T003370\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.8},{\"id\":\"T003374\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.8},{\"id\":\"T003375\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.7},{\"id\":\"T003376\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.85},{\"id\":\"T003377\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.75},{\"id\":\"T003380\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.85},{\"id\":\"T003383\",\"sentiment\":\"negative\",\"theme\":\"support\",\"confidence\":0.7}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 660,
+   "output_tokens": 273,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

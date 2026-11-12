@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Uleth Education\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 10, \"seats_assigned\": 10, \"seats_assigned_30_days_ago\": 9, \"seat_utilisation_pct\": 100, \"monthly_active_users\": 5, \"automation_rules\": 0, \"automation_rule_limit\": 5, \"integrations\": 1, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 68.3, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 321, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"10 of 10 seats assigned\", \"expansion_score_pct\": 43, \"expansion_reasons\": \"nearly all seats assigned, free edition, creating few boards\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6z6LgxzN8vXFHjygCo",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSqAsKEAgTGAI4AUIIdGhpbmtpbmcSDLo8nNjCpgqcB/K6+xoMOqIwdMSi9Ct2iZ0rIjAbn/64h7Qsta8PT47g5nk/omTten7LzyFd+vlefpzUEuZAsFksDuixTw7Kqw6ImEEqxQrjrdEeRGFHZNvPIrV9Io8i5vbgOovG8LGpWehoHX2EHW1/zksPEv20cdYHJzvn0gRkVpWR4I5/6eN31ukCUJpu2C9dX8UKVuBBY4EvHygyq9/YeJh1MPbxddGBhbNtwW0qf2q1CBwmU1FSH+j9RTH+96fsV2G5ryDtoF8QD3APonC8E68lylyZSvfG+0HbaitCYJKjJwE1RE9fuLCvatDR3WZriHOf4HFePHMSopcL8r7zjItNZFH6xghYWvDRwjYvn+VcIg30AYeGc9H9/OlT1Ar/vvBrkYKOMLZ3mGNhNTmvRgAwht74Zo/ZbYr9B+eT01peybBx8zvqtEe7JHKBQ9UIxMynNBxiqScYxqVswhG3+XpUknmK4rhxLw1k2WsZg6jL3GrcJURjwu6rHp7FhCQqRDU0CfVbLHY1e6YYkQStjRxTyqM5m6Ie/40E02lXskRpqdKZ4QG+bxczOC1WzLsGLGAs6/PNXP78FQ1RcVMgPtNOYKeySw4n2LM2+aXwOrEuywPT950Zdn1sDWOl1AezlNHqGTokbwouXOK8OFOjo6G1WMryFt7O+1bib4e1kQCWtxn8ogyKlxcIN5fRJugHBf8qnnEwgfvRWcNMuaaCBLddpeQS0Lm1re47VMakUAbAAWzBiDwWcZjInSF5WwrkRjFBC7E38/m8DgRPaAVAEeYC7td4izCcd/Go6neZGeJwuq1AH3w/Xxms1/BwAAlq4yXIdWryz57zrLtB8jlujkatInuAiJm6TRcDxef6VDPn6zC9hEkJKhWIhbKdM4a1XDI5PcsH9grJk61/vaD2D4juJJABRDNU2aEBbeQvbwmw+V+hgRiBJTjhws+HLSm1rMGPb3YKnWU4JFOC7G/uDcEVTET96xU4FgUk6TMQPZvX9tXkBSQMUD3/yG2OzeBfjDeVUcJj0sSjNW9uknyH++fPFLRvXVOcc3Lii39U7r86B3Id7WH4a2z/T+e9qVl+E+EklJxfyTnOrddz9+USyVbYMFfdOGdkokJy4VYS/op6ma/8RY3ZVuSNd5zRseEHNstd8j75Ph857NbkAboOlMYg5mVYRP7FJjjrRIm9puaesk6hReAJnzbKqVsaF0/2QfsRmiQjvoQ9d41IJmWv0rKtrWRBqu02pY26UXu0yj3ZA04iLIKw8a8amiJMJQcGZNIjmTkpQ1OHIS5Wmlr9lZqSWHIFCyUg/vWWES7aqaNrGStL4tTOaAGfMjIYtwNJmsYrDI3N3gLelR9TydP3KX+1odXFcENBon3jSU87MnFO+nf8xUYaN+YL2QjnTZXzZbDrf6I/UbgO1TEHnZGCMDfsTJEeyx9miYGOPnWPtsJyaFmF2uZzW2bAOv9NZHCd+kic5n2fvuSAMl0vyHi/iY+dQHT/5NBbSx8NY/4fwIisRm7YAT3lDdKReEPU0dDUuuX9T6mRMb+4siN/XMQoElFCTpD2uQkYc6NB1n1fzlGquQVWFB9L4KZBGjg/6S4aFcQrBzAsHQmVIC8kUj1E5sRYAPegHpTELPHrugkZv3qQL4uN8rfqlzuAv0etxIJQnvS3v/iduyL+DI9Ae19s04Apj+AGIUfubI2WJ2K/l29PhTRSty9fEqQAoIHJsWpFA3sfB7HFBRZg1PaSE8IJY263BZL/+2bGI8hwN8SJdgvuFQbuXxoDqaSdCqa1edwr27lGEiRYA8KPJi6P7zc//bmqpTXhE9CdgfkVb6kMFlRT5nFY0okyxGw9BPYpPJt2RzRVKIFQF0H7cLkncZRBcW5qxoR6y5m/0pEUtsvFT65d9hgB",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Seat pressure. All of Uleth Education's licensed seats are now assigned, and the account is on the free edition.\n\nEvidence: 10 of 10 seats assigned, up from 9 thirty days ago. Seat utilisation is 100%. Expansion score is 43%, with the reason noted as \"nearly all seats assigned, free edition, creating few boards\".\n\nLikely need: More seats, and possibly a move to the standard edition, since the account is out of seats and still on free. The data does not show why they want more seats or what standard would add for them.\n\nSuggested opener: \"Hi, I noticed all 10 of your seats are now in use, so I wanted to check how the team is getting on and whether more seats or a look at the standard edition would help.\"\n\nRisks: Health is yellow at 68.3, and only 5 monthly active users are on the 10 assigned seats. Renewal is 321 days away, so there is no near-term deadline. No open high-priority tickets, and no NPS score is recorded.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 693,
+   "output_tokens": 647,
+   "output_tokens_details": {
+    "thinking_tokens": 323
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

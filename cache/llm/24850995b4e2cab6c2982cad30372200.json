@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Iskavo Logistics\", \"segment\": \"mid\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 10, \"seats_assigned\": 7, \"seats_assigned_30_days_ago\": null, \"seat_utilisation_pct\": 70, \"monthly_active_users\": 5, \"automation_rules\": 1, \"automation_rule_limit\": 5, \"integrations\": 1, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 74.5, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 357, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"Hey, Our Assist credits keep running out. Is there a bigger package? On 27 Sep 2026, Lumen Labs Success <success@lumenlabs.example> wrote: > Connect your tools: integrations and SSO > Hi Randall, here is the latest from the Relay team...\", \"expansion_score_pct\": 45, \"expansion_reasons\": \"reads our emails, nearly all seats assigned, free edition\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6kgKxi5m8U1sxWagcQ",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Iskavo Logistics wrote in asking whether a bigger package exists because their Assist credits keep running out, which is a buying-intent signal on a free-edition account.\n\nEvidence: The customer's message says \"Our Assist credits keep running out. Is there a bigger package?\" Seats are 7 of 10 assigned (70%), and the health score is 74.5 (green) with 0 open high-priority tickets.\n\nLikely need: The request points to the next edition, standard, rather than more seats, since the customer is asking about a bigger package and the stated pain is Assist credits. Seat demand is less clear: 7 of 10 seats are assigned, and only 5 monthly active users show in the data.\n\nSuggested opener: \"Thanks for asking about a bigger package. Could we set up a short call to look at your Assist usage and which edition would fit how Iskavo is using Lumen Labs?\"\n\nRisks: The data conflicts on Assist credits: usage shows 0 credits used in the last 30 days and 0 included, which doesn't match the customer's report, so confirm what they are running into before quoting anything. Only 5 monthly active users against 7 assigned seats may mean the seat count is not the real constraint. The account is on the free edition with ARR of 0, and there is no latest NPS score on record. Renewal is 357 days away.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 777,
+   "output_tokens": 977,
+   "output_tokens_details": {
+    "thinking_tokens": 541
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

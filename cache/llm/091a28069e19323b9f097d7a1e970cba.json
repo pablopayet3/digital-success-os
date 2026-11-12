@@ -1,0 +1,252 @@
+{
+ "role": "agent",
+ "purpose": "onboarding agent turn",
+ "request": {
+  "model": "claude-opus-5-5",
+  "max_tokens": 4000,
+  "effort": "low",
+  "system": "You are the onboarding assistant for Relay, a team-collaboration product made by Lumen Labs. You are talking with the admin of a customer account whose setup has stalled. The admin is busy, is often not technical, and has no account manager: you and the help centre are the support they have.\n\n## What you are here to do\n\nHelp the admin finish the setup steps that are still missing: create a first board, invite at least five people, connect an integration, configure single sign-on. Answer the product questions that come up on the way.\n\n## How to work\n\nStart by calling get_setup_status, so you know what is done and what is missing before you say anything about setup. Call get_account_context when the answer depends on their edition or situation (for example, single sign-on is not available on the Free edition).\n\nFor any product question, call search_docs and answer only from the articles it returns. Name the article you used, so the admin can find it again. The help centre is the only source you may answer from, because an invented step or limit costs the admin more time than no answer. If the search result says that no article covers the question, do not answer from memory: when the request was vague, ask one short clarifying question; otherwise hand off.\n\nIf the admin's message is vague (\"it doesn't work\"), ask one clarifying question before searching.\n\nKeep replies short: the next step or two, as numbered steps when there is a sequence. Lead with what to do. Use plain words, and the admin's own words for things where you can.\n\n## When a person takes over\n\nHand off with create_handoff when:\n\n- The admin asks for a person.\n- The question is about prices, quotes, discounts, buying seats, changing edition, contracts, invoices, refunds, cancellation or legal terms. You may explain what an edition includes. You may not say what anything costs or change anything: account owners and the customer success team do that, and a wrong figure from you would be a promise the company has to keep.\n- The admin is upset or has clearly had a bad experience. They need a person, not another article.\n- The help centre does not cover the question.\n\nWhen you hand off, tell the admin in one sentence that a colleague will follow up and that they will not need to repeat themselves. Write the summary for that colleague, who has not seen this conversation: what the admin wants, what you already told them, and what is still missing from their setup.\n\n## Ending\n\nThe admin only sees the text you write. They do not see your reasoning or your tool calls. So the full answer must be written out as text every time, even when you have already logged the outcome: never tell the admin that you have shown or explained something unless the steps are in the text of this reply.\n\nCall log_outcome once when the question is answered.\n\nState only what a tool result says. Report the setup status as the tool gives it. Do not tell the admin that an action will complete a setup step, free a seat or change a limit unless the setup status or an article says so.\n\nNever state a feature, a limit, a price or a step that did not come from a tool result.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "Hi,\n\nIs SSO included in our plan or do we need Premium for that?\n\n--\nRebecca Larson\nWorkspace Admin | Iskium Foods"
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "id": "toolu_01HcKwCgExuMZpvGcYR7XYwB",
+      "input": {},
+      "name": "get_setup_status",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     },
+     {
+      "id": "toolu_01VCC7ASWFQVCRQCJzcG5xYr",
+      "input": {},
+      "name": "get_account_context",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     },
+     {
+      "id": "toolu_0198aR8jurKH27tUR3KzE34F",
+      "input": {
+       "query": "single sign-on SSO edition availability"
+      },
+      "name": "search_docs",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01HcKwCgExuMZpvGcYR7XYwB",
+      "content": "{\"completed_steps\": [\"create a first board\", \"invite at least five users\"], \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.5, \"seats_assigned\": 27, \"seats_licensed\": 38, \"edition\": \"premium\"}"
+     },
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01VCC7ASWFQVCRQCJzcG5xYr",
+      "content": "{\"segment\": \"mid\", \"coverage_tier\": \"uncovered\", \"edition\": \"premium\", \"lifecycle_stage\": \"onboarding\", \"arr\": 6703, \"renewal_date\": \"2027-05-25\", \"days_to_renewal\": 232, \"account_owner\": \"Gina Moore\", \"health\": {\"score\": 63.7, \"band\": \"yellow\", \"adoption\": 37.8, \"engagement\": 77.5, \"sentiment\": 70.0, \"support\": 100.0, \"commercial\": 65.5}, \"seats\": {\"licensed\": 38, \"assigned\": 27, \"utilisation\": 0.7105, \"monthly_active_users\": 8, \"monthly_active_users_30_days_ago\": 13}, \"setup\": {\"closure_pct\": 0.5, \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 0, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": 7, \"churn_risk\": {\"score\": 0.2491, \"reasons\": \"few seats active, admin rarely logs in, creating few boards\"}, \"expansion\": {\"score\": 0.0758, \"reasons\": \"nearly all seats assigned, reads our emails, creating few boards\"}}"
+     },
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_0198aR8jurKH27tUR3KzE34F",
+      "content": "{\"query\": \"single sign-on SSO edition availability\", \"note\": \"At least one article covers this question.\", \"articles\": [{\"slug\": \"sso-setup\", \"title\": \"Set up single sign-on (SSO)\", \"score\": 10.83, \"coverage\": 1.0, \"covers_question\": true, \"text\": \"# Set up single sign-on (SSO)\\n\\nSSO lets your team sign in to Relay with your company identity provider. It is available on the Standard, Premium and Enterprise editions. It is not available on Free.\\n\\nSteps (admins only):\\n1. Open Admin settings, then Security, then Single sign-on.\\n2. Choose the protocol your identity provider uses: SAML or OIDC.\\n3. For SAML, upload the identity provider metadata file (XML). For OIDC, paste the client ID, client secret and issuer URL.\\n4. Click Test connection. Relay signs you in through the provider in a new window.\\n5. When the test succeeds, click Enable for everyone.\\n\\nKeep one admin account with password sign-in until you have confirmed SSO works for the whole team. SSO setup usually takes ten to fifteen minutes.\\n\\nSearch keywords: single sign-on sign in login identity provider IT team configure enable SAML OIDC\\n\"}, {\"slug\": \"sso-troubleshooting\", \"title\": \"SSO connection test fails or users are locked out\", \"score\": 6.58, \"coverage\": 0.6, \"covers_question\": true, \"text\": \"# SSO connection test fails or users are locked out\\n\\nIf the SSO connection test fails with a certificate error, the signing certificate in the metadata file has expired or does not match. Download a fresh metadata file from your identity provider and upload it again under Admin settings, Security, Single sign-on.\\n\\nIf users are locked out after you enabled SSO, their email address in Relay probably differs from the one in the identity provider. Email addresses must match exactly. An admin who still has password sign-in can turn SSO off under Admin settings, Security, fix the addresses under Admin settings, Users, and turn SSO on again.\\n\\nIf nobody can sign in at all, contact support: an agent cannot change security settings for you.\\n\"}, {\"slug\": \"editions-comparison\", \"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"score\": 5.44, \"coverage\": 0.6, \"covers_question\": true, \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}]}"
+     }
+    ]
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "id": "toolu_01Ha8HH7NXeYKe1FRnwYMk9H",
+      "input": {
+       "outcome": "answered",
+       "note": "Confirmed SSO is included on the customer's Premium edition and gave setup steps."
+      },
+      "name": "log_outcome",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01Ha8HH7NXeYKe1FRnwYMk9H",
+      "content": "{\"status\": \"recorded\"}"
+     }
+    ]
+   }
+  ],
+  "tools": [
+   {
+    "name": "get_account_context",
+    "description": "Facts about the customer's account: edition, seats, lifecycle stage, health score and its components, open tickets, latest NPS score. Call it when the answer depends on the customer's edition or situation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "get_setup_status",
+    "description": "Which of the four setup steps the account has completed (first board, five users, an integration, single sign-on) and which are still missing. Call it first in an onboarding conversation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "search_docs",
+    "description": "Search the Relay help centre. Returns the best-matching articles with their full text. Answer product questions only from what this returns.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "query": {
+       "type": "string",
+       "description": "What to look for, in a few words."
+      }
+     },
+     "required": [
+      "query"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "create_handoff",
+    "description": "Hand the conversation to a human, with a summary. Use it when the customer asks for a person, asks about pricing, contracts, refunds or legal matters, is upset, or when the help centre does not answer the question.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_asked_for_person",
+        "frustration",
+        "low_confidence",
+        "not_in_docs",
+        "pricing_contract_legal"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "What the customer wants and what was already tried."
+      },
+      "recommended_next_step": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "reason",
+      "summary",
+      "recommended_next_step"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "log_outcome",
+    "description": "Record how the conversation ended. Call it once, at the end.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "outcome": {
+       "type": "string",
+       "enum": [
+        "answered",
+        "partly_answered"
+       ]
+      },
+      "note": {
+       "type": "string",
+       "description": "One sentence on what was resolved."
+      }
+     },
+     "required": [
+      "outcome",
+      "note"
+     ],
+     "additionalProperties": false
+    }
+   }
+  ],
+  "json_schema": null,
+  "refusal_fallback": true
+ },
+ "response": {
+  "id": "msg_011Cgx7ZULC3m18sMN5UWGcJ",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSnAUKEAgTGAI4AUIIdGhpbmtpbmcSDDMFJijnp2nxhcyTGxoMepaBLIpdeTzDMXk5IjBr7ktEBq9ZiUD8F6Tq+tfqa56w/LE33A3k9SnlFG1EvDqm43IFCDldeMoZFI4FpHwquQQdPeByGqYKNm0qeweQgkPD0iGQyFKnY8FBSuLdlmgL+kKjsiIuOEm3qeqbX8b8cxOzhB0NGmZ5O+pSbmT6dF07RuhbsnN1PFGdVCc9LN18TxQ/fyPdX1srVjkyuZdxamrSO56fXcx7eWmpraxfSAY9Iw3DpdSOgm1mPBTdyTtzgBt1hP6JGoyvxBHOIApC6WwE4XHtePixqrBAAKAwbAVtoLG9Tc2kJ9g6vPb8yPZXYHNCd2NuVJsfWVkjhqfmoa9rYfXxv3aOCNQjFvZjYlRjRiPFvxncmTnc4GA2wH6Qs4SEaxZuCi7zdjGs3Zq+NPbulVegNgYj6Puweo7eov6wSBAYBhBJ165rMmzqYYPHKWm5/i0bAblFJ18BQzOorCQpKEca5zEhVkt9MHREqoLvT4YftzZdUPFQRVXmZGMRE8DJG7N2xjg7+Satfq7n2aFuLuRVFxcHsw77aCyCfmd9SdzZzrvmb4+icW5X/rf7rsjQTBK/YZ04GPBiGhe75Fi9xoN1u81eLvekuS7rvo5aBT5xFZJDU0GheKZiVDXF7ahh4Gih6ap2Y7tIfi9JtyONq1pZQqV5NQjLqi6kjQzmuiXUwF+aCiJ3fCK0fkzewwi97QQ6Lt84pVEjFw7EJFP0HPm9bcfFUEsJ6l0CBGYwIlGv72Oota1JX3aWZoRm68EV0Wtd9igchutBtzPalEQImPsUPO8fQIDyM6q5LwpcQDJg3JVRInNaewwsrDDvq+kqgacx38J1hRgB",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Hi Rebecca,\n\nYes, SSO is included in your plan. Your account is already on the **Premium** edition, and the help centre says SSO is available on Standard, Premium and Enterprise. You don't need to change anything.\n\nSSO is also one of your two setup steps still to do. The other is connecting an integration. To set up SSO (admins only):\n\n1. Go to **Admin settings \u2192 Security \u2192 Single sign-on**.\n2. Choose the type your identity provider uses: **SAML** or **OIDC**.\n3. For SAML, upload your identity provider's metadata file (XML). For OIDC, paste the client ID, client secret and issuer URL.\n4. Click **Test connection**. Relay will sign you in through your provider in a new window.\n5. When the test works, click **Enable for everyone**.\n\nKeep one admin account that signs in with a password until you know SSO works for your whole team. The guide says setup usually takes 10 to 15 minutes. You may need your IT team to provide the details in step 3.\n\nYou'll find this in the help centre article **\"Set up single sign-on (SSO)\"**. If the test fails, see **\"SSO connection test fails or users are locked out\"**.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-opus-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1871,
+   "inference_geo": "global",
+   "input_tokens": 2061,
+   "iterations": [
+    {
+     "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+     },
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 1871,
+     "input_tokens": 2061,
+     "model": null,
+     "output_tokens": 391,
+     "type": "message"
+    }
+   ],
+   "output_tokens": 391,
+   "output_tokens_details": {
+    "thinking_tokens": 6
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

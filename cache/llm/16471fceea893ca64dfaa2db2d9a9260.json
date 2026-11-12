@@ -1,0 +1,118 @@
+{
+ "role": "classifier",
+ "purpose": "classify mailbox",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You sort replies that arrived in a shared mailbox. Each one answers an email that the customer success team of Lumen Labs sent about its product, Relay. The input is a JSON list of replies, each with an id, a subject and a body. Routing rules act on your answer; you do not reply to anyone.\n\nFor each reply return:\n\n- id: the id you were given.\n- intent: the main thing the sender wants.\n  - out_of_office: an automatic reply saying the person is away\n  - unsubscribe: the person wants to stop receiving these emails\n  - left_company: the person no longer works there, or the mailbox is closed\n  - product_question: a question about how the product works\n  - buying_intent: wants more seats, a higher edition, another product, or pricing\n  - complaint: unhappy about the product or the service\n  - meeting_request: wants a call or a meeting\n  - other: none of the above\n- sentiment: positive, neutral or negative.\n- confidence: a number from 0 to 1. Use a low number when two intents fit about equally, or when the message is too short or vague to tell.\n- seats_requested: the number of seats asked for, as text, or an empty string.\n- edition_mentioned: the edition named (free, standard, premium, enterprise), or an empty string.\n- return_date: when the person says they are back, as written, or an empty string.\n- new_contact: the name of the person to contact instead, or an empty string.\n\nReplies can be in any language. Ignore quoted text from the original email and signatures. When a reply has two intents, choose the one that needs action first: a complaint outranks an unsubscribe, and buying intent outranks a product question.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"M000409\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Happy to chat. Do you have a calendar link?\\n\\n--\\nLisa Villarreal\\nOperations Lead | Brameth Logistics\\n\\nOn 05 Sep 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Lisa, here is the latest from the Relay team...\"}, {\"id\": \"M000410\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"hello team,\\n\\nwhere do i find the sso settings? our it team is asking.\\n\\nOn 05 Sep 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Bryan, here is the latest from the Relay team...\"}, {\"id\": \"M000411\", \"subject\": \"Undeliverable: Relay monthly: what is new\", \"body\": \"Delivery has failed: the recipient's mailbox is disabled.\"}, {\"id\": \"M000412\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hey,\\n\\nHi, Christopher moved on last month and I have picked up this inbox. I am not sure who looks after Relay for us now. What do you need?\\n\\nThanks,\\nChristopher\\n\\nOn 05 Sep 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Christopher, here is the latest from the Relay team...\"}, {\"id\": \"M000413\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hey,\\n\\nI would like to book a session with someone from your team. What times do you have?\\n\\n--\\nWilliam Bates\\nProject Manager | Halivo Builders\"}, {\"id\": \"M000414\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hello team,\\n\\nWe would like to add Relay Docs for the whole company. Who do I talk to?\\n\\nThanks,\\nCarrie\\n\\nOn 05 Sep 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Carrie, here is the latest from the Relay team...\"}, {\"id\": \"M000415\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hi,\\n\\nWe are paying for 25 seats and barely half are used because setup was so painful. I want to talk to someone about reducing our plan.\\n\\n--\\nMichael Montoya\\nHead of Product | Arvarro Finance\"}, {\"id\": \"M000416\", \"subject\": \"Undeliverable: Relay monthly: what is new\", \"body\": \"Kathryn Salazar no longer works at Halanda Retail. Please contact Jerry Hall instead.\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "intent": {
+        "type": "string",
+        "enum": [
+         "out_of_office",
+         "unsubscribe",
+         "left_company",
+         "product_question",
+         "buying_intent",
+         "complaint",
+         "meeting_request",
+         "other"
+        ]
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       },
+       "seats_requested": {
+        "type": "string"
+       },
+       "edition_mentioned": {
+        "type": "string"
+       },
+       "return_date": {
+        "type": "string"
+       },
+       "new_contact": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "intent",
+       "sentiment",
+       "confidence",
+       "seats_requested",
+       "edition_mentioned",
+       "return_date",
+       "new_contact"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6f6z7Js4nyJiqfqtay",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"M000409\",\"intent\":\"meeting_request\",\"sentiment\":\"positive\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000410\",\"intent\":\"product_question\",\"sentiment\":\"neutral\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000411\",\"intent\":\"left_company\",\"sentiment\":\"neutral\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000412\",\"intent\":\"left_company\",\"sentiment\":\"neutral\",\"confidence\":0.85,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000413\",\"intent\":\"meeting_request\",\"sentiment\":\"positive\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000414\",\"intent\":\"buying_intent\",\"sentiment\":\"positive\",\"confidence\":0.8,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000415\",\"intent\":\"complaint\",\"sentiment\":\"negative\",\"confidence\":0.75,\"seats_requested\":\"25\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000416\",\"intent\":\"left_company\",\"sentiment\":\"neutral\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"Jerry Hall\"}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1079,
+   "inference_geo": "global",
+   "input_tokens": 986,
+   "output_tokens": 556,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

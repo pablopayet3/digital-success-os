@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Pellessa Foods\", \"segment\": \"mid\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 2446, \"seats_licensed\": 28, \"seats_assigned\": 21, \"seats_assigned_30_days_ago\": 20, \"seat_utilisation_pct\": 75, \"monthly_active_users\": 16, \"automation_rules\": 14, \"automation_rule_limit\": 15, \"integrations\": 3, \"integration_limit\": 3, \"assist_credits_used_30d\": 395, \"assist_credits_included\": 280, \"health_score\": 87.9, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 10, \"days_to_renewal\": 59, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 40%: heavy Assist use, nearly all seats assigned, near the automation limit\", \"expansion_score_pct\": 40, \"expansion_reasons\": \"heavy Assist use, nearly all seats assigned, near the automation limit\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7Drm1jxeHiVE3GTffA",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Pellessa Foods has an expansion-ready signal, with an expansion likelihood of 40%, driven by heavy Assist use, seat assignment rising, and automation near its limit.\n\nEvidence: Assist credits used in the last 30 days were 395 against 280 included. Automation rules are at 14 of 15, and integrations are at the 3 of 3 limit. Seats assigned went from 20 to 21 over 30 days, with 21 of 28 licensed seats in use (75% utilisation).\n\nLikely need: The next edition (premium) looks more likely than more seats. Integrations are at their limit, automation is almost full, and Assist usage is well above what the standard edition includes. Seats have headroom, with 7 licensed seats still unassigned, so adding seats now would be premature.\n\nSuggested opener: \"Your team has been getting a lot out of Assist and automation, and you're close to the limits on your current plan, so I'd like to walk through what the next edition would give you.\"\n\nRisks: Renewal is 59 days away, and the expansion likelihood is only 40%. Monthly active users are 16 of the 21 assigned seats, so adoption is not complete. Health is green at 87.9, there are no open high-priority tickets, and the latest NPS is 10, so no clear risks beyond the renewal timing.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 726,
+   "output_tokens": 889,
+   "output_tokens_details": {
+    "thinking_tokens": 456
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

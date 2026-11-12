@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Haluvia Freight\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 745, \"seats_licensed\": 8, \"seats_assigned\": 6, \"seats_assigned_30_days_ago\": 6, \"seat_utilisation_pct\": 75, \"monthly_active_users\": 5, \"automation_rules\": 9, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 80, \"health_score\": 77.8, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 8, \"days_to_renewal\": 290, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"Can you send pricing for Premium? We are hitting the automation rule limit.\", \"expansion_score_pct\": 12, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, most seats active\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6gyWT9f1QXiabCGTZj",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: The customer asked for pricing on Premium and said they are hitting the automation rule limit. This is a buying-intent signal.\n\nEvidence: They have 9 automation rules against a limit of 15, and 5 monthly active users. Seats assigned are 6 of 8 licensed, unchanged from 30 days ago, and seat utilisation is 75.\n\nLikely need: Premium, since the customer asked for it directly. More seats are less likely, because 6 of 8 are assigned and that number has not moved in 30 days. The automation limit is the stated pain, but the data shows 9 of 15 rules in use, so confirm what they mean by hitting the limit before pitching.\n\nSuggested opener: \"You asked about Premium pricing, so I'd be glad to walk you through what changes, and whether the automation limit is the main thing you're running into.\"\n\nRisks: The expansion reason says nearly all seats are assigned, but the data shows 6 of 8, so don't lead with a seat-shortage story. The automation numbers (9 of 15) don't show a limit being hit, so the claim may be out of date or refer to something outside these facts. Health is green at 77.8, with 0 open high-priority tickets and an NPS of 8, and renewal is 290 days away, so no caution flags on those.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 710,
+   "output_tokens": 987,
+   "output_tokens_details": {
+    "thinking_tokens": 567
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

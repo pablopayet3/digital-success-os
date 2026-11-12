@@ -101,8 +101,16 @@ def converse(
             return hand_off(escalation, "hard_rule", customer_text)
         earlier_questions.append(customer_text)
 
-        # Step 3: the agent's turn.
-        messages.append({"role": "user", "content": customer_text})
+        # Step 3: the agent's turn. If the previous turn ended on tool results, the new
+        # message joins them, so the conversation still alternates customer and agent.
+        if (
+            messages
+            and messages[-1]["role"] == "user"
+            and isinstance(messages[-1]["content"], list)
+        ):
+            messages[-1]["content"].append({"type": "text", "text": customer_text})
+        else:
+            messages.append({"role": "user", "content": customer_text})
         searches_before = len(tools.searches)
         try:
             reply = _agent_turn(llm, system, messages, tools, result)
@@ -148,7 +156,14 @@ def converse(
 
 
 def _agent_turn(llm, system: str, messages: list, tools: AgentTools, result: Conversation) -> str:
-    """Let the model answer one customer message, running the tools it asks for."""
+    """Let the model answer one customer message, running the tools it asks for.
+
+    The reply is everything the model wrote for the customer during the turn, not only
+    its last message. The first live run showed two orders: the model logs the outcome
+    and then writes its answer, or writes its answer and logs the outcome in one step.
+    Both must deliver the answer.
+    """
+    said: list[str] = []
     for _ in range(MAX_TOOL_ROUNDS):
         response = llm.call(
             "agent", system, messages, tools=TOOL_DEFINITIONS, purpose="onboarding agent turn"
@@ -157,9 +172,12 @@ def _agent_turn(llm, system: str, messages: list, tools: AgentTools, result: Con
             raise LLMUnavailable("the model declined to answer")
         # The model's reply goes back into the conversation exactly as it came.
         messages.append({"role": "assistant", "content": response.content})
+        if response.text:
+            said.append(response.text)
         if not response.tool_calls:
-            return response.text
+            return "\n\n".join(said)
 
+        already_logged = tools.outcome is not None
         tool_results = []
         for call in response.tool_calls:
             result.tool_calls.append({"name": call["name"], "input": call["input"]})
@@ -169,7 +187,12 @@ def _agent_turn(llm, system: str, messages: list, tools: AgentTools, result: Con
             )
         messages.append({"role": "user", "content": tool_results})
         if tools.handoff:
-            return response.text  # the model handed off: the conversation ends here
+            return "\n\n".join(said)  # the model handed off: the conversation ends here
+        # Logging the outcome is the last thing the model does in a turn. If it has already
+        # written its answer, stop here: asking it again only produces a closing remark
+        # ("I've shown you how...") in place of the answer the customer is waiting for.
+        if tools.outcome is not None and not already_logged and said:
+            return "\n\n".join(said)
     raise ToolFailure("the agent kept calling tools without answering")
 
 

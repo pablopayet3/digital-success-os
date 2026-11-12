@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Lorium Partners\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1751, \"seats_licensed\": 19, \"seats_assigned\": 16, \"seats_assigned_30_days_ago\": null, \"seat_utilisation_pct\": 84, \"monthly_active_users\": 10, \"automation_rules\": 0, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 28, \"assist_credits_included\": 190, \"health_score\": 69.5, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 1, \"latest_nps_score\": null, \"days_to_renewal\": 341, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 38%: nearly all seats assigned, reads our emails, many high-priority tickets\", \"expansion_score_pct\": 38, \"expansion_reasons\": \"nearly all seats assigned, reads our emails, many high-priority tickets\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6qDkvhn2s1ND6yPZbR",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Expansion readiness fired on Lorium Partners at a 38% expansion likelihood, with almost all licensed seats assigned.\nEvidence: 16 of 19 seats are assigned (84% utilisation), and the account reads our emails. The trigger note also cites many high-priority tickets, but the data shows 1 open high-priority ticket.\nLikely need: More seats is the more likely need. Assignment is close to the licence limit, but only 10 monthly active users sit against 16 assigned seats, and automation rules (0 of 15) and integrations (0 of 3) are unused, so a move to Premium is a weaker case for now.\nSuggested opener: \"Hi, I noticed your team has nearly all of its 19 seats in use, so I wanted to check whether you're planning to bring more people on and whether the seat count still fits.\"\nRisks: Health is yellow at 69.5, there is 1 open high-priority ticket, and the account has only 10 monthly active users against 16 assigned seats, so adding seats before adoption improves could be a hard sell. Renewal is 341 days away, so there is no near-term deadline.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 725,
+   "output_tokens": 900,
+   "output_tokens_details": {
+    "thinking_tokens": 528
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -1,0 +1,52 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Yorium Finance\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 7, \"seats_assigned\": 7, \"seats_assigned_30_days_ago\": 7, \"seat_utilisation_pct\": 100, \"monthly_active_users\": 3, \"automation_rules\": 3, \"automation_rule_limit\": 5, \"integrations\": 2, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 70.8, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 9, \"days_to_renewal\": 194, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"7 of 7 seats assigned\", \"expansion_score_pct\": 32, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, free edition\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6qb8KGFoR48KYGEW3n",
+  "container": null,
+  "content": [
+   {
+    "text": "Signal: Seat pressure fired on Yorium Finance because all 7 licensed seats are assigned, and that has been true for 30 days with no change.\n\nEvidence: 7 of 7 seats assigned (seat utilisation 100%). Only 3 monthly active users, so the seats are full but not all heavily used. Automation rules are at 3 of 5, and integrations are at 2 of 2, which is the limit. The account is on the free edition with ARR of 0.\n\nLikely need: More seats, or a move to the standard edition, since the data points to a team that has run out of room on the free plan. The integration cap is already full, which makes an upgrade a more natural conversation than adding seats alone. The data does not show why the team has not used all its seats, so treat the 3 active users as a question to ask, not a conclusion.\n\nSuggested opener: \"Hi, I noticed all seven of your seats are now in use on Yorium Finance, and you're at the integration limit, so I wanted to check how the team is finding it and whether it would help to look at what the standard edition adds.\"\n\nRisks: No open high-priority tickets, health is green at 70.8, and the latest NPS is 9. Renewal is 194 days away. The main caution is that only 3 of 7 assigned seats are active monthly, so pushing for more seats before understanding usage could land badly.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 694,
+   "output_tokens": 433,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

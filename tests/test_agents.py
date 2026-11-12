@@ -94,7 +94,9 @@ def test_cost_comes_from_tokens_and_the_price_list(tmp_path):
 
 def test_models_come_from_config_and_only_the_agent_gets_the_stronger_one():
     roles = get_llm().config["roles"]
-    assert {role["model"] for name, role in roles.items() if name != "agent"} == {"claude-haiku-5-5"}
+    assert {role["model"] for name, role in roles.items() if name != "agent"} == {
+        "claude-haiku-5-5"
+    }
     assert roles["agent"]["model"] != "claude-haiku-5-5"
 
 
@@ -146,11 +148,17 @@ def test_the_classifier_catches_what_keywords_miss():
     upset = MessageSignals(frustration=0.9)
     assert check_message(calm_words, upset, []).reason_code == "frustration"
     wants_person = MessageSignals(asks_for_human=True)
-    assert check_message("Is anyone there?", wants_person, []).reason_code == "customer_asked_for_person"
+    assert (
+        check_message("Is anyone there?", wants_person, []).reason_code
+        == "customer_asked_for_person"
+    )
 
 
 def test_a_normal_setup_question_is_not_escalated():
-    assert check_message("Where do I set up single sign-on?", MessageSignals(topic="setup"), []) is None
+    assert (
+        check_message("Where do I set up single sign-on?", MessageSignals(topic="setup"), [])
+        is None
+    )
 
 
 def test_the_same_question_twice_is_escalated():
@@ -188,7 +196,9 @@ def test_a_pricing_question_goes_to_sales_and_the_agent_is_never_asked(account):
     assert conversation.escalation.queue == "sales"
     assert conversation.escalated_by == "hard_rule"
     assert conversation.customer_quote == lines[1]
-    assert "10 more seats" in conversation.summary and account["account_name"] in conversation.summary
+    assert (
+        "10 more seats" in conversation.summary and account["account_name"] in conversation.summary
+    )
     # the agent answered the first message only: the pricing message never reached it
     agent_requests = [r for r in fake_llm.calls[mark_before:] if r["tools"]]
     assert all(lines[1] not in json.dumps(r["messages"]) for r in agent_requests)
@@ -285,7 +295,9 @@ def verdict(intent: str, confidence: float = 0.9) -> dict:
 @pytest.fixture()
 def reachable(ctx) -> dict:
     """An account with at least one contact we may email."""
-    return next(a for a in ctx.accounts.values() if consent.emailable_contacts(ctx, a["account_id"]))
+    return next(
+        a for a in ctx.accounts.values() if consent.emailable_contacts(ctx, a["account_id"])
+    )
 
 
 def test_an_unsubscribe_reply_stops_email_at_once(ctx, reachable):
@@ -295,7 +307,9 @@ def test_an_unsubscribe_reply_stops_email_at_once(ctx, reachable):
     action, _ = mailbox.route(ctx, reply, verdict("unsubscribe"))
     assert action == "opted_out"
     assert not consent.can_email(ctx, contact)  # before the CRM has been updated
-    saved = ctx.store.one("SELECT * FROM consent_changes WHERE contact_id = :c", c=contact["contact_id"])
+    saved = ctx.store.one(
+        "SELECT * FROM consent_changes WHERE contact_id = :c", c=contact["contact_id"]
+    )
     assert saved["new_status"] == "opted_out" and saved["source"] == "mailbox_triage"
 
 
@@ -333,11 +347,17 @@ def test_a_contact_who_left_is_no_longer_emailed(ctx, reachable):
 def test_an_unsure_classification_goes_to_a_person(ctx, reachable):
     action, cta_id = mailbox.route(ctx, reply_for(ctx, reachable), verdict("buying_intent", 0.3))
     assert action == "human_review"
-    assert ctx.store.one("SELECT queue FROM ctas WHERE cta_id = :id", id=cta_id)["queue"] == "human_review"
+    assert (
+        ctx.store.one("SELECT queue FROM ctas WHERE cta_id = :id", id=cta_id)["queue"]
+        == "human_review"
+    )
 
 
 def test_out_of_office_replies_are_ignored(ctx, reachable):
-    assert mailbox.route(ctx, reply_for(ctx, reachable), verdict("out_of_office")) == ("ignored", None)
+    assert mailbox.route(ctx, reply_for(ctx, reachable), verdict("out_of_office")) == (
+        "ignored",
+        None,
+    )
     assert ctx.store.one("SELECT count(*) AS n FROM ctas")["n"] == 0
 
 
@@ -435,3 +455,39 @@ def test_play_specs_on_disk_match_the_configuration():
     for play_id, text in render_all().items():
         on_disk = (SPEC_DIR / f"{play_id}.md").read_text(encoding="utf-8")
         assert on_disk == text, f"docs/play-specs/{play_id}.md is out of date"
+
+
+def test_the_answer_written_before_logging_the_outcome_reaches_the_customer(account, tmp_path):
+    """Found by the first live run: the model writes its answer and logs the outcome in one
+    step. The customer must get that answer, not the closing remark that follows it."""
+    answer = "1. Go to Admin settings. 2. Choose Invite. 3. Upload the file."
+
+    def writes_then_logs(request):
+        last = request["messages"][-1]["content"]
+        if isinstance(last, str):  # the customer's message: answer and log in the same step
+            blocks = [
+                {"type": "text", "text": answer},
+                {"type": "tool_use", "id": "toolu_log", "name": "log_outcome",
+                 "input": {"outcome": "answered", "note": "Explained the bulk invite."}},
+            ]  # fmt: skip
+            return {"content": blocks, "stop_reason": "tool_use", "model": request["model"],
+                    "usage": {"input_tokens": 10, "output_tokens": 10}}  # fmt: skip
+        closing = [{"type": "text", "text": "I've shown you how to invite your team."}]
+        return {"content": closing, "stop_reason": "end_turn", "model": request["model"],
+                "usage": {"input_tokens": 10, "output_tokens": 10}}  # fmt: skip
+
+    shared = get_llm()
+    llm = fake_llm.fake_llm(tmp_path)
+    plain_fake = llm.transport
+    # The classifier keeps its normal stand-in; only the agent's turns are scripted here.
+    llm.transport = lambda request: (
+        writes_then_logs(request) if request["tools"] else plain_fake(request)
+    )
+    set_llm(llm)
+    try:
+        conversation = converse(account, scripted(["How do I add my team?", "And guests?"]))
+    finally:
+        set_llm(shared)
+    replies = [turn["text"] for turn in conversation.transcript if turn["role"] == "agent"]
+    assert replies[0] == answer
+    assert conversation.outcome == "resolved" and len(replies) == 2

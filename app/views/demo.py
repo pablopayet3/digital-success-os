@@ -74,8 +74,10 @@ with tab_chat:
             st.json(conversation.tool_calls)
             st.write("Help-centre searches (score, and whether an article covers the question)")
             st.json(conversation.searches)
+            models = sorted({c["model"] for c in conversation.llm_log if c["role"] == "agent"})
             st.caption(
-                f"Prompt {conversation.prompt_version}. Model calls: {len(conversation.llm_log)}."
+                f"Prompt {conversation.prompt_version}. Model calls: {len(conversation.llm_log)}. "
+                f"Agent replies written by: {', '.join(models) or 'no agent model (a hard rule stopped it first)'}."
             )
 
 with tab_day:

@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Garruvia Analytics\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1368, \"seats_licensed\": 15, \"seats_assigned\": 13, \"seats_assigned_30_days_ago\": 12, \"seat_utilisation_pct\": 87, \"monthly_active_users\": 10, \"automation_rules\": 9, \"automation_rule_limit\": 15, \"integrations\": 2, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 150, \"health_score\": 90.1, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 10, \"days_to_renewal\": 214, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 41%: nearly all seats assigned, near the automation limit, reads our emails\", \"expansion_score_pct\": 41, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, reads our emails\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx81Fo7gLLa4s9LJvBrF",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Garruvia Analytics has an expansion-ready signal with a 41% expansion likelihood. Nearly all licensed seats are now assigned.\n\nEvidence: 13 of 15 seats are assigned, up from 12 thirty days ago, and 9 of 15 automation rules are in use. Health is 90.1 (green) and NPS is 10.\n\nLikely need: More seats is the best-supported need, since assignment is at 87% and still rising. Premium is the next edition, but the data shows no premium-specific need: 0 of 150 included assist credits were used in the last 30 days, and only 2 of 3 integrations are in use.\n\nSuggested opener: \"I noticed your team has grown from 12 to 13 seats this month, so I wanted to check whether you're planning to add more seats soon and whether I can help you size that.\"\n\nRisks: Only 10 monthly active users against 13 assigned seats, and 0 assist credits used, so usage may not keep pace with more seats; confirm adoption before pitching growth. Renewal is 214 days away, and there are no open high-priority tickets.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 723,
+   "output_tokens": 978,
+   "output_tokens_details": {
+    "thinking_tokens": 619
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

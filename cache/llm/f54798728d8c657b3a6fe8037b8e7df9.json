@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.\n- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"Hi, I got your email. What should I do first? I haven't set up any boards yet.\"}, {\"role\": \"agent\", \"text\": \"Welcome! The best place to start is your **first board**. None of the four setup steps are done yet, and the board comes first.\\n\\n**To create your first board:**\\n1. Click **New board** on the home page.\\n2. Pick a template:\\n   - **Kanban**: a simple to-do, doing, done flow\\n   - **Sprint**: for teams that work in iterations\\n   - **Roadmap**: for planning by quarter\\n   - **Project plan**: for work with dates and owners\\n3. Add a few real cards. Give each one an owner and a due date.\\n4. Click **Share** to share the board with your team.\\n\\nA board with real work on it is the quickest way to get your colleagues using Relay.\\n\\n**After that, the next steps are:**\\n2. **Invite at least five people.** You have 4 of your 15 seats assigned so far.\\n3. **Connect an integration.** Chat or calendar are the easiest to start with.\\n4. **Set up single sign-on (SSO).** Your Standard edition includes it.\\n\\nYou can check your progress anytime under **Admin settings \u2192 Setup progress**. Do you want help choosing a template or with any of the next steps?\"}], \"articles\": [{\"title\": \"Get started with Relay Docs\", \"text\": \"# Get started with Relay Docs\\n\\nRelay Docs is a knowledge base next to your boards: meeting notes, wiki pages, how-to guides and decisions. Pages live in spaces, and every page can link to the cards it is about.\\n\\nIf your team keeps meeting notes or wiki pages in boards today, Docs gives you proper pages, a table of contents, search across everything, and page history. To start, an admin adds Relay Docs under Admin settings, Products. Then create a space, pick the Meeting notes or Wiki template, and move your first notes over.\\n\"}, {\"title\": \"Create your first board\", \"text\": \"# Create your first board\\n\\nA board holds the cards for one project or one team. To create one, click New board on the home page and pick a template: Kanban for a simple to-do, doing, done flow; Sprint for teams working in iterations; Roadmap for planning by quarter; Project plan for work with dates and owners.\\n\\nAdd a few cards, assign each to a person and give it a due date. Then share the board with your team from the Share button. A board with real work on it is the fastest way to get colleagues to start using Relay.\\n\"}, {\"title\": \"Setup checklist: the four steps to get started\", \"text\": \"# Setup checklist: the four steps to get started\\n\\nNew to Relay, or stuck on setup? These four steps get a workspace ready. Teams that finish them in the first weeks get far more out of Relay.\\n\\n1. Create your first board. Pick a template and add a few real cards. See \\\"Create your first board\\\".\\n2. Invite at least five people. Boards are only useful with your team on them. See \\\"Invite your team\\\" or \\\"Invite many users at once\\\".\\n3. Connect an integration. Chat or calendar are the quickest wins. See \\\"Connect an integration\\\".\\n4. Configure single sign-on (Standard, Premium and Enterprise). See \\\"Set up single sign-on (SSO)\\\".\\n\\nAdmins can see which steps are done under Admin settings, Setup progress. If you are not sure what to do next, start with the first step on this list that is not done yet.\\n\\nSearch keywords: getting started onboarding stuck setup next step what should I do begin start first steps\\n\"}], \"account_facts\": {\"setup_status\": {\"completed_steps\": [], \"missing_steps\": [\"create a first board\", \"invite at least five users\", \"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.0, \"seats_assigned\": 4, \"seats_licensed\": 15, \"edition\": \"standard\"}, \"account_context\": {\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 4, \"utilisation\": 0.27, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.0, \"missing_steps\": [\"create a first board\", \"invite at least five users\", \"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}}}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx5SgHNAqS7KBRAsNPx7",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\": \"pass\", \"score\": 4, \"reason\": \"All four points hold: the board steps, template names, SSO-in-Standard and the 4-of-15 seat count match the articles and account_facts, and the reply gives a clear next action, with only a small clarity weakness from the numbering jumping from 1 to 2-4 across two lists.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 782
+   },
+   "cache_creation_input_tokens": 782,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 1696,
+   "output_tokens": 472,
+   "output_tokens_details": {
+    "thinking_tokens": 358
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

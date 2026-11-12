@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Halivo Builders\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 2088, \"seats_licensed\": 25, \"seats_assigned\": 24, \"seats_assigned_30_days_ago\": 24, \"seat_utilisation_pct\": 96, \"monthly_active_users\": 10, \"automation_rules\": 5, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 250, \"health_score\": 73.6, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 8, \"days_to_renewal\": 196, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"Hi there, Before our renewal I would like to understand what Enterprise would give us compared with what we have. On 18 Sep 2026, Lumen Labs Success <success@lumenlabs.example> wrote: > Live session: automation rules in 30 minutes > Hi Randy, here is the latest from the Relay team...\", \"expansion_score_pct\": 37, \"expansion_reasons\": \"nearly all seats assigned, creating few boards, near the automation limit\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6jmQXhHuaxNd58wiCy",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Halivo Builders has shown buying intent. Their contact wrote before renewal asking what Enterprise would offer compared with their current plan.\n\nEvidence: 24 of 25 licensed seats are assigned (96% utilisation), unchanged from 30 days ago, but only 10 monthly active users. Automation rules are at 5 of 15, and integrations are at 0 of 3. Health is 73.6 (green), with 0 open high-priority tickets and an NPS of 8.\n\nLikely need: The enquiry is about comparing editions, so the next step is probably the upgrade conversation rather than more seats. The fact sheet names premium as the next edition, but the customer wrote about Enterprise, so confirm which tier they mean before you quote anything. The seat count is nearly full, but only 10 of 24 assigned users are active, so extra seats are not clearly needed yet. The expansion reasons say the account is \"near the automation limit,\" but 5 of 15 rules is well below the limit, so do not lean on that point.\n\nSuggested opener: \"Thanks for asking about Enterprise. Before we compare, I'd like to understand which team workflows you want to cover so I can show you what fits.\"\n\nRisks: Only 10 of 24 assigned seats are active, which weakens any case for more seats. The expansion reason about the automation limit conflicts with the data. Renewal is 196 days away, so there is no urgency. Health is green, there are no open high-priority tickets, and NPS is 8, so no obvious blockers are visible.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 791,
+   "output_tokens": 1020,
+   "output_tokens_details": {
+    "thinking_tokens": 520
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

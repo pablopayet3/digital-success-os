@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Hestolo Travel\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 10, \"seats_assigned\": 8, \"seats_assigned_30_days_ago\": 7, \"seat_utilisation_pct\": 80, \"monthly_active_users\": 7, \"automation_rules\": 5, \"automation_rule_limit\": 5, \"integrations\": 2, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 92.2, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 9, \"days_to_renewal\": 82, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 41%: nearly all seats assigned, near the automation limit, most seats active\", \"expansion_score_pct\": 41, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, most seats active\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx8Gd7gaWWaUzeG2NE1y",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Hestolo Travel's expansion score fired at 41%, based on seat growth, a fully used automation allowance, and most seats being active.\n\nEvidence: 8 of 10 seats are assigned, up from 7 thirty days ago, and 7 users are active monthly. The account has used all 5 of its automation rules and both of its integrations, which are its limits on the Free edition.\n\nLikely need: The most likely need is the Standard edition, since automation and integrations are both at their Free limits, and the account is still growing into its seats. The data does not show Standard's limits, so confirm those before promising more capacity. Two seats remain unassigned, so more seats may not be needed yet.\n\nSuggested opener: \"Hi, I noticed your team has been growing and has reached the automation and integration limits on Free, so I'd like to show you what Standard would add before your renewal.\"\n\nRisks: The renewal is 82 days away, and the account is on Free with an ARR of 0, so the commercial stakes are still unclear. The expansion score is 41%, which is moderate rather than strong. No open high-priority tickets, the health score is 92.2 (green), and the latest NPS is 9.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 718,
+   "output_tokens": 929,
+   "output_tokens_details": {
+    "thinking_tokens": 548
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

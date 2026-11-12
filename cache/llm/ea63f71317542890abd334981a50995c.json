@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T003432\", \"text\": \"Boards are very slow to load. Hi, Since last week our larger boards take more than ten seconds to load. Thanks in advance.\\n\\nAmber\"}, {\"id\": \"T003433\", \"text\": \"QUESTION ABOUT RENEWAL. I am honestly fed up. Our renewal is coming up and we want to understand our options before it goes through. Frankly we are considering cancelling.\\n\\nKaitlyn\"}, {\"id\": \"T003434\", \"text\": \"Cannot remove a former employee. We are paying for this product and it does not work. Someone left our company and I cannot find how to deactivate their seat. Frankly we are considering cancelling.\\n\\nDerrick\"}, {\"id\": \"T003435\", \"text\": \"Search times out. I am honestly fed up. Searching across Relay Docs often times out for our team in the afternoon. This is blocking the whole team.\\n\\nDawn\"}, {\"id\": \"T003436\", \"text\": \"CHAT INTEGRATION KEEPS DISCONNECTING. I am honestly fed up. The chat integration disconnects every few days and we have to authorise it again. This is blocking the whole team.\\n\\nBradley\"}, {\"id\": \"T003440\", \"text\": \"Charged for seats we do not use. Hi team, Our last invoice shows more seats than we have people. Can you explain the charge? Any help appreciated.\\n\\nChristina\"}, {\"id\": \"T003441\", \"text\": \"SSO connection test fails. I am honestly fed up. We are trying to set up single sign-on and the connection test fails at the last step with a certificate error. If this is not fixed this week we will look at alternatives.\\n\\nMichelle\"}, {\"id\": \"T003445\", \"text\": \"Hit the automation rule limit. I am honestly fed up. We tried to add a new rule and got a message saying we reached the limit for our plan. I need someone to call me today.\\n\\nStephen\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7ezSKhmwHjzt87V6C4",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\": [{\"id\": \"T003432\", \"sentiment\": \"negative\", \"theme\": \"performance\", \"confidence\": 0.9}, {\"id\": \"T003433\", \"sentiment\": \"negative\", \"theme\": \"pricing\", \"confidence\": 0.8}, {\"id\": \"T003434\", \"sentiment\": \"negative\", \"theme\": \"usability\", \"confidence\": 0.8}, {\"id\": \"T003435\", \"sentiment\": \"negative\", \"theme\": \"performance\", \"confidence\": 0.9}, {\"id\": \"T003436\", \"sentiment\": \"negative\", \"theme\": \"performance\", \"confidence\": 0.9}, {\"id\": \"T003440\", \"sentiment\": \"neutral\", \"theme\": \"pricing\", \"confidence\": 0.85}, {\"id\": \"T003441\", \"sentiment\": \"negative\", \"theme\": \"setup\", \"confidence\": 0.9}, {\"id\": \"T003445\", \"sentiment\": \"negative\", \"theme\": \"pricing\", \"confidence\": 0.8}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 642,
+   "output_tokens": 316,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

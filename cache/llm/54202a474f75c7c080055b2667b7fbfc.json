@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Yoranda Studios\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1843, \"seats_licensed\": 20, \"seats_assigned\": 12, \"seats_assigned_30_days_ago\": 1, \"seat_utilisation_pct\": 60, \"monthly_active_users\": 11, \"automation_rules\": 2, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 200, \"health_score\": 83.8, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 335, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 42%: seats growing, reads our emails, most seats active\", \"expansion_score_pct\": 42, \"expansion_reasons\": \"seats growing, reads our emails, most seats active\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7yLuPTyX3iFjBZYKLa",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Yoranda Studios's expansion score is 42%, driven by seat growth, email engagement, and high seat activity.\n\nEvidence: Assigned seats rose from 1 to 12 in 30 days, against 20 licensed. 11 monthly active users. Health is green at 83.8.\n\nLikely need: More seats aren't the immediate need, since 8 licensed seats are still unassigned. The more likely next step is helping the team get value from the seats they have. Premium is a possible later conversation, but the data doesn't show a need for it yet: only 2 of 15 automation rules are used, 0 of 3 integrations are connected, and 0 of 200 included assist credits have been used.\n\nSuggested opener: \"Your team has gone from 1 to 12 seats in the last 30 days, so I wanted to check how things are going and whether there's anything that would help as more people join.\"\n\nRisks: Automation, integrations, and assist credits are unused, so a premium pitch may not land yet. Renewal is 335 days away, so there is no time pressure. No open high-priority tickets. NPS is not recorded.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 707,
+   "output_tokens": 946,
+   "output_tokens_details": {
+    "thinking_tokens": 587
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

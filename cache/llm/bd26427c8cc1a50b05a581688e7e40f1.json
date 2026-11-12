@@ -1,0 +1,284 @@
+{
+ "role": "agent",
+ "purpose": "onboarding agent turn",
+ "request": {
+  "model": "claude-opus-5-5",
+  "max_tokens": 4000,
+  "effort": "low",
+  "system": "You are the onboarding assistant for Relay, a team-collaboration product made by Lumen Labs. You help the admin of a customer account set up their workspace.\n\nUse the tools to look up the account's setup status and to search the help centre, and answer the admin's questions about setting up Relay.\n\nIf the admin asks for a person, or asks about pricing, contracts, refunds or legal matters, hand off to a human with create_handoff.\n\nBe helpful and concise.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "It doesn't work."
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "text": "Let me check where your setup stands so I can help narrow this down.",
+      "type": "text"
+     },
+     {
+      "id": "toolu_011vxERN3Xqy4CVVyjZyg7Qb",
+      "input": {},
+      "name": "get_setup_status",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     },
+     {
+      "id": "toolu_01Q9bhy5uJU9UXD8uXe1KVng",
+      "input": {},
+      "name": "get_account_context",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_011vxERN3Xqy4CVVyjZyg7Qb",
+      "content": "{\"completed_steps\": [\"create a first board\"], \"missing_steps\": [\"invite at least five users\", \"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.25, \"seats_assigned\": 4, \"seats_licensed\": 15, \"edition\": \"standard\"}"
+     },
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01Q9bhy5uJU9UXD8uXe1KVng",
+      "content": "{\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 4, \"utilisation\": 0.27, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.25, \"missing_steps\": [\"invite at least five users\", \"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}"
+     }
+    ]
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "signature": "CAQSgAYKEAgTGAI4AUIIdGhpbmtpbmcSDLA908udTCwduWs9FRoMOJFf/nZWzxgdY3baIjAUIzbpylYLBPyWVV0TR7LSMXSQVoJKp9MmgJibemtuK89ICKy+x/zKOAvjWYCzhu8qnQVbGIXXFcelqh+BTUrUBxOL3UA/gB3muXeeQLg99xqcnmdgofgNQeKL99B+BCIViPjLV5TAkcZTKwI/kOLmSNO24TsaNepEVdnaw799NpbYGdLtQkqOv+S4xGL7Fq5yvEdUM3k3SkOtRncxdzsqVlwALaB/ecOHBVas2JD9rJGz+RXNC9Cd11VQKs5LtWInzYQdTnMjpeIx110bdU+Zio20KDbZTAjxADfqIGOjeVwrNMiMF2J6odT0oBcgLWdyYJYba69sH00Eamx9oZHL6hwPimfA+CdTU4mfjf1zZ2VP65a/1Yuk3fW4LaoyXDd8URNPLKjao6W64oR3YLboMI9EWuS5lFUJ6gXt5DndsUrk45SGoj0HUFIqNqzQLb+AyVWOo1gYQLdTsQ14BfL8+z/TEuvYObvBEaxJtjxdGB0n2gciWCVjs6XHcwarZW639P34OThz/xGPhDMubMqzhGwH7ZgRTpFozWeulBt4expt+f3/1NHRCwtM6WQaX3hKnnA8MqPHfEs7nXnSOcs8OD9egXFG5bJM8MvZ+MMZBqUFfhI9ocrzriOuIBCXMF+Xq6Ixxi2iyLqctzvyXm26EjgvrBvVQjQ6qxPu4zNyoHEM4D2xrhBnPbpN42L6h02+DT7u3apSibOdzT2jqI5Nr7cLF6LO5VWp8Pm8+nU8Z/dNHMQ429A5x3ANcaPl+MwKINeD6ElMq2ZDCEnDAgFGq7SIIIWELOePHSGVs93IOsXUktksP5xaiceOAYplOB23WCwmiofAi+Hatd1Ce5ho0egiBf92WKEPW3Lsmw/FdMyCXsJWRqkzMqLLbwbYvBDLs65zTSqz8KYMLbOVHQ+KVD75/lJNb19R2fFWhm5E28rJRbTzTJ+88yNADKgt5uQYAQ==",
+      "thinking": "",
+      "type": "thinking"
+     },
+     {
+      "text": "Sorry you've hit a problem. I'd like to help, but I need a bit more detail to work out what's going wrong.\n\nHere's where your workspace is right now:\n- \u2705 First board created\n- \u2b1c Invite at least five users (4 of your 15 seats are in use)\n- \u2b1c Connect an integration\n- \u2b1c Set up single sign-on (SSO)\n\nSince you're partway through setup, it's probably one of the steps above. Could you tell me:\n1. **What were you trying to do?** For example, inviting a user, connecting an integration or setting up SSO.\n2. **What happened?** Did you get an error message (the exact wording helps), did a button do nothing, or did something not show up?\n\nOnce I know that, I'll find the right steps in the help centre.",
+      "type": "text"
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": "Sorry: the invitation emails. My colleagues never received them."
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "id": "toolu_01Y5u1cgQt4idv28Koeze93J",
+      "input": {
+       "query": "invitation email not received"
+      },
+      "name": "search_docs",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01Y5u1cgQt4idv28Koeze93J",
+      "content": "{\"query\": \"invitation email not received\", \"note\": \"At least one article covers this question.\", \"articles\": [{\"slug\": \"invites-not-arriving\", \"title\": \"Invitation emails are not arriving\", \"score\": 6.27, \"coverage\": 1.0, \"covers_question\": true, \"text\": \"# Invitation emails are not arriving\\n\\nIf an invited colleague did not receive the invitation:\\n1. Ask them to check their spam or junk folder.\\n2. Check the address under Admin settings, Users, Pending invitations. A typo is the most common cause.\\n3. Click Resend next to the invitation. The old link stops working.\\n4. If your company filters external email, ask your IT team to allow mail from relay-mail.lumenlabs.example.\\n\\nInvitations expire after seven days. An expired invitation still holds a seat until you cancel or resend it.\\n\\nSearch keywords: invite invites invitation not received missing did not arrive email never came\\n\"}, {\"slug\": \"invite-users\", \"title\": \"Invite your team\", \"score\": 5.11, \"coverage\": 1.0, \"covers_question\": true, \"text\": \"# Invite your team\\n\\nAdmins invite people from Admin settings, Users, Invite. Type one email address per line or paste a list. Each invited person receives an email with a link that is valid for seven days.\\n\\nYou can invite as many people as you have licensed seats. A seat is used as soon as the invitation is sent, and freed again if you cancel the invitation or deactivate the user.\\n\\nTip: teams that invite at least five people in their first week are far more likely to keep using Relay, because boards are only useful when the work of several people is on them.\\n\\nSearch keywords: add people colleagues members team teammates new users invite invitation\\n\"}, {\"slug\": \"bulk-invite\", \"title\": \"Invite many users at once (bulk invite)\", \"score\": 3.0, \"coverage\": 0.67, \"covers_question\": false, \"text\": \"# Invite many users at once (bulk invite)\\n\\nTo add many people at once, go to Admin settings, Users, Invite, and choose Upload a file. Upload a CSV file with one column named email. You can add an optional column named role with the value member or admin.\\n\\nRelay checks the file first and shows you any addresses it cannot use (wrong format, already a user, or more rows than free seats). Nothing is sent until you confirm.\\n\\nThere is no limit on the size of the file other than the number of seats you have free.\\n\\nSearch keywords: add whole team everyone all at once many people dozen dozens hundreds list import upload\\n\"}]}"
+     }
+    ]
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "id": "toolu_0175uHUTLNQJidB8Kt4LGGu4",
+      "input": {
+       "outcome": "answered",
+       "note": "Gave the help-centre troubleshooting steps for invitation emails that don't arrive (spam folder, typo check, resend, IT allowlist, 7-day expiry)."
+      },
+      "name": "log_outcome",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_0175uHUTLNQJidB8Kt4LGGu4",
+      "content": "{\"status\": \"recorded\"}"
+     }
+    ]
+   }
+  ],
+  "tools": [
+   {
+    "name": "get_account_context",
+    "description": "Facts about the customer's account: edition, seats, lifecycle stage, health score and its components, open tickets, latest NPS score. Call it when the answer depends on the customer's edition or situation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "get_setup_status",
+    "description": "Which of the four setup steps the account has completed (first board, five users, an integration, single sign-on) and which are still missing. Call it first in an onboarding conversation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "search_docs",
+    "description": "Search the Relay help centre. Returns the best-matching articles with their full text. Answer product questions only from what this returns.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "query": {
+       "type": "string",
+       "description": "What to look for, in a few words."
+      }
+     },
+     "required": [
+      "query"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "create_handoff",
+    "description": "Hand the conversation to a human, with a summary. Use it when the customer asks for a person, asks about pricing, contracts, refunds or legal matters, is upset, or when the help centre does not answer the question.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_asked_for_person",
+        "frustration",
+        "low_confidence",
+        "not_in_docs",
+        "pricing_contract_legal"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "What the customer wants and what was already tried."
+      },
+      "recommended_next_step": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "reason",
+      "summary",
+      "recommended_next_step"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "log_outcome",
+    "description": "Record how the conversation ended. Call it once, at the end.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "outcome": {
+       "type": "string",
+       "enum": [
+        "answered",
+        "partly_answered"
+       ]
+      },
+      "note": {
+       "type": "string",
+       "description": "One sentence on what was resolved."
+      }
+     },
+     "required": [
+      "outcome",
+      "note"
+     ],
+     "additionalProperties": false
+    }
+   }
+  ],
+  "json_schema": null,
+  "refusal_fallback": true
+ },
+ "response": {
+  "id": "msg_011Cgx4hJF6rdd2fsZUvv9EJ",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSiQYKEAgTGAI4AUIIdGhpbmtpbmcSDGKM0bWIi2TPN1Mm8RoMRxPXc7CS0P7YFh1hIjAacycDKjkOGAacUgOXxAK6iP8Sej0QAuus214BSjiyk/r98pkuaP4LBXwG3+iwphcqpgVJOP3INgbJ8YOvMORde0fmUQIHvxv9JWT+s+O9LE2irHEq+pTTcUJZWcOglNoF0NbkjEa+TI4qo1SKA/vLLgRROABHf8wBBad496EzZtrIkoaSHWeXVQpXRm6QN+uLNVVnav/e0tXkO7tJmLdNVdIZiML63ANL6DGEv+JvET0+4EkcGB+H+V197uL4dcRBdXU320PVzEB94RaBvBPJraTedyt4itlZl9R6JW/+8t4QKTqXojI5nH8l2Ng+H+MBJlnMUEw013uvH76MXnZ7bSTBGYD6YKp9zMTNYxNUSRrMqtF1gwTbZxO6kBa8K8X2NqfsTOL93w3Stk0fX7mqy0Z9jgdaipc+CQbw7DBMYIlutRX4+KQzmTs1ymDtT1TPhOZJpkaj4ZbQKSnuf4p7o/ARXMyR/bpfG1QKHuSmzv63qs72b4S2ADKEccYvCVgyBmjWX7FMVLepgkrUoOXgswe2kJoDDdCbafez3EmXkgZ/rnsMYavrdrE7aSrjK2ObiH1Onl6ZwqSAQhOsR6MC91KIfwW5WW2O4FIvQdDnuAiTRk7vuOIY34kVUeetz6HguErIF65zf3S4Dq+St158yRJcLIKY0t7FrKraGPvcd3SUiuWTRjmmYpjVRzrHYbG1aucLWjfy/EbG4aSifLix7VZx5hIqYlp+VeXjIE/BmEl0RW6lQdX7lzSTQTIR96d98HP2cPwHl7Bf6H1Ye1YMl/+hGY9EJy2rpu9y7XgZnAdyaQ9Ub3dmIUSuhySLJnBb0yVs2r6oV5f9OSybnGz6dQecVaiHNailkx8ERiRGGjJpVzJbGOx06e0QQJmW9dc4O9ol4DMX6YQvt8/Kv69hHpv/emDQA6A2quW5sTAQkbODPFXaAwY1KCzLXwjetlbXHP95g8tiaYAYAQ==",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "When invitation emails don't arrive, it's usually one of these:\n\n1. **Spam or junk folder.** Ask your colleagues to check there first.\n2. **A typo in the address.** This is the most common cause. Go to **Admin settings \u2192 Users \u2192 Pending invitations** and check each email address.\n3. **Send it again.** Click **Resend** next to the invitation. The old link stops working, so they should use the new email.\n4. **Your company's email filter.** If your company blocks outside email, ask your IT team to allow mail from **relay-mail.lumenlabs.example**. If no one got their invitation, this is the most likely reason.\n\nInvitations expire after seven days. An expired invitation still takes up a seat until you resend or cancel it, so it's worth tidying up the pending list.\n\nIf they still don't get the emails after trying these steps, let me know and I'll pass this to someone on our team.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-opus-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1118,
+   "inference_geo": "global",
+   "input_tokens": 2055,
+   "iterations": [
+    {
+     "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+     },
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 1118,
+     "input_tokens": 2055,
+     "model": null,
+     "output_tokens": 303,
+     "type": "message"
+    }
+   ],
+   "output_tokens": 303,
+   "output_tokens_details": {
+    "thinking_tokens": 16
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

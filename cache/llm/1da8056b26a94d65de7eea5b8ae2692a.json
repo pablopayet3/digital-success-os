@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Fenenta Health\", \"segment\": \"mid\", \"edition\": \"premium\", \"next_edition\": \"enterprise\", \"arr\": 14742, \"seats_licensed\": 90, \"seats_assigned\": 82, \"seats_assigned_30_days_ago\": 74, \"seat_utilisation_pct\": 91, \"monthly_active_users\": 65, \"automation_rules\": 59, \"automation_rule_limit\": 60, \"integrations\": 2, \"integration_limit\": 10, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 3600, \"health_score\": 87.1, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 10, \"days_to_renewal\": 251, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"82 of 90 seats assigned\", \"expansion_score_pct\": 40, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, most seats active\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx8NXzGkxCyYA3mbFh1P",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Seat pressure. Fenenta Health has assigned nearly all of its licensed seats, and the count is rising.\n\nEvidence: 82 of 90 seats are assigned, up from 74 thirty days ago, for 91% utilisation. Automation rules stand at 59 against a limit of 60. Health is green at 87.1 with an NPS of 10.\n\nLikely need: More seats on the current premium plan are the most direct need, since the seat count is almost full and still climbing. The automation rules at 59 of 60 suggest they may also need headroom on automation, which points toward asking whether enterprise fits their growth, but the data does not confirm that.\n\nSuggested opener: \"Fenenta's team has grown quickly on Lumen Labs, and I'd like to make sure you have the seats and room you need as you keep expanding. Could we look at options together?\"\n\nRisks: Only 65 monthly active users against 82 assigned seats, so some assigned seats may not be in active use, and a seat expansion may get pushback on that. Assist credits show 0 used against 3600 included, so an assist-based pitch will not land. Renewal is 251 days away, so there is no urgency.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 700,
+   "output_tokens": 759,
+   "output_tokens_details": {
+    "thinking_tokens": 375
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

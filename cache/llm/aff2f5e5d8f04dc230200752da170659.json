@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Ravavo Media\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1253, \"seats_licensed\": 15, \"seats_assigned\": 10, \"seats_assigned_30_days_ago\": 10, \"seat_utilisation_pct\": 67, \"monthly_active_users\": 5, \"automation_rules\": 1, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 107, \"assist_credits_included\": 150, \"health_score\": 79.4, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 10, \"days_to_renewal\": 274, \"trigger_signal\": \"edition_fit\", \"trigger_evidence\": \"Used 135 of 150 included Assist credits in 30 days\", \"expansion_score_pct\": 18, \"expansion_reasons\": \"heavy Assist use, nearly all seats assigned, reads our emails\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7Pns98HCoiEF4Czyed",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Ravavo Media's Assist usage has triggered an edition-fit signal, which suggests the Standard edition may be too small for how they use Assist.\n\nEvidence: The account used 107 of 150 included Assist credits in the last 30 days. Only 10 of 15 licensed seats are assigned (67%), and 5 monthly active users. Automation is at 1 of 15 rules and integrations at 0 of 3. The trigger text says 135 credits were used, which conflicts with the 107 figure, so check which is correct before quoting either.\n\nLikely need: The Premium edition, not more seats. Assist is the only limit under pressure, and seats and other limits have plenty of room. Expansion score is 18%.\n\nSuggested opener: \"I noticed your team has been making heavy use of Assist this month, and I wanted to check whether the current plan still fits how you're working.\"\n\nRisks: Only 5 of 10 assigned seats are active, and the expansion reasons say \"nearly all seats assigned,\" which doesn't match the 10 of 15 in the data. Health is green at 79.4, with no open high-priority tickets, NPS of 10, and renewal 274 days away, so none of these argue strongly for caution.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 707,
+   "output_tokens": 1001,
+   "output_tokens_details": {
+    "thinking_tokens": 604
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

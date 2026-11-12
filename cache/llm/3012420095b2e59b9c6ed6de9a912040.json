@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to answer from.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every step, limit or feature the assistant states can be found in the articles. Anything stated that is not in the articles is a failure, even if it happens to be true.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"Hi, I got your email. What should I do first? I haven't set up any boards yet.\"}, {\"role\": \"agent\", \"text\": \"Welcome! The best place to start is your **first board**. None of the four setup steps are done yet, and the board comes first.\\n\\n**To create your first board:**\\n1. Click **New board** on the home page.\\n2. Pick a template:\\n   - **Kanban**: a simple to-do, doing, done flow\\n   - **Sprint**: for teams that work in iterations\\n   - **Roadmap**: for planning by quarter\\n   - **Project plan**: for work with dates and owners\\n3. Add a few real cards. Give each one an owner and a due date.\\n4. Click **Share** to share the board with your team.\\n\\nA board with real work on it is the quickest way to get your colleagues using Relay.\\n\\n**After that, the next steps are:**\\n2. **Invite at least five people.** You have 4 of your 15 seats assigned so far.\\n3. **Connect an integration.** Chat or calendar are the easiest to start with.\\n4. **Set up single sign-on (SSO).** Your Standard edition includes it.\\n\\nYou can check your progress anytime under **Admin settings \u2192 Setup progress**. Do you want help choosing a template or with any of the next steps?\"}], \"articles\": [{\"title\": \"Get started with Relay Docs\", \"text\": \"# Get started with Relay Docs\\n\\nRelay Docs is a knowledge base next to your boards: meeting notes, wiki pages, how-to guides and decisions. Pages live in spaces, and every page can link to the cards it is about.\\n\\nIf your team keeps meeting notes or wiki pages in boards today, Docs gives you proper pages, a table of contents, search across everything, and page history. To start, an admin adds Relay Docs under Admin settings, Products. Then create a space, pick the Meeting notes or Wiki template, and move your first notes over.\\n\"}, {\"title\": \"Create your first board\", \"text\": \"# Create your first board\\n\\nA board holds the cards for one project or one team. To create one, click New board on the home page and pick a template: Kanban for a simple to-do, doing, done flow; Sprint for teams working in iterations; Roadmap for planning by quarter; Project plan for work with dates and owners.\\n\\nAdd a few cards, assign each to a person and give it a due date. Then share the board with your team from the Share button. A board with real work on it is the fastest way to get colleagues to start using Relay.\\n\"}, {\"title\": \"Setup checklist: the four steps to get started\", \"text\": \"# Setup checklist: the four steps to get started\\n\\nNew to Relay, or stuck on setup? These four steps get a workspace ready. Teams that finish them in the first weeks get far more out of Relay.\\n\\n1. Create your first board. Pick a template and add a few real cards. See \\\"Create your first board\\\".\\n2. Invite at least five people. Boards are only useful with your team on them. See \\\"Invite your team\\\" or \\\"Invite many users at once\\\".\\n3. Connect an integration. Chat or calendar are the quickest wins. See \\\"Connect an integration\\\".\\n4. Configure single sign-on (Standard, Premium and Enterprise). See \\\"Set up single sign-on (SSO)\\\".\\n\\nAdmins can see which steps are done under Admin settings, Setup progress. If you are not sure what to do next, start with the first step on this list that is not done yet.\\n\\nSearch keywords: getting started onboarding stuck setup next step what should I do begin start first steps\\n\"}]}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx4Yw1S2x62oVFDz5oXR",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSrwkKEAgTGAI4AUIIdGhpbmtpbmcSDJDkkp/EB6v6KrYWNRoMcJLFaAvUgTVboC3qIjAt8mGVOY0QkOeaMnWbPxYoF45X7DHHGEEzsw7NLro2/dnmqMUPZBjZjekOKCpkyRYqzAg4Vu3icWhPu2GjU33g3J4RAq2LaGxF08r7wkJqW2F2M4hdputJeCVcdVsxNMf1dU7rTnh/Z/8GNUVDogMeqy1+m5geyAKS1XNsOqSJb8K+fdp+c66CJNwH92f76xWJbK/GiLtca3qyzHa6mXl2YjKFp/x1UctwCZ4gipUHjbVYVGINDJhObmfWLWGXNgGVYAxVBXkE9Ft+53dg/VTjqfV4tkYthsmiUcoospJLYdiHRayEus6jgSApCQiB4sTktuF4o40hxAdt42J/N9U+gwIz2a3A1Bk+ErYWSDVwzH7B2PTKGh4KXc9kpX3+tr8eXHsdcyHUEUCr6RmZMn8H6v4QOmq8ilxgiwlx9XtanJfxvqsypAWhmfSnCgbFuXPSCRlHuzmL/oeBPLkzoKpGP9PeLTq2OJwcZWS1p7qdfmclEaSQJnqqe5pyLRt91zfRhX01cPxdY4UHos6rswrsHTNH0n3JYXmQsb46q7GWfmCs4inA8bL9iQu2L1+bssgwLIWdW10jXssuEBfr5B24/hLOunwXu3yhdvriTNdHLU1zb6hrfZMshXRnqn6TljTcuXNhu5ycVqDD6NlwauOZVIkOAGbAwtFpoSFMyipRFqxwhaPZR7tTiFQ4OCmQhTMtrrg5twAtb3+FA1LsNUHnDDhpTqxKeJf4ot0ui5cpHSiZuX6dqSLmq1up/bdeQB5KdohwmEbZwGVe/I+JOhJbXiFV9HDDWT1jCzTTUvq8hLO6oB0+7sjQLrBjeDZl0biPp3hZKXBBWdo9Ie6AtOBA/FqrxRfb1juSqqF3sWHJQrRYC9ylVR+p5MXwlhCV+oItstIWAkAW5UELugE/XBMafkQ6SZ/e6oVr6nhwkPF7G3P/ZCEOMSdCaMlSI26dabFE4zBcGlmkD7xkC4VmLdT3INgD1lX43171x5W/oGwDkDPfWuGUEYNbsxoIB73D//DO4jirMKxKUPnBECplCxloWUnBrawGSSJ3+Jx0zMYCb4YWd0FOtCRidiqCDjJja13nZHH68VU+0QmUfeq9aJdcYemUgNEzP4/Jh4IfN4ysJFI7c7k4L4AJGwgP6OiCYIFsX9LSn1Oa6y/qe6m79JzCbJ1kWkAmeJq8Yj/v+mbNVr4+d0U3N/xpHNANRmPxbcbot0ganc8u8ycq7wBeEI3rkSX0dQC9IXPO2Vio8Kr7UtFICRJr8dIOeaVDbNtGM3VJvB3l2TCwSRP7+y65ZICPrmRWvV4qoCIRjTuLtKfdk4KLsopIBBzm+c6T2QcvmnntO0xmmNQMuM0YJPf65rseB99f7rYL6ahpA8QCYxqN+6airBpMY/hUK8UFFu4Fyu1pHXDm3F/4fVZ94htenCLUlIa47dAN+GRrzbm7/yqiFwnmdlMVzgCZB9SjxwGF3foa/NMhMqMnzlVuphVlz7jJ/GcvWhKYoED1Wsyk/BurjLZazV5xrsDDJgyDyJNuvxgB",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\":\"fail\",\"score\":2,\"reason\":\"The reply fails the grounded point: it states that 4 of 15 seats are assigned and that the customer's Standard edition includes SSO, neither of which appears in the articles.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 671
+   },
+   "cache_creation_input_tokens": 671,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 1200,
+   "output_tokens": 285,
+   "output_tokens_details": {
+    "thinking_tokens": 208
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Bramolo Analytics\", \"segment\": \"smb\", \"edition\": \"enterprise\", \"next_edition\": \"enterprise\", \"arr\": 6417, \"seats_licensed\": 23, \"seats_assigned\": 21, \"seats_assigned_30_days_ago\": 21, \"seat_utilisation_pct\": 91, \"monthly_active_users\": 10, \"automation_rules\": 5, \"automation_rule_limit\": 100000, \"integrations\": 1, \"integration_limit\": 100, \"assist_credits_used_30d\": 141, \"assist_credits_included\": 3450, \"health_score\": 69.3, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 244, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"21 of 23 seats assigned\", \"expansion_score_pct\": 22, \"expansion_reasons\": \"nearly all seats assigned, few support tickets, creating few boards\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6xpwDUuQuug8bc9fUM",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Seat pressure. 21 of 23 licensed seats are assigned, and that count has not changed in the last 30 days.\n\nEvidence: Seat utilisation is 91%, with 21 seats assigned against 23 licensed. Only 10 monthly active users are on the account, and the expansion score is 22%.\n\nLikely need: More seats, since the account is already on Enterprise and the next edition is also Enterprise. The seats are nearly full, but the 10 active users suggest the new seats would only help if the assigned users actually log in, so confirm usage before pitching headcount.\n\nSuggested opener: \"Bramolo's team has almost filled its 23 seats, so I wanted to check whether you're planning to add people and whether there's anything getting in the way of the team using the seats you already have.\"\n\nRisks: Health is yellow at 69.3. Only 10 of 21 assigned seats are active monthly, so adding seats may not be the right step. No latest NPS score is recorded. Renewal is 244 days away, so there is no near-term deadline. No open high-priority tickets.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 706,
+   "output_tokens": 706,
+   "output_tokens_details": {
+    "thinking_tokens": 355
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

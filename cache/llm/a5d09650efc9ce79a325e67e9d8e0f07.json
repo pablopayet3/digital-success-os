@@ -1,0 +1,123 @@
+{
+ "role": "classifier",
+ "purpose": "classify mailbox",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You sort replies that arrived in a shared mailbox. Each one answers an email that the customer success team of Lumen Labs sent about its product, Relay. The input is a JSON list of replies, each with an id, a subject and a body. Routing rules act on your answer; you do not reply to anyone.\n\nFor each reply return:\n\n- id: the id you were given.\n- intent: the main thing the sender wants.\n  - out_of_office: an automatic reply saying the person is away\n  - unsubscribe: the person wants to stop receiving these emails\n  - left_company: the person no longer works there, or the mailbox is closed\n  - product_question: a question about how the product works\n  - buying_intent: wants more seats, a higher edition, another product, or pricing\n  - complaint: unhappy about the product or the service\n  - meeting_request: wants a call or a meeting\n  - other: none of the above\n- sentiment: positive, neutral or negative.\n- confidence: a number from 0 to 1. Use a low number when two intents fit about equally, or when the message is too short or vague to tell.\n- seats_requested: the number of seats asked for, as text, or an empty string.\n- edition_mentioned: the edition named (free, standard, premium, enterprise), or an empty string.\n- return_date: when the person says they are back, as written, or an empty string.\n- new_contact: the name of the person to contact instead, or an empty string.\n\nReplies can be in any language. Ignore quoted text from the original email and signatures. When a reply has two intents, choose the one that needs action first: a complaint outranks an unsubscribe, and buying intent outranks a product question.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"M000201\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"How do automation rules work with recurring cards?\\n\\nSent from my phone\"}, {\"id\": \"M000202\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Hey,\\n\\nHappy to chat. Do you have a calendar link?\\n\\n--\\nSherry Parsons\\nWorkspace Admin | Soressa Freight\"}, {\"id\": \"M000203\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Our Assist credits keep running out. Is there a bigger package?\\n\\nThanks,\\nJennifer\"}, {\"id\": \"M000204\", \"subject\": \"Automatic reply: Live session: automation rules in 30 minutes\", \"body\": \"I am currently travelling and will respond as soon as I can.\"}, {\"id\": \"M000205\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Hello team,\\n\\nHow do automation rules work with recurring cards?\\n\\nThanks,\\nShannon\\n\\nOn 18 Jun 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Live session: automation rules in 30 minutes\\n> Hi Shannon, here is the latest from the Relay team...\"}, {\"id\": \"M000206\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Hello team,\\n\\nQuick question: can guests be limited to a single board?\\n\\nThanks,\\nChristopher\"}, {\"id\": \"M000207\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Where do I find the SSO settings? Our IT team is asking.\\n\\nThanks,\\nCody\"}, {\"id\": \"M000208\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Please take me off this list. Also, the last update broke our board filters and nobdoy has replied to my ticket.\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "intent": {
+        "type": "string",
+        "enum": [
+         "out_of_office",
+         "unsubscribe",
+         "left_company",
+         "product_question",
+         "buying_intent",
+         "complaint",
+         "meeting_request",
+         "other"
+        ]
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       },
+       "seats_requested": {
+        "type": "string"
+       },
+       "edition_mentioned": {
+        "type": "string"
+       },
+       "return_date": {
+        "type": "string"
+       },
+       "new_contact": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "intent",
+       "sentiment",
+       "confidence",
+       "seats_requested",
+       "edition_mentioned",
+       "return_date",
+       "new_contact"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6aVnAnaFjHGKnCvKWV",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSkgsKEAgTGAI4AUIIdGhpbmtpbmcSDFUPCWmcSS+4AUFgIBoMuI6euVkr1VnxQ4fLIjA2mU3avNw4Ar9hkhBiVdAWNvNEPQN4KqW8ibUmnslLCRJMLHAIDtrq785nPsNu61YqrwpqHMeod26/fS5MhHiEsJX+Aq+APvLOCGQp5a6Bs4bMPFIerygPQ3Zpsnhqqi8qfwO4QZsLVH+SH553jgwKcF33NFQbhTxfgFktCQ06PRR/iAvP7CU4qeyNnzCHJ1Z32Z9hQ1xjrWnSpLrcSA8R1DQDqU6Ru/VrzszDWV8XFsrg6milvwBCdFFfiUxfu55qx05SJ/LhGnp2TkLnkuzLvOgr+zw6TrNS1xYtxU4G+AqBievsQPxkpmC80h3IZSYsriZOcIY7NDqr4e7TqpgD5/GEcVl41QZS3RQ7ztV5XOEiwJZv8dScYqEQJhYvuG4fZp9zBdX3jkmSjYpbUOZwMCgw+vxgr7BaSwrO9C0inc3IDcwepnNVGr7r4ZiqybcxmfERe8B/lcxA4bYXBsjVOwvpFAKLDaVwt6g+q73RgMKeojjAfVEI1W0rRZC9MBhslDKycjaPOHV06Jm4LE1zsQjLvNAGB5RHLMkXs2YhWSfjdTRK0pVLMzJSIrNKKTAhj8szCV2BDrMcw/1ZP6k7y11Q+0cjXsy6ZcRqJkT6hH5IdXDRmtgQ4WJF1BseUfC49nwVkOGW9LMrPZqHwlLfA3IPtzcfuSYUfN1HZZWHCJnzNW2uzV/CKP5OdqXn2/aUADKHark2f2GWqr0lRZe7vsNAvtWOS94S0sj70/jvPtrhlJb+CGfTrj0aB1YaFENZQM49QwNEt9PAaQVpLwHX9anHWxiBvX2rJlT6Yks0M1uXqCDMO8a65KickKg8f7Sk5R2YIVxoO52M0b1eZGPur/szGqz7eohhfnJouGLEvOElEV7Ex2VxMInQtyxzVQHn9JWNJKd5o+KgBxgMmCYs7OqQdXFuRIyVLFucVbb3h+a7w5zklrG+27MX2N1vz3ExVMnIThicJiEdfCqGkvvgwi0vcxMOQZztji305orkzSjL1AIhCoDBjVb9ryz30l5IVg9PfagaHtIscg7oOGmoAk1Hz3tvdcegJu+TvhtZaGaUTcATS/cofEV+B5lh2OSvxk88dMC8UP5jSqnMxolAIw4gW4EG1qJ0JsBX7IeSeHotKxWWPRWmBfTAmWFcgQA5Fi9YEs9HmFJhJY0+O2mkiFLPy3xci1xu4fOSNXuoCfa3aSAexQtURLdfu0p139CeuLM5kLxj1R7xaX+U1HOCGDyBSqNcxmx4hnLM89nCxbwZ5a012SoT4X8Yl8yvu+ShpjNN1rjH1LuB2UEH+m5y2iQbXxgPi+wgBsBIL9kgqn80yRD6vUc5FAZM0RqEgS6hrwTmTz56nzOOuS2i62ZrwtODtwLJGYWCXHNUcOPfx068Q7ryPhlhWbZH3GVkn/mKOx6fqpBlBYJoW54SQX0mLI8C7H370eY7+jDHGdyMKRFLdasWwZkiiCmRBhQS0eHgerZDSek5zeTNvAo778CzeUnrc1d4HK7sw+gj7+KdeE6fG/DKTskX7iInWiht4mqHRmUWL/1CL+DqdblFK66I+SxQIe0C1bSP68wAw9525c2Hvw2GIN9CjIBfFK/o66OQqivVKBp+XKAbJ7ylKqPQDeQEcNPXOLbVrQoxVFYT8A41Bdq2HFmrmT52bL1+uHFzWybwMpFPbl/e5rfXfFKu9qMkRj5YL2ciwKUTBaBTEoxhBOjxYkzTES9e+iuJsZi+8s8USvkmoMdvzAdv1i8Ihp4wo2rpdBd7L32hKtB87ZCo2LNxRFStCaqDMpvhYdrU451CEVt/SSRtZHyVU4gQ7lTTHOOT7hzYtH7cJpWQedRbGAE=",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"results\":[{\"id\":\"M000201\",\"intent\":\"product_question\",\"sentiment\":\"neutral\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000202\",\"intent\":\"meeting_request\",\"sentiment\":\"positive\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000203\",\"intent\":\"buying_intent\",\"sentiment\":\"neutral\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000204\",\"intent\":\"out_of_office\",\"sentiment\":\"neutral\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000205\",\"intent\":\"product_question\",\"sentiment\":\"neutral\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000206\",\"intent\":\"product_question\",\"sentiment\":\"neutral\",\"confidence\":0.85,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000207\",\"intent\":\"product_question\",\"sentiment\":\"neutral\",\"confidence\":0.85,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000208\",\"intent\":\"complaint\",\"sentiment\":\"negative\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1079,
+   "inference_geo": "global",
+   "input_tokens": 689,
+   "output_tokens": 874,
+   "output_tokens_details": {
+    "thinking_tokens": 325
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

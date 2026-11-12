@@ -1,0 +1,123 @@
+{
+ "role": "classifier",
+ "purpose": "classify mailbox",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You sort replies that arrived in a shared mailbox. Each one answers an email that the customer success team of Lumen Labs sent about its product, Relay. The input is a JSON list of replies, each with an id, a subject and a body. Routing rules act on your answer; you do not reply to anyone.\n\nFor each reply return:\n\n- id: the id you were given.\n- intent: the main thing the sender wants.\n  - out_of_office: an automatic reply saying the person is away\n  - unsubscribe: the person wants to stop receiving these emails\n  - left_company: the person no longer works there, or the mailbox is closed\n  - product_question: a question about how the product works\n  - buying_intent: wants more seats, a higher edition, another product, or pricing\n  - complaint: unhappy about the product or the service\n  - meeting_request: wants a call or a meeting\n  - other: none of the above\n- sentiment: positive, neutral or negative.\n- confidence: a number from 0 to 1. Use a low number when two intents fit about equally, or when the message is too short or vague to tell.\n- seats_requested: the number of seats asked for, as text, or an empty string.\n- edition_mentioned: the edition named (free, standard, premium, enterprise), or an empty string.\n- return_date: when the person says they are back, as written, or an empty string.\n- new_contact: the name of the person to contact instead, or an empty string.\n\nReplies can be in any language. Ignore quoted text from the original email and signatures. When a reply has two intents, choose the one that needs action first: a complaint outranks an unsubscribe, and buying intent outranks a product question.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"M000512\", \"subject\": \"Undeliverable: Relay monthly: what is new\", \"body\": \"I have left Sorisko Retail as of last month. For Relay questions please reach out to Kimberly Roberts.\"}, {\"id\": \"M000513\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hi,\\n\\nHow do automation rules work with recurring cards?\\n\\nOn 05 Oct 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Gregory, here is the latest from the Relay team...\"}, {\"id\": \"M000514\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"hello team,\\n\\ni would like to book a session with someone from your team. what times do you have?\\n\\nSent from my phone\"}, {\"id\": \"M000515\", \"subject\": \"Undeliverable: Relay monthly: what is new\", \"body\": \"Delivery has failed: the recipient's mailbox is disabled.\"}, {\"id\": \"M000516\", \"subject\": \"Undeliverable: Relay monthly: what is new\", \"body\": \"This mailbox is no longer monitored. John Burns has left Bexivo Energy.\"}, {\"id\": \"M000517\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hello team,\\n\\nDoes Relay Assist work on Docs pages as well as boards?\"}, {\"id\": \"M000518\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hello team,\\n\\nWe are paying for 38 seats and barely half are used because setup was so painful. I want to talk to someone about reducing our plan.\\n\\nThanks,\\nElijah\"}, {\"id\": \"M000519\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hi,\\n\\nCan you send pricing for Premium? We are hitting the automation rule limit.\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "intent": {
+        "type": "string",
+        "enum": [
+         "out_of_office",
+         "unsubscribe",
+         "left_company",
+         "product_question",
+         "buying_intent",
+         "complaint",
+         "meeting_request",
+         "other"
+        ]
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       },
+       "seats_requested": {
+        "type": "string"
+       },
+       "edition_mentioned": {
+        "type": "string"
+       },
+       "return_date": {
+        "type": "string"
+       },
+       "new_contact": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "intent",
+       "sentiment",
+       "confidence",
+       "seats_requested",
+       "edition_mentioned",
+       "return_date",
+       "new_contact"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7VxD8Z5GncvhMgfrow",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSxw0KEAgTGAI4AUIIdGhpbmtpbmcSDPjyV2fWNsMJ4Ci7NxoMYPG9Sgyxo+ScJCVUIjByCj2CXeppRkPnNlhdEkssTbAu2R+ClCDgnHFYsqPu4ZSHnf2YZG5m1+QYkcasIrcq5AzamDwPtJZFDfLkC5a3XAHa8w5QqtQDx6lgvDDHUQaM1wSCATF5bIHKcdj5sA90mbc39b2WQ4TW1YPrSvKtwRoXWOvGeGDNCqLbjCHPyweebCz3Rc+kNdwV0SyrOMPozAnvNt7oCJm2kMIuMrlWWl9R1VgFF2oK+hK+Dgftm7c5usuGhOsQw5eSzvvKVrn3RXxSB8wcNNRDR64+2w8ZZvhCM8IcvxfHcXBmcb0GkjIQQbSXlY/MCsPbwtB9z+vYNX7VN0pVfM6Olsh6xlENYX0pxEKBIZ8e/A9BrVaswDNrp4wYQdZ0wocGGNiEibfyWlw8GJBN+LSJUeSCX2U0cLyyFhBlQc6SMRgq3LcAgNlOOYTp6UuLhaWaYWjUgrscLcie938Ban6dGdPx4zHiF8YJdqM2yAWnWZxd/XPcLk9ByfQd7xUmzJOaMYn8mwNW7Muopf4T7xRS4wK58bxnNTH7S5kNSLchfCZ8keS632xrh45StEikY42CwmeBOHfNXdkazVNEXcc6c8bWi6VEAoGYNyFApk6Hzg3ezzwAyUiBV6f4v8nln/lKqcgHZX2M5attq6Iq4WuTIec/PmWhyIclEDEBihTzewjD8COStG+cFrqHdfndh4bv5Jx1XrojBttT8GQ9NneNRd4Y6Ip8E5Gy4SFpNsqNWXn8jpZcG197a+QseGYJbHZmOT1EJabT/DJ6qCxYho24951v5j6sov9h4umU8l1g6qwsaxuSnIwv/CMllu0BFzvOahjEdpNTHFTfk8xz7e6wRDs9wYm0t3A1KWQdTbGw41tIZZsyGhcPMrtB1x57sVQQG0+uv4CkUn6DrSHXCSVW94b3lztY2ECFlnM+Fs3dDVFAR1WF9EBeKefzhUBylweAjaPDUJC41ymdBKYexzxe73/WVZcMtXteDtuqelirr2SJ7U/NHYFaQXHQEl6ecp8S2GLKg91ZVTNTG6MieiakaRVNYr4vfjOIm9No4TN729lad2u184rX2CZIGVOXNyUE9SyIGn/mjORjzKyMd72eoVuiSeY9HPMuBUVaMDf07oytz41cZmkZvTtsvTSuNKPP3uGlhbCcoYWR2MFcdl6V6mWlAkLTRegWKg+22ChUDH8BbbTOse7oP4tLCTYXof9nnCySzqa4rWOeUAZRV3PNIBZ1a+mHc5TMkMgYWP10EI2wnoNORNusj2rXgB+QTbGlGE3oonJOPMbbdroOR1+OQtoBnsOHm/sbJ3yrvTCQmIFihh+UCnXi71IaiL5/5c3ICJk67j0YJSD578UomN95fTDM5poNUthYHEMFKQ92GbuRmFhsvIWKtMtRjTgFdEkiyfn2y5LGfkqD575B9y2lGVWwy1+46OAyQbZRIJhKu9aT3JHjYPuFQQ0a4M2AZon2qdrZKaaa6CexT/bhQeSWIREQhGQ59fcuwSLZCuu4inm8u9Gqq9xas9kDan3qb4xDNzcXmXw2oibAReeR/YSjOrfIAJl5Ff0mjJld4bwBmw8PLT8IbmTcA+U9OPLQlKeZZeoADmGGr9iiL8m0ld2KbH6ZVOSROx/VupAHTuzWQnbDCWHPdFRBbG3Qx2oegYfAThrytEa3N6CbxIpzOWdqPNiwq0CYDG9kYX1a1eHCwKseekwu8g4m3D5A7LTGdoeWU+grN/7MlFctUW/yvN360uFXUvn/jVl3XLhMk1lirYN4olEDdlWyU50OYmBZ43BBqymbzCryU5LAflTnx9nEt2hoiOdhqs25giEbv2P019DhO+VUaLSydMM6NFcdBA6YH3uH0kyVaX8qkgf4wsBK15z9Swi/evzuUZ5a8Rcp+Ctibgt9jlzK82wVET7KAg4SLjU9bjTCqVEELrms+TXI7EMYHZzF7Nn9AW8kpBHWrOD+P1nyzOFtdkjbG1O/XIWUMrs06Xz6QWI0sBNUHkgpcEiRW2HxVcrpR6nqjzg8tRuoAgWN90m+Y6xZGBUHrIOSTLJtQIe3zXS/0s5exmnb6wy1xeQIKLJafYMukqyOwUDobbFC7RKBvSfPmT+OABGYpgkZ4mqVyelGnIIX4J8z/BLy/mydcyplnuB451J55mrERID2NIRWGIHuVdrB3ae9j/jp7WIFbv3+HJuUpqRtRgpsa2FqHWbm/9bKENyaN0d5x+9x+8TqPmZUhlBGAbi30jBZ1b8sIAdnD/G1GAE=",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"results\": [{\"id\": \"M000512\", \"intent\": \"left_company\", \"sentiment\": \"neutral\", \"confidence\": 0.95, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"Kimberly Roberts\"}, {\"id\": \"M000513\", \"intent\": \"product_question\", \"sentiment\": \"neutral\", \"confidence\": 0.9, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000514\", \"intent\": \"meeting_request\", \"sentiment\": \"neutral\", \"confidence\": 0.9, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000515\", \"intent\": \"left_company\", \"sentiment\": \"neutral\", \"confidence\": 0.85, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000516\", \"intent\": \"left_company\", \"sentiment\": \"neutral\", \"confidence\": 0.95, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000517\", \"intent\": \"product_question\", \"sentiment\": \"neutral\", \"confidence\": 0.95, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000518\", \"intent\": \"complaint\", \"sentiment\": \"negative\", \"confidence\": 0.8, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000519\", \"intent\": \"buying_intent\", \"sentiment\": \"positive\", \"confidence\": 0.9, \"seats_requested\": \"\", \"edition_mentioned\": \"premium\", \"return_date\": \"\", \"new_contact\": \"\"}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1079,
+   "inference_geo": "global",
+   "input_tokens": 647,
+   "output_tokens": 1065,
+   "output_tokens_details": {
+    "thinking_tokens": 436
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -1,0 +1,289 @@
+{
+ "role": "agent",
+ "purpose": "onboarding agent turn",
+ "request": {
+  "model": "claude-opus-5-5",
+  "max_tokens": 4000,
+  "effort": "low",
+  "system": "You are the onboarding assistant for Relay, a team-collaboration product made by Lumen Labs. You are talking with the admin of a customer account whose setup has stalled. The admin is busy, is often not technical, and has no account manager: you and the help centre are the support they have.\n\n## What you are here to do\n\nHelp the admin finish the setup steps that are still missing: create a first board, invite at least five people, connect an integration, configure single sign-on. Answer the product questions that come up on the way.\n\n## How to work\n\nStart by calling get_setup_status, so you know what is done and what is missing before you say anything about setup. Call get_account_context when the answer depends on their edition or situation (for example, single sign-on is not available on the Free edition).\n\nFor any product question, call search_docs and answer only from the articles it returns. Name the article you used, so the admin can find it again. The help centre is the only source you may answer from, because an invented step or limit costs the admin more time than no answer. If the search result says that no article covers the question, do not answer from memory: when the request was vague, ask one short clarifying question; otherwise hand off.\n\nIf the admin's message is vague (\"it doesn't work\"), ask one clarifying question before searching.\n\nKeep replies short: the next step or two, as numbered steps when there is a sequence. Lead with what to do. Use plain words, and the admin's own words for things where you can.\n\n## When a person takes over\n\nHand off with create_handoff when:\n\n- The admin asks for a person.\n- The question is about prices, quotes, discounts, buying seats, changing edition, contracts, invoices, refunds, cancellation or legal terms. You may explain what an edition includes. You may not say what anything costs or change anything: account owners and the customer success team do that, and a wrong figure from you would be a promise the company has to keep.\n- The admin is upset or has clearly had a bad experience. They need a person, not another article.\n- The help centre does not cover the question.\n\nWhen you hand off, tell the admin in one sentence that a colleague will follow up and that they will not need to repeat themselves. Write the summary for that colleague, who has not seen this conversation: what the admin wants, what you already told them, and what is still missing from their setup.\n\n## Ending\n\nWhen the admin's question is answered, call log_outcome once.\n\nNever state a feature, a limit, a price or a step that did not come from a tool result.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "Can someone outside our company see just one board, as a guest?"
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "id": "toolu_017ozWSkDgWJG8BCx7Mv7F7w",
+      "input": {},
+      "name": "get_setup_status",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     },
+     {
+      "id": "toolu_01Co1VjQM3i4mvNbxUBaEZ9Y",
+      "input": {
+       "query": "guest access to a single board"
+      },
+      "name": "search_docs",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     },
+     {
+      "id": "toolu_01Caqy9HdYzGGRiefKG2gmwF",
+      "input": {},
+      "name": "get_account_context",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_017ozWSkDgWJG8BCx7Mv7F7w",
+      "content": "{\"completed_steps\": [\"create a first board\", \"invite at least five users\"], \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.5, \"seats_assigned\": 9, \"seats_licensed\": 15, \"edition\": \"standard\"}"
+     },
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01Co1VjQM3i4mvNbxUBaEZ9Y",
+      "content": "{\"query\": \"guest access to a single board\", \"note\": \"At least one article covers this question.\", \"articles\": [{\"slug\": \"guest-access\", \"title\": \"Give an external person access to one board (guests)\", \"score\": 8.53, \"coverage\": 0.75, \"covers_question\": true, \"text\": \"# Give an external person access to one board (guests)\\n\\nYou can invite a contractor or client as a guest. Open the board, click Share, type their email address and choose Guest. A guest sees only the boards they were invited to, and cannot see the list of users or any other board.\\n\\nGuests do not use a licensed seat on Standard, Premium and Enterprise. On the Free edition, guests are not available.\\n\\nTo remove a guest, open Share on the board and remove them, or deactivate them under Admin settings, Users, Guests.\\n\\nSearch keywords: contractor client external partner guest one board only permissions\\n\"}, {\"slug\": \"editions-comparison\", \"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"score\": 4.99, \"coverage\": 0.5, \"covers_question\": false, \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}, {\"slug\": \"admin-roles\", \"title\": \"Admin and member roles\", \"score\": 3.64, \"coverage\": 0.75, \"covers_question\": true, \"text\": \"# Admin and member roles\\n\\nRelay has two roles. Members can create and edit boards, cards and documents they have access to. Admins can do everything a member can, and also invite and deactivate users, manage seats, connect integrations, configure single sign-on, and see the billing page.\\n\\nEvery workspace needs at least one admin. We recommend two, so that setup and user management do not depend on one person. An admin can make another user an admin under Admin settings, Users.\\n\"}]}"
+     },
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01Caqy9HdYzGGRiefKG2gmwF",
+      "content": "{\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 9, \"utilisation\": 0.6, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.5, \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}"
+     }
+    ]
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "id": "toolu_01UvJfhEjxBA6iw9qoBah2BG",
+      "input": {
+       "outcome": "answered",
+       "note": "Explained how to invite an external guest to a single board on the Standard edition."
+      },
+      "name": "log_outcome",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01UvJfhEjxBA6iw9qoBah2BG",
+      "content": "{\"status\": \"not recorded\", \"reason\": \"You have not written your reply to the admin yet. Write the reply now. Log the outcome only after the reply is written.\"}"
+     }
+    ]
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "signature": "CAQSoQUKEAgTGAI4AUIIdGhpbmtpbmcSDAvN5a/iS6WupuDcVBoMhBy98OYs3pqNQvmLIjDyhnbssKKrHlLwzsUrr1AK2VPOI7Cfe+CbxAeCtBB8w4IdmtUe3P/kaxkDrjALqtMqvgSVGX+vLmL7oI7iBfCnf7YGXhZ1eQWIkw6DP/bweFtcje8LOgtBrWobW0qhXF4AftYNetjrQ9oUR7bX2tgNugQ4AFAY0Jfj9ewhrumpSIs8UyMbmhg0gPbw0BCF4Sok59KtM3pfdewjE/anKPLV4+9ogdxMkeCtzBOwHvnGg1554IIJTjTvzTFxUrbVat7YvZe5nbTApFiJMzgP92e+3Lb08kHPj9Zf88ZOmiaPnGYPugsq7nJWGqF5O0ukohsnLrUIVBCro2vdkQ7G6BWQwzjgeiG+EkWkult17QPGvHcf8ZFu5H3sGn1VyUexfbRoZ+92TdiHKfe4zD9v4GcMIf87hX+1Ubi5RugYRd9kA6pa8mrmgKtGjETu1CeBm4/egg69k8b8CjwLOVZ7um8oZXAZzY9KZ87xfA9wKJ19EI4XGkFoXxpob4ORYEXFWqOzrokLC1NTQkDvtt+rQc6JS0XQFdvRgYQZDH0TYa2Xa4tKzKfD5zOQFieOr8ep+GGvkP1ybsI2tdarkXOyT43jLkTEb8j8874Y3cWxWG7VCMYd+pnBtPB0qbUH9/IxdmoxZlBjtC/z/me5cdS7SquU5gY7pSpRgY0Pdgy5YdNkO/QR2e15ms/PFpAt1+xvU+e9oBGyaxq/0lo79IVLUOzq3XnGjacxDPCLgLGeGikYLZ4Iu0sZmWudShBjJpzRlMBjKMrBdm4FkDJCGru6xpyT3ZVKrzQbWTIGn0WAbhJkJMXc9MGgLmXVJZ8P3QYmIhHGGAE=",
+      "thinking": "",
+      "type": "thinking"
+     },
+     {
+      "signature": "CAQSpwsKEQgTGAI4AUIJbmFycmF0aW9uEgwaDhHVS9W6o0pKfrIaDEZ8ikYlYYQ9ZollYyIwywBp64vLkFGxPBl9JZjMNkldzuzcDkEnqSqwVJ+kpsg8ooqkyHypOEJf/4VrlD6FKsMKb3PvOgHuhXnhIyhzqIstJia9Sh3JXVLhXJFABwisGnaclFFfUpuDVMz1OxMSk6iva9AAyGY9vXGp4xkYbXVhdKjykB2iIHXc8bADx5tRvGBz5ILOdJmGYTUT28gM+WC2FkKrPJ7H0dv6RQ0QgPFLqKTp9KDrNp+fIpKxRKqM82lYtq/mBVFq9kyjzvABdlf8cbE4sHdOHOtviD7lcLyH/4lo8crD3yKy+M797bqO+/JypxB2CJwScIn0W0KuniSaOiU/R9QMU8ZCwmbsjB4s7fgK++y2z2fYIL9jC4kLYyEbQd/hfzsxJpmK8zq4nQ8hCvGJj/kqTi4EwxqYB100/gewYlrKQ+t8Bx1SH1EiXU/hJHepXxeHJjKl2dzZQDLu2v9HANBOozMDLxYluGFJGzI9DYNFeuN3mcuV8Kt4pOc8OkXNbSJydGLFDGdIPUTD6BQyrK6MmFy0vdmPvV3Kc+L5myBHIgZP1838/O0cc+Itqm6NHBphvUSQSlkdCHHxwd+9ZqaiGGg1D/pLQCea4RVV1BUzxm4/kv30eCL0Uh+iAUStHFxfH2j1sP/jcYnbcDWymL8gT8rRAtHH3/ZRz8TOtXkZxn/CYBVfC2ZloCPcDBCneY4RBxiakdHLKoCHwQF+vqfHENsKJiXOp9VOHflDmcaC/dR+FBnW67fGalGCTcaI4B6wwLJhFlJtT99xA6DiKD5E5JyKnsRLzsRaLRIGI/mP622Cs565JgUDDU76L9Q2H76nTIvhbIS6CRFzcnIkvBAR7RQAhJRDmQQiMeh8NgmjbHhy9QMu3TmTh4eA5MM2C9onvgkEveRImX/1vA5GxWPlmGf+tomy2XukymlPNAnfLEg2nOXvVHGDQxQzjSER7wsx2PtSV+I878LaXOlK3FeZnAYlnZhYL4zTfq+bNHfoLCouP+UUwKYfVj5gqeKmaO8DtuXirRA7Z6Xt75dw2Q40tjbDrQrd6/Ol2Q4dkp2eb84YTJVp8yFybPtyRnFQRkmSMjhGSU9VnZUZ0UKLNz6lwO3hDKPjPyyFOeqBY9ycTqHsmQHG9q9bu0C1Y2tcQu1Brer8Ojx7LWaV1FGhGTIxGJCzG/oNv0bv2e5iPCMPDP2eVFzWqcb03lr7dPM0FrzaoAT6q/Nb2m7BeBWk8a49H95AUL0elrtJd3zEtE1OCVbuO4DQQBRekBBBWkOlywiW0ocP/SVuDkgkbTwp0QfWaQIxdcg1PzuCWWC2Q7rf+vI0wWzH6oUhXVUCUJPpZAvHysarfoYxDX1nIxEZZ6ttU6opz1+Jc/0yL7C+Q5DKYp6tP6iEPGpzJ0haw92zJcmg7HBkZiqGQDshOb7vki7yclc3+EDNi60NFjKTNGnrLlPWIwspOgxTGgjir5VUTr/yABa2ziqmfBaO9aict3pm4jS1Xophe3EbuuOFIqdR/WAnc8aC0k8xGMeOCv7/qUwbkwAk0NE9DwhW9cpB8zDdxQry82U0mMcKh6KcY0yWZtCkfqZoarleHMZdGSIOhVjbw6uLDeCcmiRf7WEqMcSB/1TqPG6dx8n/zrTY/nDP4dxMzwFUu+rMxcTVn5dLJFKo8FpjxvLltZsxG1XcwkYM7uNOOhgDbibpAEjd6Ne81xQTmSm9NmuwAK0t/0WsfuslQBHXL/RMauZBcGO8ppsZ79Z9FQ/6duLz5a4bQZwPgcG6LOjRJofYbeeN+uXYkmqbje7b5t7NmvN7ICzOPWVL+yVucHiXMGDw0pG9iYAgGcqMyWb/cJEak0wlqB17V+5vgx93d5C6r1CefCCtGAE=",
+      "thinking": "",
+      "type": "thinking"
+     },
+     {
+      "id": "toolu_01CKY7GVpru8Y6rHRXxmhiSV",
+      "input": {
+       "outcome": "answered",
+       "note": "Explained how to invite an external guest to a single board on the Standard edition."
+      },
+      "name": "log_outcome",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01CKY7GVpru8Y6rHRXxmhiSV",
+      "content": "{\"status\": \"not recorded\", \"reason\": \"You have not written your reply to the admin yet. Write the reply now. Log the outcome only after the reply is written.\"}"
+     }
+    ]
+   }
+  ],
+  "tools": [
+   {
+    "name": "get_account_context",
+    "description": "Facts about the customer's account: edition, seats, lifecycle stage, health score and its components, open tickets, latest NPS score. Call it when the answer depends on the customer's edition or situation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "get_setup_status",
+    "description": "Which of the four setup steps the account has completed (first board, five users, an integration, single sign-on) and which are still missing. Call it first in an onboarding conversation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "search_docs",
+    "description": "Search the Relay help centre. Returns the best-matching articles with their full text. Answer product questions only from what this returns.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "query": {
+       "type": "string",
+       "description": "What to look for, in a few words."
+      }
+     },
+     "required": [
+      "query"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "create_handoff",
+    "description": "Hand the conversation to a human, with a summary. Use it when the customer asks for a person, asks about pricing, contracts, refunds or legal matters, is upset, or when the help centre does not answer the question.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_asked_for_person",
+        "frustration",
+        "low_confidence",
+        "not_in_docs",
+        "pricing_contract_legal"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "What the customer wants and what was already tried."
+      },
+      "recommended_next_step": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "reason",
+      "summary",
+      "recommended_next_step"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "log_outcome",
+    "description": "Record how the conversation ended. Call it once, at the end.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "outcome": {
+       "type": "string",
+       "enum": [
+        "answered",
+        "partly_answered"
+       ]
+      },
+      "note": {
+       "type": "string",
+       "description": "One sentence on what was resolved."
+      }
+     },
+     "required": [
+      "outcome",
+      "note"
+     ],
+     "additionalProperties": false
+    }
+   }
+  ],
+  "json_schema": null,
+  "refusal_fallback": true
+ },
+ "response": {
+  "id": "msg_011Cgx5wYkVPG6EijrNu9M8U",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQStwYKEAgTGAI4AUIIdGhpbmtpbmcSDAbljo3NOZzhkUU20hoMCzTbrtOQVSWttFSCIjAXdTzSLUopI6ICZURYiqywFV1rGyAZ+zzgaTf/pNdb3sGO3NylFagRo/BNLKRtzVAq1AXrMjKPmno0U1cxy6EpcLyUiQwWF65bvEsPmvEHNo+wG3KUOlQLBK/FJDKVA7QpZ1c6NWXHYJsMZd96e1CbZNTrsw9RcvLxOxgrBF1uBCcjHZREIQTDJBldofRXdAPomquvXJlNo9Tn4VEIVMxCCO/6GZ3cQhh1fVhCIRN7L5UgJAcXOcybh+RsqoDDMKZz0EOQEgQov497BdT66VUYneo9UUGoo1vpBygLZMTFka9IQRRwjdhp1rX10TvVJC5i53HvnqeQ8eu0gvDmso+4ZLpuDEf/6WyQfWvR1UhiWug4tmluahkNfo37MIqxDbArXVo4hqn3F1msPc1jl8rJG0cPzzrpKC0tiyJYKbju63L6L5paXg1gjECgEJoxvdKG8A1hJr767wv++uXtrvwZZZID/NddayK5/glhbNyc+amHBOkJogGW4PH5cygOP9p22Pjoz1hl/k2jFK0e9l8omK5rQ5bzB32vHdWMm64XGHR/DPW7BXAwtFpJUByvzGDssAmah6IP7BCZtlUyClaBFOAt5fikRrwVudG6Q5jwQkJQxYWjrgL1cao7cTDjqDLbYLARbhYkshMXQQqPs10VuaNKLKgwdpAyURoZcso8ppGxkTBT3eu72XWinbhLSDP6iBPvBVmG9PXzZRKyl+cCuD3UcDiaI/0C/FUOAv8lU5uyTsj1VGmbbmAyZr+vj00KCFsiXEQFvFlnwMOvU3FsbuNxNisMpKdcf2tdweKIg4KcibfGFajM12fvo5etp7p21fD7kIBt2GilhNw2LfuVvJpmJBe3oooHiuEn2bYZBWcLhHUdAFChvgPYdVhNT7IssoQbHFvjrUBslKmvuVxdZ9y2lQqKLBxonuHWRcQgO1jL2+SKWYUcvS5X8z6GoKUqYxFmn6+dGY1p0UW/H7TnZkPMn4/ayTSEd4O3kqt1TOaK23lknIQasnFp0BTOI9YSS08dD7TVGAE=",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Yes. You're on the Standard edition, so you can invite someone as a guest:\n\n1. Open the board you want to share and click **Share**.\n2. Type their email address and choose **Guest**.\n\nA guest can only see the boards you invite them to. They can't see your list of users or any other board. Guests also don't use one of your paid seats on Standard.\n\nTo remove a guest later, open **Share** on the board and remove them. You can also turn off their access under **Admin settings \u2192 Users \u2192 Guests**.\n\nThis is from the help centre article \"Give an external person access to one board (guests).\"\n\nTwo setup steps are still left: connecting an integration and setting up single sign-on. I can walk you through either one.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-opus-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1727,
+   "inference_geo": "global",
+   "input_tokens": 2167,
+   "iterations": [
+    {
+     "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+     },
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 1727,
+     "input_tokens": 2167,
+     "model": null,
+     "output_tokens": 246,
+     "type": "message"
+    }
+   ],
+   "output_tokens": 246,
+   "output_tokens_details": {
+    "thinking_tokens": 29
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

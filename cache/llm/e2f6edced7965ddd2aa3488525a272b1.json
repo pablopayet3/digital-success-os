@@ -1,0 +1,118 @@
+{
+ "role": "classifier",
+ "purpose": "classify mailbox",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You sort replies that arrived in a shared mailbox. Each one answers an email that the customer success team of Lumen Labs sent about its product, Relay. The input is a JSON list of replies, each with an id, a subject and a body. Routing rules act on your answer; you do not reply to anyone.\n\nFor each reply return:\n\n- id: the id you were given.\n- intent: the main thing the sender wants.\n  - out_of_office: an automatic reply saying the person is away\n  - unsubscribe: the person wants to stop receiving these emails\n  - left_company: the person no longer works there, or the mailbox is closed\n  - product_question: a question about how the product works\n  - buying_intent: wants more seats, a higher edition, another product, or pricing\n  - complaint: unhappy about the product or the service\n  - meeting_request: wants a call or a meeting\n  - other: none of the above\n- sentiment: positive, neutral or negative.\n- confidence: a number from 0 to 1. Use a low number when two intents fit about equally, or when the message is too short or vague to tell.\n- seats_requested: the number of seats asked for, as text, or an empty string.\n- edition_mentioned: the edition named (free, standard, premium, enterprise), or an empty string.\n- return_date: when the person says they are back, as written, or an empty string.\n- new_contact: the name of the person to contact instead, or an empty string.\n\nReplies can be in any language. Ignore quoted text from the original email and signatures. When a reply has two intents, choose the one that needs action first: a complaint outranks an unsubscribe, and buying intent outranks a product question.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"M000137\", \"subject\": \"Undeliverable: Relay monthly: what is new\", \"body\": \"This mailbox is no longer monitored. James Johnson has left Ulisko Logistics.\"}, {\"id\": \"M000138\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"hi there,\\n\\nthanks for this. how do we connect our calendar so due dates show up there?\\n\\nOn 05 Jun 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Rebecca, here is the latest from the Relay team...\"}, {\"id\": \"M000139\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Does Relay Assist work on Docs pages as well as boards?\\n\\n--\\nAnthony Smith\\nEngineer | Jorune Logistics\"}, {\"id\": \"M000140\", \"subject\": \"Undeliverable: Relay monthly: what is new\", \"body\": \"Melanie Cobb no longer works at Joryx Partners. Please contact Wendy Morales instead.\"}, {\"id\": \"M000141\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hi,\\n\\nI am out until the 2nd. If this is about scheduling the review meeting, please book time with Alejandra Calderon.\"}, {\"id\": \"M000142\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hey,\\n\\nstop sending me these\\n\\n--\\nRhonda Hayes\\nHead of Product | Bramuvia Supply\"}, {\"id\": \"M000143\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hello team,\\n\\nWe are paying for 40 seats and barely half are used because setup was so painful. I want to talk to someone about reducing our plan.\"}, {\"id\": \"M000144\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Ich bin bis Thursday nicht im B\u00fcro und habe keinen Zugriff auf meine E-Mails.\\n\\nSent from my phone\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "intent": {
+        "type": "string",
+        "enum": [
+         "out_of_office",
+         "unsubscribe",
+         "left_company",
+         "product_question",
+         "buying_intent",
+         "complaint",
+         "meeting_request",
+         "other"
+        ]
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       },
+       "seats_requested": {
+        "type": "string"
+       },
+       "edition_mentioned": {
+        "type": "string"
+       },
+       "return_date": {
+        "type": "string"
+       },
+       "new_contact": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "intent",
+       "sentiment",
+       "confidence",
+       "seats_requested",
+       "edition_mentioned",
+       "return_date",
+       "new_contact"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6Z3iV7HFgNSm8nxUm1",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\": [{\"id\": \"M000137\", \"intent\": \"left_company\", \"sentiment\": \"neutral\", \"confidence\": 0.95, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000138\", \"intent\": \"product_question\", \"sentiment\": \"neutral\", \"confidence\": 0.9, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000139\", \"intent\": \"product_question\", \"sentiment\": \"neutral\", \"confidence\": 0.9, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000140\", \"intent\": \"left_company\", \"sentiment\": \"neutral\", \"confidence\": 0.95, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"Wendy Morales\"}, {\"id\": \"M000141\", \"intent\": \"out_of_office\", \"sentiment\": \"neutral\", \"confidence\": 0.85, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"2nd\", \"new_contact\": \"Alejandra Calderon\"}, {\"id\": \"M000142\", \"intent\": \"unsubscribe\", \"sentiment\": \"negative\", \"confidence\": 0.9, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000143\", \"intent\": \"complaint\", \"sentiment\": \"negative\", \"confidence\": 0.8, \"seats_requested\": \"40\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000144\", \"intent\": \"out_of_office\", \"sentiment\": \"neutral\", \"confidence\": 0.9, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"Thursday\", \"new_contact\": \"\"}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1079,
+   "inference_geo": "global",
+   "input_tokens": 706,
+   "output_tokens": 645,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

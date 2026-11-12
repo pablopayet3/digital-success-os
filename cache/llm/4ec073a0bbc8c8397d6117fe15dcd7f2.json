@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.\n- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"How do automation rules work with recurring cards?\"}, {\"role\": \"agent\", \"text\": \"Every time a recurring card makes a new copy of itself, your automation rules run on that copy, just as they would on any other card.\\n\\nTo set up a rule:\\n1. Open the board and click the **Automation** button.\\n2. Choose a trigger, such as \\\"card moves to Done.\\\"\\n3. Add conditions if you want them. They're optional.\\n4. Choose one or more actions, such as \\\"notify the reporter.\\\"\\n\\nYou're on the Standard edition, which allows **15 rules per workspace**. If you reach that limit, the rules you already have keep running, but you can't add new ones.\\n\\nIf a rule doesn't run, open the Automation panel on the board and check that rule's run history.\\n\\nThis is from the help centre articles **\\\"Automation rules\\\"** and **\\\"An automation rule did not run, or runs twice.\\\"**\\n\\nYou have two setup steps left: **connecting an integration** and **setting up single sign-on**. Your edition includes both. Would you like to start with one of them?\"}], \"articles\": [{\"title\": \"Automation rules\", \"text\": \"# Automation rules\\n\\nAn automation rule does something for you when something happens on a board. Example: when a card moves to Done, notify the reporter. Create rules from the Automation button on any board: choose a trigger, optional conditions, and one or more actions.\\n\\nRules also work with recurring cards: the rule runs each time a new copy of the card is created.\\n\\nThe number of rules per workspace depends on your edition: 5 on Free, 15 on Standard, 60 on Premium, and no practical limit on Enterprise. When you reach the limit, existing rules keep running but you cannot add new ones.\\n\\nSearch keywords: automate automation rule rules trigger action limit\\n\"}, {\"title\": \"An automation rule did not run, or runs twice\", \"text\": \"# An automation rule did not run, or runs twice\\n\\nIf a rule did not run, open the Automation panel on the board and look at the rule's run history. The most common causes are: the rule is switched off; the trigger is on a different list than the one the card moved to; or a condition (label, assignee) did not match.\\n\\nIf a rule sends two notifications for every card, two rules have the same trigger. Check for a copy of the rule on the board and in the workspace template the board was created from. Switch one of them off.\\n\"}, {\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}], \"account_facts\": {\"setup_status\": {\"completed_steps\": [\"create a first board\", \"invite at least five users\"], \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.5, \"seats_assigned\": 9, \"seats_licensed\": 15, \"edition\": \"standard\"}, \"account_context\": {\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 9, \"utilisation\": 0.6, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.5, \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}}}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx5WDgL1AmbBMRxEfqHg",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\":\"pass\",\"score\":4,\"reason\":\"All product steps, the Standard 15-rule limit, and the account setup facts match the articles and account_facts, and the reply answers the recurring-card question without promises, with only a slight clarity cost from the unrequested setup-steps paragraph.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 782,
+   "inference_geo": "global",
+   "input_tokens": 1659,
+   "output_tokens": 412,
+   "output_tokens_details": {
+    "thinking_tokens": 313
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Hestora Works\", \"segment\": \"smb\", \"edition\": \"premium\", \"next_edition\": \"enterprise\", \"arr\": 5076, \"seats_licensed\": 30, \"seats_assigned\": 29, \"seats_assigned_30_days_ago\": 28, \"seat_utilisation_pct\": 97, \"monthly_active_users\": 15, \"automation_rules\": 8, \"automation_rule_limit\": 60, \"integrations\": 1, \"integration_limit\": 10, \"assist_credits_used_30d\": 395, \"assist_credits_included\": 1200, \"health_score\": 80.1, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 8, \"days_to_renewal\": 153, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"29 of 30 seats assigned\", \"expansion_score_pct\": 28, \"expansion_reasons\": \"nearly all seats assigned, heavy Assist use, creating few boards\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx72HeQHGfWBq22ECCoi",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Seat pressure. Almost all of Hestora Works' licensed seats are now assigned, and the count has risen over the last 30 days.\n\nEvidence: 29 of 30 seats are assigned, up from 28 thirty days ago (utilisation 97). Only 15 monthly active users are on the account, and the health score is 80.1 (green) with 0 open high-priority tickets.\n\nLikely need: More seats are the most direct fit for the trigger, but the data doesn't support urgency: only 15 users are active against 29 assigned seats, so the next conversation should confirm whether the team really needs more seats. The Enterprise case is weak: 8 of 60 automation rules and 1 of 10 integrations are used, and the stated expansion reason of heavy Assist use doesn't match the data, since 395 of 1200 included Assist credits were used in 30 days. The expansion score is 28.\n\nSuggested opener: \"I noticed your team has nearly filled its 30 seats, so I wanted to check whether you're getting enough room for the people who need access.\"\n\nRisks: The stated expansion reason (\"heavy Assist use\") conflicts with 395 of 1200 Assist credits used, and the \"few boards\" reason has no supporting figure in the data. Only 15 monthly active users against 29 assigned seats suggests seats may be assigned but not used, and the NPS score is 8. The renewal is 153 days out.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 701,
+   "output_tokens": 896,
+   "output_tokens_details": {
+    "thinking_tokens": 433
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

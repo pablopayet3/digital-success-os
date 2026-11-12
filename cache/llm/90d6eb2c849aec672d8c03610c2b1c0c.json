@@ -1,0 +1,118 @@
+{
+ "role": "classifier",
+ "purpose": "classify mailbox",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You sort replies that arrived in a shared mailbox. Each one answers an email that the customer success team of Lumen Labs sent about its product, Relay. The input is a JSON list of replies, each with an id, a subject and a body. Routing rules act on your answer; you do not reply to anyone.\n\nFor each reply return:\n\n- id: the id you were given.\n- intent: the main thing the sender wants.\n  - out_of_office: an automatic reply saying the person is away\n  - unsubscribe: the person wants to stop receiving these emails\n  - left_company: the person no longer works there, or the mailbox is closed\n  - product_question: a question about how the product works\n  - buying_intent: wants more seats, a higher edition, another product, or pricing\n  - complaint: unhappy about the product or the service\n  - meeting_request: wants a call or a meeting\n  - other: none of the above\n- sentiment: positive, neutral or negative.\n- confidence: a number from 0 to 1. Use a low number when two intents fit about equally, or when the message is too short or vague to tell.\n- seats_requested: the number of seats asked for, as text, or an empty string.\n- edition_mentioned: the edition named (free, standard, premium, enterprise), or an empty string.\n- return_date: when the person says they are back, as written, or an empty string.\n- new_contact: the name of the person to contact instead, or an empty string.\n\nReplies can be in any language. Ignore quoted text from the original email and signatures. When a reply has two intents, choose the one that needs action first: a complaint outranks an unsubscribe, and buying intent outranks a product question.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"M000417\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hello team,\\n\\nQuick question: can guests be limited to a single board?\\n\\nThanks,\\nDouglas\"}, {\"id\": \"M000418\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hey,\\n\\nPlease remove me from this mailing list.\\n\\nThanks,\\nChristian\\n\\nOn 05 Sep 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Christian, here is the latest from the Relay team...\"}, {\"id\": \"M000419\", \"subject\": \"Undeliverable: Relay monthly: what is new\", \"body\": \"Samantha Walsh no longer works at Dovolo Analytics. Please contact Karen Patel instead.\"}, {\"id\": \"M000420\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hi,\\n\\nCan someone walk our admins through the setup? Thursday afternoon works for us.\"}, {\"id\": \"M000421\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hey,\\n\\nHappy to chat. Do you have a calendar link?\\n\\nThanks,\\nWendy\\n\\nOn 05 Sep 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Wendy, here is the latest from the Relay team...\"}, {\"id\": \"M000422\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"not relevant to my role, i work in finance. can you stop these? chad randall is the right person.\\n\\n--\\nMelissa Lopez\\nOperations Lead | Torolo Travel\"}, {\"id\": \"M000423\", \"subject\": \"Automatic reply: Relay monthly: what is new\", \"body\": \"I am on annual leave and will reply when I am back on the 14th.\"}, {\"id\": \"M000424\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hi,\\n\\nIch bin bis Monday nicht im B\u00fcro und habe keinen Zugriff auf meine E-Mails.\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "intent": {
+        "type": "string",
+        "enum": [
+         "out_of_office",
+         "unsubscribe",
+         "left_company",
+         "product_question",
+         "buying_intent",
+         "complaint",
+         "meeting_request",
+         "other"
+        ]
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       },
+       "seats_requested": {
+        "type": "string"
+       },
+       "edition_mentioned": {
+        "type": "string"
+       },
+       "return_date": {
+        "type": "string"
+       },
+       "new_contact": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "intent",
+       "sentiment",
+       "confidence",
+       "seats_requested",
+       "edition_mentioned",
+       "return_date",
+       "new_contact"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6fFNe2wdN7HG5qaW8j",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"M000417\",\"intent\":\"product_question\",\"sentiment\":\"neutral\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000418\",\"intent\":\"unsubscribe\",\"sentiment\":\"neutral\",\"confidence\":0.97,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000419\",\"intent\":\"left_company\",\"sentiment\":\"neutral\",\"confidence\":0.97,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"Karen Patel\"},{\"id\":\"M000420\",\"intent\":\"meeting_request\",\"sentiment\":\"positive\",\"confidence\":0.85,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000421\",\"intent\":\"meeting_request\",\"sentiment\":\"positive\",\"confidence\":0.93,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000422\",\"intent\":\"unsubscribe\",\"sentiment\":\"negative\",\"confidence\":0.8,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"Chad Randall\"},{\"id\":\"M000423\",\"intent\":\"out_of_office\",\"sentiment\":\"neutral\",\"confidence\":0.97,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"the 14th\",\"new_contact\":\"\"},{\"id\":\"M000424\",\"intent\":\"out_of_office\",\"sentiment\":\"neutral\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"bis Monday\",\"new_contact\":\"\"}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1079,
+   "inference_geo": "global",
+   "input_tokens": 751,
+   "output_tokens": 579,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

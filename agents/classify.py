@@ -67,8 +67,14 @@ REPLY_SCHEMA = {
                     "new_contact": {"type": "string"},
                 },
                 "required": [
-                    "id", "intent", "sentiment", "confidence", "seats_requested",
-                    "edition_mentioned", "return_date", "new_contact",
+                    "id",
+                    "intent",
+                    "sentiment",
+                    "confidence",
+                    "seats_requested",
+                    "edition_mentioned",
+                    "return_date",
+                    "new_contact",
                 ],  # fmt: skip
                 "additionalProperties": False,
             },
@@ -90,8 +96,15 @@ FEEDBACK_SCHEMA = {
                     "sentiment": {"type": "string", "enum": SENTIMENTS},
                     "theme": {
                         "type": "string",
-                        "enum": ["setup", "usability", "performance", "support", "pricing",
-                                 "value", "other"],
+                        "enum": [
+                            "setup",
+                            "usability",
+                            "performance",
+                            "support",
+                            "pricing",
+                            "value",
+                            "other",
+                        ],
                     },  # fmt: skip
                     "confidence": {"type": "number"},
                 },

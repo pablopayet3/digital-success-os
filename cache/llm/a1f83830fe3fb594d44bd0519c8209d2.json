@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Dovium Travel\", \"segment\": \"smb\", \"edition\": \"premium\", \"next_edition\": \"enterprise\", \"arr\": 2052, \"seats_licensed\": 12, \"seats_assigned\": 10, \"seats_assigned_30_days_ago\": 10, \"seat_utilisation_pct\": 83, \"monthly_active_users\": 9, \"automation_rules\": 2, \"automation_rule_limit\": 60, \"integrations\": 0, \"integration_limit\": 10, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 480, \"health_score\": 80.5, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 326, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 53%: nearly all seats assigned, reads our emails, most seats active\", \"expansion_score_pct\": 53, \"expansion_reasons\": \"nearly all seats assigned, reads our emails, most seats active\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6y7pxYYwHgo1MMu4ww",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Dovium Travel's expansion score has reached 53%, which fired an expansion-ready signal on this Premium account.\n\nEvidence: 10 of 12 licensed seats are assigned, the same as 30 days ago, and 9 monthly active users. Automation rules are at 2 of a 60 limit, integrations at 0 of 10, and Assist credits used are 0 of 480.\n\nLikely need: The seat count is the closest step, since 10 of 12 are assigned, but the data does not show demand for more seats yet. Nothing in the data points to Enterprise features either, because automation, integrations and Assist credits are all barely used. Confirm what they need before proposing either an add-on or the Enterprise edition.\n\nSuggested opener: \"Dovium, your team is using Lumen well, so I wanted to check whether your current setup still fits what you're planning over the next few months.\"\n\nRisks: Health is green at 80.5 with 0 open high-priority tickets, and renewal is 326 days away. The main caution is that the usage data shows low adoption of automation, integrations and Assist, so an upsell may not be the right first conversation. No NPS score is recorded.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 718,
+   "output_tokens": 904,
+   "output_tokens_details": {
+    "thinking_tokens": 524
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

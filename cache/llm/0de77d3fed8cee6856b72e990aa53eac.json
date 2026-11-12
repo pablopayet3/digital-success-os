@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Zanivo Education\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 2120, \"seats_licensed\": 23, \"seats_assigned\": 18, \"seats_assigned_30_days_ago\": 17, \"seat_utilisation_pct\": 78, \"monthly_active_users\": 11, \"automation_rules\": 11, \"automation_rule_limit\": 15, \"integrations\": 1, \"integration_limit\": 3, \"assist_credits_used_30d\": 272, \"assist_credits_included\": 230, \"health_score\": 80.1, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 335, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 43%: nearly all seats assigned, heavy Assist use, near the automation limit\", \"expansion_score_pct\": 43, \"expansion_reasons\": \"nearly all seats assigned, heavy Assist use, near the automation limit\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7fbyjfY51fCd7BVysb",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Zanivo Education has fired an expansion-ready signal, with an expansion likelihood of 43%.\nEvidence: 18 of 23 licensed seats are assigned, up from 17 thirty days ago, and seat utilisation is 78%. Assist credits used in the last 30 days are 272 against 230 included. Automation rules are at 11 of a 15 limit.\nLikely need: The data points to more seats, since assignment is close to the licensed total and growing. Heavy Assist use and automation close to the limit could also make the next edition, premium, worth raising. The data does not show which one the customer wants.\nSuggested opener: \"Your team has been making strong use of Assist and automation, so I wanted to check whether you need more seats or a look at what Premium adds for that.\"\nRisks: Only 11 of the 18 assigned seats are monthly active users, so adoption may not match assignment. Renewal is 335 days away and health is green at 80.1 with 0 open high-priority tickets. No NPS score is on file.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 724,
+   "output_tokens": 808,
+   "output_tokens_details": {
+    "thinking_tokens": 472
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

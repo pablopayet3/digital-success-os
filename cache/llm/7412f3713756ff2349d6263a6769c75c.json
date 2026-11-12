@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.\n- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"How do I connect our calendar so due dates show up there?\"}, {\"role\": \"agent\", \"text\": \"Here's how to connect your calendar:\\n\\n1. Go to **Admin settings \u2192 Integrations \u2192 Calendar**. Only admins can do this.\\n2. Click **Connect**. Your calendar tool will ask you to allow access. After you allow it, you'll be sent back to Relay, and the connection works for everyone straight away.\\n\\n**When due dates show up:** a card appears in a person's calendar only if it has **both a due date and someone assigned to it**. It shows up in the calendar of the person it's assigned to.\\n\\n**If due dates don't show up, check:**\\n- The card has a due date and someone assigned to it.\\n- That person has accepted the calendar permission request they got by email.\\n- The board isn't archived.\\n- New or changed dates can take up to 15 minutes to appear.\\n\\nConnecting the calendar also completes your \\\"connect an integration\\\" setup step. After that, the only step left is setting up single sign-on.\\n\\nSource: help centre articles \\\"Show due dates in your calendar\\\" and \\\"Connect an integration.\\\"\"}], \"articles\": [{\"title\": \"Show due dates in your calendar\", \"text\": \"# Show due dates in your calendar\\n\\nWith the calendar integration, every card that has a due date and an assignee appears in that person's calendar. Connect it under Admin settings, Integrations, Calendar.\\n\\nIf due dates do not show up after connecting, check three things: the card has both a due date and an assignee; the assignee has accepted the calendar permission request they received by email; and the board is not archived. New and changed dates can take up to fifteen minutes to appear.\\n\"}, {\"title\": \"Create your first board\", \"text\": \"# Create your first board\\n\\nA board holds the cards for one project or one team. To create one, click New board on the home page and pick a template: Kanban for a simple to-do, doing, done flow; Sprint for teams working in iterations; Roadmap for planning by quarter; Project plan for work with dates and owners.\\n\\nAdd a few cards, assign each to a person and give it a due date. Then share the board with your team from the Share button. A board with real work on it is the fastest way to get colleagues to start using Relay.\\n\"}, {\"title\": \"Connect an integration\", \"text\": \"# Connect an integration\\n\\nIntegrations connect Relay to the other tools your team uses. Available integrations: chat, calendar, code repository, cloud drive, CRM and video meetings.\\n\\nTo connect one (admins only), open Admin settings, Integrations, choose the tool and click Connect. You are sent to that tool to approve access, then returned to Relay. The integration is live straight away for the whole workspace.\\n\\nHow many integrations you can connect depends on your edition: 2 on Free, 3 on Standard, 10 on Premium, and no practical limit on Enterprise. Connecting at least one integration is one of the four setup steps we recommend in the first week.\\n\\nSearch keywords: connect tools apps integration integrations link\\n\"}], \"account_facts\": {\"setup_status\": {\"completed_steps\": [\"create a first board\", \"invite at least five users\"], \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.5, \"seats_assigned\": 9, \"seats_licensed\": 15, \"edition\": \"standard\"}, \"account_context\": {\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 9, \"utilisation\": 0.6, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.5, \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}}}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx5VSVETNdr3RyHVsqKA",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\":\"fail\",\"score\":3,\"reason\":\"Grounding fails: the reply states as fact that connecting the calendar completes the 'connect an integration' setup step, but neither the articles nor account_facts say a calendar connection counts toward that step.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 782,
+   "inference_geo": "global",
+   "input_tokens": 1514,
+   "output_tokens": 630,
+   "output_tokens_details": {
+    "thinking_tokens": 545
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

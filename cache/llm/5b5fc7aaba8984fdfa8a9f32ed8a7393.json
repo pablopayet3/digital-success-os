@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Garrivo Supply\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1490, \"seats_licensed\": 16, \"seats_assigned\": 14, \"seats_assigned_30_days_ago\": 14, \"seat_utilisation_pct\": 88, \"monthly_active_users\": 11, \"automation_rules\": 15, \"automation_rule_limit\": 15, \"integrations\": 2, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 160, \"health_score\": 65.5, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 6, \"days_to_renewal\": 247, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 71%: many high-priority tickets, nearly all seats assigned, near the automation limit\", \"expansion_score_pct\": 71, \"expansion_reasons\": \"many high-priority tickets, nearly all seats assigned, near the automation limit\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx72cwmAzHgSBPaKF5zH",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: The account scored 71% on expansion likelihood, driven by the automation rule limit being reached and near-full seat assignment.\n\nEvidence: Automation rules are at 15 of 15, the limit. Seats are 14 of 16 assigned (88% utilisation), unchanged from 30 days ago. Integrations are 2 of 3.\n\nLikely need: The automation cap is the clearest pressure point, which points to the Premium edition rather than more seats, since 2 licensed seats are still unassigned. Confirm this with the customer before proposing either.\n\nSuggested opener: \"You're at your automation rule limit, so I wanted to walk you through what Premium would give your team and whether it fits how you're working now.\"\n\nRisks: The trigger evidence cites many high-priority tickets, but the account shows 0 open high-priority tickets, so don't repeat that claim without checking. The latest NPS is 6, and health is yellow at 65.5. Monthly active users are 11, below the 14 seats assigned, so adoption may not be full. Renewal is 247 days away, so there is no immediate deadline.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 730,
+   "output_tokens": 842,
+   "output_tokens_details": {
+    "thinking_tokens": 482
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

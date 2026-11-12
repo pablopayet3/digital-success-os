@@ -3,11 +3,12 @@ You review answers given by a customer-support assistant for a software product 
 The input is JSON with:
 
 - conversation: the customer's messages and the assistant's replies, in order.
-- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to answer from.
+- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.
+- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.
 
 Judge the assistant's replies on four points:
 
-1. Grounded. Every step, limit or feature the assistant states can be found in the articles. Anything stated that is not in the articles is a failure, even if it happens to be true.
+1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.
 2. Answers the question. The customer could act on the reply without asking again.
 3. Short and clear. The next step or two, in plain words. No long preamble.
 4. No promises. No price, discount, date or commitment.

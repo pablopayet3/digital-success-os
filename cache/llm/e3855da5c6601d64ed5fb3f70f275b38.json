@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Kelivo Freight\", \"segment\": \"mid\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 3036, \"seats_licensed\": 34, \"seats_assigned\": 31, \"seats_assigned_30_days_ago\": null, \"seat_utilisation_pct\": 91, \"monthly_active_users\": 17, \"automation_rules\": 0, \"automation_rule_limit\": 15, \"integrations\": 1, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 340, \"health_score\": 73.9, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 348, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"31 of 34 seats assigned\", \"expansion_score_pct\": 42, \"expansion_reasons\": \"nearly all seats assigned, reads our emails, few support tickets\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7iaeTtQ92YHWXu9xEn",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Seat pressure. Almost all of Kelivo Freight's licensed seats are now assigned.\n\nEvidence: 31 of 34 seats assigned, seat utilisation at 91, and health score 73.9 (green). The expansion score is 42, with the reasons noted as nearly all seats assigned, reads our emails, and few support tickets.\n\nLikely need: More seats on the current Standard edition is the most direct fit, since the trigger is seat capacity. The next edition (Premium) is less clearly supported: automation rules are at 0 of a 15 limit, integrations at 1 of a 3 limit, and Assist credits at 0 of 340 used in 30 days.\n\nSuggested opener: \"Your team is close to using all 34 seats, so I wanted to check whether you need a few more to keep everyone covered, and whether anything about how you're using the platform is getting in the way.\"\n\nRisks: Only 17 monthly active users against 31 assigned seats, so seat demand may be overstated and a seat add may not be what they need. No latest NPS score is recorded. Automation and Assist usage are at zero, which weakens any case for Premium. Renewal is 348 days away, so there is no near-term deadline pressure.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 696,
+   "output_tokens": 810,
+   "output_tokens_details": {
+    "thinking_tokens": 410
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

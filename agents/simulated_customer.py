@@ -53,7 +53,9 @@ def script_for(enrollment_id: str, account: dict) -> tuple[str, list[str]]:
             break
 
     missing = [column for column in QUESTION_FOR_MISSING_STEP if not account[column]]
-    setup_question = QUESTION_FOR_MISSING_STEP[missing[0]] if missing else (
-        "How do automation rules work with recurring cards?"
+    setup_question = (
+        QUESTION_FOR_MISSING_STEP[missing[0]]
+        if missing
+        else ("How do automation rules work with recurring cards?")
     )
     return name, [setup_question if line == "<setup question>" else line for line in messages]

@@ -1,0 +1,238 @@
+{
+ "role": "agent",
+ "purpose": "onboarding agent turn",
+ "request": {
+  "model": "claude-opus-5-5",
+  "max_tokens": 4000,
+  "effort": "low",
+  "system": "You are the onboarding assistant for Relay, a team-collaboration product made by Lumen Labs. You are talking with the admin of a customer account whose setup has stalled. The admin is busy, is often not technical, and has no account manager: you and the help centre are the support they have.\n\n## What you are here to do\n\nHelp the admin finish the setup steps that are still missing: create a first board, invite at least five people, connect an integration, configure single sign-on. Answer the product questions that come up on the way.\n\n## How to work\n\nStart by calling get_setup_status, so you know what is done and what is missing before you say anything about setup. Call get_account_context when the answer depends on their edition or situation (for example, single sign-on is not available on the Free edition).\n\nFor any product question, call search_docs and answer only from the articles it returns. Name the article you used, so the admin can find it again. The help centre is the only source you may answer from, because an invented step or limit costs the admin more time than no answer. If the search result says that no article covers the question, do not answer from memory: when the request was vague, ask one short clarifying question; otherwise hand off.\n\nIf the admin's message is vague (\"it doesn't work\"), ask one clarifying question before searching.\n\nKeep replies short: the next step or two, as numbered steps when there is a sequence. Lead with what to do. Use plain words, and the admin's own words for things where you can.\n\n## When a person takes over\n\nHand off with create_handoff when:\n\n- The admin asks for a person.\n- The question is about prices, quotes, discounts, buying seats, changing edition, contracts, invoices, refunds, cancellation or legal terms. You may explain what an edition includes. You may not say what anything costs or change anything: account owners and the customer success team do that, and a wrong figure from you would be a promise the company has to keep.\n- The admin is upset or has clearly had a bad experience. They need a person, not another article.\n- The help centre does not cover the question.\n\nWhen you hand off, tell the admin in one sentence that a colleague will follow up and that they will not need to repeat themselves. Write the summary for that colleague, who has not seen this conversation: what the admin wants, what you already told them, and what is still missing from their setup.\n\n## Ending\n\nWhen the admin's question is answered, call log_outcome once.\n\nNever state a feature, a limit, a price or a step that did not come from a tool result.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "How do I invite my whole team at once? There are about a dozen of us."
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "id": "toolu_01C2M5UEsPXp34zdXYkSxfB2",
+      "input": {},
+      "name": "get_setup_status",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     },
+     {
+      "id": "toolu_01CPDoDqnbTjV9TLKZuG4ACG",
+      "input": {
+       "query": "invite multiple users at once"
+      },
+      "name": "search_docs",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01C2M5UEsPXp34zdXYkSxfB2",
+      "content": "{\"completed_steps\": [\"create a first board\"], \"missing_steps\": [\"invite at least five users\", \"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.25, \"seats_assigned\": 4, \"seats_licensed\": 15, \"edition\": \"standard\"}"
+     },
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01CPDoDqnbTjV9TLKZuG4ACG",
+      "content": "{\"query\": \"invite multiple users at once\", \"note\": \"At least one article covers this question.\", \"articles\": [{\"slug\": \"bulk-invite\", \"title\": \"Invite many users at once (bulk invite)\", \"score\": 6.31, \"coverage\": 0.75, \"covers_question\": true, \"text\": \"# Invite many users at once (bulk invite)\\n\\nTo add many people at once, go to Admin settings, Users, Invite, and choose Upload a file. Upload a CSV file with one column named email. You can add an optional column named role with the value member or admin.\\n\\nRelay checks the file first and shows you any addresses it cannot use (wrong format, already a user, or more rows than free seats). Nothing is sent until you confirm.\\n\\nThere is no limit on the size of the file other than the number of seats you have free.\\n\\nSearch keywords: add whole team everyone all at once many people dozen dozens hundreds list import upload\\n\"}, {\"slug\": \"setup-checklist\", \"title\": \"Setup checklist: the four steps to get started\", \"score\": 3.29, \"coverage\": 0.75, \"covers_question\": true, \"text\": \"# Setup checklist: the four steps to get started\\n\\nNew to Relay, or stuck on setup? These four steps get a workspace ready. Teams that finish them in the first weeks get far more out of Relay.\\n\\n1. Create your first board. Pick a template and add a few real cards. See \\\"Create your first board\\\".\\n2. Invite at least five people. Boards are only useful with your team on them. See \\\"Invite your team\\\" or \\\"Invite many users at once\\\".\\n3. Connect an integration. Chat or calendar are the quickest wins. See \\\"Connect an integration\\\".\\n4. Configure single sign-on (Standard, Premium and Enterprise). See \\\"Set up single sign-on (SSO)\\\".\\n\\nAdmins can see which steps are done under Admin settings, Setup progress. If you are not sure what to do next, start with the first step on this list that is not done yet.\\n\\nSearch keywords: getting started onboarding stuck setup next step what should I do begin start first steps\\n\"}, {\"slug\": \"invite-users\", \"title\": \"Invite your team\", \"score\": 2.83, \"coverage\": 0.5, \"covers_question\": false, \"text\": \"# Invite your team\\n\\nAdmins invite people from Admin settings, Users, Invite. Type one email address per line or paste a list. Each invited person receives an email with a link that is valid for seven days.\\n\\nYou can invite as many people as you have licensed seats. A seat is used as soon as the invitation is sent, and freed again if you cancel the invitation or deactivate the user.\\n\\nTip: teams that invite at least five people in their first week are far more likely to keep using Relay, because boards are only useful when the work of several people is on them.\\n\\nSearch keywords: add people colleagues members team teammates new users invite invitation\\n\"}]}"
+     }
+    ]
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "signature": "CAQS9AUKEAgTGAI4AUIIdGhpbmtpbmcSDFqs+eF4UzWcw2BnnBoMSeMQWYkiOdG5WMWEIjBTkkt8LTFA6ZNsIaFQTyDlWgIh6q/v2F0Of+98Z7IDhBoYTcgULFa9gTMP85M5gtMqkQVCgTHW4AxAcfFwnJmAEZkTnjgkmPyAwJhPgrt+8sFwQ/uilIbGeuHnScdtYUvAC0OGx1zFbw24XU1iCytntSO5El3XAoojVMSBeh4CbC7sxT8fuQrC7wyWWvpqWYLpflpciz+qUQa373JdpKivewdeqf5SHAyY1KjiWAuDKlTNjYmmfR92BXSWU1JRRQtbfIrtXMlJdWAXwMUmbyJ6wxRQVBM9alqUYesDmU4X4oT5Q3iCZhECkGAULuwz50c193gqxqAKZ5k+9ejjIfXQtFw5a4y7r+WMlbTkKz4g1wmp9iqUy7PFYotTHJJzYU8Ketix/ou1L9NNLsrpnTs2bB8IatU24laYX45oJZUHpuM2nPUK5XDXgowa5/8F3bEEqJitShkgNCQhmqo6VzmFjtwuYQ7zBZ9WVGmLsXKm34xqrlLrq8kxg0scTcbvG87pzK6y5UTsUtqdswHHw7RmXn4Q/4bG9RFH/Clj366pGa2uyuO6oHhBtdWbU9H7uOxUydbzXZzQHgDcaJ36F8haRxyL7sRL+BGBaioN6/BBQIKd7IvBBIw4poEM/TdsjlgDMiNioGrAXR/ldB3HQJ/+WKVAx51gls5uqI8UYzJOLw92zjo9pMuCCpOk2lNiD8W4UsVKmUZCzC9leSqRWrGSJoeek56f4r50vXt1duk0UwKNdf0r3HatkRRrPByKfNDft5w3b3THbjrGRMTH/haF7lgReyqzcapVqIs0NwqMcgfXZ8MhfFSqitWClOtxbquxxSBDJuqYthRK2aEXXBQtwwth+wcljxdyNrX+bIaPo3jvvvq/QGeMay2MWqCbB7lEjUkF/57iS1ewTKP7KX+nsmtZ+FUw/OzYTdactVFKjLQw4NIYAQ==",
+      "thinking": "",
+      "type": "thinking"
+     },
+     {
+      "id": "toolu_01LhE2Zv4kt3xCLJTrmVvMdL",
+      "input": {
+       "outcome": "answered",
+       "note": "Explained bulk invite by CSV or pasted list, and flagged that 11 seats are free."
+      },
+      "name": "log_outcome",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01LhE2Zv4kt3xCLJTrmVvMdL",
+      "content": "{\"status\": \"recorded\"}"
+     }
+    ]
+   }
+  ],
+  "tools": [
+   {
+    "name": "get_account_context",
+    "description": "Facts about the customer's account: edition, seats, lifecycle stage, health score and its components, open tickets, latest NPS score. Call it when the answer depends on the customer's edition or situation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "get_setup_status",
+    "description": "Which of the four setup steps the account has completed (first board, five users, an integration, single sign-on) and which are still missing. Call it first in an onboarding conversation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "search_docs",
+    "description": "Search the Relay help centre. Returns the best-matching articles with their full text. Answer product questions only from what this returns.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "query": {
+       "type": "string",
+       "description": "What to look for, in a few words."
+      }
+     },
+     "required": [
+      "query"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "create_handoff",
+    "description": "Hand the conversation to a human, with a summary. Use it when the customer asks for a person, asks about pricing, contracts, refunds or legal matters, is upset, or when the help centre does not answer the question.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_asked_for_person",
+        "frustration",
+        "low_confidence",
+        "not_in_docs",
+        "pricing_contract_legal"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "What the customer wants and what was already tried."
+      },
+      "recommended_next_step": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "reason",
+      "summary",
+      "recommended_next_step"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "log_outcome",
+    "description": "Record how the conversation ended. Call it once, at the end.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "outcome": {
+       "type": "string",
+       "enum": [
+        "answered",
+        "partly_answered"
+       ]
+      },
+      "note": {
+       "type": "string",
+       "description": "One sentence on what was resolved."
+      }
+     },
+     "required": [
+      "outcome",
+      "note"
+     ],
+     "additionalProperties": false
+    }
+   }
+  ],
+  "json_schema": null,
+  "refusal_fallback": true
+ },
+ "response": {
+  "id": "msg_011Cgx4nHWb7omuZowuj1eRm",
+  "container": null,
+  "content": [
+   {
+    "text": "You can invite everyone in one go. There are two ways:\n\n**Option A: Paste a list** (from the help centre article \"Invite your team\")\n1. Go to **Admin settings \u2192 Users \u2192 Invite**.\n2. Type or paste the email addresses, one per line.\n\n**Option B: Upload a file** (from the help centre article \"Invite many users at once (bulk invite)\")\n1. Make a CSV file with one column named **email**. If you like, add a second column named **role** and put **member** or **admin** in it for each person.\n2. Go to **Admin settings \u2192 Users \u2192 Invite \u2192 Upload a file**.\n3. Relay checks the list first and shows you any addresses it can't use. Nothing is sent until you confirm.\n\n**Check your seats first:** You have 15 seats and 4 are already taken, so you can invite 11 more people. If your dozen includes people who already have an account, you're fine. If it doesn't, one person won't fit. A seat counts as taken as soon as an invite is sent. Invite links stop working after 7 days.\n\nInviting your team will also finish the \"invite at least five people\" setup step. After that, the remaining steps are connecting an integration and setting up single sign-on.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-opus-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1727,
+   "inference_geo": "global",
+   "input_tokens": 1454,
+   "iterations": [
+    {
+     "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+     },
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 1727,
+     "input_tokens": 1454,
+     "model": null,
+     "output_tokens": 381,
+     "type": "message"
+    }
+   ],
+   "output_tokens": 381,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

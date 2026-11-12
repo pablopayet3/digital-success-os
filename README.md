@@ -35,23 +35,27 @@ From `uv run python run.py demo` (180 days of history, then 30 simulated days of
 
 | | |
 |---|---|
-| Accounts generated / active today | 1,200 / 1,038 (709 in the pilot segment) |
-| Product events kept / rejected with a reason | 617,001 / 8,388 |
+| Accounts generated / active today | 1,200 / 1,036 (705 in the pilot segment) |
+| Product events kept / rejected with a reason | 617,555 / 8,385 |
 | Data tests / contract checks passing | 100 of 100 / 14 of 14 |
 | Plays live, each with an owner, a metric and a holdout | 7 |
-| Decisions logged with a reason (entered, held out, excluded) | 3,755 |
-| Tasks handed to people, each with a handoff packet | 388 |
-| Agent conversations / handed off | 52 / 20 (38%) |
-| Mailbox replies read and routed | 584 |
-| Onboarding rescue: setup completed, treatment against holdout | 35% (17 of 49) against 0% (0 of 50): **+35 points**, 95% interval +21 to +48 |
-| Seat expansion: expansion closed, treatment against holdout | 23% against 10%: +13 points, p = 0.054: **not yet proven, keep testing** |
-| Evaluation cases for the agents | 44 |
-| Automated tests | 138 |
+| Decisions logged with a reason (entered, held out, excluded) | 3,740 |
+| Tasks handed to people, each with a handoff packet | 372 |
+| Agent conversations with the real model / handed off | 50 / 13 (26%) |
+| Mailbox replies read and routed | 613 (37 old buying questions and 37 old complaints had gone unread before the agent existed) |
+| Onboarding rescue: setup completed, treatment against holdout | 41% (19 of 46) against 2% (1 of 55): **+39 points**, 95% interval +25 to +54 |
+| Usage recovery: usage back to 90%, treatment against holdout | 32% against 13%: +19 points, p = 0.10: **not yet proven, keep testing** |
+| Seat expansion: expansion closed, treatment against holdout | 19% against 21%: **no effect detected** (the sample could only have shown 20 points or more) |
+| Agent evaluation, real model, 44 cases | Onboarding agent 30 of 30 with prompt v3 (v1: 29, v2: 25); mailbox 10 of 10; briefs 4 of 4; classifier 96% on 160 labelled replies |
+| Cost of every real model call behind this (817 calls) | about $3 |
+| Automated tests | 141 |
 
-Two honest notes. The lift comes from assumptions in `config/sim_effects.yaml`: this
-demonstrates a measurement system, not a result. And the agent answers in this run come
-from a labelled rule-based stand-in; one run with an API key replaces them with real
-model responses, which are then cached and replayed offline (see ADR 0015).
+Three honest notes. The lift comes from assumptions in `config/sim_effects.yaml`: this
+demonstrates a measurement system, not a result. The agent answers are real: one live
+run produced every conversation, classification, brief and evaluation shown here, and
+the responses are stored in `cache/llm/`, so everything replays offline with no key
+(ADR 0015). And that first live run found a real bug in the agent and three faults in
+the evaluation harness that the stand-in could never have shown (ADR 0017).
 
 ## Run it in 60 seconds
 
@@ -59,12 +63,20 @@ Needs [uv](https://docs.astral.sh/uv/). Python 3.12 is installed by uv.
 
 ```
 uv sync
-uv run python run.py demo 10 --profile small   # a small world, about 3 minutes
-uv run python run.py app                       # http://localhost:8501
+uv run python run.py demo 10 --profile small --stand-in   # a small world, about 3 minutes
+uv run python run.py app --stand-in                       # http://localhost:8501
 ```
 
-The full build is `uv run python run.py demo` (about 15 minutes). Everything runs offline:
-no key, no network.
+The full build is `uv run python run.py demo` (about 15 minutes). It replays the real
+model responses stored in `cache/llm/`, so it needs no key and no network.
+
+**Who answers as the model** is a switch on any command:
+
+| Switch | Answers come from | Needs |
+|---|---|---|
+| (none) | Real model responses replayed from `cache/llm/`. Anything not cached is handed to a person | Nothing |
+| `--live` | The cache first, then the API, up to a budget that stops the run | A key in `.env` |
+| `--stand-in` | Keyword rules, labelled as a stand-in on every screen | Nothing |
 
 | Command | What it does |
 |---|---|
@@ -74,6 +86,8 @@ no key, no network.
 | `run.py run-days 30` | Simulate days: world, pipeline, staff, mailbox, rules, journeys |
 | `run.py experiments` | Every play against its holdout: `experiments/reports/` |
 | `run.py evals` | Score the agents on the fixed cases: `evals/reports/` |
+| `run.py review` | Write the monthly operating review from the data: `docs/operating-review.md` |
+| `run.py extracts` | Write the gold tables as files for a BI tool: `exports/bi/` |
 | `run.py specs` | Rebuild the play specs from the configuration |
 | `run.py app` / `run.py api` | The app (port 8501) / the API (port 8000, `/docs`) |
 | `run.py test` / `run.py lint` | Tests and style |
@@ -133,7 +147,7 @@ branding or data.
 | Gainsight Journey Orchestrator | Audience rules, steps, branches, exits | `config/journeys.yaml` and the journey runner |
 | Gainsight CTAs and Cockpit | Tasks for people, with playbooks | The `ctas` table and the Human console |
 | Salesforce | Accounts, contacts, opportunities, owners | Synthetic CRM tables and export endpoints |
-| Tableau | Dashboards | Streamlit on the gold tables |
+| Tableau | Dashboards | Streamlit on the gold tables; extracts and a build guide for Tableau Public (`docs/bi-dashboard-guide.md`) |
 | Shared mailbox | Replies to digital journeys | Mailbox triage agent and routing rules |
 | The company's own AI agents | Agents with tools and retrieval | Claude with tool use, and keyword retrieval over a help centre |
 
@@ -151,7 +165,7 @@ they connect.
 | Agent plays | Built with CS AI agent engineers | `agents/`, `docs/play-specs/` |
 | Handoff workflows | CTAs and shared-mailbox workflows | `engine/handoff.py`, `agents/mailbox.py` |
 | Measurement | Tableau; experiments with Analytics | `experiments/`, `app/` |
-| Operating documents | Confluence and Jira | `docs/` |
+| Operating documents | Confluence and Jira | `docs/`, including a generated monthly review (`docs/operating-review.md`) |
 
 Why there is a mailbox agent: replies to journey emails land in a shared mailbox, and as
 far as I could tell from the vendor's community forum, reading and routing those replies
@@ -173,14 +187,14 @@ options, the decision, consequences and when to revisit. The ones worth reading 
 | Plays as configuration, holdouts by hash | 0014 |
 | LLM cost controls, and the labelled stand-in | 0015 |
 | A 50% holdout and leading indicators for the pilot; what happened when the split check fired | 0016 |
-| Evals: code checks first, judge second | 0017 |
+| Evals: code checks first, judge second; what the first real-model run taught | 0017 |
 
 What each phase delivered, and three decisions to defend for each, is in
 [docs/phase-notes.md](docs/phase-notes.md).
 
 ## What runs on GitHub, and what has not been run yet
 
-Running on GitHub Actions: CI on every push (lint, 138 tests on Linux, the dbt build, a
+Running on GitHub Actions: CI on every push (lint, 141 tests on Linux, the dbt build, a
 secret scan), the container image build (it generates a demo world inside the image and
 publishes it), and the daily pipeline schedule, which opens an issue when a run fails.
 
@@ -188,7 +202,6 @@ Written but not yet run against the real thing. Each needs an account or a key.
 
 | What | Needs |
 |---|---|
-| Real model responses for the agents, the judge and the prompt comparison | An API key, one live run (stops at a $5 budget) |
 | Databricks as the `prod` warehouse | A workspace host, SQL warehouse path and token |
 | Postgres operational store | A database URL |
 | Hosted app and API | A host connected to the repository (`render.yaml` is ready) |
@@ -219,5 +232,5 @@ evals/        evaluation cases, runner and reports
 experiments/  play results against holdouts
 api/ app/     FastAPI endpoints; the Streamlit app
 docs/         operating documents, decision records, play specs, model cards
-tests/        138 tests; they generate a small world and run everything on it
+tests/        141 tests; they generate a small world and run everything on it
 ```

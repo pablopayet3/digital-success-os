@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.\n- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"Can someone outside our company see just one board, as a guest?\"}, {\"role\": \"agent\", \"text\": \"Yes. You're on the Standard edition, which includes guest access.\\n\\n**To invite a guest:**\\n1. Open the board you want to share.\\n2. Click **Share**.\\n3. Type their email address and choose **Guest**.\\n\\n**What a guest can see:** Only the boards you invite them to. They can't see other boards or your list of users.\\n\\n**Seats:** Guests don't take up one of your licensed seats.\\n\\n**To remove a guest later:** Remove them in **Share** on that board, or deactivate them under **Admin settings \u2192 Users \u2192 Guests**.\"}], \"articles\": [{\"title\": \"Admin and member roles\", \"text\": \"# Admin and member roles\\n\\nRelay has two roles. Members can create and edit boards, cards and documents they have access to. Admins can do everything a member can, and also invite and deactivate users, manage seats, connect integrations, configure single sign-on, and see the billing page.\\n\\nEvery workspace needs at least one admin. We recommend two, so that setup and user management do not depend on one person. An admin can make another user an admin under Admin settings, Users.\\n\"}, {\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}, {\"title\": \"Give an external person access to one board (guests)\", \"text\": \"# Give an external person access to one board (guests)\\n\\nYou can invite a contractor or client as a guest. Open the board, click Share, type their email address and choose Guest. A guest sees only the boards they were invited to, and cannot see the list of users or any other board.\\n\\nGuests do not use a licensed seat on Standard, Premium and Enterprise. On the Free edition, guests are not available.\\n\\nTo remove a guest, open Share on the board and remove them, or deactivate them under Admin settings, Users, Guests.\\n\\nSearch keywords: contractor client external partner guest one board only permissions\\n\"}], \"account_facts\": {\"setup_status\": {\"completed_steps\": [\"create a first board\", \"invite at least five users\"], \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.5, \"seats_assigned\": 9, \"seats_licensed\": 15, \"edition\": \"standard\"}, \"account_context\": {\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 9, \"utilisation\": 0.6, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.5, \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}}}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx5TzzmvFrRYiTqQo3Cz",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQS7QcKEAgTGAI4AUIIdGhpbmtpbmcSDKnB8w2tqyCdUwQ2RBoMfVry4E5AYz+0OrgYIjBnG8xCVPtlkrgNiZu43Q3br56k4rVjkUb50wh4JdhSaQ6tpxnqoFJxvAMB/QW9FEIqigeYeKrDfmz1b3fqsSZ+iM18PceFn7UO4Br/FJxrwVSjaHcR3/MYKmDJNL/7AA6vVFUJtIcTe0pzZcMPA6d8XdElGlgoat9sQhk9BchaBqHVWLnvxCf/forVzl/7i+Rowv+g3IrbpIR380ZsCrpAfXwiVljMWZkf8u5OQQ5SPpdjP1KFGGCqaVghAAOnmONyXK/USZUX/r5vbUcA3e6l10cJLttRBVkbo6ASD+vMqg14Aq4Ymuzzrp1ftugKFDm+v6DOrMyOdaMYjgC0UJcpsQC1ypowD4Dhr0HuIhmlARCsvtexX3VKga4ggCcbjUi41hPScz/sCVtwYdd7VkNwtKRs3ELroo0e8VydSwhqHMoeGV76fIL8SGGrP2AL462+r0smNaj7DUscQzkHmOBx/YBZrnCFpkR163PEE4+WspQP21K2+boCDYStdIyNmeOwapteqIZwR7jaOFFSHKXiLv3eHxtdR3dlxxMtRNKULAXTWjdroJ79ubF5x0vjRC/8v5ihy2TZucMGF7MDfwYlEnGXPyJzNgW7QrSiDhAi9Mu/ycAYRrRswbODXs1JTf1pSMsyQmafmZ45OwmH29E86xmnh8/nIlEQpa7lBU/7H3Ygtr21ZzMNFN6qtmt5AC4Azp6JeZEANEyuYS++9QycZtIJSXK8mMszr8Lgf+Op3GohHe5lkX6u5NTMS0qYhY7qjDQyk5UaUXH0oCZmhgCfOtxzGgPz69KqraTX1/5MpenNjOY85RzQJ1ixduwbJjqxsdPnndkV+fMFkbAj5vvB0GMA5Ud6uPMOp7X/jaN8JCK/tIf16lVym04my0kKKtMyXwGK9rdypO1MGStnC3WSxaH/np5JYCmXYUroBaiVV7BOu5c4oYRzDnabK+BFcaXvIePkijnJBL9+Bz+wzkDKy+u2EB2uSAj2iqSWdawaQ8Y0L36cCXeqWLIuv8Melxz4y5Sa4aXE41yRjv9Q1duCk6vbBIFJeo4umyfpEJH7pKtZqohZ9SzpjvdnS8+14ZMFnlrV9EkEsahPhczEA1/htrE2yAzD3MImK7O4SJJglw80L0zVH2LebJQ6bkYbNH1wHWwEqLBIMr7Mb8QufC5vDX1nKmPS3XiWOvYNERZoU1v14UplKuVdQ4Co/G0XeBDP3aDJnzq9NmDX8PVYNBKCDHMg5eRBDlGaUjCOFLxaZyefVbPyKLDsXFAm94AYAQ==",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\": \"pass\", \"score\": 5, \"reason\": \"Every product step, guest permission, seat rule and removal method matches the guest article, the Standard edition claim matches account_facts, and the reply is direct with no promises, so all four points hold.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 782,
+   "inference_geo": "global",
+   "input_tokens": 1487,
+   "output_tokens": 221,
+   "output_tokens_details": {
+    "thinking_tokens": 138
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Velium Supply\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 518, \"seats_licensed\": 6, \"seats_assigned\": 5, \"seats_assigned_30_days_ago\": 5, \"seat_utilisation_pct\": 83, \"monthly_active_users\": 3, \"automation_rules\": 2, \"automation_rule_limit\": 15, \"integrations\": 1, \"integration_limit\": 3, \"assist_credits_used_30d\": 87, \"assist_credits_included\": 60, \"health_score\": 74.1, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 8, \"days_to_renewal\": 244, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 60%: nearly all seats assigned, heavy Assist use, creating few boards\", \"expansion_score_pct\": 60, \"expansion_reasons\": \"nearly all seats assigned, heavy Assist use, creating few boards\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6sxBPyDBAx8s43RJvv",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Velium Supply's expansion likelihood fired at 60%, pointing to a possible upgrade or added seats.\nEvidence: 5 of 6 licensed seats are assigned, and Assist used 87 credits in 30 days against 60 included. Health is 74.1 (green) with 0 open high-priority tickets.\nLikely need: Seats are nearly full but have not grown in 30 days, so more seats are a plausible ask. The heavy Assist use above the included allowance points more toward the premium edition, though the data does not show what premium includes, so confirm that before pitching it.\nSuggested opener: \"Your team has been making heavy use of Assist this month, so I wanted to check whether your current plan still fits how you're working.\"\nRisks: Only 3 monthly active users against 5 assigned seats, so a seat expansion could be hard to justify until more of the existing seats are in use. Renewal is 244 days out, so there is no urgency. The trigger reasons do not show how many boards the account has, so avoid quoting a number.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 721,
+   "output_tokens": 849,
+   "output_tokens_details": {
+    "thinking_tokens": 509
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

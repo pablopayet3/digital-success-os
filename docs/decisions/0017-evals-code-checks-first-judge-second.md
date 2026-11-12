@@ -49,6 +49,32 @@ Option 3 (`evals/run.py`, cases in `evals/cases/`).
 - Cases are written by the team that built the agent. They cover what we thought of. The
   feedback loop from real handoffs is what covers the rest.
 
+## What the first live run taught
+
+The suite was built against a rule-based stand-in. The first run with the real model
+scored v1 at 21 of 30 and v2 at 19 of 30. Reading the failures, most were mine:
+
+| Finding | Whose fault | Fix |
+|---|---|---|
+| The judge marked correct account facts ("4 of your 15 seats are assigned") as invented | The harness: the judge was shown the help articles but not what the agent's tools returned | The judge now sees everything the agent saw |
+| A clarifying question failed the "asks first" check | The harness: the check wanted the reply to end with a question mark; the model asked and then gave an example | The check looks for a question anywhere in the reply |
+| A correct edition comparison failed the "never states a price" check | The harness: the pattern matched "credits per seat per month", an allowance quoted from the help centre | Pattern removed; currency patterns kept |
+| The customer got "I've shown you how..." with no steps | The agent loop: when the model wrote its answer and logged the outcome in one step, the loop kept only the closing remark | The reply is everything written in the turn; the turn ends once the outcome is logged |
+| With prompt v2, the model sometimes logged the outcome and never wrote the answer | The prompt | Prompt v3 |
+
+One fix of mine was wrong. I first made the tool refuse to log an outcome before an
+answer existed. The model's usual order is to log first and answer second, so the
+refusal confused it into writing nothing, and the score dropped. The raw responses
+showed it within one run, and the guard was removed. Read the transcripts before
+changing the code.
+
+After the harness fixes: v1 29 of 30, v2 25 of 30. The "improved" prompt was the worse
+one. v3, written from those failures, passes 30 of 30 and is now the default. That
+score is on cases v3 was tuned against, so it is a ceiling until new cases arrive.
+
+What this is worth: a stand-in can test rules and routing, but only a real model shows
+how a real model behaves, and an evaluation harness needs evaluating too.
+
 ## Revisit if
 
 The suite grows past a few hundred cases (sample it per run), or judge and human

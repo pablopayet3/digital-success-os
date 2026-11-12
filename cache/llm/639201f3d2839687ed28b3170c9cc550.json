@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Wexessa Clinics\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 2189, \"seats_licensed\": 24, \"seats_assigned\": 19, \"seats_assigned_30_days_ago\": 16, \"seat_utilisation_pct\": 79, \"monthly_active_users\": 13, \"automation_rules\": 12, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 240, \"health_score\": 76.0, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 9, \"days_to_renewal\": 213, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 39%: nearly all seats assigned, near the automation limit, creating few boards\", \"expansion_score_pct\": 39, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, creating few boards\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6vmmR6D2D8r9dBYGTH",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Expansion-readiness signal fired with a 39% expansion likelihood. Seat assignment is nearly full and automation use is close to the plan limit.\n\nEvidence: 19 of 24 licensed seats are assigned, up from 16 thirty days ago, and seat utilisation is 79%. Automation rules are at 12 of 15. The trigger notes also point to few boards being created.\n\nLikely need: Automation headroom looks like the stronger need, since the account is close to its 15-rule limit, and Premium is the next edition. Seats are not yet constrained, since 5 licensed seats are still unassigned. Usage is also thin: only 13 monthly active users against 19 assigned seats, and 0 of 3 integrations and 0 of 240 assist credits used, so the case for Premium rests mainly on automation.\n\nSuggested opener: \"Wexessa's team has been adding people and automations quickly, so I wanted to check whether the current limits still fit how you're working.\"\n\nRisks: Only 13 of 19 assigned seats are monthly active, and no integrations or assist credits are in use, so a Premium pitch may get a weak response. Health is green at 76, NPS is 9, and there are no open high-priority tickets. Renewal is 213 days away.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 723,
+   "output_tokens": 886,
+   "output_tokens_details": {
+    "thinking_tokens": 472
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

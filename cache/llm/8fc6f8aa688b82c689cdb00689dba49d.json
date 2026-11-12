@@ -1,0 +1,52 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Ravarro Software\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1754, \"seats_licensed\": 21, \"seats_assigned\": 20, \"seats_assigned_30_days_ago\": 20, \"seat_utilisation_pct\": 95, \"monthly_active_users\": 13, \"automation_rules\": 14, \"automation_rule_limit\": 15, \"integrations\": 2, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 210, \"health_score\": 54.9, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 1, \"latest_nps_score\": 5, \"days_to_renewal\": 195, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"20 of 21 seats assigned\", \"expansion_score_pct\": 40, \"expansion_reasons\": \"nearly all seats assigned, many high-priority tickets, near the automation limit\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6os7C6CsHUFRXGwN3F",
+  "container": null,
+  "content": [
+   {
+    "text": "Signal: Seat pressure. Ravarro Software has assigned 20 of its 21 licensed seats, which is 95% utilisation, and that level was already reached 30 days ago with no change.\n\nEvidence: 20 of 21 seats assigned (seat_utilisation_pct 95), 14 of 15 automation rules used, and 13 monthly active users against 20 assigned seats.\n\nLikely need: More seats, since the account is nearly out of licensed capacity. Automation use is also close to the rule limit, so the Premium edition may be the better fit if they want more headroom, but the data does not show that they have asked for it.\n\nSuggested opener: \"Hi, I noticed your team has nearly used all 21 seats, so I wanted to check whether you need more room or a quick review of how the seats are being used.\"\n\nRisks: Health is yellow at 54.9, latest NPS is 5, and there is 1 open high-priority ticket. Renewal is 195 days away. Only 13 of the 20 assigned seats are active, so adding seats before checking usage could be a poor fit.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 703,
+   "output_tokens": 350,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

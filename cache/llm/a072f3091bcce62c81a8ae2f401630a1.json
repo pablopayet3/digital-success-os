@@ -1,0 +1,52 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Lundomi Travel\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1734, \"seats_licensed\": 21, \"seats_assigned\": 17, \"seats_assigned_30_days_ago\": 17, \"seat_utilisation_pct\": 81, \"monthly_active_users\": 13, \"automation_rules\": 12, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 210, \"health_score\": 77.1, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 7, \"days_to_renewal\": 262, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 41%: nearly all seats assigned, near the automation limit, reads our emails\", \"expansion_score_pct\": 41, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, reads our emails\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx74Lb42fUnTyvixmFLT",
+  "container": null,
+  "content": [
+   {
+    "text": "Signal: Lundomi Travel has been flagged as expansion-ready, with an expansion likelihood of 41%.\nEvidence: 17 of 21 licensed seats are assigned, 12 of 15 automation rules are in use, and the account is on the standard edition with premium as the next edition.\nLikely need: More seats or the move to premium. Seats are almost full (81% utilisation), and automation use is close to the limit of 15, so the account may need room to grow or features that go beyond standard. The data does not show which of these they need, so check before proposing either.\nSuggested opener: \"Hi, I noticed your team is using most of its seats and automation rules, so I wanted to check whether you have room to grow or whether anything in your current setup is getting in the way.\"\nRisks: Monthly active users are 13 of 17 assigned seats, and latest NPS is 7. Integrations are at 0 of 3 with 0 Assist credits used in 30 days, so adoption of some features is low. Renewal is 262 days away. Health is green at 77.1, with no open high-priority tickets.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 722,
+   "output_tokens": 351,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

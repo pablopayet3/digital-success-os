@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.\n- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"Where do I set up single sign-on? Our IT team is asking.\"}, {\"role\": \"agent\", \"text\": \"Your Standard edition includes single sign-on. It's also the last setup step you have left: the other three are done.\\n\\nOnly an admin can do these steps. Do them with your IT team:\\n\\n1. Go to **Admin settings \u2192 Security \u2192 Single sign-on**.\\n2. Pick the type of connection your company's login system (identity provider) uses: **SAML** or **OIDC**.\\n3. Enter your IT team's details:\\n   - **SAML:** upload the identity provider's metadata file (XML).\\n   - **OIDC:** paste the client ID, client secret and issuer URL.\\n4. Click **Test connection**. A new window will open and sign you in through your company's login system.\\n5. If the test works, click **Enable for everyone**.\\n\\nTip: keep one admin account that signs in with a password until you know single sign-on works for the whole team. Setup usually takes 10 to 15 minutes.\\n\\nThese steps come from the help centre article **\\\"Set up single sign-on (SSO)\\\"**, so you can send it to your IT team.\"}], \"articles\": [{\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}, {\"title\": \"Setup checklist: the four steps to get started\", \"text\": \"# Setup checklist: the four steps to get started\\n\\nNew to Relay, or stuck on setup? These four steps get a workspace ready. Teams that finish them in the first weeks get far more out of Relay.\\n\\n1. Create your first board. Pick a template and add a few real cards. See \\\"Create your first board\\\".\\n2. Invite at least five people. Boards are only useful with your team on them. See \\\"Invite your team\\\" or \\\"Invite many users at once\\\".\\n3. Connect an integration. Chat or calendar are the quickest wins. See \\\"Connect an integration\\\".\\n4. Configure single sign-on (Standard, Premium and Enterprise). See \\\"Set up single sign-on (SSO)\\\".\\n\\nAdmins can see which steps are done under Admin settings, Setup progress. If you are not sure what to do next, start with the first step on this list that is not done yet.\\n\\nSearch keywords: getting started onboarding stuck setup next step what should I do begin start first steps\\n\"}, {\"title\": \"Set up single sign-on (SSO)\", \"text\": \"# Set up single sign-on (SSO)\\n\\nSSO lets your team sign in to Relay with your company identity provider. It is available on the Standard, Premium and Enterprise editions. It is not available on Free.\\n\\nSteps (admins only):\\n1. Open Admin settings, then Security, then Single sign-on.\\n2. Choose the protocol your identity provider uses: SAML or OIDC.\\n3. For SAML, upload the identity provider metadata file (XML). For OIDC, paste the client ID, client secret and issuer URL.\\n4. Click Test connection. Relay signs you in through the provider in a new window.\\n5. When the test succeeds, click Enable for everyone.\\n\\nKeep one admin account with password sign-in until you have confirmed SSO works for the whole team. SSO setup usually takes ten to fifteen minutes.\\n\\nSearch keywords: single sign-on sign in login identity provider IT team configure enable SAML OIDC\\n\"}], \"account_facts\": {\"setup_status\": {\"completed_steps\": [\"create a first board\", \"invite at least five users\", \"connect an integration\"], \"missing_steps\": [\"configure single sign-on\"], \"closure_pct\": 0.75, \"seats_assigned\": 11, \"seats_licensed\": 15, \"edition\": \"standard\"}, \"account_context\": {\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 11, \"utilisation\": 0.73, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.75, \"missing_steps\": [\"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}}}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6BjXn1uGE9FyPSp7rd",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\":\"pass\",\"score\":4,\"reason\":\"All steps, the Standard edition SSO inclusion, the remaining setup step and the admin-only requirement are grounded in the articles and account_facts, the reply directly answers where to set up SSO, and it makes no promises, with only minor length in the step list holding it below a 5.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 782,
+   "inference_geo": "global",
+   "input_tokens": 1940,
+   "output_tokens": 455,
+   "output_tokens_details": {
+    "thinking_tokens": 345
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

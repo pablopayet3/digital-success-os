@@ -7,7 +7,27 @@ is set in `config/llm.yaml` (`prompt_versions`). Evals compare versions on the s
 
 ## onboarding_agent
 
-### v2 (current)
+### v3 (current)
+
+Written after the first live evaluation, which v2 lost to v1. Two changes from v2:
+
+1. **The answer must be written as text, every time.** With v2 the model sometimes
+   logged the outcome and then told the admin "I've shown you how to create your first
+   board" without the steps ever appearing. It had worked the answer out and behaved
+   as if it had been sent. v3 says plainly that the admin sees only the text.
+2. **State only what a tool result says.** v2's "check setup status first" led the model
+   to add friendly inferences ("connecting the calendar completes your integration
+   step") that no tool result or article supports. The judge failed them as ungrounded.
+
+Result on the 30 agent cases with the real model: v1 29, v2 25, v3 30. v3 became the
+default (`config/llm.yaml`). One caution: v3 was written after seeing where v1 and v2
+failed on these same cases, so 30 of 30 is a result on cases it was tuned against. New
+cases, from real handoffs, are what will show whether it holds.
+
+### v2 (not promoted)
+
+The evaluation did not confirm the expected effect below: v2 passed 25 of 30 where v1
+passed 29. It is kept as written, as the record of what was tried.
 
 Changes from v1, each with its reason:
 
@@ -48,7 +68,20 @@ Short instructions plus a JSON schema the reply must match. No examples: the cat
 are few and their names are plain. Add examples only for categories the eval shows are
 confused with each other.
 
-## brief, judge, customer_simulator
+## judge
+
+### v2 (current)
+
+The judge is now given the account facts the agent's tools returned, and told the agent
+may state them. v1 saw only the help articles, so on the first live run it marked
+correct statements such as "4 of your 15 seats are assigned" as invented and failed
+good answers. A judge has to see what the agent saw.
+
+### v1
+
+Articles only.
+
+## brief, customer_simulator
 
 ### v1 (current)
 

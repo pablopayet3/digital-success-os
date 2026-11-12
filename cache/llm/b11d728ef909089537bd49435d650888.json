@@ -1,0 +1,52 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Norisko Energy\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 9, \"seats_assigned\": 9, \"seats_assigned_30_days_ago\": 8, \"seat_utilisation_pct\": 100, \"monthly_active_users\": 7, \"automation_rules\": 5, \"automation_rule_limit\": 5, \"integrations\": 1, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 89.5, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 10, \"days_to_renewal\": 214, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"9 of 9 seats assigned\", \"expansion_score_pct\": 74, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, free edition\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6oRkwLS2npKaB9DcnW",
+  "container": null,
+  "content": [
+   {
+    "text": "Signal: Norisko Energy has run out of seats. All 9 licensed seats are assigned, up from 8 thirty days ago, on the Free edition.\n\nEvidence: Seat utilisation is 100%, with 9 of 9 seats assigned and 7 monthly active users. Automation rules are at 5 of 5, which is the limit for this edition.\n\nLikely need: The account is at its seat ceiling and has hit the automation rule cap, so the next step is likely the Standard edition, which would add room for more seats and rules. Seats were added in the last 30 days, which points to growing use, but the data does not show what the team plans to do next.\n\nSuggested opener: \"Hi, I noticed your team has filled all nine seats and is using every automation rule available, so I wanted to see whether Standard would give you more room to keep going.\"\n\nRisks: Current ARR is 0 and the account is on the Free edition, so there is no revenue at stake yet, and renewal is 214 days out. Health is green at 89.5, NPS is 10, and there are no open high-priority tickets. Assist credits are 0 used and 0 included, and one of two integrations is in use, so none of these are a concern here.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 694,
+   "output_tokens": 383,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

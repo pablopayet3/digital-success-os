@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Yorium Logistics\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 10, \"seats_assigned\": 7, \"seats_assigned_30_days_ago\": 6, \"seat_utilisation_pct\": 70, \"monthly_active_users\": 6, \"automation_rules\": 5, \"automation_rule_limit\": 5, \"integrations\": 1, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 94.7, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 10, \"days_to_renewal\": 60, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 51%: near the automation limit, nearly all seats assigned, reads our emails\", \"expansion_score_pct\": 51, \"expansion_reasons\": \"near the automation limit, nearly all seats assigned, reads our emails\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6umeSNXUa9gSzW4VYC",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Yorium Logistics, a free-edition SMB account, has an expansion-ready signal at 51% likelihood. They are at their automation rule limit.\nEvidence: Automation rules are at 5 of 5, and seats assigned rose from 6 to 7 over the last 30 days, out of 10 licensed. Health is green at 94.7 with an NPS of 10.\nLikely need: The Standard edition, since the automation rule limit is the clearest constraint in the data. More seats are less pressing, with 3 of 10 still unassigned. The integration count of 1 of 2 leaves room there too.\nSuggested opener: \"Your team has reached the five-rule automation limit on the free plan, so I wanted to check whether Standard would help you keep those workflows running without hitting a ceiling.\"\nRisks: Renewal is 60 days away and ARR is recorded as 0, so confirm the commercial position before you raise pricing. Assist credits are 0 included and 0 used in the last 30 days, so don't assume they value AI assistance.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 720,
+   "output_tokens": 812,
+   "output_tokens_details": {
+    "thinking_tokens": 468
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

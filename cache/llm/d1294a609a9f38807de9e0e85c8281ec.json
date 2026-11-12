@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Tevora Logistics\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 10, \"seats_assigned\": 9, \"seats_assigned_30_days_ago\": 9, \"seat_utilisation_pct\": 90, \"monthly_active_users\": 6, \"automation_rules\": 5, \"automation_rule_limit\": 5, \"integrations\": 2, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 77.4, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 8, \"days_to_renewal\": 266, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"9 of 10 seats assigned\", \"expansion_score_pct\": 52, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, free edition\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6wQQoqh69dijVwzQfd",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Tevora Logistics has nearly used all its seats, which is the seat pressure signal.\n\nEvidence: 9 of 10 seats are assigned (seat utilisation 90%), and automation rules (5 of 5) and integrations (2 of 2) are both at their limits on the free edition. Monthly active users are 6.\n\nLikely need: The account seems to be hitting free-edition limits on seats, automation rules, and integrations, so the next edition (standard) is the likely fit, with more seats as a possible first step. Expansion score is 52%.\n\nSuggested opener: \"Your team is close to the seat, automation, and integration limits on the free plan, so I wanted to see whether it would help to talk through what Standard would give you.\"\n\nRisks: ARR is 0, the seat count has not changed in 30 days (9 then, 9 now), and monthly active users (6) are below assigned seats (9). Health is green (77.4), there are no open high-priority tickets, and NPS is 8. Renewal is 266 days away.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 695,
+   "output_tokens": 703,
+   "output_tokens_details": {
+    "thinking_tokens": 370
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

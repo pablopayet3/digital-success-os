@@ -1,0 +1,52 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Bramessa Media\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 10, \"seats_assigned\": 8, \"seats_assigned_30_days_ago\": null, \"seat_utilisation_pct\": 80, \"monthly_active_users\": 7, \"automation_rules\": 1, \"automation_rule_limit\": 5, \"integrations\": 0, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 74.8, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 359, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 47%: nearly all seats assigned, most seats active, free edition\", \"expansion_score_pct\": 47, \"expansion_reasons\": \"nearly all seats assigned, most seats active, free edition\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7iv5WWokgoNWkW6HpK",
+  "container": null,
+  "content": [
+   {
+    "text": "Signal: Bramessa Media is flagged as expansion-ready, with an expansion likelihood of 47% on a free-edition account.\nEvidence: 8 of 10 licensed seats are assigned (80% utilisation), 7 monthly active users, and the account is on the free edition with 1 of 5 automation rules and 0 of 2 integrations used.\nLikely need: The account is nearly full on seats and is on the free edition, so the most likely next step is the standard edition, which is the next edition listed, with more seats if they keep adding people. The data does not show why they would need the upgrade, so confirm with the customer what they want to do next.\nSuggested opener: \"Hi, I noticed your team is using most of its seats on the free plan, and I'd be glad to walk through what the standard edition would add for you if that would help.\"\nRisks: The account has zero ARR, no seat-change history to show trend (the 30-day-ago seat count is missing), and no NPS score is recorded. Health is green at 74.8 with no open high-priority tickets, and renewal is 359 days away.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 709,
+   "output_tokens": 349,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

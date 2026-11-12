@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Toryx Studios\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 6, \"seats_assigned\": 5, \"seats_assigned_30_days_ago\": 5, \"seat_utilisation_pct\": 83, \"monthly_active_users\": 5, \"automation_rules\": 3, \"automation_rule_limit\": 5, \"integrations\": 1, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 90.3, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 9, \"days_to_renewal\": 252, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 66%: nearly all seats assigned, most seats active, near the automation limit\", \"expansion_score_pct\": 66, \"expansion_reasons\": \"nearly all seats assigned, most seats active, near the automation limit\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6pMo6eSH1Z32mRWee7",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Toryx Studios, a free-edition SMB account, has an expansion-ready signal with a 66% expansion likelihood.\n\nEvidence: 5 of 6 licensed seats are assigned, the same 5 as 30 days ago, and 5 monthly active users. Automation rules are at 3 against a limit of 5, and integrations are at 1 against a limit of 2.\n\nLikely need: The move looks like the next edition (standard) rather than more seats. Seat assignment is high but has not grown in 30 days, and the team is nearing its automation limit, which is the kind of constraint a higher edition addresses.\n\nSuggested opener: \"Hi, I noticed Toryx is using most of its automation and team seats on the free plan, so I wanted to see whether the standard edition would give you more room to grow. Would a short call be useful?\"\n\nRisks: The account is on the free plan with ARR of 0, and seat assignment has not grown in the last 30 days. Health is green at 90.3, with 0 open high-priority tickets, NPS of 9, and 252 days to renewal, so nothing here argues strongly for caution.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 717,
+   "output_tokens": 767,
+   "output_tokens_details": {
+    "thinking_tokens": 399
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

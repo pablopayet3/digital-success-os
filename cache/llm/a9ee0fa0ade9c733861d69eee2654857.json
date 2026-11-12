@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Kelomi Software\", \"segment\": \"smb\", \"edition\": \"premium\", \"next_edition\": \"enterprise\", \"arr\": 2059, \"seats_licensed\": 13, \"seats_assigned\": 11, \"seats_assigned_30_days_ago\": null, \"seat_utilisation_pct\": 85, \"monthly_active_users\": 8, \"automation_rules\": 0, \"automation_rule_limit\": 60, \"integrations\": 0, \"integration_limit\": 10, \"assist_credits_used_30d\": 67, \"assist_credits_included\": 520, \"health_score\": 73.4, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 350, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 39%: nearly all seats assigned, reads our emails, most seats active\", \"expansion_score_pct\": 39, \"expansion_reasons\": \"nearly all seats assigned, reads our emails, most seats active\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7BETuZWXDWwXJRed8k",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Kelomi Software has an expansion-ready signal at 39% expansion likelihood, driven by nearly all seats being assigned, the contact reading emails, and most seats being active.\n\nEvidence: 11 of 13 seats are assigned (seat utilisation 85%), with 8 monthly active users. Health is 73.4 (green), with 0 open high-priority tickets.\n\nLikely need: The seat numbers point to more seats eventually, but 2 licensed seats are still unassigned, so seats are not yet the constraint. Enterprise is the next edition, but the account shows 0 automation rules (limit 60) and 0 integrations (limit 10), and only 67 of 520 included assist credits used in 30 days. The data does not show whether they need Enterprise features, so a conversation about using what Premium already includes may come before an edition upsell.\n\nSuggested opener: \"Kelomi, your team has nearly all its seats in use, so I wanted to check how the platform is working for you and whether any of the automation or integration options would help your team day to day.\"\n\nRisks: Automation rules and integrations are both at 0, and assist credit use is low, so an Enterprise pitch could land poorly if the team has not yet adopted Premium. The data does not show a 30-day seat trend (the prior figure is null), and no NPS score is recorded. Renewal is 350 days out, so there is no urgency.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 717,
+   "output_tokens": 990,
+   "output_tokens_details": {
+    "thinking_tokens": 536
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

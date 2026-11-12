@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to answer from.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every step, limit or feature the assistant states can be found in the articles. Anything stated that is not in the articles is a failure, even if it happens to be true.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"Can someone outside our company see just one board, as a guest?\"}, {\"role\": \"agent\", \"text\": \"Yes. You're on the Standard edition, which includes guests. To add one:\\n\\n1. Open the board you want to share.\\n2. Click **Share**, type the person's email address and choose **Guest**.\\n\\nA guest sees only the boards they're invited to. They can't see your list of users or any other board. On Standard, guests don't use one of your paid seats.\\n\\nTo remove a guest later, open **Share** on the board and remove them. You can also turn off their access under **Admin settings \u2192 Users \u2192 Guests**.\\n\\nThis comes from the help centre article \\\"Give an external person access to one board (guests).\\\"\\n\\nTwo setup steps are still open: connecting an integration and setting up single sign-on. I can walk you through either one.\"}], \"articles\": [{\"title\": \"Admin and member roles\", \"text\": \"# Admin and member roles\\n\\nRelay has two roles. Members can create and edit boards, cards and documents they have access to. Admins can do everything a member can, and also invite and deactivate users, manage seats, connect integrations, configure single sign-on, and see the billing page.\\n\\nEvery workspace needs at least one admin. We recommend two, so that setup and user management do not depend on one person. An admin can make another user an admin under Admin settings, Users.\\n\"}, {\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}, {\"title\": \"Give an external person access to one board (guests)\", \"text\": \"# Give an external person access to one board (guests)\\n\\nYou can invite a contractor or client as a guest. Open the board, click Share, type their email address and choose Guest. A guest sees only the boards they were invited to, and cannot see the list of users or any other board.\\n\\nGuests do not use a licensed seat on Standard, Premium and Enterprise. On the Free edition, guests are not available.\\n\\nTo remove a guest, open Share on the board and remove them, or deactivate them under Admin settings, Users, Guests.\\n\\nSearch keywords: contractor client external partner guest one board only permissions\\n\"}]}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx4qsLtnRLj1aEpRZciQ",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSnwkKEAgTGAI4AUIIdGhpbmtpbmcSDOd174qDG9g7nIkjmxoMrrJ6c+tkWWJKBQ6uIjBH2yksGCPJntNKP/k6HUlik8mx4dL7fIICFP2yCsD+o8r0HyMfe4QpvwVhHFDARPYqvAjHatxwYBDJY/629X+pxeUEZ0i+eqYZJQTiA9SJL+tXQLjKsXEXbEZA2hi3gNdrYWTB849DwtouH/HZv/hmqmE+FeSV+xZToZnEe8OVLdjpe4jpUGfiqL/59yi07ySmD9ADkHuDsFrdauUiEYC2ZU+oZHWHRzNowjAcig37sZIBsYHbs8XklMnuMTzDqV7jiYyMt23UaJtxDfRA6rSQJUNLmrSvXavrMfrG8xET0j7gbGD5/nBUd/FOFl9eWR6lH2tuyWMmaJYY0R50lmOXp8cdvAA0YXJjR/+fQMOO6N0ULwGl6OpJDoRWlfjJFdOpCJESQ22jz1AaetzrFCCfCbCXSosTizexyt7/tqAxzSujiOhOwXy4+uWWAisr2FukPS3/VQDPA7MPb+vSYTcq3PV2GyL8hDARlPIe3/lKaLdUX1jyVyXmeVdSfk3hWohi5Ou9X786NBgL1hht2+5irexqEpjXrOb0DYS1n9WlBc8kA/Z6mR2bfqv96bL2IWsl9SsdFyY9wfrwUv3ZPk9EA4//j6JzgVkT10oxtrRU3nRnx8atwnzCdIXCYVOyclBE5X2G0MflGat6mqApG7OFbTnQycdD9GAEVv/Y1d3TroblRQXx9SBDb7A9RmsAEiD6bTQJfJyt69E8mNFUJtP0XKqsgBRoq6pbvdxXB4udoqvozapqttaL/YdNvchMdc/3pasHhePoR6WcnbNfOOOEvXOh54Uf5yp7B+m0/jx1FjPbB1+JhxCQxqIDYxlBBDtVv9eLl90RLAzaBWhx5ULGPO1DdCXMfttpr48wx+o/fMYR/6k4PyAQtr074plIgP9OxVdVw+Fou9WRGnCSOnMV80RIBzjn0ddhg6cTTy4qFzVUiI7NxjyoK2fwMjl3LsYEjz+EYmJoEZyv4dN/lpxqH3s3zdMXZoX+mOpoo0xKTebs+m/EL514w58J8l2s4sSXzLi8bfsS8JrbY3Rpm6ZXWlfsqSLjPwk7Sa1tgnCL4IqRZKVuvpZ+oT1gPfQUjr1yfFpSqRFpddYaJz3a7p8BlBIXESooPCdxEo4CbHeMQe3k2fQaS09Apk9ZcFTq7GbYId2o3kt2K5iVOnaKoEWlfREy54IR/CXMFa6I7ihw3zGXP3NKYDIeH7dHlgfDn05FO9kcXdpOCxrPQesLm025gf+C6PRaw6nvXNjlMvqBnNZrUk9Y61NfZkse3z6xy5LiNPPe4Np/9LqfQ/c64CTKzCRZWJh0lCy3jx3S1k0DQsZqcOFlP1/+OcY9HED7tQ+VbvDOMSLBdSC4GCjFLl1hlp2R91ZXJIAshHDArS4haQNlbJlRVXYmoH3Z9ea7RK5LsxXimuEJTd05CMWcNwPt8PrDpQshpaLno7guUVQPN3rNya05OMbGaK19OiOqiCExMmtA1M1hswSuFVwTxcKAgB6JsSZ/wxNpwWFMXiYyGAE=",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\":\"fail\",\"score\":2,\"reason\":\"Point 1 (grounded) fails: the reply states \\\"You're on the Standard edition\\\" and that two setup steps are still open, neither of which the customer said or the articles establish, so these are unsupported claims about the customer's account.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 671,
+   "inference_geo": "global",
+   "input_tokens": 1053,
+   "output_tokens": 276,
+   "output_tokens_details": {
+    "thinking_tokens": 182
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

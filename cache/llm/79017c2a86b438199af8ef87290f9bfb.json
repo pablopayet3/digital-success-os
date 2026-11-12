@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Tevarro Media\", \"segment\": \"smb\", \"edition\": \"premium\", \"next_edition\": \"enterprise\", \"arr\": 2095, \"seats_licensed\": 12, \"seats_assigned\": 11, \"seats_assigned_30_days_ago\": 10, \"seat_utilisation_pct\": 92, \"monthly_active_users\": 8, \"automation_rules\": 8, \"automation_rule_limit\": 60, \"integrations\": 2, \"integration_limit\": 10, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 480, \"health_score\": 80.7, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 7, \"days_to_renewal\": 60, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"11 of 12 seats assigned\", \"expansion_score_pct\": 17, \"expansion_reasons\": \"nearly all seats assigned, most seats active, few support tickets\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6sJzm6PgyNqgcaWeY2",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Tevarro Media has nearly used up its licensed seats, which points to a possible seat expansion conversation.\n\nEvidence: 11 of 12 seats are assigned, up from 10 thirty days ago, and seat utilisation is 92%. Health is green at 80.7 with no open high-priority tickets.\n\nLikely need: More seats on the current premium edition. The data shows seat demand rising, but it does not show a need for enterprise features, so enterprise is not supported by this evidence.\n\nSuggested opener: \"Hi, I noticed your team has grown to 11 of your 12 seats, so I wanted to check whether you'd like to talk through adding a few more before renewal.\"\n\nRisks: Renewal is 60 days away, latest NPS is 7, monthly active users are 8 against 11 assigned seats, and expansion score is 17%.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 698,
+   "output_tokens": 714,
+   "output_tokens_details": {
+    "thinking_tokens": 436
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

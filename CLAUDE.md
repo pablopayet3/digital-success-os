@@ -23,8 +23,8 @@ human's outcome comes back into the system. Every play has a holdout.
 
 - **Never use real company names, logos or branding** in data, code or screens. Real tool
   names appear only in the README mapping tables, `docs/production-architecture.md`,
-  `docs/demo-script.md` and the ADRs about the production profile (the brief update asked
-  for those). The app does not list those two documents. The employer is never named.
+  `docs/demo-script.md`, `docs/bi-dashboard-guide.md` and the ADRs about the production
+  profile (the brief update asked for those). The app does not list those two documents. The employer is never named.
 - Every file and screen says "Synthetic data, fictional company".
 - Simple, readable code over clever code. This code is walked through live, line by line.
   Short functions, plain names, comments that say why.
@@ -237,12 +237,18 @@ Phases 6 to 9 additions:
 - Docs: `prd`, `roadmap`, `principles`, `ownership-map`, `change-control`,
   `data-requirements`, `pilot-plan`, `dependency-map`, `production-architecture`,
   `demo-script`, `portfolio-entry`. ADRs 0016 to 0018.
-- Tests: `tests/test_evals.py`, `tests/test_api.py`. 138 tests in total.
+- Tests: `tests/test_evals.py`, `tests/test_api.py`. 141 tests in total.
 - `DSO_DATA_DIR` points the app and the API at another data folder (tests, containers).
 
-Still open: one live run with `ANTHROPIC_API_KEY` to fill `cache/llm/` (then set
-`llm_stand_in: false`); first runs of the hosted deployment, the Databricks target and
-the Postgres store.
+The live run is done: `cache/llm/` holds the real model responses (committed), replay
+is the default mode, the agent prompt in use is v3, and every stored conversation
+records who answered (`answered_by`). `run.py` takes `--live` and `--stand-in`.
+`run.py review` writes `docs/operating-review.md`; `run.py extracts` writes
+`exports/bi/` (guide: `docs/bi-dashboard-guide.md`, which names a real BI product).
+Stand-in eval runs write to `evals/reports/stand-in/`, never over the real report.
+
+Hosting: a Render blueprint from the public repository (no auto-deploy: use Manual
+sync in Render after a push). Still open: the Databricks target and the Postgres store.
 
 Ignore rules: anchor file names to the top folder (`/BRIEF.md`). Git on Windows matches
 without regard to case, and an unanchored `BRIEF.md` once hid `prompts/brief.md`.

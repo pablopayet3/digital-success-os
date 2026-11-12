@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T003555\", \"text\": \"Invites not arriving. Hello, I invited six colleagues yesterday and none of them received the invitation email. Could you point me in the right direction?\\n\\nRobert\"}, {\"id\": \"T003565\", \"text\": \"Users locked out after enabling SSO. I am honestly fed up. We switched on SSO this morning and now several people cannot log in at all. Frankly we are considering cancelling.\\n\\nBrianna\"}, {\"id\": \"T003566\", \"text\": \"Relay Assist credits ran out. Hi team, We ran out of Relay Assist credits in the middle of the month. How do we get more? Could you point me in the right direction?\\n\\nJose\"}, {\"id\": \"T003568\", \"text\": \"How to set up a board template. We are paying for this product and it does not work. We want every new project to start from the same board layout. What is the best way to do this? I need someone to call me today.\\n\\nCameron\"}, {\"id\": \"T003573\", \"text\": \"DOCS EDITOR LOSES FORMATTING. Not happy at all. When we paste a table into Relay Docs the formatting is lost every time. Frankly we are considering cancelling.\\n\\nAngela\"}, {\"id\": \"T003576\", \"text\": \"DOCS EDITOR LOSES FORMATTING. I am honestly fed up. When we paste a table into Relay Docs the formatting is lost every time. If this is not fixed this week we will look at alternatives.\\n\\nKathryn\"}, {\"id\": \"T003578\", \"text\": \"Docs editor loses formatting. Hello, When we paste a table into Relay Docs the formatting is lost every time. Could you point me in the right direction?\\n\\nVictoria\"}, {\"id\": \"T003579\", \"text\": \"Chat integration keeps disconnecting. Hi, The chat integration disconnects every few days and we have to authorise it again. Any help appreciated.\\n\\nChristopher\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7i4zWaF7AGFuLAsg7v",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"T003555\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.8},{\"id\":\"T003565\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.92},{\"id\":\"T003566\",\"sentiment\":\"neutral\",\"theme\":\"pricing\",\"confidence\":0.85},{\"id\":\"T003568\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.8},{\"id\":\"T003573\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9},{\"id\":\"T003576\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.93},{\"id\":\"T003578\",\"sentiment\":\"neutral\",\"theme\":\"performance\",\"confidence\":0.75},{\"id\":\"T003579\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.8}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 635,
+   "output_tokens": 278,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

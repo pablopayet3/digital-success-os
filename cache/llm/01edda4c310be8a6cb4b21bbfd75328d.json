@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T003162\", \"text\": \"Automation rule did not fire. Good morning, We created a rule to move cards when they are approved, but it has not run once. Could you point me in the right direction?\\n\\nStanley\"}, {\"id\": \"T003163\", \"text\": \"NOTIFICATIONS SENT TO THE WRONG PERSON. This is the third time I am writing about this. A colleague is getting notifications for cards assigned to someone else. Frankly we are considering cancelling.\\n\\nTammy\"}, {\"id\": \"T003164\", \"text\": \"WHERE DO I UPLOAD SSO METADATA?. We are paying for this product and it does not work. Our IT team wants to turn on SSO but we cannot find where to upload the identity provider metadata file. I need someone to call me today.\\n\\nRebecca\"}, {\"id\": \"T003167\", \"text\": \"NOTIFICATIONS SENT TO THE WRONG PERSON. Not happy at all. A colleague is getting notifications for cards assigned to someone else. This is blocking the whole team.\\n\\nAriel\"}, {\"id\": \"T003168\", \"text\": \"How to set up a board template. Hello, We want every new project to start from the same board layout. What is the best way to do this? Could you point me in the right direction?\\n\\nKristina\"}, {\"id\": \"T003169\", \"text\": \"Permissions for guests. Not happy at all. Can we give an external contractor access to one board only? I need someone to call me today.\\n\\nMorgan\"}, {\"id\": \"T003171\", \"text\": \"INVITES NOT ARRIVING. We are paying for this product and it does not work. I invited six colleagues yesterday and none of them received the invitation email. Frankly we are considering cancelling.\\n\\nEmily\"}, {\"id\": \"T003172\", \"text\": \"Chat integration keeps disconnecting. We are paying for this product and it does not work. The chat integration disconnects every few days and we have to authorise it again. I need someone to call me today.\\n\\nDiana\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7RxrTxtzXKGngzi1xj",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"T003162\",\"sentiment\":\"neutral\",\"theme\":\"performance\",\"confidence\":0.7},{\"id\":\"T003163\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9},{\"id\":\"T003164\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.9},{\"id\":\"T003167\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9},{\"id\":\"T003168\",\"sentiment\":\"neutral\",\"theme\":\"usability\",\"confidence\":0.85},{\"id\":\"T003169\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.75},{\"id\":\"T003171\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.9},{\"id\":\"T003172\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 661,
+   "output_tokens": 276,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

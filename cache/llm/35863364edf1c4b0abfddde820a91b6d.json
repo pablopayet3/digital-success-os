@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.\n- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"Bonjour, comment inviter toute mon \u00e9quipe en une seule fois ?\"}, {\"role\": \"agent\", \"text\": \"\"}], \"articles\": [{\"title\": \"Invite many users at once (bulk invite)\", \"text\": \"# Invite many users at once (bulk invite)\\n\\nTo add many people at once, go to Admin settings, Users, Invite, and choose Upload a file. Upload a CSV file with one column named email. You can add an optional column named role with the value member or admin.\\n\\nRelay checks the file first and shows you any addresses it cannot use (wrong format, already a user, or more rows than free seats). Nothing is sent until you confirm.\\n\\nThere is no limit on the size of the file other than the number of seats you have free.\\n\\nSearch keywords: add whole team everyone all at once many people dozen dozens hundreds list import upload\\n\"}, {\"title\": \"Invite your team\", \"text\": \"# Invite your team\\n\\nAdmins invite people from Admin settings, Users, Invite. Type one email address per line or paste a list. Each invited person receives an email with a link that is valid for seven days.\\n\\nYou can invite as many people as you have licensed seats. A seat is used as soon as the invitation is sent, and freed again if you cancel the invitation or deactivate the user.\\n\\nTip: teams that invite at least five people in their first week are far more likely to keep using Relay, because boards are only useful when the work of several people is on them.\\n\\nSearch keywords: add people colleagues members team teammates new users invite invitation\\n\"}, {\"title\": \"Invitation emails are not arriving\", \"text\": \"# Invitation emails are not arriving\\n\\nIf an invited colleague did not receive the invitation:\\n1. Ask them to check their spam or junk folder.\\n2. Check the address under Admin settings, Users, Pending invitations. A typo is the most common cause.\\n3. Click Resend next to the invitation. The old link stops working.\\n4. If your company filters external email, ask your IT team to allow mail from relay-mail.lumenlabs.example.\\n\\nInvitations expire after seven days. An expired invitation still holds a seat until you cancel or resend it.\\n\\nSearch keywords: invite invites invitation not received missing did not arrive email never came\\n\"}], \"account_facts\": {\"setup_status\": {\"completed_steps\": [\"create a first board\"], \"missing_steps\": [\"invite at least five users\", \"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.25, \"seats_assigned\": 4, \"seats_licensed\": 15, \"edition\": \"standard\"}, \"account_context\": {\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 4, \"utilisation\": 0.27, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.25, \"missing_steps\": [\"invite at least five users\", \"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}}}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx5stDATzGrEDpBsseSK",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQS2wUKEAgTGAI4AUIIdGhpbmtpbmcSDCbjeLMrHNogqZ2DnxoM0Cd3mGsF0GSZ/FI4IjBjElBNELYiUj6zo1+aRpQIOIcGVTRdgOrv8I/hhtfu6yZEDszDri6SVuKT+FMSxT4q+AQhHrjPPlbjoPpAW6NQDlYR07O/eAZ1w1VMXsDhp3gHVIgrjJ9KLKGJvc1oLFQBV7aZNurAHQdrReKpohvxiAKPnrvpjxIn4cERWqRRkdn1jZfiQhS4B0jtrXb6z01AGgjbY5lgTYZVe2zubnyGqUdiw/NkWN1NC8bsU6PxxDnqByWhSeNBz3PiLe2t+f0o7NddoUcMk7Nb2DC5Gk70Lb1LuZjq6xQrPYGkXE+J8NAbXfybco5U+bsRbm2zBv/eiKrxKhaBnUFccd24SDIgjYAd69BKj352OhR//Y4C84MdYMfcrhGyMG1fhQRUf8Dx17UdBaUvbvM2ZCpUewJKkCYjg1DgY54PIM8FkLTZFA5hgd04jq9zw3a37VRx6F+zzS3s9PiMT4fugP6EhQOGlG6VQNgnutaM7+VhWestuDs1k7LEiWwl+d+/TvQWPHEjkvu+nPhc9QUKYm92WeggUyScJ21S7aK1Z32oyJJjXKP78dDH7mdqLa433JbtsbSvIr/K+AFBvfiWeVlXb+FCBb/BguSZyq4oA8R5T85c3jMTKrCvZ0zK0JQom4yFoGl5I8NeZN64rdnGqxevySfw4PisfRhC0uqrJogPpGw5tOi35EIDd0G7vi3tTnK4PBdIg6/0/qjOIYhLro5RIgzC7v5K7quFXIsE8PaqLa59uIDVxZ/ebdM2094rakD3ET//H/SFAk/Owe7wfXlndwjXeQy5qINE7BM/Tg0suCjBhNm3SgxIo/Yv8UJW39wYKk/QojG+G64uX4cptOo3DZe9XvKdqZ5rxgGQ7pzqYn4UKSD5s4XVg633+KYpaTBSwmmeguqV/QTAP6DhghgB",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\": \"fail\", \"score\": 1, \"reason\": \"The assistant's reply is empty, so it does not answer the customer's question about inviting the whole team at once and fails the answers-the-question point.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 782,
+   "inference_geo": "global",
+   "input_tokens": 1262,
+   "output_tokens": 110,
+   "output_tokens_details": {
+    "thinking_tokens": 42
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

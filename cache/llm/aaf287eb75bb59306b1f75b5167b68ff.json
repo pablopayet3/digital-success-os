@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Cavora Partners\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 10, \"seats_assigned\": 7, \"seats_assigned_30_days_ago\": 7, \"seat_utilisation_pct\": 70, \"monthly_active_users\": 6, \"automation_rules\": 2, \"automation_rule_limit\": 5, \"integrations\": 0, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 74.4, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 325, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 40%: nearly all seats assigned, most seats active, free edition\", \"expansion_score_pct\": 40, \"expansion_reasons\": \"nearly all seats assigned, most seats active, free edition\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6ppTDXr9GGjc8mX6CK",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: The account fired an expansion-ready signal. It is on the free edition with most seats assigned and active, and the model puts expansion likelihood at 40%.\nEvidence: 7 of 10 licensed seats are assigned, the same 7 as 30 days ago, with 6 monthly active users. Health is 74.4 (green), and ARR is 0.\nLikely need: The data points toward the standard edition rather than more seats. Seats are 7 of 10 and have not grown in 30 days, so there is still room. The account is on free with 0 of 2 integrations and 2 of 5 automation rules in use, so the upgrade case is about capability, but the data does not show what they are missing.\nSuggested opener: \"I noticed Cavora Partners is using most of its seats, so I wanted to see whether the standard edition would be worth a look for your team.\"\nRisks: No open high-priority tickets and green health. Expansion likelihood is only 40%, seat count has been flat for 30 days, and there is no paid revenue yet (ARR 0). Renewal is 325 days away, so there is no time pressure.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 710,
+   "output_tokens": 991,
+   "output_tokens_details": {
+    "thinking_tokens": 631
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

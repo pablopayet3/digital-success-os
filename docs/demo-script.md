@@ -64,12 +64,14 @@ Resolve as `expansion_opportunity`.
 
 **6. Agent quality (30 seconds). Agents page, Evaluation tab.**
 
-> "Forty-four fixed cases. Code checks first: did it hand off, for the right reason, to
-> the right queue. A judge model only scores the wording of answers that already passed.
-> Each prompt version runs on the same cases before it ships."
+> "Forty-four fixed cases, run against the real model. Code checks first: did it hand
+> off, for the right reason, to the right queue. A judge model only scores the wording of
+> answers that already passed. Three prompt versions ran on the same cases: the one I
+> expected to win scored 25 of 30, the baseline 29, and the third, written from the
+> failures, 30. The evals picked the prompt, not me."
 
-If the report says stand-in, say so: "This run used a rule-based stand-in, so it proves
-the rules and the routing, not the answers."
+The report states which model produced the answers. If it ever says stand-in, say so:
+"this run proves the rules and the routing, not the answers."
 
 **7. Pilot (30 seconds). Pilot page.**
 
@@ -103,6 +105,9 @@ Open the ownership map, then one play spec.
 ## Before the interview
 
 - [ ] `uv run python run.py test` passes.
-- [ ] The app opens with Wi-Fi off.
+- [ ] Decide the mode. With the key in `.env`, add the line `DSO_OFFLINE_MODE=false` so the
+      Live demo answers anything you type (cached answers are instant, new ones cost
+      cents). With no network, add `DSO_LLM_STAND_IN=true` instead and say so.
+- [ ] The app opens with Wi-Fi off (replay or stand-in mode).
 - [ ] The Live demo conversation above has been run once on this machine.
 - [ ] A second tab is signed in to the Human console.

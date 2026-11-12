@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T003257\", \"text\": \"Need a copy of our invoice. We are paying for this product and it does not work. Finance is asking for last month's invoice and I cannot find it in the admin settings. Frankly we are considering cancelling.\\n\\nJason\"}, {\"id\": \"T003259\", \"text\": \"Is there an integration for our code repository?. I am honestly fed up. We would like commits to show on cards. I could not find the setup guide. This is blocking the whole team.\\n\\nWarren\"}, {\"id\": \"T003260\", \"text\": \"SSO connection test fails. Not happy at all. We are trying to set up single sign-on and the connection test fails at the last step with a certificate error. I need someone to call me today.\\n\\nErin\"}, {\"id\": \"T003267\", \"text\": \"Users locked out after enabling SSO. Not happy at all. We switched on SSO this morning and now several people cannot log in at all. This is blocking the whole team.\\n\\nMelissa\"}, {\"id\": \"T003270\", \"text\": \"How to set up a board template. Hello, We want every new project to start from the same board layout. What is the best way to do this? Thank you.\\n\\nHenry\"}, {\"id\": \"T003271\", \"text\": \"Permissions for guests. Hello, Can we give an external contractor access to one board only? Could you point me in the right direction?\\n\\nAmanda\"}, {\"id\": \"T003278\", \"text\": \"Boards are very slow to load. Hi team, Since last week our larger boards take more than ten seconds to load. Thanks in advance.\\n\\nMichael\"}, {\"id\": \"T003281\", \"text\": \"RELAY ASSIST CREDITS RAN OUT. This is the third time I am writing about this. We ran out of Relay Assist credits in the middle of the month. How do we get more? Frankly we are considering cancelling.\\n\\nShirley\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7TjoChySXG9CEgBtkH",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"T003257\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.8},{\"id\":\"T003259\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.75},{\"id\":\"T003260\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.9},{\"id\":\"T003267\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.9},{\"id\":\"T003270\",\"sentiment\":\"neutral\",\"theme\":\"usability\",\"confidence\":0.85},{\"id\":\"T003271\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.85},{\"id\":\"T003278\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.85},{\"id\":\"T003281\",\"sentiment\":\"negative\",\"theme\":\"pricing\",\"confidence\":0.85}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 609,
+   "output_tokens": 276,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

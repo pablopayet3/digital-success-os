@@ -14,17 +14,18 @@ clean run of `uv run python run.py demo`; replace them if the run is repeated.
 | Badge | Value |
 |---|---|
 | Accounts simulated | 1,200 |
-| Events processed | 617,001 kept, 8,388 rejected with a reason |
+| Events processed | 617,555 kept, 8,385 rejected with a reason |
 | Data tests passing | 100 of 100, plus a 14-check data contract |
 | Plays | 7, each with an owner, a success metric and a holdout |
-| Agent evaluation cases | 44 |
-| Agent handoff rate | 38% (20 of 52 conversations) |
-| Lift against holdout | +35 points on setup completion (onboarding rescue), 95% interval +21 to +48 |
-| Automated tests | 138 |
+| Agent evaluation, real model | 44 cases; onboarding agent 30 of 30 with prompt v3 (v1: 29, v2: 25) |
+| Agent handoff rate | 26% (13 of 50 conversations) |
+| Lift against holdout | +39 points on setup completion (onboarding rescue), 95% interval +25 to +54 |
+| Automated tests | 141 |
+| Cost of all real model calls | about $3 |
 
-Until one run with an API key, add this line under the badges: "Agent answers in this run
-come from a labelled rule-based stand-in; the lift is a simulation assumption coming back
-out through a real measurement pipeline."
+Add this line under the badges: "Agent answers are real model responses, cached and
+replayed offline. The lift is a simulation assumption coming back out through a real
+measurement pipeline."
 
 ## Problem
 
@@ -65,6 +66,7 @@ computed in the warehouse and each play is compared with its holdout.
 - Plays are configuration; guardrails are engine code that no play can skip (ADR 0014).
 - LLM cost is designed in: cache, offline by default, a budget that stops the run (ADR 0015).
 - When the split check fired on my own data, I investigated before reading the result (ADR 0016).
+- The first run with a real model scored 21 of 30. Most failures were my harness, one was a real bug, and the prompt I expected to win lost. The evals picked the prompt (ADR 0017).
 
 ## Tools
 

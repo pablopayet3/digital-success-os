@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Quinune Foods\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1037, \"seats_licensed\": 12, \"seats_assigned\": 11, \"seats_assigned_30_days_ago\": 9, \"seat_utilisation_pct\": 92, \"monthly_active_users\": 6, \"automation_rules\": 14, \"automation_rule_limit\": 15, \"integrations\": 3, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 120, \"health_score\": 69.6, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 7, \"days_to_renewal\": 54, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"11 of 12 seats assigned\", \"expansion_score_pct\": 34, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, many high-priority tickets\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx83wDzRt75eDgQ61jmV",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Seat pressure. Quinune Foods has nearly all of its licensed seats assigned, and assignments rose recently.\nEvidence: 11 of 12 seats assigned, up from 9 thirty days ago. Automation rules are at 14 of 15 and integrations at 3 of 3, both close to or at their limits.\nLikely need: More seats are the direct need, since 11 of 12 are assigned and the count grew by 2 in 30 days. The automation and integration limits suggest they may also outgrow Standard, so Premium is worth raising, but the data does not show Premium's limits. Only 6 monthly active users against 11 assigned seats means they should confirm seats are being used before adding more.\nSuggested opener: \"Your team has grown quickly and you're nearly at your seat and automation limits, so I'd like to walk through what adding seats or moving to Premium would look like for you.\"\nRisks: Health is yellow at 69.6, NPS is 7, and renewal is 54 days away. Only 6 of 11 assigned seats are active monthly. The expansion reasons mention many high-priority tickets, but the open high-priority ticket count is 0, so check the ticket history before reaching out. Assist credits show 0 of 120 used.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 703,
+   "output_tokens": 812,
+   "output_tokens_details": {
+    "thinking_tokens": 402
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

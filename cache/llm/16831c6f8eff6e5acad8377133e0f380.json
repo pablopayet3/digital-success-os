@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T002962\", \"text\": \"Search times out. This is the third time I am writing about this. Searching across Relay Docs often times out for our team in the afternoon. I need someone to call me today.\\n\\nJennifer\"}, {\"id\": \"T002963\", \"text\": \"SEARCH TIMES OUT. This is the third time I am writing about this. Searching across Relay Docs often times out for our team in the afternoon. Frankly we are considering cancelling.\\n\\nDaniel\"}, {\"id\": \"T002969\", \"text\": \"Charged for seats we do not use. Good morning, Our last invoice shows more seats than we have people. Can you explain the charge? Thanks in advance.\\n\\nWendy\"}, {\"id\": \"T002975\", \"text\": \"RULE RUNS TWICE. This is the third time I am writing about this. One of our automation rules sends two notifications for every card. How do we stop the duplicate? Frankly we are considering cancelling.\\n\\nKevin\"}, {\"id\": \"T002976\", \"text\": \"Docs editor loses formatting. I am honestly fed up. When we paste a table into Relay Docs the formatting is lost every time. I need someone to call me today.\\n\\nJessica\"}, {\"id\": \"T002977\", \"text\": \"Automation rule did not fire. I am honestly fed up. We created a rule to move cards when they are approved, but it has not run once. Frankly we are considering cancelling.\\n\\nJennifer\"}, {\"id\": \"T002986\", \"text\": \"SSO connection test fails. Hi, We are trying to set up single sign-on and the connection test fails at the last step with a certificate error. Could you point me in the right direction?\\n\\nMelissa\"}, {\"id\": \"T002987\", \"text\": \"Search times out. Not happy at all. Searching across Relay Docs often times out for our team in the afternoon. I need someone to call me today.\\n\\nAlexander\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7PMZsW7HnH7FqLSSEb",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"T002962\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.93},{\"id\":\"T002963\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.95},{\"id\":\"T002969\",\"sentiment\":\"neutral\",\"theme\":\"pricing\",\"confidence\":0.85},{\"id\":\"T002975\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9},{\"id\":\"T002976\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.88},{\"id\":\"T002977\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9},{\"id\":\"T002986\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.9},{\"id\":\"T002987\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.93}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 624,
+   "output_tokens": 276,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

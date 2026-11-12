@@ -9,6 +9,7 @@ select
     enrollment_id,
     scenario,
     prompt_version,
+    answered_by,
     outcome,
     reason_code,
     escalated_by,

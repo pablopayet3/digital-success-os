@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.\n- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"What does the Premium edition include that Standard does not?\"}, {\"role\": \"agent\", \"text\": \"You're on **Standard** now. Premium raises three limits. Everything else on the feature list is the same in both editions.\\n\\n| | Standard | Premium |\\n|---|---|---|\\n| Automation rules per workspace | 15 | 60 |\\n| Integrations | 3 | 10 |\\n| Relay Assist credits per seat per month | 10 (only if you add Relay Assist) | 40 |\\n| Single sign-on | \u2713 | \u2713 |\\n| Guests | \u2713 | \u2713 |\\n\\nIf you hit a limit, nothing stops working. For example, rules you already have keep running, but you can't add new ones.\\n\\nI can't give prices or change your edition. Your account owner, **Morgan Ellis**, can help with that.\\n\\nBefore you upgrade: your setup still has two steps left, **connecting an integration** and **setting up single sign-on**. Your current edition includes both, so you can do them now. Would you like help with either one?\"}], \"articles\": [{\"title\": \"Automation rules\", \"text\": \"# Automation rules\\n\\nAn automation rule does something for you when something happens on a board. Example: when a card moves to Done, notify the reporter. Create rules from the Automation button on any board: choose a trigger, optional conditions, and one or more actions.\\n\\nRules also work with recurring cards: the rule runs each time a new copy of the card is created.\\n\\nThe number of rules per workspace depends on your edition: 5 on Free, 15 on Standard, 60 on Premium, and no practical limit on Enterprise. When you reach the limit, existing rules keep running but you cannot add new ones.\\n\\nSearch keywords: automate automation rule rules trigger action limit\\n\"}, {\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}, {\"title\": \"Connect an integration\", \"text\": \"# Connect an integration\\n\\nIntegrations connect Relay to the other tools your team uses. Available integrations: chat, calendar, code repository, cloud drive, CRM and video meetings.\\n\\nTo connect one (admins only), open Admin settings, Integrations, choose the tool and click Connect. You are sent to that tool to approve access, then returned to Relay. The integration is live straight away for the whole workspace.\\n\\nHow many integrations you can connect depends on your edition: 2 on Free, 3 on Standard, 10 on Premium, and no practical limit on Enterprise. Connecting at least one integration is one of the four setup steps we recommend in the first week.\\n\\nSearch keywords: connect tools apps integration integrations link\\n\"}], \"account_facts\": {\"setup_status\": {\"completed_steps\": [\"create a first board\", \"invite at least five users\"], \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.5, \"seats_assigned\": 9, \"seats_licensed\": 15, \"edition\": \"standard\"}, \"account_context\": {\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 9, \"utilisation\": 0.6, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.5, \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}}}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx5rZQnUjqqEb289rPNY",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\": \"fail\", \"score\": 3, \"reason\": \"Point 1 (grounded) fails: the claim that 'if you hit a limit, nothing stops working' is stated as fact for all limits, but the articles only say existing automation rules keep running when the rule limit is reached.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 782,
+   "inference_geo": "global",
+   "input_tokens": 1727,
+   "output_tokens": 770,
+   "output_tokens_details": {
+    "thinking_tokens": 676
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

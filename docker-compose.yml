@@ -16,7 +16,7 @@ services:
 
   api:
     build: .
-    command: ["sh", "-c", "uv run --no-dev uvicorn api.main:app --host 0.0.0.0 --port 8000"]
+    command: ["sh", "scripts/start-api.sh"]
     ports: ["8000:8000"]
     environment:
       API_TOKEN: ${API_TOKEN:-local-demo-token}

@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Lorexo Freight\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1339, \"seats_licensed\": 15, \"seats_assigned\": 12, \"seats_assigned_30_days_ago\": 12, \"seat_utilisation_pct\": 80, \"monthly_active_users\": 8, \"automation_rules\": 13, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 150, \"health_score\": 71.1, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 9, \"days_to_renewal\": 188, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 39%: nearly all seats assigned, near the automation limit, creating few boards\", \"expansion_score_pct\": 39, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, creating few boards\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx8FxfQ1gbSBE24F5Qaq",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Lorexo Freight's expansion likelihood is 39%, and the account is flagged expansion_ready.\nEvidence: 12 of 15 seats are assigned (80% utilisation), unchanged from 12 thirty days ago. Automation rules are at 13 of a 15 limit. The trigger notes say the account creates few boards.\nLikely need: The stronger pull looks like the next edition (premium), because automation is close to its limit, but 3 licensed seats are still unassigned, so more seats alone is less clearly needed. The account has 0 of 3 integrations in use and 0 of 150 assist credits used in 30 days, so the customer may not yet be getting full value from the current edition.\nSuggested opener: \"I noticed you're getting close to the automation limit on your current plan, so I wanted to check how the team is finding it and whether there's anything you'd like to set up next.\"\nRisks: Only 8 monthly active users against 12 assigned seats, 0 of 3 integrations used, and 0 assist credits used suggest low adoption, so a pitch may land better after the team is using what it already has. Renewal is 188 days away. Health is green at 71.1, NPS is 9, and there are no open high-priority tickets, so no serious warning signs are visible.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 722,
+   "output_tokens": 990,
+   "output_tokens_details": {
+    "thinking_tokens": 573
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

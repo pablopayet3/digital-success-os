@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Eldium Foods\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1734, \"seats_licensed\": 21, \"seats_assigned\": 19, \"seats_assigned_30_days_ago\": 19, \"seat_utilisation_pct\": 90, \"monthly_active_users\": 11, \"automation_rules\": 4, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 210, \"health_score\": 73.5, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 10, \"days_to_renewal\": 259, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"19 of 21 seats assigned\", \"expansion_score_pct\": 30, \"expansion_reasons\": \"nearly all seats assigned, few support tickets, near the automation limit\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6sbLkposRKNpNayqKu",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Seat pressure. Almost all licensed seats are assigned, and the seat count has not moved in 30 days.\nEvidence: 19 of 21 seats assigned (seat utilisation 90), unchanged from 19 thirty days ago. Only 11 monthly active users, and the account has 0 integrations of 3 and 0 of 210 Assist credits used in 30 days.\nLikely need: Possibly more seats, but the evidence is weaker than the 90 utilisation suggests, because only 11 of the 19 assigned seats are active. The expansion reason cites nearing the automation limit, yet the data shows 4 of 15 rules used, so the case for Premium is not supported by these facts.\nSuggested opener: \"Eldium's team has most of its seats in use, so I wanted to check whether you're finding everything you need from Standard or whether more seats or a different setup would help.\"\nRisks: Only 11 of 19 assigned seats are monthly active, so seat growth may not be needed. Automation (4 of 15), integrations (0 of 3) and Assist credits (0 of 210) are all unused. The expansion reason about the automation limit does not match the data. Renewal is 259 days away. Health is green at 73.5, NPS is 10, and there are no open high-priority tickets.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 698,
+   "output_tokens": 978,
+   "output_tokens_details": {
+    "thinking_tokens": 552
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

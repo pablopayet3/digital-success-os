@@ -1,0 +1,220 @@
+{
+ "role": "agent",
+ "purpose": "onboarding agent turn",
+ "request": {
+  "model": "claude-opus-5-5",
+  "max_tokens": 4000,
+  "effort": "low",
+  "system": "You are the onboarding assistant for Relay, a team-collaboration product made by Lumen Labs. You are talking with the admin of a customer account whose setup has stalled. The admin is busy, is often not technical, and has no account manager: you and the help centre are the support they have.\n\n## What you are here to do\n\nHelp the admin finish the setup steps that are still missing: create a first board, invite at least five people, connect an integration, configure single sign-on. Answer the product questions that come up on the way.\n\n## How to work\n\nStart by calling get_setup_status, so you know what is done and what is missing before you say anything about setup. Call get_account_context when the answer depends on their edition or situation (for example, single sign-on is not available on the Free edition).\n\nFor any product question, call search_docs and answer only from the articles it returns. Name the article you used, so the admin can find it again. The help centre is the only source you may answer from, because an invented step or limit costs the admin more time than no answer. If the search result says that no article covers the question, do not answer from memory: when the request was vague, ask one short clarifying question; otherwise hand off.\n\nIf the admin's message is vague (\"it doesn't work\"), ask one clarifying question before searching.\n\nKeep replies short: the next step or two, as numbered steps when there is a sequence. Lead with what to do. Use plain words, and the admin's own words for things where you can.\n\n## When a person takes over\n\nHand off with create_handoff when:\n\n- The admin asks for a person.\n- The question is about prices, quotes, discounts, buying seats, changing edition, contracts, invoices, refunds, cancellation or legal terms. You may explain what an edition includes. You may not say what anything costs or change anything: account owners and the customer success team do that, and a wrong figure from you would be a promise the company has to keep.\n- The admin is upset or has clearly had a bad experience. They need a person, not another article.\n- The help centre does not cover the question.\n\nWhen you hand off, tell the admin in one sentence that a colleague will follow up and that they will not need to repeat themselves. Write the summary for that colleague, who has not seen this conversation: what the admin wants, what you already told them, and what is still missing from their setup.\n\n## Ending\n\nWhen the admin's question is answered, call log_outcome once.\n\nNever state a feature, a limit, a price or a step that did not come from a tool result.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "Can Relay produce payroll summaries for our accountants?"
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "id": "toolu_01CPTFnpYQhUtApbnrRxPjHE",
+      "input": {},
+      "name": "get_setup_status",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     },
+     {
+      "id": "toolu_01TXm33nEGCKgMVkKEgHY74d",
+      "input": {
+       "query": "payroll summaries"
+      },
+      "name": "search_docs",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01CPTFnpYQhUtApbnrRxPjHE",
+      "content": "{\"completed_steps\": [\"create a first board\", \"invite at least five users\"], \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.5, \"seats_assigned\": 9, \"seats_licensed\": 15, \"edition\": \"standard\"}"
+     },
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01TXm33nEGCKgMVkKEgHY74d",
+      "content": "{\"query\": \"payroll summaries\", \"note\": \"No article covers this question. Do not answer from memory: ask one clarifying question, or hand off.\", \"articles\": [{\"slug\": \"assist-on-docs\", \"title\": \"Use Relay Assist on documents and boards\", \"score\": 3.35, \"coverage\": 0.5, \"covers_question\": false, \"text\": \"# Use Relay Assist on documents and boards\\n\\nRelay Assist works on both Relay Boards and Relay Docs. On a card or a board, it can summarise the discussion, draft a status update, or find related cards. On a document, it can summarise the page, draft a first version from a few bullet points, or answer a question using the documents you have access to.\\n\\nAssist only reads content the person asking is allowed to see. It needs the Relay Assist add-on, which is available on Standard, Premium and Enterprise.\\n\"}, {\"slug\": \"assist-credits\", \"title\": \"How Relay Assist credits work\", \"score\": 1.93, \"coverage\": 0.5, \"covers_question\": false, \"text\": \"# How Relay Assist credits work\\n\\nRelay Assist is the AI assistant inside Relay. Each use spends credits: a summary of a card or document uses 1 to 4 credits depending on length, a draft uses 3 to 8, and a search across the workspace uses 1 to 3.\\n\\nYour workspace receives a monthly allowance of credits per licensed seat, set by your edition (10 on Standard, 40 on Premium, 150 on Enterprise). Credits are shared across the workspace and reset on the first day of each month. Unused credits do not carry over.\\n\\nAdmins can see usage under Admin settings, Relay Assist. If you run out before the end of the month, Assist stops until the reset. To get more credits, talk to your account owner.\\n\\nSearch keywords: AI assistant credits run out ran out usage allowance how many\\n\"}]}"
+     }
+    ]
+   }
+  ],
+  "tools": [
+   {
+    "name": "get_account_context",
+    "description": "Facts about the customer's account: edition, seats, lifecycle stage, health score and its components, open tickets, latest NPS score. Call it when the answer depends on the customer's edition or situation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "get_setup_status",
+    "description": "Which of the four setup steps the account has completed (first board, five users, an integration, single sign-on) and which are still missing. Call it first in an onboarding conversation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "search_docs",
+    "description": "Search the Relay help centre. Returns the best-matching articles with their full text. Answer product questions only from what this returns.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "query": {
+       "type": "string",
+       "description": "What to look for, in a few words."
+      }
+     },
+     "required": [
+      "query"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "create_handoff",
+    "description": "Hand the conversation to a human, with a summary. Use it when the customer asks for a person, asks about pricing, contracts, refunds or legal matters, is upset, or when the help centre does not answer the question.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_asked_for_person",
+        "frustration",
+        "low_confidence",
+        "not_in_docs",
+        "pricing_contract_legal"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "What the customer wants and what was already tried."
+      },
+      "recommended_next_step": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "reason",
+      "summary",
+      "recommended_next_step"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "log_outcome",
+    "description": "Record how the conversation ended. Call it once, at the end.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "outcome": {
+       "type": "string",
+       "enum": [
+        "answered",
+        "partly_answered"
+       ]
+      },
+      "note": {
+       "type": "string",
+       "description": "One sentence on what was resolved."
+      }
+     },
+     "required": [
+      "outcome",
+      "note"
+     ],
+     "additionalProperties": false
+    }
+   }
+  ],
+  "json_schema": null,
+  "refusal_fallback": true
+ },
+ "response": {
+  "id": "msg_011Cgx4vSAiHYD6xMKXqS6uG",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQStwUKEAgTGAI4AUIIdGhpbmtpbmcSDHcwjb73cvIrBatuuxoMBySo7h/TcQkMy5bRIjCKG548D1twu0LOsFYz48Vfjy3N92RN05T0EGecyQx39rqtLMC/LqckQhg6os5azK0q1ARBvruIJm7m8dBxatYiM6xhhk2FhsnIjPk9BV1xujFV0n5QMIVsFPuWq4cpA8uDlxTpJkXIbEfM+91ZnAQxZETPLFBK0BQ4fzWDl1Y1uDjPudcCOVi52dh9GpRFZBYyQVNwbYk20GrgdasIL8jNAfLVD1lJa9cophP9N+2f09rcHlVu8fZZL7WrbUzF7Aq2p9C0KicVw1UJWaosv43Ap+I40w4pj0S1wZ4/1j3bsaSckXFVLO1x1AVLQq4kBr1TP8C3PqgJpNyw/+PPQvSRqjbvMpCOOmeke86+GCuwouwyfGdnTTaDaOUjiz3Oq7cTO70jCBGhghi/dOtDk6QX+R4WfOR1ZRpB/e6n4QBK9trDrR7TeFGVrRKvLnFlesQq/3qpaCFFLpMlxWKSu6BRKE2BmZ0PVjz3457CRbj97FORIxrDMezphZWzfpAiv1tW7TL0KI8fto6vnh8jpMYAQlsLUSNBvQGFoshWoCF1Cm0rZfeNvDDpLqwwHQhC/9mEjm20CgGN9arvbGdQAEJZkfcatv+kN4v18kFYHmmxGqbwulsP3pQbuObEpRBWUU0NYvM/rppsbh0X4yBBssIuezAKn4qJRzx+bt4Ep0lJgWKDcVL4zT/b89tPPhOBKM5RiznflWs3W/GWBqIQnkOH9duYBKHV9lu27SisAxEtaeJQMScht9oHzedjynbJKldBJhJKsMOdNe5DeVZqj4Iw7v+4rjU9z1sDdvix2St0Aai8PCfxMTQGS1ldNSOFeU4vjqHICWlzggNaynE9HCUexNpNWhlwlBgB",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "id": "toolu_01JGYnQQPJVASxu2DmMo62Bq",
+    "input": {
+     "reason": "not_in_docs",
+     "summary": "Admin (Standard edition, 9 of 15 seats assigned) asks whether Relay can produce payroll summaries for their accountants. The help centre has no article on payroll. The closest article is \"Use Relay Assist on documents and boards\", which covers summarising boards and docs but not payroll. I did not answer from memory. Setup: first board and 5+ users are done. Still missing: connect an integration and configure single sign-on.",
+     "recommended_next_step": "Tell the admin whether Relay supports payroll summaries, or suggest another way to do it. Then help them finish the integration and SSO setup steps."
+    },
+    "name": "create_handoff",
+    "type": "tool_use",
+    "caller": {
+     "type": "direct"
+    }
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-opus-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1727,
+   "inference_geo": "global",
+   "input_tokens": 950,
+   "iterations": [
+    {
+     "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+     },
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 1727,
+     "input_tokens": 950,
+     "model": null,
+     "output_tokens": 310,
+     "type": "message"
+    }
+   ],
+   "output_tokens": 310,
+   "output_tokens_details": {
+    "thinking_tokens": 21
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

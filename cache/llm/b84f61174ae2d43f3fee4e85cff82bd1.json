@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Jorisko Builders\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1715, \"seats_licensed\": 19, \"seats_assigned\": 12, \"seats_assigned_30_days_ago\": 12, \"seat_utilisation_pct\": 63, \"monthly_active_users\": 6, \"automation_rules\": 8, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 235, \"assist_credits_included\": 190, \"health_score\": 53.7, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 1, \"latest_nps_score\": null, \"days_to_renewal\": 257, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 39%: many high-priority tickets, heavy Assist use, near the automation limit\", \"expansion_score_pct\": 39, \"expansion_reasons\": \"many high-priority tickets, heavy Assist use, near the automation limit\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6p2Xin1vQv6cZDgPAS",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: The expansion-ready signal fired on Jorisko Builders with an expansion likelihood of 39%.\n\nEvidence: Assist credits used in the last 30 days are 235 against 190 included. Seats assigned are 12 of 19 licensed (63% utilisation), unchanged from 30 days ago. Automation rules are 8 of a limit of 15.\n\nLikely need: The Assist overage is the clearest pointer toward the Premium edition, but the data does not show what Premium includes, so confirm that before proposing it. More seats are unlikely to be the need, since 7 licensed seats are unassigned. The 8 of 15 automation rules does not look near the limit, despite the trigger's wording.\n\nSuggested opener: \"Jorisko's team has been using Assist beyond what your plan includes, so I wanted to check whether you'd like to look at what Premium would cover for you.\"\n\nRisks: The trigger cites many high-priority tickets, but the data shows only 1 open high-priority ticket. The account is in yellow health at 53.7, with 6 monthly active users and 0 of 3 integrations in use, which suggests weak adoption beyond Assist. Renewal is 257 days out, so there is time to build the case.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 725,
+   "output_tokens": 920,
+   "output_tokens_details": {
+    "thinking_tokens": 517
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

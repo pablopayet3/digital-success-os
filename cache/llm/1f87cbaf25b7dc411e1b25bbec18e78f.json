@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Hestora Clinics\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 10, \"seats_assigned\": 9, \"seats_assigned_30_days_ago\": null, \"seat_utilisation_pct\": 90, \"monthly_active_users\": 7, \"automation_rules\": 0, \"automation_rule_limit\": 5, \"integrations\": 0, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 72.8, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 351, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"9 of 10 seats assigned\", \"expansion_score_pct\": 67, \"expansion_reasons\": \"nearly all seats assigned, free edition, most seats active\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6obBEUJzZpL4HDzq4k",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Hestora Clinics has nearly used up its licensed seats, with 9 of 10 assigned.\nEvidence: 9 of 10 seats are assigned (90% utilisation), 7 monthly active users, and the expansion score is 67.\nLikely need: More seats, since the account is on the free edition and almost full, with 7 monthly active users. Standard is the next edition if they want more than seat capacity, but the data shows only seat pressure, not a feature need.\nSuggested opener: \"Hi, I noticed your team has nearly filled its 10 seats, so I wanted to check whether you need more room or want to talk through what Standard would include.\"\nRisks: Current ARR is 0, there is no NPS score, and the seat count from 30 days ago is missing, so the trend is unknown. Health is green at 72.8 with no open high-priority tickets, and renewal is 351 days away.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 691,
+   "output_tokens": 699,
+   "output_tokens_details": {
+    "thinking_tokens": 406
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T003998\", \"text\": \"CARDS DISAPPEARING FROM BOARD. We are paying for this product and it does not work. Two cards vanished from our sprint board. They are not in the archive either. I need someone to call me today.\\n\\nDavid\"}, {\"id\": \"T003999\", \"text\": \"CARDS DISAPPEARING FROM BOARD. Not happy at all. Two cards vanished from our sprint board. They are not in the archive either. This is blocking the whole team.\\n\\nPhillip\"}, {\"id\": \"T004000\", \"text\": \"INVITES NOT ARRIVING. Not happy at all. I invited six colleagues yesterday and none of them received the invitation email. Frankly we are considering cancelling.\\n\\nWilliam\"}, {\"id\": \"T004004\", \"text\": \"How do I bulk invite users?. Hello, We need to add around 30 people. Is there a way to invite them in bulk instead of one by one? Thank you.\\n\\nElizabeth\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx8SYMxiXLertDUVVtzH",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"T003998\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9},{\"id\":\"T003999\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.92},{\"id\":\"T004000\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.85},{\"id\":\"T004004\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.9}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 335,
+   "output_tokens": 142,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

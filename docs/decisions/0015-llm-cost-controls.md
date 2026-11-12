@@ -69,10 +69,25 @@ It is switched on with `llm_stand_in: true` (the dev default until the cache is 
 or `DSO_LLM_STAND_IN`. It tests the code around the model. It says nothing about how
 well a real model answers, and evaluation reports state which one produced them.
 
-## Not yet verified
+## Verified with a live run
 
-No real API call has been made yet: there was no key on the build machine. The request
-shapes follow the current API reference. The first online run may need small fixes.
+The first real calls worked without changes: plain text, structured output, and the
+agent with tools. The refusal fallback was seen working too: on a few requests the
+agent model declined and the API answered from its fallback model. That exposed one
+gap: the fallback model was not in the price list, so its calls counted as free. A
+model with no listed price is now counted at the highest price in the list, so the
+budget can be over-counted but never under-counted.
+
+Every stored conversation also records which model wrote the agent's replies
+(`answered_by`), so a stand-in answer can never be read as a real one, or the reverse.
+
+## The three modes, in one table
+
+| Mode | Settings | Answers come from | Use it for |
+|---|---|---|---|
+| Replay (default) | `DSO_OFFLINE_MODE=true`, stand-in off | `cache/llm/` only; anything not cached is a handoff | Reproducing the reports and the simulation for free |
+| Live | `DSO_OFFLINE_MODE=false` and a key in `.env` | The cache first, then the API, up to the budget | Typing new questions in the Live demo |
+| Stand-in | `DSO_LLM_STAND_IN=true` | Keyword rules, labelled as such | No key, no network: CI, the container image |
 
 ## Revisit if
 

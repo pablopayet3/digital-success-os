@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Dovuvia Finance\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1002, \"seats_licensed\": 12, \"seats_assigned\": 10, \"seats_assigned_30_days_ago\": 10, \"seat_utilisation_pct\": 83, \"monthly_active_users\": 6, \"automation_rules\": 6, \"automation_rule_limit\": 15, \"integrations\": 2, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 120, \"health_score\": 70.1, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 6, \"days_to_renewal\": 82, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"Hey, We would like to add Relay Docs for the whole company. Who do I talk to? Sent from my phone\", \"expansion_score_pct\": 12, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, few support tickets\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx8DksvZX3dEbPprjekr",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: The customer wrote in asking to add Relay Docs for the whole company and asked who to talk to.\n\nEvidence: 10 of 12 licensed seats are assigned (83% utilisation), unchanged from 10 thirty days ago. Health is 70.1 (green), with 0 open high-priority tickets. The customer is on standard and the next edition is premium.\n\nLikely need: More seats, since the customer wants company-wide access and only 2 licensed seats are unassigned. The message is the strongest evidence. Seat utilisation alone is not, because the assigned count hasn't moved in 30 days. The data doesn't say how many people are in the company, so confirm the headcount before quoting.\n\nSuggested opener: \"Thanks for reaching out about rolling Relay Docs out company-wide. Could we set up a short call to scope the seats and make sure it fits your team's needs?\"\n\nRisks: Only 6 monthly active users against 10 assigned seats, and the latest NPS is 6. The renewal is 82 days away. The expansion reason says the account is near its automation limit, but the data shows 6 of 15 rules used, so don't lead with that claim.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 724,
+   "output_tokens": 863,
+   "output_tokens_details": {
+    "thinking_tokens": 483
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

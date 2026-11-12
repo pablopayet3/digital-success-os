@@ -1,0 +1,123 @@
+{
+ "role": "classifier",
+ "purpose": "classify mailbox",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You sort replies that arrived in a shared mailbox. Each one answers an email that the customer success team of Lumen Labs sent about its product, Relay. The input is a JSON list of replies, each with an id, a subject and a body. Routing rules act on your answer; you do not reply to anyone.\n\nFor each reply return:\n\n- id: the id you were given.\n- intent: the main thing the sender wants.\n  - out_of_office: an automatic reply saying the person is away\n  - unsubscribe: the person wants to stop receiving these emails\n  - left_company: the person no longer works there, or the mailbox is closed\n  - product_question: a question about how the product works\n  - buying_intent: wants more seats, a higher edition, another product, or pricing\n  - complaint: unhappy about the product or the service\n  - meeting_request: wants a call or a meeting\n  - other: none of the above\n- sentiment: positive, neutral or negative.\n- confidence: a number from 0 to 1. Use a low number when two intents fit about equally, or when the message is too short or vague to tell.\n- seats_requested: the number of seats asked for, as text, or an empty string.\n- edition_mentioned: the edition named (free, standard, premium, enterprise), or an empty string.\n- return_date: when the person says they are back, as written, or an empty string.\n- new_contact: the name of the person to contact instead, or an empty string.\n\nReplies can be in any language. Ignore quoted text from the original email and signatures. When a reply has two intents, choose the one that needs action first: a complaint outranks an unsubscribe, and buying intent outranks a product question.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"M000321\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Could we set up a 30 minute call next week to go through this?\\n\\nThanks,\\nCassandra\\n\\nOn 05 Aug 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Cassandra, here is the latest from the Relay team...\"}, {\"id\": \"M000322\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hello team,\\n\\nwe tried the thing you mention in step 2 and nothing happens?? is that normal\"}, {\"id\": \"M000323\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hey,\\n\\nIs SSO included in our plan or do we need Premium for that?\\n\\n--\\nAmber Martin\\nWorkspace Admin | Velomi Logistics\\n\\nOn 05 Aug 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Amber, here is the latest from the Relay team...\"}, {\"id\": \"M000324\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"I am out until the 2nd. If this is about scheduling the review meeting, please book time with Monique Serrano.\\n\\n--\\nIsaac Davis\\nIT Manager | Cavavo Partners\\n\\nOn 05 Aug 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Isaac, here is the latest from the Relay team...\"}, {\"id\": \"M000325\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hi,\\n\\nIs there a way to bulk invite users? We have about 5 people to add.\\n\\nSent from my phone\"}, {\"id\": \"M000326\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hey,\\n\\nBonjour, je suis absent du bureau jusqu'au the 2nd. Je r\u00e9pondrai \u00e0 votre message \u00e0 mon retour.\\n\\nThanks,\\nThomas\\n\\nOn 05 Aug 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Thomas, here is the latest from the Relay team...\"}, {\"id\": \"M000327\", \"subject\": \"Undeliverable: Relay monthly: what is new\", \"body\": \"Charles Wright no longer works at Bramyx Health. Please contact Timothy Morton instead.\"}, {\"id\": \"M000328\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Qiuck question, what happens if we go over our seat count? We are onboarding about 21 poeple in the next few weeks.\\n\\nSent from my phone\\n\\nOn 05 Aug 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Alec, here is the latest from the Relay team...\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "intent": {
+        "type": "string",
+        "enum": [
+         "out_of_office",
+         "unsubscribe",
+         "left_company",
+         "product_question",
+         "buying_intent",
+         "complaint",
+         "meeting_request",
+         "other"
+        ]
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       },
+       "seats_requested": {
+        "type": "string"
+       },
+       "edition_mentioned": {
+        "type": "string"
+       },
+       "return_date": {
+        "type": "string"
+       },
+       "new_contact": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "intent",
+       "sentiment",
+       "confidence",
+       "seats_requested",
+       "edition_mentioned",
+       "return_date",
+       "new_contact"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6d6Gtw753m1jxUWURj",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"results\":[{\"id\":\"M000321\",\"intent\":\"meeting_request\",\"sentiment\":\"positive\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000322\",\"intent\":\"product_question\",\"sentiment\":\"neutral\",\"confidence\":0.8,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000323\",\"intent\":\"product_question\",\"sentiment\":\"neutral\",\"confidence\":0.65,\"seats_requested\":\"\",\"edition_mentioned\":\"premium\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000324\",\"intent\":\"out_of_office\",\"sentiment\":\"neutral\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"the 2nd\",\"new_contact\":\"Monique Serrano\"},{\"id\":\"M000325\",\"intent\":\"product_question\",\"sentiment\":\"neutral\",\"confidence\":0.8,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000326\",\"intent\":\"out_of_office\",\"sentiment\":\"neutral\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"the 2nd\",\"new_contact\":\"\"},{\"id\":\"M000327\",\"intent\":\"left_company\",\"sentiment\":\"neutral\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"Timothy Morton\"},{\"id\":\"M000328\",\"intent\":\"buying_intent\",\"sentiment\":\"neutral\",\"confidence\":0.8,\"seats_requested\":\"21\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1079,
+   "inference_geo": "global",
+   "input_tokens": 1056,
+   "output_tokens": 1200,
+   "output_tokens_details": {
+    "thinking_tokens": 619
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

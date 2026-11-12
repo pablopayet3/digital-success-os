@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to use for how the product works.\n- account_facts: what the assistant's tools told it about this customer's own account (setup steps done and missing, edition, seats, health, account owner, renewal). The assistant is allowed to state these.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every product step, limit or feature the assistant states can be found in the articles, and every statement about the customer's account can be found in account_facts. Anything else stated as fact is a failure, even if it happens to be true. Offering further help, or naming the account owner as the person to ask about prices, is not a failure.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"How do I connect our calendar so due dates show up there?\"}, {\"role\": \"agent\", \"text\": \"Here's how to connect your calendar:\\n\\n1. Go to **Admin settings \u2192 Integrations \u2192 Calendar** and click **Connect**. Only admins can do this.\\n2. Approve access in your calendar tool. You'll then be sent back to Relay, and the integration is on for the whole workspace right away.\\n\\nAfter that, any card with **both a due date and an assignee** shows up in that person's calendar.\\n\\n**If due dates don't appear:**\\n- Make sure the card has both a due date and an assignee.\\n- Make sure the assignee has accepted the calendar permission request. Each person gets it by email.\\n- Make sure the board isn't archived.\\n- Wait a bit. New or changed dates can take up to 15 minutes to show up.\\n\\nConnecting this also completes one of your remaining setup steps. After that, the only step left is single sign-on.\"}], \"articles\": [{\"title\": \"Show due dates in your calendar\", \"text\": \"# Show due dates in your calendar\\n\\nWith the calendar integration, every card that has a due date and an assignee appears in that person's calendar. Connect it under Admin settings, Integrations, Calendar.\\n\\nIf due dates do not show up after connecting, check three things: the card has both a due date and an assignee; the assignee has accepted the calendar permission request they received by email; and the board is not archived. New and changed dates can take up to fifteen minutes to appear.\\n\"}, {\"title\": \"Create your first board\", \"text\": \"# Create your first board\\n\\nA board holds the cards for one project or one team. To create one, click New board on the home page and pick a template: Kanban for a simple to-do, doing, done flow; Sprint for teams working in iterations; Roadmap for planning by quarter; Project plan for work with dates and owners.\\n\\nAdd a few cards, assign each to a person and give it a due date. Then share the board with your team from the Share button. A board with real work on it is the fastest way to get colleagues to start using Relay.\\n\"}, {\"title\": \"Connect an integration\", \"text\": \"# Connect an integration\\n\\nIntegrations connect Relay to the other tools your team uses. Available integrations: chat, calendar, code repository, cloud drive, CRM and video meetings.\\n\\nTo connect one (admins only), open Admin settings, Integrations, choose the tool and click Connect. You are sent to that tool to approve access, then returned to Relay. The integration is live straight away for the whole workspace.\\n\\nHow many integrations you can connect depends on your edition: 2 on Free, 3 on Standard, 10 on Premium, and no practical limit on Enterprise. Connecting at least one integration is one of the four setup steps we recommend in the first week.\\n\\nSearch keywords: connect tools apps integration integrations link\\n\"}], \"account_facts\": {\"setup_status\": {\"completed_steps\": [\"create a first board\", \"invite at least five users\"], \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.5, \"seats_assigned\": 9, \"seats_licensed\": 15, \"edition\": \"standard\"}, \"account_context\": {\"segment\": \"smb\", \"coverage_tier\": \"uncovered\", \"edition\": \"standard\", \"lifecycle_stage\": \"onboarding\", \"arr\": 4200, \"renewal_date\": \"2027-03-01\", \"days_to_renewal\": 150, \"account_owner\": \"Morgan Ellis\", \"health\": {\"score\": 48.0, \"band\": \"red\", \"adoption\": 30.0, \"engagement\": 45.0, \"sentiment\": 60.0, \"support\": 80.0, \"commercial\": 50.0}, \"seats\": {\"licensed\": 15, \"assigned\": 9, \"utilisation\": 0.6, \"monthly_active_users\": 3, \"monthly_active_users_30_days_ago\": 2}, \"setup\": {\"closure_pct\": 0.5, \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"]}, \"support\": {\"tickets_30d\": 1, \"open_high_priority_tickets\": 0}, \"latest_nps_score\": null, \"churn_risk\": {\"score\": 0.22, \"reasons\": \"setup is not finished\"}, \"expansion\": {\"score\": 0.08, \"reasons\": \"\"}}}}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx5TBBvWxyBM5YjkcNxF",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\":\"pass\",\"score\":5,\"reason\":\"Every step, troubleshooting point, and account-setup claim matches the articles and account_facts, the reply gives the customer a clear next action without promises, and it stays concise.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 782,
+   "inference_geo": "global",
+   "input_tokens": 1454,
+   "output_tokens": 476,
+   "output_tokens_details": {
+    "thinking_tokens": 400
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Bramomi Studios\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 518, \"seats_licensed\": 6, \"seats_assigned\": 5, \"seats_assigned_30_days_ago\": 5, \"seat_utilisation_pct\": 83, \"monthly_active_users\": 5, \"automation_rules\": 3, \"automation_rule_limit\": 15, \"integrations\": 1, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 60, \"health_score\": 90.3, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 9, \"days_to_renewal\": 254, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 38%: nearly all seats assigned, most seats active, reads our emails\", \"expansion_score_pct\": 38, \"expansion_reasons\": \"nearly all seats assigned, most seats active, reads our emails\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx791iPfZznVdP65HbB7",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Bramomi Studios has an expansion-ready signal with a 38% expansion likelihood, driven by nearly all seats being assigned and most of them being active.\n\nEvidence: 5 of 6 licensed seats are assigned (seat utilisation 83%), with 5 monthly active users, and the latest NPS is 9.\n\nLikely need: The strongest evidence points to more seats, since only one seat is free and the account is close to capacity. The data does not show a clear need for Premium. Automation rules (3 of 15), integrations (1 of 3) and Assist credits (0 of 60 used in 30 days) are all low, so an edition upgrade is not supported by these facts.\n\nSuggested opener: \"Hi, I noticed your team is nearly using all of its Standard seats, so I wanted to check whether you'd like to add a few more so everyone has access.\"\n\nRisks: Health is green at 90.3, with no open high-priority tickets, and renewal is 254 days away. The caution is that the 38% likelihood is moderate, and the low use of automation, integrations and Assist credits means the case for Premium is weak, so avoid pitching it on these facts alone.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 717,
+   "output_tokens": 855,
+   "output_tokens_details": {
+    "thinking_tokens": 475
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

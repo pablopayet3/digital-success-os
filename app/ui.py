@@ -30,7 +30,8 @@ def banner() -> None:
     """On every page: this is made-up data, and who is playing the model."""
     st.caption(
         ":orange[**Synthetic data, fictional company.**] Lumen Labs and Relay do not exist. "
-        f"AI answers on these pages come from: **{get_llm().mode}**."
+        f"New AI answers are produced by: **{get_llm().mode}**. "
+        "Stored conversations say who answered them."
     )
 
 

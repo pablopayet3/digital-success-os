@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Halarro Systems\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1811, \"seats_licensed\": 23, \"seats_assigned\": 21, \"seats_assigned_30_days_ago\": 19, \"seat_utilisation_pct\": 91, \"monthly_active_users\": 14, \"automation_rules\": 8, \"automation_rule_limit\": 15, \"integrations\": 2, \"integration_limit\": 3, \"assist_credits_used_30d\": 151, \"assist_credits_included\": 230, \"health_score\": 79.9, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 8, \"days_to_renewal\": 204, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"21 of 23 seats assigned\", \"expansion_score_pct\": 37, \"expansion_reasons\": \"nearly all seats assigned, heavy Assist use, near the automation limit\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx74zZKSxp9rgN9CxvVf",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Seat pressure. Nearly all of Halarro's licensed seats are now assigned, and assignment rose over the last 30 days.\n\nEvidence: 21 of 23 seats assigned, up from 19 thirty days ago. Seat utilisation is 91%. Health is green at 79.9, with 0 open high-priority tickets.\n\nLikely need: More seats on the current Standard edition, since the seat count is what is nearly full. Premium is a possible later conversation, but the data here points to seats first. Assist credit use is 151 of 230 and automation rules are 8 of 15, so neither is close to a limit, despite the expansion note.\n\nSuggested opener: \"Halarro's team has grown into most of the seats on your plan, so I wanted to check whether you'd like to add a few more before new people need access.\"\n\nRisks: Only 14 monthly active users against 21 assigned seats, so some assigned seats may be unused and a seat increase may need to be justified with usage. Latest NPS is 8. Renewal is 204 days away, so there is time to plan.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 700,
+   "output_tokens": 862,
+   "output_tokens_details": {
+    "thinking_tokens": 515
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

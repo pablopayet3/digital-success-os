@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Garrivo Supply\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 1490, \"seats_licensed\": 16, \"seats_assigned\": 15, \"seats_assigned_30_days_ago\": 14, \"seat_utilisation_pct\": 94, \"monthly_active_users\": 9, \"automation_rules\": 15, \"automation_rule_limit\": 15, \"integrations\": 2, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 160, \"health_score\": 78.5, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 6, \"days_to_renewal\": 227, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"Before our renewal I would like to understand what Enterprise would give us compared with what we have. -- Michele Haney Operations Lead | Garrivo Supply On 18 Oct 2026, Lumen Labs Success <success@lumenlabs.example> wrote: > Live session: automation rules in 30 minutes > Hi Michele, here is the latest from the Relay team...\", \"expansion_score_pct\": 69, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, reads our emails\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx8DR35Cf1s2kvbDdDSN",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Michele Haney, Operations Lead at Garrivo Supply, asked before renewal what Enterprise would give them compared with what they have now. The trigger came from her reply to a Lumen Labs automation session invitation.\n\nEvidence: 15 of 16 licensed seats are assigned, up from 14 thirty days ago, at 94% utilisation. Automation rules are at 15 of 15, the limit. Integrations are at 2 of 3.\n\nLikely need: More seats and an upgrade. Seats are almost full and still rising, and the automation rule limit is reached, so the account is hitting the limits of its current edition. Her question names Enterprise, but the account record lists premium as the next edition, so confirm which tier she means before quoting anything.\n\nSuggested opener: \"Michele, you asked what Enterprise would give Garrivo compared with what you have now, so I'd be glad to walk through that side by side and see whether it fits how your team is using automation.\"\n\nRisks: Only 9 monthly active users against 15 assigned seats, and 0 of 160 included Assist credits used in the last 30 days, so adoption of some features is thin. The latest NPS score is 6. Health is green at 78.5 with no open high-priority tickets. Renewal is 227 days away.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 810,
+   "output_tokens": 845,
+   "output_tokens_details": {
+    "thinking_tokens": 428
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

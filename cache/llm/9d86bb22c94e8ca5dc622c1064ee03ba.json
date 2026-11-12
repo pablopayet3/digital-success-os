@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to answer from.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every step, limit or feature the assistant states can be found in the articles. Anything stated that is not in the articles is a failure, even if it happens to be true.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"Is single sign-on available on the edition we are on?\"}, {\"role\": \"agent\", \"text\": \"No, single sign-on isn't available on your account. You're on the **Free** edition, and SSO is only included in **Standard, Premium and Enterprise**.\\n\\nIf you want SSO, you'd need to move to Standard or higher. Your account owner, **Morgan Ellis**, can help with prices and changing editions. I can't quote prices or change your edition, but I can pass you to a person if you'd like.\\n\\nYou can still finish two other setup steps on Free:\\n- **Invite at least five users.** You have 4 assigned now, and Free allows up to 10.\\n- **Connect an integration.** Free includes up to 2.\\n\\nWant help with either of those?\"}], \"articles\": [{\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}, {\"title\": \"Set up single sign-on (SSO)\", \"text\": \"# Set up single sign-on (SSO)\\n\\nSSO lets your team sign in to Relay with your company identity provider. It is available on the Standard, Premium and Enterprise editions. It is not available on Free.\\n\\nSteps (admins only):\\n1. Open Admin settings, then Security, then Single sign-on.\\n2. Choose the protocol your identity provider uses: SAML or OIDC.\\n3. For SAML, upload the identity provider metadata file (XML). For OIDC, paste the client ID, client secret and issuer URL.\\n4. Click Test connection. Relay signs you in through the provider in a new window.\\n5. When the test succeeds, click Enable for everyone.\\n\\nKeep one admin account with password sign-in until you have confirmed SSO works for the whole team. SSO setup usually takes ten to fifteen minutes.\\n\\nSearch keywords: single sign-on sign in login identity provider IT team configure enable SAML OIDC\\n\"}, {\"title\": \"SSO connection test fails or users are locked out\", \"text\": \"# SSO connection test fails or users are locked out\\n\\nIf the SSO connection test fails with a certificate error, the signing certificate in the metadata file has expired or does not match. Download a fresh metadata file from your identity provider and upload it again under Admin settings, Security, Single sign-on.\\n\\nIf users are locked out after you enabled SSO, their email address in Relay probably differs from the one in the identity provider. Email addresses must match exactly. An admin who still has password sign-in can turn SSO off under Admin settings, Security, fix the addresses under Admin settings, Users, and turn SSO on again.\\n\\nIf nobody can sign in at all, contact support: an agent cannot change security settings for you.\\n\"}]}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx4fM2DuAPZ4rwscD2A6",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQSlQsKEAgTGAI4AUIIdGhpbmtpbmcSDHjFHIO34hNYvs8K8RoM+Fo639xOuiUJvi0DIjBWCN1kWJBaJej4asELoM5XJ/770nYyNnxaYuNOkx85NlSDRJbzCRto5gVMqNAslEQqsgqIL/TvVQgpFvjs3KtqVQci0SDHjBLCo1noiIFz8gV72o+VKMF2iFzU4195eGhXcBUv23QhpPdIsxaCh79Bd9aCkWzSx5lSegTv/7lqFZ9w7PSm2MVnEaGx7vRQ4GWU1kApr4UWMhrnaoDK/iwXj4TnuMOZJs/+VpCeiWzvgVV5Jl7dAdtunyPkeJWiFb3ItA7dGZe3nFLxcH8A2WgdFPo7J1gPvsuviwobmjBmTenU6DaZPXYrNwUWHV+hd7h1XJpRpS5WjqdiT8H2DlUYz2eahXB9q+WjS0PjrcuZ/U97dTgM0kOCgy49qB//ASIrCZ6dASq2ulVTUEhWdbTfl6u1I6lU55W41lqKdbZu6jW5ueRFIFmrA04u0vYzG8amgIF309W1uHO74uz8VpRtaReHLlvBxhYTH/yiA1LH508N26I4fRIp3XeMGl5EWXflYmEJeaL+y3OhQTcM2N7XMZaRufE45hkR+kLG9rkfuK0qcnzoR20kZq3dIZLRmip26rMBAUFprNhaJ7iszNocTCw/qXJG6xD+yC5J0ed9KC7Xm8UYuXNIKOHsUv1tOs+fk0T08vRF7tJhfN72q+BgVRl/gtcs4VVkO4dU3fRmke3sCQRThyTL/BUSgGGNsXpc00DUphIfMfMnVYyZXWvdV9bOKUyWs2i6wQP3okC4+moA3XEUehPR69hoYJMOdIC/x2oCYj1CILnCkcthMPi+IwfiHX9BpAfGjkC1T9aFl/JYoBpevseLWwV+ONs/AktnJnFWqyjG66oDTaPOIjRLAiiGS2ITyrfq0mBiVwrnEb3o+qeY0rNGbPOFf0/IoPNfa+O5S5J0HmtFnGlxGvNBaiSKwTfPJqJs4EK+CLKGmdbh2bPegzce4p+hoSwGaL6g1Ef+rHSMdHY+hLnn/9ffPRrEuV3C5v2kkimNY2afLvfoulMimGWbg20aeAzAcFjWUVBaOJ2p8CqeJbTBo/aijkF0IHIpBFdgXMjddY38BNvQDCCjdXQlQNKRcLqqGTbw2ey9O8xdhbBWReC/W7+QX/uWNsj0shAZAH0ZbktPQshW3Kmo5R4tlabNto1M78Otssll3NKJRkVuaTlnSyVOYc5wVdprXg0LP+YOsy7AvGcfSic63FGyVGij0nsE+KvYbAc469/kFwRkLuuVViKraRoEolSCUF0Ip27t6vjoaLzqSWD1Q5dHLtqPj7EGn+xdv84qrnMepdsG63PyLmD65ZHS+gL8jaidHZxkOnQ9OS+Vja0noJNfU3uXKig9dijNHRFNe4D5WHUHT6RQa9ZQrXcbF6ao/WlB6MFwiWA0O80reSv1dpeTdyzwlsMNOoFiSG7E3lLs9mucc+p/k9WKZyV/RLvvvcT6Jx6MMo6QuMw7gG3TObxjxcV4bWb2r+C+Uat3TmpIxezJqRsSGNGVkbw6amD2sSlnQnSiqrDLV+uNFHQ7I20jN3cKwjqAvd6gjITfK3wxZ/yDdQyg1XF2OOSaPNEXKfBHhQQkTppRN5ccp8IUn+OGd6U68I+u6VxKmuL+L+lBA27T4P7M7JKheMZfRzQKSFcUYvcWpmf07nUuCqW9escrJs3QWskPrYQRE2N4o4NM+cySSRWWXLa55maP6ku9nshFv8Rgb8rDbiO7md0JXryScFVr6jthjpIQRaiiP4zGwl+FaoRezc3TShn45z96X+L1t9pdLwcvdqsBTEfezO0ef+7HGLGgJ5/nPtuIcSF+pdXY5N+JYHN3GqPITh49bzreNhh7j6AQKM9NdqolGAE=",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\": \"fail\", \"score\": 2, \"reason\": \"Point 1 (grounded) fails: the reply states account facts the articles never provide, namely that the customer is on Free, that Morgan Ellis is the account owner, and that 4 users are assigned, and it adds setup steps like inviting five users that are not in the articles.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 671,
+   "inference_geo": "global",
+   "input_tokens": 1251,
+   "output_tokens": 389,
+   "output_tokens_details": {
+    "thinking_tokens": 279
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

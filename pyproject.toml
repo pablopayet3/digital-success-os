@@ -51,6 +51,7 @@ select = ["E", "F", "I", "B", "UP"]
 # Report writers: a table row or a sentence of the report is clearer on one line.
 "evals/run.py" = ["E501"]
 "experiments/analyze.py" = ["E501"]
+"experiments/review.py" = ["E501"]
 # App pages: a sentence shown on screen is clearer on one line.
 "app/views/*.py" = ["E501"]
 # Tests read better with each case on one line.

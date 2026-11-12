@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Ravora Energy\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 797, \"seats_licensed\": 10, \"seats_assigned\": 7, \"seats_assigned_30_days_ago\": 7, \"seat_utilisation_pct\": 70, \"monthly_active_users\": 6, \"automation_rules\": 14, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 161, \"assist_credits_included\": 100, \"health_score\": 84.5, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 10, \"days_to_renewal\": 284, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 50%: heavy Assist use, near the automation limit, nearly all seats assigned\", \"expansion_score_pct\": 50, \"expansion_reasons\": \"heavy Assist use, near the automation limit, nearly all seats assigned\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6nKPBZKYYaTq8v43ZN",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Ravora Energy's expansion signal fired with a 50% expansion likelihood, driven by heavy Assist use and a near-full automation limit.\nEvidence: Assist credits used in the last 30 days were 161 against 100 included, automation rules are at 14 of a 15 limit, and 7 of 10 licensed seats are assigned.\nLikely need: The next edition (premium) looks more likely than more seats. Usage is running past the included Assist credits and close to the automation cap, while 3 seats remain unassigned and assigned seats have not changed in 30 days.\nSuggested opener: \"Your team has been getting a lot out of Assist and automation lately, so I wanted to walk you through what the next edition would add to keep that going.\"\nRisks: Health is green at 84.5, there are no open high-priority tickets, and NPS is 10, so no strong caution. Softer points: 0 of 3 integrations are in use and 6 monthly active users out of 7 assigned seats, so adoption breadth is limited. Renewal is 284 days away, so there is no time pressure.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 724,
+   "output_tokens": 804,
+   "output_tokens_details": {
+    "thinking_tokens": 448
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

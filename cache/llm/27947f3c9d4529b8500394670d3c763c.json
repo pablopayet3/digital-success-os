@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Fenessa Software\", \"segment\": \"smb\", \"edition\": \"free\", \"next_edition\": \"standard\", \"arr\": 0, \"seats_licensed\": 10, \"seats_assigned\": 8, \"seats_assigned_30_days_ago\": 8, \"seat_utilisation_pct\": 80, \"monthly_active_users\": 5, \"automation_rules\": 1, \"automation_rule_limit\": 5, \"integrations\": 0, \"integration_limit\": 2, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 0, \"health_score\": 73.1, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 10, \"days_to_renewal\": 316, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 38%: many high-priority tickets, nearly all seats assigned, free edition\", \"expansion_score_pct\": 38, \"expansion_reasons\": \"many high-priority tickets, nearly all seats assigned, free edition\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6qn6rdk7QnG5zHXkF5",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Fenessa Software is flagged as expansion-ready. The model puts expansion likelihood at 38%, on a free edition with 8 of 10 seats assigned.\n\nEvidence: 8 of 10 seats are assigned, unchanged from 30 days ago. Only 5 monthly active users. Automation uses 1 of 5 rules and integrations use 0 of 2. Health is 73.1 (green) and NPS is 10.\n\nLikely need: The most plausible move is the Standard edition, since the account is on free with no ARR and has spare automation and integration capacity it isn't using. Adding seats is less supported: assignment hasn't grown in 30 days, and only 5 of the 8 assigned seats are active.\n\nSuggested opener: \"Fenessa, you're getting good use out of the free plan, and I'd like to show you what Standard adds for automations and integrations if that would help your team.\"\n\nRisks: The trigger evidence cites \"many high-priority tickets,\" but the account shows 0 open high-priority tickets, so check the ticket history before you rely on that claim. Activity is low (5 active of 8 assigned), and the account is 316 days from renewal, so there is no urgency.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 719,
+   "output_tokens": 826,
+   "output_tokens_details": {
+    "thinking_tokens": 435
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

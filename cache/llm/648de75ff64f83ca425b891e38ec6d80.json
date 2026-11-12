@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Wexuvia Energy\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 598, \"seats_licensed\": 7, \"seats_assigned\": 7, \"seats_assigned_30_days_ago\": 2, \"seat_utilisation_pct\": 100, \"monthly_active_users\": 2, \"automation_rules\": 1, \"automation_rule_limit\": 15, \"integrations\": 1, \"integration_limit\": 3, \"assist_credits_used_30d\": 26, \"assist_credits_included\": 70, \"health_score\": 54.9, \"health_band\": \"yellow\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 294, \"trigger_signal\": \"seat_pressure\", \"trigger_evidence\": \"7 of 7 seats assigned\", \"expansion_score_pct\": 48, \"expansion_reasons\": \"nearly all seats assigned, many high-priority tickets, heavy Assist use\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx8Szy7245HCgwRFoFgd",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Seat pressure. All 7 licensed seats are now assigned, up from 2 assigned 30 days ago.\n\nEvidence: 7 of 7 seats assigned, up from 2 thirty days ago. Only 2 monthly active users. Health score 54.9, yellow band.\n\nLikely need: More seats is the obvious read, but only 2 of the 7 assigned seats are active, so the data does not show that people are short of seats. Before offering more, confirm whether the new assignments are being used. Premium is the other possibility, but the data shows only 1 of 15 automation rules and 1 of 3 integrations in use, so the case for Premium is weak right now. The expansion score is 48%.\n\nSuggested opener: \"I noticed your team recently took on more Lumen seats, and I'd like to make sure everyone has what they need to get value from them. Would a quick check-in on how the rollout is going help?\"\n\nRisks: Usage is thin, with 2 active users on 7 seats and health in the yellow band. The expansion reasons cite many high-priority tickets and heavy Assist use, but the account shows 0 open high-priority tickets and 26 of 70 Assist credits used in 30 days, so do not repeat those claims. Renewal is 294 days away.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 704,
+   "output_tokens": 930,
+   "output_tokens_details": {
+    "thinking_tokens": 516
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

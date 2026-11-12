@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"N001848\", \"text\": \"Decent, although the integrations could be easier to configure.\"}, {\"id\": \"N001849\", \"text\": \"Okay overall. Search could be better.\"}, {\"id\": \"T003785\", \"text\": \"Chat integration keeps disconnecting. Hi team, The chat integration disconnects every few days and we have to authorise it again. Could you point me in the right direction?\\n\\nLeslie\"}, {\"id\": \"T003790\", \"text\": \"Search times out. Good morning, Searching across Relay Docs often times out for our team in the afternoon. Thanks in advance.\\n\\nAndre\"}, {\"id\": \"T003791\", \"text\": \"Users locked out after enabling SSO. Hi team, We switched on SSO this morning and now several people cannot log in at all. Thanks in advance.\\n\\nJames\"}, {\"id\": \"T003798\", \"text\": \"Docs editor loses formatting. Hello, When we paste a table into Relay Docs the formatting is lost every time. Any help appreciated.\\n\\nJoel\"}, {\"id\": \"T003800\", \"text\": \"CHAT INTEGRATION KEEPS DISCONNECTING. We are paying for this product and it does not work. The chat integration disconnects every few days and we have to authorise it again. Frankly we are considering cancelling.\\n\\nStephanie\"}, {\"id\": \"T003801\", \"text\": \"Cannot remove a former employee. Hello, Someone left our company and I cannot find how to deactivate their seat. Could you point me in the right direction?\\n\\nPaul\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx83NsKVtptYMNpvBLVd",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"N001848\",\"sentiment\":\"neutral\",\"theme\":\"usability\",\"confidence\":0.6},{\"id\":\"N001849\",\"sentiment\":\"neutral\",\"theme\":\"usability\",\"confidence\":0.6},{\"id\":\"T003785\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.7},{\"id\":\"T003790\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.8},{\"id\":\"T003791\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.85},{\"id\":\"T003798\",\"sentiment\":\"negative\",\"theme\":\"usability\",\"confidence\":0.75},{\"id\":\"T003800\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9},{\"id\":\"T003801\",\"sentiment\":\"neutral\",\"theme\":\"pricing\",\"confidence\":0.7}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 513,
+   "output_tokens": 278,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -1,0 +1,101 @@
+{
+ "role": "classifier",
+ "purpose": "classify feedback",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read short pieces of customer feedback about Relay, a team-collaboration product: comments left with an NPS score, and support ticket texts. The input is a JSON list, each item with an id and a text. Your answer feeds a health score; you do not reply to anyone.\n\nFor each item return:\n\n- id: the id you were given.\n- sentiment: positive, neutral or negative. A calm question or request for help is neutral. A ticket that reports a problem angrily is negative.\n- theme: what it is mainly about.\n  - setup: getting started, inviting users, single sign-on, integrations\n  - usability: hard to use or to understand\n  - performance: slow, errors, things breaking\n  - support: the help the customer received, or did not receive\n  - pricing: cost, seats, billing\n  - value: whether the product is worth it to them\n  - other: anything else\n- confidence: a number from 0 to 1.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"T003133\", \"text\": \"Hit the automation rule limit. Hello, We tried to add a new rule and got a message saying we reached the limit for our plan. Thanks in advance.\\n\\nMichele\"}, {\"id\": \"T003135\", \"text\": \"NOTIFICATIONS SENT TO THE WRONG PERSON. This is the third time I am writing about this. A colleague is getting notifications for cards assigned to someone else. This is blocking the whole team.\\n\\nKara\"}, {\"id\": \"T003136\", \"text\": \"HOW ARE ASSIST CREDITS COUNTED?. I am honestly fed up. I am trying to understand how many credits a summary uses so I can plan our usage. I need someone to call me today.\\n\\nMelissa\"}, {\"id\": \"T003137\", \"text\": \"How do I bulk invite users?. Good morning, We need to add around 30 people. Is there a way to invite them in bulk instead of one by one? Thank you.\\n\\nEmily\"}, {\"id\": \"T003139\", \"text\": \"Cards disappearing from board. Hi, Two cards vanished from our sprint board. They are not in the archive either. Thank you.\\n\\nTodd\"}, {\"id\": \"T003140\", \"text\": \"Search times out. Not happy at all. Searching across Relay Docs often times out for our team in the afternoon. If this is not fixed this week we will look at alternatives.\\n\\nTammy\"}, {\"id\": \"T003144\", \"text\": \"Is there an integration for our code repository?. This is the third time I am writing about this. We would like commits to show on cards. I could not find the setup guide. Frankly we are considering cancelling.\\n\\nChelsea\"}, {\"id\": \"T003145\", \"text\": \"Invites not arriving. Good morning, I invited six colleagues yesterday and none of them received the invitation email. Thank you.\\n\\nRobert\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "theme": {
+        "type": "string",
+        "enum": [
+         "setup",
+         "usability",
+         "performance",
+         "support",
+         "pricing",
+         "value",
+         "other"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       }
+      },
+      "required": [
+       "id",
+       "sentiment",
+       "theme",
+       "confidence"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx7RitamaJ9p2HVgiGS2",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\":[{\"id\":\"T003133\",\"sentiment\":\"neutral\",\"theme\":\"pricing\",\"confidence\":0.7},{\"id\":\"T003135\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.85},{\"id\":\"T003136\",\"sentiment\":\"negative\",\"theme\":\"pricing\",\"confidence\":0.8},{\"id\":\"T003137\",\"sentiment\":\"neutral\",\"theme\":\"setup\",\"confidence\":0.85},{\"id\":\"T003139\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.8},{\"id\":\"T003140\",\"sentiment\":\"negative\",\"theme\":\"performance\",\"confidence\":0.9},{\"id\":\"T003144\",\"sentiment\":\"negative\",\"theme\":\"value\",\"confidence\":0.8},{\"id\":\"T003145\",\"sentiment\":\"negative\",\"theme\":\"setup\",\"confidence\":0.8}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 700,
+   "inference_geo": "global",
+   "input_tokens": 622,
+   "output_tokens": 276,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Lundavo Foods\", \"segment\": \"mid\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 7338, \"seats_licensed\": 78, \"seats_assigned\": 67, \"seats_assigned_30_days_ago\": 54, \"seat_utilisation_pct\": 86, \"monthly_active_users\": 40, \"automation_rules\": 12, \"automation_rule_limit\": 15, \"integrations\": 0, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 780, \"health_score\": 74.8, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": null, \"days_to_renewal\": 312, \"trigger_signal\": \"expansion_ready\", \"trigger_evidence\": \"Expansion likelihood 50%: nearly all seats assigned, near the automation limit, reads our emails\", \"expansion_score_pct\": 50, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, reads our emails\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6v5awfqKYtrfB7FssR",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: The expansion-ready signal fired on Lundavo Foods with an expansion likelihood of 50%, driven by seats filling up and automation nearing its limit.\n\nEvidence: 67 of 78 licensed seats are assigned, up from 54 thirty days ago, for 86% utilisation. Automation rules are at 12 of a 15-rule limit.\n\nLikely need: More seats are the clearest need, since assignment is near the licence cap and still climbing. The automation count is close to its limit, so they may also need more room there. Premium is the next edition, but the data does not show what it adds, so check that before proposing it.\n\nSuggested opener: \"Lundavo's team has been growing fast on the platform, so I wanted to check whether you need more seats or room for more automation before you hit a limit.\"\n\nRisks: Only 40 monthly active users against 67 assigned seats, so adding seats before adoption improves could be a hard sell. Assist credits used over the last 30 days are 0 of 780 included. Health is green at 74.8, with 0 open high-priority tickets, and renewal is 312 days away, so there is no urgency pressure. No NPS score is on file.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 721,
+   "output_tokens": 891,
+   "output_tokens_details": {
+    "thinking_tokens": 511
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

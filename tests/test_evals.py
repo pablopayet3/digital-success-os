@@ -84,7 +84,7 @@ def test_the_eval_run_writes_a_report_that_says_who_answered(simulated, tmp_path
     failed = {result["id"] for group in groups for result in group if result["status"] == "failed"}
     assert failed <= needs_model, f"unexpected failures: {sorted(failed - needs_model)}"
     assert all(counts["run"] > 0 for counts in results["totals"].values())
-    assert set(results["agent"]) == {"v1", "v2"}  # both prompt versions ran on the same cases
+    assert set(results["agent"]) == {"v1", "v2", "v3"}  # every prompt version, same cases
 
 
 def test_mailbox_accuracy_is_scored_against_the_simulators_labels(simulated):
@@ -151,3 +151,30 @@ def test_every_success_metric_in_the_play_config_exists_in_the_warehouse(simulat
     con.close()
     assert {play.success_metric["id"] for play in load_catalog().plays} <= columns
     assert {arm for (arm,) in arms} == {"treatment", "holdout"}
+
+
+# --- The operating review and the BI extracts ----------------------------------------------------
+
+
+def test_the_operating_review_is_written_from_the_data(simulated, tmp_path):
+    from experiments.review import write_operating_review
+
+    _, data_dir = simulated
+    analyse(data_dir, tmp_path, verbose=False)  # the review reads the results table
+    text = write_operating_review(data_dir, tmp_path / "review.md").read_text(encoding="utf-8")
+    assert "Synthetic data, fictional company" in text and "This is a simulation" in text
+    for section in ("The short version", "Leading indicators", "What the plays moved",
+                    "The agents", "What people had to pick up", "Can the data be trusted",
+                    "Decisions requested"):  # fmt: skip
+        assert section in text, f"section missing: {section}"
+
+
+def test_bi_extracts_are_one_file_per_table_with_no_logic_added(simulated, tmp_path):
+    from analytics.extracts import EXTRACTS, write_extracts
+
+    _, data_dir = simulated
+    analyse(data_dir, tmp_path, verbose=False)
+    counts = write_extracts(data_dir, tmp_path / "bi")
+    assert set(counts) == set(EXTRACTS) and counts["accounts.csv"] > 100
+    header = (tmp_path / "bi" / "play_results.csv").read_text(encoding="utf-8").splitlines()[0]
+    assert header.startswith("play_id") and "verdict" in header

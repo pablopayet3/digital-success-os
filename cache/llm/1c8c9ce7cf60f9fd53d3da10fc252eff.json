@@ -1,0 +1,224 @@
+{
+ "role": "agent",
+ "purpose": "onboarding agent turn",
+ "request": {
+  "model": "claude-opus-5-5",
+  "max_tokens": 4000,
+  "effort": "low",
+  "system": "You are the onboarding assistant for Relay, a team-collaboration product made by Lumen Labs. You are talking with the admin of a customer account whose setup has stalled. The admin is busy, is often not technical, and has no account manager: you and the help centre are the support they have.\n\n## What you are here to do\n\nHelp the admin finish the setup steps that are still missing: create a first board, invite at least five people, connect an integration, configure single sign-on. Answer the product questions that come up on the way.\n\n## How to work\n\nStart by calling get_setup_status, so you know what is done and what is missing before you say anything about setup. Call get_account_context when the answer depends on their edition or situation (for example, single sign-on is not available on the Free edition).\n\nFor any product question, call search_docs and answer only from the articles it returns. Name the article you used, so the admin can find it again. The help centre is the only source you may answer from, because an invented step or limit costs the admin more time than no answer. If the search result says that no article covers the question, do not answer from memory: when the request was vague, ask one short clarifying question; otherwise hand off.\n\nIf the admin's message is vague (\"it doesn't work\"), ask one clarifying question before searching.\n\nKeep replies short: the next step or two, as numbered steps when there is a sequence. Lead with what to do. Use plain words, and the admin's own words for things where you can.\n\n## When a person takes over\n\nHand off with create_handoff when:\n\n- The admin asks for a person.\n- The question is about prices, quotes, discounts, buying seats, changing edition, contracts, invoices, refunds, cancellation or legal terms. You may explain what an edition includes. You may not say what anything costs or change anything: account owners and the customer success team do that, and a wrong figure from you would be a promise the company has to keep.\n- The admin is upset or has clearly had a bad experience. They need a person, not another article.\n- The help centre does not cover the question.\n\nWhen you hand off, tell the admin in one sentence that a colleague will follow up and that they will not need to repeat themselves. Write the summary for that colleague, who has not seen this conversation: what the admin wants, what you already told them, and what is still missing from their setup.\n\n## Ending\n\nThe admin only sees the text you write. They do not see your reasoning or your tool calls. So the full answer must be written out as text every time, even when you have already logged the outcome: never tell the admin that you have shown or explained something unless the steps are in the text of this reply.\n\nCall log_outcome once when the question is answered.\n\nState only what a tool result says. Report the setup status as the tool gives it. Do not tell the admin that an action will complete a setup step, free a seat or change a limit unless the setup status or an article says so.\n\nNever state a feature, a limit, a price or a step that did not come from a tool result.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "What is the maximum file size for attachments on a card?"
+   },
+   {
+    "role": "assistant",
+    "content": [
+     {
+      "text": "Start with setup status per instructions, and search docs in parallel.",
+      "type": "text"
+     },
+     {
+      "id": "toolu_01QpvVNnjAESDz2hNqfCjBT7",
+      "input": {},
+      "name": "get_setup_status",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     },
+     {
+      "id": "toolu_01DFkWxCQVa8DUFNE9tMd7B4",
+      "input": {
+       "query": "attachment file size limit card"
+      },
+      "name": "search_docs",
+      "type": "tool_use",
+      "caller": {
+       "type": "direct"
+      }
+     }
+    ]
+   },
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01QpvVNnjAESDz2hNqfCjBT7",
+      "content": "{\"completed_steps\": [\"create a first board\", \"invite at least five users\"], \"missing_steps\": [\"connect an integration\", \"configure single sign-on\"], \"closure_pct\": 0.5, \"seats_assigned\": 9, \"seats_licensed\": 15, \"edition\": \"standard\"}"
+     },
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01DFkWxCQVa8DUFNE9tMd7B4",
+      "content": "{\"query\": \"attachment file size limit card\", \"note\": \"At least one article covers this question.\", \"articles\": [{\"slug\": \"bulk-invite\", \"title\": \"Invite many users at once (bulk invite)\", \"score\": 6.43, \"coverage\": 0.6, \"covers_question\": true, \"text\": \"# Invite many users at once (bulk invite)\\n\\nTo add many people at once, go to Admin settings, Users, Invite, and choose Upload a file. Upload a CSV file with one column named email. You can add an optional column named role with the value member or admin.\\n\\nRelay checks the file first and shows you any addresses it cannot use (wrong format, already a user, or more rows than free seats). Nothing is sent until you confirm.\\n\\nThere is no limit on the size of the file other than the number of seats you have free.\\n\\nSearch keywords: add whole team everyone all at once many people dozen dozens hundreds list import upload\\n\"}, {\"slug\": \"automation-rules\", \"title\": \"Automation rules\", \"score\": 3.06, \"coverage\": 0.4, \"covers_question\": false, \"text\": \"# Automation rules\\n\\nAn automation rule does something for you when something happens on a board. Example: when a card moves to Done, notify the reporter. Create rules from the Automation button on any board: choose a trigger, optional conditions, and one or more actions.\\n\\nRules also work with recurring cards: the rule runs each time a new copy of the card is created.\\n\\nThe number of rules per workspace depends on your edition: 5 on Free, 15 on Standard, 60 on Premium, and no practical limit on Enterprise. When you reach the limit, existing rules keep running but you cannot add new ones.\\n\\nSearch keywords: automate automation rule rules trigger action limit\\n\"}, {\"slug\": \"export-board\", \"title\": \"Export a board to a spreadsheet\", \"score\": 2.09, \"coverage\": 0.4, \"covers_question\": false, \"text\": \"# Export a board to a spreadsheet\\n\\nTo export a board, open it, choose the menu at the top right, then Export, then CSV. The file has one row per card with its list, title, assignee, labels, due date and the date it was last changed. Archived cards are included only if you tick Include archived.\\n\\nFor a monthly report, save the export with the same filter each time, or connect the cloud drive integration to have the export written to a shared folder automatically.\\n\"}]}"
+     }
+    ]
+   }
+  ],
+  "tools": [
+   {
+    "name": "get_account_context",
+    "description": "Facts about the customer's account: edition, seats, lifecycle stage, health score and its components, open tickets, latest NPS score. Call it when the answer depends on the customer's edition or situation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "get_setup_status",
+    "description": "Which of the four setup steps the account has completed (first board, five users, an integration, single sign-on) and which are still missing. Call it first in an onboarding conversation.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "search_docs",
+    "description": "Search the Relay help centre. Returns the best-matching articles with their full text. Answer product questions only from what this returns.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "query": {
+       "type": "string",
+       "description": "What to look for, in a few words."
+      }
+     },
+     "required": [
+      "query"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "create_handoff",
+    "description": "Hand the conversation to a human, with a summary. Use it when the customer asks for a person, asks about pricing, contracts, refunds or legal matters, is upset, or when the help centre does not answer the question.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_asked_for_person",
+        "frustration",
+        "low_confidence",
+        "not_in_docs",
+        "pricing_contract_legal"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "What the customer wants and what was already tried."
+      },
+      "recommended_next_step": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "reason",
+      "summary",
+      "recommended_next_step"
+     ],
+     "additionalProperties": false
+    }
+   },
+   {
+    "name": "log_outcome",
+    "description": "Record how the conversation ended. Call it once, at the end.",
+    "strict": true,
+    "input_schema": {
+     "type": "object",
+     "properties": {
+      "outcome": {
+       "type": "string",
+       "enum": [
+        "answered",
+        "partly_answered"
+       ]
+      },
+      "note": {
+       "type": "string",
+       "description": "One sentence on what was resolved."
+      }
+     },
+     "required": [
+      "outcome",
+      "note"
+     ],
+     "additionalProperties": false
+    }
+   }
+  ],
+  "json_schema": null,
+  "refusal_fallback": true
+ },
+ "response": {
+  "id": "msg_011Cgx6JT2n1Haur9x975cQi",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQS+wUKEAgTGAI4AUIIdGhpbmtpbmcSDGCy+rgNda8jFgZ4PBoMXM4E8ExHprGJZkuzIjBrYNo4pIZk1iyBU+CXTsDgFAZZ1w4xFlHeorOWUkzeKnPmmlO4mfpWyRWkKAOotNAqmAXphcBvVGsIHSUa7sc92glzAjq/5sJBpz7BZlHgUAmMI4RKAbO+GNHhE18+eYIc4IzXjvtVxs82jmMj0qPzrUTPE1MqH5EEBsmWuymaxngJ3LFDuivfIChcoQJzqna+wEdZQm4XwgjJBIdgAgT/UfdbaKmsCRxdLcCEP4KSjSuQCN836YM8yN+STwP0id9CxkS4GNkOaa1RHEQuku2PLyc6Uzkv6JZQhkVyW2Wnba0bvcNR6phnpfuCm6CrJthVEmHL+tBPd6asJO2A8+L+FxhlhVdQyPqloMFcoa94ghoe6HjUYQo+OLmq+/szFhmsbSV6CzROY9pz7GUf7O0XZHWhMD2sVmFyGGmb65WwEdizWKwOLFVqtBZm3DdLv7uEAR+kyLLR4JW4qcwClEQkcKFshqUu1XNaHJEMbKu9Q4RpWDCL19pH24VfcxQM2vwZsCueD7bhcfGLgOyL4IZ7gJsfve7LC7pkFbusaNhP0M826n1A6QSHlf8I0orMZp1nJyMLYblQDdkHGEFHH7d9jgot9/9vP6kgY1Cg2Zh7tLDxsSBVU02OFDosj3k9G6UKAAfOWjQoQvzI+pkVOMhxyL0KzTQyET63CCMzB2MHynWKyW1p0kFUBUxE8QoJvqOuJ1qAqnupIP1jWDnCPHe583ZE8jhoaEFTf+2+92wsFEWQXItQvA/YWRj2jC9/1qVR5Jfks56DDTZqGYWChqvcHYIiiACocKgs1281yaDjBcdseV5oOV1W2jRZ/FbupICJrcd7jiBktUAQ6WAMlHPK33FG62p+ll/a3XhaL28M9s4b5VZK2gNvtm0nABG6mjHoD05pwebP4QGg0pE9ZAZjds9S2EzGSgcJKGdNomDuGXS8Ksp5UetkMxE7GAE=",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "id": "toolu_013t7byMVJeRfBw783H7zTWz",
+    "input": {
+     "reason": "not_in_docs",
+     "summary": "Admin asked for the maximum file size for attachments on a card. The help centre has no article on card attachment limits. The search returned the bulk-invite article, which is about the size of the CSV invite file, not card attachments, so I did not give an answer. Setup status (Standard edition, 9 of 15 seats assigned): first board and five users are done. Still missing: connect an integration and configure single sign-on.",
+     "recommended_next_step": "Tell the admin the card attachment size limit for the Standard edition. Then offer help connecting an integration and setting up SSO."
+    },
+    "name": "create_handoff",
+    "type": "tool_use",
+    "caller": {
+     "type": "direct"
+    }
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-opus-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1871,
+   "inference_geo": "global",
+   "input_tokens": 1130,
+   "iterations": [
+    {
+     "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+     },
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 1871,
+     "input_tokens": 1130,
+     "model": null,
+     "output_tokens": 316,
+     "type": "message"
+    }
+   ],
+   "output_tokens": 316,
+   "output_tokens_details": {
+    "thinking_tokens": 44
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

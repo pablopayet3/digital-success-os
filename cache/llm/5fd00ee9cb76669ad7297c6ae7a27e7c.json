@@ -1,0 +1,118 @@
+{
+ "role": "classifier",
+ "purpose": "classify mailbox",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You sort replies that arrived in a shared mailbox. Each one answers an email that the customer success team of Lumen Labs sent about its product, Relay. The input is a JSON list of replies, each with an id, a subject and a body. Routing rules act on your answer; you do not reply to anyone.\n\nFor each reply return:\n\n- id: the id you were given.\n- intent: the main thing the sender wants.\n  - out_of_office: an automatic reply saying the person is away\n  - unsubscribe: the person wants to stop receiving these emails\n  - left_company: the person no longer works there, or the mailbox is closed\n  - product_question: a question about how the product works\n  - buying_intent: wants more seats, a higher edition, another product, or pricing\n  - complaint: unhappy about the product or the service\n  - meeting_request: wants a call or a meeting\n  - other: none of the above\n- sentiment: positive, neutral or negative.\n- confidence: a number from 0 to 1. Use a low number when two intents fit about equally, or when the message is too short or vague to tell.\n- seats_requested: the number of seats asked for, as text, or an empty string.\n- edition_mentioned: the edition named (free, standard, premium, enterprise), or an empty string.\n- return_date: when the person says they are back, as written, or an empty string.\n- new_contact: the name of the person to contact instead, or an empty string.\n\nReplies can be in any language. Ignore quoted text from the original email and signatures. When a reply has two intents, choose the one that needs action first: a complaint outranks an unsubscribe, and buying intent outranks a product question.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"M000313\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hi there,\\n\\nWe have had an open ticket for ten days and no answer. This is not acceptable.\\n\\n--\\nKaren Lee\\nIT Manager | Tevanda Works\\n\\nOn 05 Aug 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Karen, here is the latest from the Relay team...\"}, {\"id\": \"M000316\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"we tried the thing you mention in step 2 and nothing happens?? is that normal\"}, {\"id\": \"M000319\", \"subject\": \"Undeliverable: Relay monthly: what is new\", \"body\": \"Delivery has failed: the recipient's mailbox is disabled.\"}, {\"id\": \"M000322\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hello team,\\n\\nwe tried the thing you mention in step 2 and nothing happens?? is that normal\"}, {\"id\": \"M000325\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hi,\\n\\nIs there a way to bulk invite users? We have about 5 people to add.\\n\\nSent from my phone\"}, {\"id\": \"M000328\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Qiuck question, what happens if we go over our seat count? We are onboarding about 21 poeple in the next few weeks.\\n\\nSent from my phone\\n\\nOn 05 Aug 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Relay monthly: what is new\\n> Hi Alec, here is the latest from the Relay team...\"}, {\"id\": \"M000331\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Does Relay Assist work on Docs pages as well as boards?\\n\\n--\\nRhonda Pena\\nIT Manager | Iskomi Works\"}, {\"id\": \"M000334\", \"subject\": \"Re: Relay monthly: what is new\", \"body\": \"Hi,\\n\\nWe need 15 more seats for a new team starting next month. What is the process?\\n\\n--\\nBecky Steele\\nWorkspace Admin | Garranda Clinics\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "intent": {
+        "type": "string",
+        "enum": [
+         "out_of_office",
+         "unsubscribe",
+         "left_company",
+         "product_question",
+         "buying_intent",
+         "complaint",
+         "meeting_request",
+         "other"
+        ]
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       },
+       "seats_requested": {
+        "type": "string"
+       },
+       "edition_mentioned": {
+        "type": "string"
+       },
+       "return_date": {
+        "type": "string"
+       },
+       "new_contact": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "intent",
+       "sentiment",
+       "confidence",
+       "seats_requested",
+       "edition_mentioned",
+       "return_date",
+       "new_contact"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx4zv9ZY1tYE7u5fRgX8",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"results\": [{\"id\": \"M000313\", \"intent\": \"complaint\", \"sentiment\": \"negative\", \"confidence\": 0.95, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000316\", \"intent\": \"product_question\", \"sentiment\": \"neutral\", \"confidence\": 0.7, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000319\", \"intent\": \"left_company\", \"sentiment\": \"neutral\", \"confidence\": 0.85, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000322\", \"intent\": \"product_question\", \"sentiment\": \"neutral\", \"confidence\": 0.7, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000325\", \"intent\": \"product_question\", \"sentiment\": \"neutral\", \"confidence\": 0.75, \"seats_requested\": \"5\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000328\", \"intent\": \"buying_intent\", \"sentiment\": \"neutral\", \"confidence\": 0.8, \"seats_requested\": \"21\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000331\", \"intent\": \"product_question\", \"sentiment\": \"neutral\", \"confidence\": 0.9, \"seats_requested\": \"\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}, {\"id\": \"M000334\", \"intent\": \"buying_intent\", \"sentiment\": \"positive\", \"confidence\": 0.9, \"seats_requested\": \"15\", \"edition_mentioned\": \"\", \"return_date\": \"\", \"new_contact\": \"\"}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1079,
+   "inference_geo": "global",
+   "input_tokens": 793,
+   "output_tokens": 621,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

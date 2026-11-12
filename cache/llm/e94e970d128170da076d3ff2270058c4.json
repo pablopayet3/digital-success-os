@@ -1,0 +1,80 @@
+{
+ "role": "judge",
+ "purpose": "eval judge",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You review answers given by a customer-support assistant for a software product called Relay. You decide whether one answer is good enough to send to a customer. Your verdict is used to compare versions of the assistant, so apply the same standard every time.\n\nThe input is JSON with:\n\n- conversation: the customer's messages and the assistant's replies, in order.\n- articles: the help-centre articles the assistant found. These are the only source the assistant is allowed to answer from.\n\nJudge the assistant's replies on four points:\n\n1. Grounded. Every step, limit or feature the assistant states can be found in the articles. Anything stated that is not in the articles is a failure, even if it happens to be true.\n2. Answers the question. The customer could act on the reply without asking again.\n3. Short and clear. The next step or two, in plain words. No long preamble.\n4. No promises. No price, discount, date or commitment.\n\nReturn:\n\n- verdict: \"pass\" when all four points hold, otherwise \"fail\".\n- score: 1 to 5. 5 = all four points hold fully. 4 = all hold, with a small weakness in clarity. 3 or lower = at least one point fails.\n- reason: one sentence naming the point that decided it.\n\nA clarifying question in reply to a vague message is fine and is not a failure of point 2.",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"conversation\": [{\"role\": \"customer\", \"text\": \"How do automation rules work with recurring cards?\"}, {\"role\": \"agent\", \"text\": \"Every time a recurring card makes a new copy of itself, your automation rules run on that copy, just as they would on any other card.\\n\\nTo set up a rule:\\n1. Open the board and click the **Automation** button.\\n2. Choose a trigger, such as \\\"card moves to Done.\\\"\\n3. Add conditions if you want them. They're optional.\\n4. Choose one or more actions, such as \\\"notify the reporter.\\\"\\n\\nYou're on the Standard edition, which allows **15 rules per workspace**. If you reach that limit, the rules you already have keep running, but you can't add new ones.\\n\\nIf a rule doesn't run, open the Automation panel on the board and check that rule's run history.\\n\\nThis is from the help centre articles **\\\"Automation rules\\\"** and **\\\"An automation rule did not run, or runs twice.\\\"**\\n\\nYou have two setup steps left: **connecting an integration** and **setting up single sign-on**. Your edition includes both. Would you like to start with one of them?\"}], \"articles\": [{\"title\": \"Automation rules\", \"text\": \"# Automation rules\\n\\nAn automation rule does something for you when something happens on a board. Example: when a card moves to Done, notify the reporter. Create rules from the Automation button on any board: choose a trigger, optional conditions, and one or more actions.\\n\\nRules also work with recurring cards: the rule runs each time a new copy of the card is created.\\n\\nThe number of rules per workspace depends on your edition: 5 on Free, 15 on Standard, 60 on Premium, and no practical limit on Enterprise. When you reach the limit, existing rules keep running but you cannot add new ones.\\n\\nSearch keywords: automate automation rule rules trigger action limit\\n\"}, {\"title\": \"An automation rule did not run, or runs twice\", \"text\": \"# An automation rule did not run, or runs twice\\n\\nIf a rule did not run, open the Automation panel on the board and look at the rule's run history. The most common causes are: the rule is switched off; the trigger is on a different list than the one the card moved to; or a condition (label, assignee) did not match.\\n\\nIf a rule sends two notifications for every card, two rules have the same trigger. Check for a copy of the rule on the board and in the workspace template the board was created from. Switch one of them off.\\n\"}, {\"title\": \"Compare editions: Free, Standard, Premium, Enterprise\", \"text\": \"# Compare editions: Free, Standard, Premium, Enterprise\\n\\nWhat each edition includes:\\n\\n- Free: up to 10 users, 5 automation rules, 2 integrations. No single sign-on, no guests, no Relay Assist.\\n- Standard: 15 automation rules, 3 integrations, single sign-on, guests, and 10 Relay Assist credits per seat per month if you add Relay Assist.\\n- Premium: 60 automation rules, 10 integrations, single sign-on, guests, and 40 Assist credits per seat per month.\\n- Enterprise: no practical limit on rules or integrations, and 150 Assist credits per seat per month.\\n\\nThis article describes features only. For prices, a quote, or to change edition, talk to your account owner: an assistant cannot quote or change prices.\\n\\nSearch keywords: plan plans tier tiers compare comparison difference differences included includes include features premium standard enterprise free what do I get\\n\"}]}"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "verdict": {
+     "type": "string",
+     "enum": [
+      "pass",
+      "fail"
+     ]
+    },
+    "score": {
+     "type": "integer"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "verdict",
+    "score",
+    "reason"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx4qG18LxkdHfFV1CyAz",
+  "container": null,
+  "content": [
+   {
+    "signature": "CAQS8AgKEAgTGAI4AUIIdGhpbmtpbmcSDL6LJReBPKeSJUQ1XhoMpuxA8gG2jpPRdWx4IjDHeGm+n5vKoD/PdcxwQMm8Si51jPmbHi8mjxVdcHTlNjOcRydYw0oNu/+ojDId8tAqjQgynm2kR9fEX2a5NagRdJxNvxevL+t/Z+l2/OVF/GRh32IjFpXVcCI6apIHKFYLl57fry82ZReN7fAGbaGV3I7Nj8E1K8P56jMQ8bji2Ern3H5lWpYxIYQg05LMimNCPIHmCTSRaNw7ecA55BRFW0IEflo5JXznDuN7A4ucGcGvG8nTp8GqZOsnMC76IZiyePc6a/c+eXUeTFzAwXEawACIrQXjzDf0/17HLEdIagGeapbBH/Hm9/jCx/q2e35OwgImX1zJO68GvtLP8HPA+svIS0SK/uzxd6x7CkJXBsY3uLFCPDSCLr16JxXr2n/PYn1fDDsJjJVF2YLr0zd87k887pKbl1ePNTsg/tqGBG9SIc02EKdli5WYlyTB/geNi+5Tjv+SN+f4A7IoJ6Pt5qRCPX9rFI7+pcuhqqvR6Mu8uBbIUmYIdxnXizWwcEeDLU6kElCQA2S+u+hbTGwDv0g78WPcE95n+rTzDY8TZfiI5D/6PIsvPHa4JrJ7BjAMI+G3srciBW/uLM1j7IRP5hWKcQ/t1zP+b6Fu7nXrqYwHYrlSU49cIEiV6lrN1x0l2FDQ/buooOeO/XMrsns0dAsPF6zRfX7jof4ODyEVplmF6o7YKTZt9T3yViJfE+CqluLlZjASk8THK468CAblrYBznVWu0BDgEid6Up1ZlUlP9puz75jedaOtmojEkBRPmuwdZ2sxE7aq/k2XmGawMd/aMqQmKDkcQDlwFgU5nOy2OHSVWKT3H6XZZ4sZx+5b1wppdj/V21gf22JaztvgIa/9b7vnvg6sPsAOTDbkuLU+uCbia3mLLDIdn905KSeyznM2EtNyKCd5z6ZVm9XzQFLBdMe5lcSjgndjkWttkQYbmzioB4WDiumQRV2zIbkJ1hrvedYA7p/7RTbzg/9kRz/ZMa3ieFnAwmZt3GrFp3UoTKM4D5WBnAOL7UizVMZ6zG12pLr3/cO3+7cwAQr+sMNS4Z7ZiP0k4lwkiNgxdsM6hC1TJ2r6Qc1R+udOT7DM0l5g+gevS48IT7Cewrc9l1R9KwEFJLn2N6BumP13hzkyLiDP/4Fs9yO9NDz+aqGIHhGpr3c4ym5YtG8R/FX9BhSE5ZECrvEMv1mGGJNvDNA+LIDWosa/M5O+GXMiiPgXOT6x8G/LH0o4xs9X0wXj4wC/tEhOxsDeHT2E1mxZb6wn4utkxNgpmfKqOrtXT/mRcZeM7ZngT+nUb1HvzIrXoRCI7kZeYRfcrc4isvxxnbhyS1g9oO4AXlGUao0VqnDBKxT0EEUjUWUSSjHJSqHp/oFAhMp3wCi8mF16sca+8/1U71xTlMfXVEwESZezXPvl4wNrYW2cR8Rj02XMY5ThLAYfkQaxL8eWpEUhnZhR9xgB",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"verdict\": \"fail\", \"score\": 2, \"reason\": \"The reply states as fact that the customer is on the Standard edition and has two setup steps left (integration and single sign-on), but nothing in the conversation or articles establishes either, so point 1 (grounded) fails.\"}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 671,
+   "inference_geo": "global",
+   "input_tokens": 1177,
+   "output_tokens": 258,
+   "output_tokens_details": {
+    "thinking_tokens": 167
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

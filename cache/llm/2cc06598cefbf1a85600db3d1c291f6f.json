@@ -1,0 +1,57 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Dovune Freight\", \"segment\": \"smb\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 795, \"seats_licensed\": 9, \"seats_assigned\": 8, \"seats_assigned_30_days_ago\": 8, \"seat_utilisation_pct\": 89, \"monthly_active_users\": 4, \"automation_rules\": 1, \"automation_rule_limit\": 15, \"integrations\": 1, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 90, \"health_score\": 76.1, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 8, \"days_to_renewal\": 29, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"We need 25 more seats for a new team starting next month. What is the process? -- Rachel Peterson Head of IT | Dovune Freight\", \"expansion_score_pct\": 14, \"expansion_reasons\": \"nearly all seats assigned, reads our emails, many high-priority tickets\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6hsEDZFHHZh3nWQpLG",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "Signal: Rachel Peterson, Head of IT at Dovune Freight, asked what the process is for adding 25 more seats for a new team starting next month.\n\nEvidence: The account has 9 seats licensed, 8 assigned (89% utilisation), and 30 days ago it also had 8 assigned. Health is green at 76.1, and renewal is in 29 days.\n\nLikely need: More seats, on the Standard edition. The request is explicit and the current seats are nearly full. The facts don't show a need for Premium: automation rules (1 of 15) and integrations (1 of 3) are well under their limits, and no Premium-specific usage appears in the data.\n\nSuggested opener: \"Rachel, thanks for letting us know about the new team starting next month. I'd be glad to walk you through how adding seats works and make sure they're set up before their start date.\"\n\nRisks: Only 4 monthly active users against 8 assigned seats, so assigned seats are not all in use. Renewal is 29 days out, so the seat change should be handled alongside it. The expansion reasons mention many high-priority tickets, but open_high_priority_tickets is 0, so check the ticket history before the call. Assist credits used are 0 of 90.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 732,
+   "output_tokens": 924,
+   "output_tokens_details": {
+    "thinking_tokens": 527
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

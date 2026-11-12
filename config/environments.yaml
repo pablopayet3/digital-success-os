@@ -10,10 +10,11 @@ dev:
   dbt_target: dev
   operational_store: sqlite:///data/ops.db
   offline_mode: true          # replay cached LLM responses; never call the API
-  # Until one live run has filled cache/llm/ with real responses, a rule-based stand-in
-  # plays the model so the whole flow can be shown. It is labelled as a stand-in
-  # everywhere. Set to false once the cache is filled (see docs/decisions/0015).
-  llm_stand_in: true
+  # false = replay the real model responses in cache/llm/ (filled by one live run).
+  # true  = a rule-based stand-in plays the model, labelled as such everywhere: for
+  #         machines with no key and no network (CI, the container image).
+  # See docs/decisions/0015 for the three modes.
+  llm_stand_in: false
 
 prod:
   description: Real services. Databricks SQL warehouse, Postgres operational store.

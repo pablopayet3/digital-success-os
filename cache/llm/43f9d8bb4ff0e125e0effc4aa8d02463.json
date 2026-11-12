@@ -1,0 +1,123 @@
+{
+ "role": "classifier",
+ "purpose": "classify mailbox",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You sort replies that arrived in a shared mailbox. Each one answers an email that the customer success team of Lumen Labs sent about its product, Relay. The input is a JSON list of replies, each with an id, a subject and a body. Routing rules act on your answer; you do not reply to anyone.\n\nFor each reply return:\n\n- id: the id you were given.\n- intent: the main thing the sender wants.\n  - out_of_office: an automatic reply saying the person is away\n  - unsubscribe: the person wants to stop receiving these emails\n  - left_company: the person no longer works there, or the mailbox is closed\n  - product_question: a question about how the product works\n  - buying_intent: wants more seats, a higher edition, another product, or pricing\n  - complaint: unhappy about the product or the service\n  - meeting_request: wants a call or a meeting\n  - other: none of the above\n- sentiment: positive, neutral or negative.\n- confidence: a number from 0 to 1. Use a low number when two intents fit about equally, or when the message is too short or vague to tell.\n- seats_requested: the number of seats asked for, as text, or an empty string.\n- edition_mentioned: the edition named (free, standard, premium, enterprise), or an empty string.\n- return_date: when the person says they are back, as written, or an empty string.\n- new_contact: the name of the person to contact instead, or an empty string.\n\nReplies can be in any language. Ignore quoted text from the original email and signatures. When a reply has two intents, choose the one that needs action first: a complaint outranks an unsubscribe, and buying intent outranks a product question.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"M000586\", \"subject\": \"Undeliverable: New in Relay Assist: smarter summaries\", \"body\": \"Brittany Bean no longer works at Halexo Robotics. Please contact Erica Clay instead.\"}, {\"id\": \"M000587\", \"subject\": \"Re: New in Relay Assist: smarter summaries\", \"body\": \"Hey,\\n\\nQuick question: can gusets be limited to a single board?\\n\\nThanks,\\nTony\"}, {\"id\": \"M000588\", \"subject\": \"Automatic reply: New in Relay Assist: smarter summaries\", \"body\": \"I am currently travelling and will respond as soon as I can.\"}, {\"id\": \"M000589\", \"subject\": \"Undeliverable: New in Relay Assist: smarter summaries\", \"body\": \"Angela Torres no longer works at Tevomi Energy. Please contact April Phillips instead.\"}, {\"id\": \"M000590\", \"subject\": \"Re: New in Relay Assist: smarter summaries\", \"body\": \"We are paying for 31 seats and barely half are used because setup was so painful. I want to talk to someone about reducing our plan.\\n\\nThanks,\\nBrian\"}, {\"id\": \"M000591\", \"subject\": \"Re: New in Relay Assist: smarter summaries\", \"body\": \"Bonjour, je suis absent du bureau jusqu'au Monday. Je r\u00e9pondrai \u00e0 votre message \u00e0 mon retour.\\n\\nThanks,\\nJesus\"}, {\"id\": \"M000592\", \"subject\": \"Undeliverable: New in Relay Assist: smarter summaries\", \"body\": \"I have left Hestomi Studios as of last month. For Relay questions please reach out to Donald Hoover.\"}, {\"id\": \"M000593\", \"subject\": \"Re: New in Relay Assist: smarter summaries\", \"body\": \"Hi there,\\n\\nOur Assist credits keep running out. Is there a bigger package?\\n\\n--\\nStephanie Ray\\nTeam Lead | Quinessa Robotics\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "intent": {
+        "type": "string",
+        "enum": [
+         "out_of_office",
+         "unsubscribe",
+         "left_company",
+         "product_question",
+         "buying_intent",
+         "complaint",
+         "meeting_request",
+         "other"
+        ]
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       },
+       "seats_requested": {
+        "type": "string"
+       },
+       "edition_mentioned": {
+        "type": "string"
+       },
+       "return_date": {
+        "type": "string"
+       },
+       "new_contact": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "intent",
+       "sentiment",
+       "confidence",
+       "seats_requested",
+       "edition_mentioned",
+       "return_date",
+       "new_contact"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx8B5KrYvMQM2kWEGyGA",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"results\":[{\"id\":\"M000586\",\"intent\":\"left_company\",\"sentiment\":\"neutral\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"Erica Clay\"},{\"id\":\"M000587\",\"intent\":\"product_question\",\"sentiment\":\"neutral\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000588\",\"intent\":\"out_of_office\",\"sentiment\":\"neutral\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000589\",\"intent\":\"left_company\",\"sentiment\":\"neutral\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"April Phillips\"},{\"id\":\"M000590\",\"intent\":\"complaint\",\"sentiment\":\"negative\",\"confidence\":0.7,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000591\",\"intent\":\"out_of_office\",\"sentiment\":\"neutral\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"Monday\",\"new_contact\":\"\"},{\"id\":\"M000592\",\"intent\":\"left_company\",\"sentiment\":\"neutral\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"Donald Hoover\"},{\"id\":\"M000593\",\"intent\":\"buying_intent\",\"sentiment\":\"neutral\",\"confidence\":0.85,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1079,
+   "inference_geo": "global",
+   "input_tokens": 664,
+   "output_tokens": 1070,
+   "output_tokens_details": {
+    "thinking_tokens": 496
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

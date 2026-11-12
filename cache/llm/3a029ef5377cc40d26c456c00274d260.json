@@ -1,0 +1,123 @@
+{
+ "role": "classifier",
+ "purpose": "classify mailbox",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You sort replies that arrived in a shared mailbox. Each one answers an email that the customer success team of Lumen Labs sent about its product, Relay. The input is a JSON list of replies, each with an id, a subject and a body. Routing rules act on your answer; you do not reply to anyone.\n\nFor each reply return:\n\n- id: the id you were given.\n- intent: the main thing the sender wants.\n  - out_of_office: an automatic reply saying the person is away\n  - unsubscribe: the person wants to stop receiving these emails\n  - left_company: the person no longer works there, or the mailbox is closed\n  - product_question: a question about how the product works\n  - buying_intent: wants more seats, a higher edition, another product, or pricing\n  - complaint: unhappy about the product or the service\n  - meeting_request: wants a call or a meeting\n  - other: none of the above\n- sentiment: positive, neutral or negative.\n- confidence: a number from 0 to 1. Use a low number when two intents fit about equally, or when the message is too short or vague to tell.\n- seats_requested: the number of seats asked for, as text, or an empty string.\n- edition_mentioned: the edition named (free, standard, premium, enterprise), or an empty string.\n- return_date: when the person says they are back, as written, or an empty string.\n- new_contact: the name of the person to contact instead, or an empty string.\n\nReplies can be in any language. Ignore quoted text from the original email and signatures. When a reply has two intents, choose the one that needs action first: a complaint outranks an unsubscribe, and buying intent outranks a product question.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "[{\"id\": \"M000193\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Hi there,\\n\\nHappy to chat. Do you have a calendar link?\\n\\n--\\nMary Murphy\\nOperations Lead | Bexanda Freight\\n\\nOn 18 Jun 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Live session: automation rules in 30 minutes\\n> Hi Mary, here is the latest from the Relay team...\"}, {\"id\": \"M000194\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"I would like to book a session with someone from your team. What times do you have?\\n\\nThanks,\\nChristopher\\n\\nOn 18 Jun 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Live session: automation rules in 30 minutes\\n> Hi Christopher, here is the latest from the Relay team...\"}, {\"id\": \"M000195\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Hi there,\\n\\nIs there someone I can talk to about how other companies our size use this?\\n\\nSent from my phone\"}, {\"id\": \"M000196\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Hello team,\\n\\nHappy to chat. Do you have a calendar link?\\n\\n--\\nBrian Wise\\nSystems Admin | Arvarro Finance\\n\\nOn 18 Jun 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Live session: automation rules in 30 minutes\\n> Hi Brian, here is the latest from the Relay team...\"}, {\"id\": \"M000197\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"hey,\\n\\nhappy to chat. do you have a calendar link?\"}, {\"id\": \"M000198\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Hi,\\n\\nIs there a way to bulk invite users? We have about 26 people to add.\\n\\n--\\nHeather Mosley\\nIT Manager | Loreth Freight\\n\\nOn 18 Jun 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Live session: automation rules in 30 minutes\\n> Hi Heather, here is the latest from the Relay team...\"}, {\"id\": \"M000199\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Hi,\\n\\nOur Assist credits keep running out. Is there a bigger package?\\n\\n--\\nBeth Buckley\\nIT Manager | Noromi Finance\"}, {\"id\": \"M000200\", \"subject\": \"Re: Live session: automation rules in 30 minutes\", \"body\": \"Hi,\\n\\nwe tried the thing you mention in step 2 and nothing happens?? is that normal\\n\\nThanks,\\nDaniel\\n\\nOn 18 Jun 2026, Lumen Labs Success <success@lumenlabs.example> wrote:\\n> Live session: automation rules in 30 minutes\\n> Hi Daniel, here is the latest from the Relay team...\"}]"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "results": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string"
+       },
+       "intent": {
+        "type": "string",
+        "enum": [
+         "out_of_office",
+         "unsubscribe",
+         "left_company",
+         "product_question",
+         "buying_intent",
+         "complaint",
+         "meeting_request",
+         "other"
+        ]
+       },
+       "sentiment": {
+        "type": "string",
+        "enum": [
+         "positive",
+         "neutral",
+         "negative"
+        ]
+       },
+       "confidence": {
+        "type": "number"
+       },
+       "seats_requested": {
+        "type": "string"
+       },
+       "edition_mentioned": {
+        "type": "string"
+       },
+       "return_date": {
+        "type": "string"
+       },
+       "new_contact": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "id",
+       "intent",
+       "sentiment",
+       "confidence",
+       "seats_requested",
+       "edition_mentioned",
+       "return_date",
+       "new_contact"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "results"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6aCEUr4NWmhvdK3aYK",
+  "container": null,
+  "content": [
+   {
+    "signature": "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",
+    "thinking": "",
+    "type": "thinking"
+   },
+   {
+    "text": "{\"results\":[{\"id\":\"M000193\",\"intent\":\"meeting_request\",\"sentiment\":\"positive\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000194\",\"intent\":\"meeting_request\",\"sentiment\":\"positive\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000195\",\"intent\":\"meeting_request\",\"sentiment\":\"neutral\",\"confidence\":0.6,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000196\",\"intent\":\"meeting_request\",\"sentiment\":\"positive\",\"confidence\":0.95,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000197\",\"intent\":\"meeting_request\",\"sentiment\":\"positive\",\"confidence\":0.9,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000198\",\"intent\":\"product_question\",\"sentiment\":\"neutral\",\"confidence\":0.75,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000199\",\"intent\":\"buying_intent\",\"sentiment\":\"neutral\",\"confidence\":0.8,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"},{\"id\":\"M000200\",\"intent\":\"product_question\",\"sentiment\":\"neutral\",\"confidence\":0.75,\"seats_requested\":\"\",\"edition_mentioned\":\"\",\"return_date\":\"\",\"new_contact\":\"\"}]}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 1079,
+   "inference_geo": "global",
+   "input_tokens": 1109,
+   "output_tokens": 1028,
+   "output_tokens_details": {
+    "thinking_tokens": 475
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

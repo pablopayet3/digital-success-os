@@ -1,0 +1,52 @@
+{
+ "role": "brief",
+ "purpose": "account-owner brief",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1500,
+  "effort": "low",
+  "system": "You write a short brief for an account owner in Sales at Lumen Labs. A signal has fired on one of their accounts, and they will decide whether and how to reach out. They have two minutes and have not looked at this account recently.\n\nYou are given a JSON object of facts about the account. Use only those facts. Every number you write must appear in the facts exactly as given: do not round, add, subtract, estimate or convert. If a fact is missing or null, leave it out. Do not guess at reasons the data does not show.\n\nWrite five short lines, in this order, each starting with its label:\n\nSignal: what fired, in plain words.\nEvidence: the two or three facts that matter most for this signal.\nLikely need: what the customer probably needs (more seats, or the next edition), and why the evidence points there.\nSuggested opener: one sentence the account owner could say or write to the customer. Helpful, not pushy.\nRisks: anything in the facts that argues for caution (open high-priority tickets, a low NPS score, yellow or red health, a renewal close by). Write \"none visible in the data\" if there is nothing.\n\nPlain text, no headings, no bullet symbols.\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "{\"account_name\": \"Hestarro Clinics\", \"segment\": \"mid\", \"edition\": \"standard\", \"next_edition\": \"premium\", \"arr\": 5892, \"seats_licensed\": 66, \"seats_assigned\": 55, \"seats_assigned_30_days_ago\": 51, \"seat_utilisation_pct\": 83, \"monthly_active_users\": 48, \"automation_rules\": 14, \"automation_rule_limit\": 15, \"integrations\": 1, \"integration_limit\": 3, \"assist_credits_used_30d\": 0, \"assist_credits_included\": 660, \"health_score\": 95.0, \"health_band\": \"green\", \"open_high_priority_tickets\": 0, \"latest_nps_score\": 10, \"days_to_renewal\": 289, \"trigger_signal\": \"buying_intent\", \"trigger_evidence\": \"We would like to add Relay Docs for the whole company. Who do I talk to? -- Eric Martinez Engineering Manager | Hestarro Clinics On 18 Sep 2026, Lumen Labs Success <success@lumenlabs.example> wrote: > Live session: automation rules in 30 minutes > Hi Eric, here is the latest from the Relay team...\", \"expansion_score_pct\": 53, \"expansion_reasons\": \"nearly all seats assigned, near the automation limit, most seats active\"}"
+   }
+  ],
+  "tools": [],
+  "json_schema": null,
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011Cgx6kVUqvTYzeH92xFiFh",
+  "container": null,
+  "content": [
+   {
+    "text": "Signal: Buying intent. Eric Martinez, Engineering Manager at Hestarro Clinics, wrote asking to add Relay Docs for the whole company and who to talk to about it.\nEvidence: 55 of 66 seats are assigned, up from 51 thirty days ago, and 83% utilisation. Automation rules are at 14 of 15, close to the limit. Health is 95 (green) with an NPS of 10.\nLikely need: More seats, and possibly the Premium edition. Seats are nearly full and growing, and the automation rules are almost at the limit of the Standard edition, which suggests they will need more capacity on the current plan or the next tier. Eric's request is specifically about extending to the whole company, so seat expansion is the most direct need. Premium is a reasonable second conversation given the rule limit.\nSuggested opener: \"Hi Eric, thanks for asking about Relay Docs for the whole company. I'd be glad to walk you through what that would look like for Hestarro, including seat numbers and whether Premium makes sense alongside it.\"\nRisks: Renewal is 289 days away, so there is no urgency on the contract. The data shows no open high-priority tickets and no negative health signals. Only 48 of the 55 assigned seats are active monthly, so confirm real demand before sizing up.",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "inference_geo": "global",
+   "input_tokens": 810,
+   "output_tokens": 433,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

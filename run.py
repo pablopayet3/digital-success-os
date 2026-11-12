@@ -9,6 +9,8 @@ Usage:
     uv run python run.py run-days 30       simulate thirty days
     uv run python run.py evals             score the agents on the evaluation cases
     uv run python run.py experiments       compare every play with its holdout
+    uv run python run.py review            write the monthly operating review from the data
+    uv run python run.py extracts          write the gold tables as files for a BI tool
     uv run python run.py specs             rebuild docs/play-specs/ from the play config
     uv run python run.py app               open the app (http://localhost:8501)
     uv run python run.py api               start the API (http://localhost:8000/docs)
@@ -16,24 +18,37 @@ Usage:
     uv run python run.py test              run the tests
     uv run python run.py lint              check code style
 
+Who answers as the model (add to any command):
+    (nothing)      real model responses replayed from cache/llm/; no key, no network
+    --live         the cache first, then the API, up to the budget; needs a key in .env
+    --stand-in     keyword rules, labelled as a stand-in everywhere; no key, no network
+
 This file is the single entry point (see docs/decisions/0006). The Makefile
 only forwards to it, for machines that have `make`.
 """
 
 import argparse
+import os
 import subprocess
 import sys
+
+COMMANDS = [
+    "data", "pipeline", "train", "run-day", "run-days", "evals", "experiments", "review",
+    "extracts", "specs", "app", "api", "demo", "test", "lint",
+]  # fmt: skip
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Digital Success OS task runner")
-    commands = ["data", "pipeline", "train", "run-day", "run-days", "evals", "experiments"]
-    commands += ["specs", "test", "lint"]
-    commands += ["app", "api", "demo"]
-    parser.add_argument("command", choices=commands)
+    parser.add_argument("command", choices=COMMANDS)
     parser.add_argument("days", nargs="?", type=int, default=30, help="for run-days: how many")
     parser.add_argument("--profile", default=None, help="config profile, for example: small")
+    parser.add_argument("--live", action="store_true", help="call the API when not cached")
+    parser.add_argument("--stand-in", action="store_true", help="keyword rules play the model")
     args = parser.parse_args()
+    if args.live and args.stand_in:
+        parser.error("choose --live or --stand-in, not both")
+    choose_who_answers(args.live, args.stand_in)
 
     if args.command == "data":
         from synth.generate import generate
@@ -67,6 +82,15 @@ def main() -> None:
         from experiments.analyze import analyse
 
         analyse()
+    elif args.command == "review":
+        from experiments.review import write_operating_review
+
+        print(f"wrote {write_operating_review().name}: docs/operating-review.md")
+    elif args.command == "extracts":
+        from analytics.extracts import write_extracts
+
+        for name, rows in write_extracts().items():
+            print(f"wrote exports/bi/{name} ({rows:,} rows)")
     elif args.command == "specs":
         from engine.specs import write_play_specs
 
@@ -85,12 +109,26 @@ def main() -> None:
         build_demo(args.days, args.profile)
 
 
+def choose_who_answers(live: bool, stand_in: bool) -> None:
+    """Turn --live or --stand-in into the settings the rest of the code reads.
+
+    Set here, before anything else is loaded, so the choice also reaches whatever this
+    command starts (the app, the API).
+    """
+    if live:
+        os.environ["DSO_OFFLINE_MODE"] = "false"
+        os.environ["DSO_LLM_STAND_IN"] = "false"
+    elif stand_in:
+        os.environ["DSO_LLM_STAND_IN"] = "true"
+
+
 def build_demo(days: int, profile: str | None = None) -> None:
     """Everything from nothing: data, pipeline, models, simulated days, reports. Then the app."""
     from analytics.train import train_all
     from engine.run import run_days
     from evals.run import run_evals
     from experiments.analyze import analyse
+    from experiments.review import write_operating_review
     from ingest.pipeline import run_pipeline
     from synth.generate import generate
 
@@ -101,7 +139,10 @@ def build_demo(days: int, profile: str | None = None) -> None:
     run_days(days)
     analyse()
     run_evals()
+    if profile is None:  # the committed review describes the full world, not a small one
+        write_operating_review()
     print("\nReady. Start the app with: uv run python run.py app")
+
 
 if __name__ == "__main__":
     main()
