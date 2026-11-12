@@ -1,5 +1,13 @@
 # Building the dashboard in Tableau Public
 
+**Published:** [Digital Success pilot (synthetic data)](https://public.tableau.com/views/DigitalSuccesspilotsyntheticdata/DigitalSuccesspilot_Syntheticdatafictionalcompany). It was built in Tableau
+Public's browser editor (Create > Web Authoring), which needs no desktop install: upload
+a file under Connect to Data > Files, double-click fields to add them, and use Show Me
+to pick the chart. It has three sheets, each from one extract: treatment rate against
+holdout rate per play (`play_results.csv`), accounts by health band and coverage tier
+(`accounts.csv`), and tasks handed to people by queue and status (`handoffs.csv`). The
+steps below describe the fuller five-sheet version in the desktop app.
+
 Synthetic data, fictional company. This page names a real product because it is a build
 guide for it. The data is generated; nothing in it belongs to a real customer.
 

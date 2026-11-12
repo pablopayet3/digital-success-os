@@ -57,6 +57,12 @@ the responses are stored in `cache/llm/`, so everything replays offline with no 
 (ADR 0015). And that first live run found a real bug in the agent and three faults in
 the evaluation harness that the stand-in could never have shown (ADR 0017).
 
+## See it without installing anything
+
+- **The app:** https://digital-success-os-app.onrender.com (free hosting: the first load can take a minute; it runs the labelled stand-in, not the real model)
+- **The API:** https://digital-success-os-api.onrender.com/health
+- **The dashboard:** [Digital Success pilot on Tableau Public](https://public.tableau.com/views/DigitalSuccesspilotsyntheticdata/DigitalSuccesspilot_Syntheticdatafictionalcompany)
+
 ## Run it in 60 seconds
 
 Needs [uv](https://docs.astral.sh/uv/). Python 3.12 is installed by uv.
@@ -147,7 +153,7 @@ branding or data.
 | Gainsight Journey Orchestrator | Audience rules, steps, branches, exits | `config/journeys.yaml` and the journey runner |
 | Gainsight CTAs and Cockpit | Tasks for people, with playbooks | The `ctas` table and the Human console |
 | Salesforce | Accounts, contacts, opportunities, owners | Synthetic CRM tables and export endpoints |
-| Tableau | Dashboards | Streamlit on the gold tables; extracts and a build guide for Tableau Public (`docs/bi-dashboard-guide.md`) |
+| Tableau | Dashboards | Streamlit on the gold tables, and a [published Tableau Public dashboard](https://public.tableau.com/views/DigitalSuccesspilotsyntheticdata/DigitalSuccesspilot_Syntheticdatafictionalcompany) built from the same tables (`docs/bi-dashboard-guide.md`) |
 | Shared mailbox | Replies to digital journeys | Mailbox triage agent and routing rules |
 | The company's own AI agents | Agents with tools and retrieval | Claude with tool use, and keyword retrieval over a help centre |
 
@@ -204,7 +210,6 @@ Written but not yet run against the real thing. Each needs an account or a key.
 |---|---|
 | Databricks as the `prod` warehouse | A workspace host, SQL warehouse path and token |
 | Postgres operational store | A database URL |
-| Hosted app and API | A host connected to the repository (`render.yaml` is ready) |
 | Trace export | A tracing key (JSON traces work without one) |
 
 ## What I would do differently at scale
