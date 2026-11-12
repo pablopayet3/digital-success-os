@@ -689,10 +689,15 @@ missing or only half there. This section is what closed them.
   command.
 - **The exploratory analysis as a notebook** (`analytics/01_eda.ipynb`), saved with its
   charts so the code host shows them.
+- **Live demo page: the whole loop on one account.** It shows the signal firing today,
+  the play it triggers and whether the account is treated or held out. A scripted
+  story runs in one click (the brief's "run the story"), or you type. Accounts whose
+  setup-stalled signal is firing come first. The Human console shows the signals
+  firing on the account for a handoff that came from the agent.
 - **A picture of every page** in `docs/screenshots/`.
 - **Every page of the app is run by a test** on the small world (`tests/test_app.py`),
   and again with the internet blocked, which is the offline promise as a test.
-  178 tests in total.
+  179 tests in total.
 
 ### How to run
 
@@ -734,6 +739,12 @@ uv run --group notebook jupyter nbconvert --to notebook --execute --inplace anal
 - **Why translate diagrams instead of loading a library** (ADR 0022). The demo must work
   with the network off. About a hundred lines that understand the diagrams this project
   has, and show anything else as text instead of guessing.
+- **Why some Live demo questions only work on the first accounts.** The default mode
+  replays stored model answers, and an answer is stored for one exact conversation on
+  one account. I stored the scripted story for the first five accounts in the list
+  (16 cents of real calls). A price or a request for a person works everywhere,
+  because a rule stops those before any model is asked. Anything else is honest: the
+  agent says it is unavailable and hands off. `--live` answers anything.
 - **Why the notebook's libraries are a separate group.** Charting and notebook libraries
   are only needed to re-run the notebook, so the app, the tests, CI and the container do
   not install them.

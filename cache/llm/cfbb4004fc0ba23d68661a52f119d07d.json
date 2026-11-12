@@ -1,0 +1,84 @@
+{
+ "role": "classifier",
+ "purpose": "classify customer message",
+ "request": {
+  "model": "claude-haiku-5-5",
+  "max_tokens": 2000,
+  "effort": "low",
+  "system": "You read one message that a customer admin wrote to an onboarding assistant for Relay, a team-collaboration product. Describe the message so that routing rules can act on it. You do not answer the customer.\n\nReturn:\n\n- asks_for_human: true if the customer asks to talk to a person (in any wording), false otherwise.\n- frustration: a number from 0 to 1. 0 is calm, 0.5 is mildly annoyed, 0.7 and above means the customer is clearly upset, has run out of patience, or threatens to leave.\n- topic: what the message is mainly about.\n  - setup: setting up the workspace (boards, inviting users, integrations, single sign-on)\n  - product: how a feature works, or what an edition includes\n  - pricing: prices, quotes, discounts, buying seats, upgrading\n  - contract: contracts, invoices, billing, renewal terms, cancellation\n  - refund: asking for money back\n  - legal: legal or data-protection terms\n  - other: anything else\n- confidence: a number from 0 to 1 for how sure you are of the topic.\n\nA question about what an edition includes is \"product\". A question about what it costs is \"pricing\".\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "Does Relay do timesheets?"
+   }
+  ],
+  "tools": [],
+  "json_schema": {
+   "type": "object",
+   "properties": {
+    "asks_for_human": {
+     "type": "boolean"
+    },
+    "frustration": {
+     "type": "number"
+    },
+    "topic": {
+     "type": "string",
+     "enum": [
+      "setup",
+      "product",
+      "pricing",
+      "contract",
+      "refund",
+      "legal",
+      "other"
+     ]
+    },
+    "confidence": {
+     "type": "number"
+    }
+   },
+   "required": [
+    "asks_for_human",
+    "frustration",
+    "topic",
+    "confidence"
+   ],
+   "additionalProperties": false
+  },
+  "refusal_fallback": false
+ },
+ "response": {
+  "id": "msg_011CgyQvZdm3EqRVMUkTfhgQ",
+  "container": null,
+  "content": [
+   {
+    "text": "{\"asks_for_human\": false, \"frustration\": 0, \"topic\": \"product\", \"confidence\": 0.9}",
+    "type": "text"
+   }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 702,
+   "inference_geo": "global",
+   "input_tokens": 17,
+   "output_tokens": 38,
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "service_tier": "standard",
+   "speed": "standard"
+  }
+ }
+}

@@ -20,7 +20,7 @@ clean run of `uv run python run.py demo`; replace them if the run is repeated.
 | Agent evaluation, real model | 44 cases; onboarding agent 30 of 30 with prompt v3 (v1: 29, v2: 25) |
 | Agent handoff rate | 26% (13 of 50 conversations) |
 | Lift against holdout | +39 points on setup completion (onboarding rescue), 95% interval +25 to +54 |
-| Automated tests | 178 |
+| Automated tests | 179 |
 | Cost of all real model calls | about $3 |
 
 Add this line under the badges: "Agent answers are real model responses, cached and
@@ -88,7 +88,7 @@ of the demo path (`demo.gif`):
 | Data quality | `data-quality.jpg` |
 | Pilot | `pilot.jpg` |
 | Operating model | `operating-model.jpg` |
-| Live demo | `live-demo-handoff.jpg` |
+| Live demo: the signal and the play, then the handoff | `live-demo.jpg`, `live-demo-handoff.jpg` |
 
 Plus the reports: `evals/reports/eval-report.md`,
 `experiments/reports/experiment-report.md`, `docs/operating-review.md`, and the

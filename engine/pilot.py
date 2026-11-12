@@ -149,8 +149,9 @@ def _queues_have_capacity(store: Store, queues: dict, max_days: float) -> tuple[
         if queue in queues and count > max_days * queues[queue]["capacity_per_day"]
     ]
     last_alert = store.one("SELECT max(alert_date) AS day FROM queue_alerts")["day"]
+    total = sum(open_now.values())
     detail = (
-        f"{sum(open_now.values())} tasks open across {len(queues)} queues. "
+        f"{total} task{'' if total == 1 else 's'} open across {len(queues)} queues. "
         + (f"Over {max_days:g} days of capacity: {'; '.join(over)}. " if over else "")
         + (f"Last capacity alert: {last_alert}." if last_alert else "No capacity alert so far.")
     )

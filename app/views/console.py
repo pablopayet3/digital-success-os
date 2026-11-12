@@ -110,7 +110,13 @@ with left:
     st.subheader("Why this is on your desk")
     trigger = packet["trigger"]
     st.write(f"**Source:** {trigger.get('source')} | **Play:** {trigger.get('play') or 'none'}")
-    st.write(f"**Signal:** {trigger.get('signal') or 'n/a'}. {trigger.get('evidence') or ''}")
+    if trigger.get("signal"):
+        st.write(f"**Signal:** {trigger['signal']}. {trigger.get('evidence') or ''}")
+    else:
+        # Not from a journey step (the agent or the mailbox handed off): show what is firing.
+        firing = trigger.get("all_signals_firing") or {}
+        listed = "; ".join(f"{name} ({why})" for name, why in firing.items())
+        st.write(f"**Signals firing on the account:** {listed or 'none today'}.")
     if packet.get("customer_quote"):
         st.write("**In the customer's words:**")
         st.info(packet["customer_quote"])

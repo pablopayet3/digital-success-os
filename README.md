@@ -31,11 +31,13 @@ flowchart LR
 
 ## What it looks like
 
-The demo path in twenty seconds. A customer asks the onboarding agent a setup question and
-gets an answer from the help centre. The next message asks for a price: the agent hands
-it to Sales with a written summary. The last frame is every play against its holdout.
+The demo path in twenty-three seconds. A signal fires on an account and triggers a play.
+The account's admin asks the onboarding agent a setup question and gets an answer from
+the help centre. The next message asks for a price: a rule hands it to Sales. The task
+arrives in the Human console with a written summary. The last frame is every play
+against its holdout.
 
-![The demo path: a question, an answer, a handoff, the results](docs/screenshots/demo.gif)
+![The demo path: a signal, a question, an answer, a handoff, the task, the results](docs/screenshots/demo.gif)
 
 The Overview: the measures the pilot is run on, then the loop in numbers. Revenue is
 shown with the holdout's figure beside it, so the page cannot claim what the plays did
@@ -79,8 +81,8 @@ From `uv run python run.py demo` (180 days of history, then 30 simulated days of
 | Usage recovery: usage back to 90%, treatment against holdout | 32% against 13%: +19 points, p = 0.10: **not yet proven, keep testing** |
 | Seat expansion: expansion closed, treatment against holdout | 19% against 21%: **no effect detected** (the sample could only have shown 20 points or more) |
 | Agent evaluation, real model, 44 cases | Onboarding agent 30 of 30 with prompt v3 (v1: 29, v2: 25); mailbox 10 of 10; briefs 4 of 4; classifier 96% on 160 labelled replies |
-| Cost of every real model call behind this (817 calls) | about $3 |
-| Automated tests | 178 |
+| Cost of every real model call behind this (834 calls) | about $3 |
+| Automated tests | 179 |
 
 Three honest notes. The lift comes from assumptions in `config/sim_effects.yaml`: this
 demonstrates a measurement system, not a result. The agent answers are real: one live
@@ -147,7 +149,7 @@ file names past the 260-character limit.
 | Data quality | What was rejected and why, test results, freshness, the data contract |
 | Pilot | The readiness checklist answered from live data; rollout stage and verdict per play; results per rung; weekly review notes; how the pattern scales |
 | Operating model | Ownership, change control, principles, the dependency map drawn as a diagram, the data dictionary, play specs, decision records |
-| Live demo | Talk to the agent and watch it hand off; advance the world one day |
+| Live demo | One account from signal to task: the signal firing, the play it triggers, a scripted story in one click or your own messages to the agent, the handoff; advance the world one day |
 
 ## Coverage map: what the role asks for, and where it is here
 
@@ -261,7 +263,7 @@ What each phase delivered, and three decisions to defend for each, is in
 
 ## What runs for real, and what has not been run yet
 
-Running on GitHub Actions: CI on every push (lint, 178 tests on Linux, the dbt build, a
+Running on GitHub Actions: CI on every push (lint, 179 tests on Linux, the dbt build, a
 secret scan), the container image build (it generates a demo world inside the image and
 publishes it), and the daily pipeline schedule, which opens an issue when a run fails.
 
@@ -308,5 +310,5 @@ experiments/  play results against holdouts
 api/ app/     FastAPI endpoints; the Streamlit app
 integrations/ the CRM sync
 docs/         operating documents, decision records, play specs, model cards
-tests/        178 tests; they generate a small world and run everything on it, every app page included
+tests/        179 tests; they generate a small world and run everything on it, every app page included
 ```

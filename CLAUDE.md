@@ -253,7 +253,7 @@ Stand-in eval runs write to `evals/reports/stand-in/`, never over the real repor
 
 CRM sync: `integrations/crm_sync.py` (`run.py crm-sync`, dry run by default, `--push`
 to send; standard Account and Task objects; safe to run twice; ADR 0019). The live push
-has not been run (needs `SALESFORCE_*` credentials in `.env`). 178 tests in total.
+has not been run (needs `SALESFORCE_*` credentials in `.env`). 179 tests in total.
 
 After the phases (the brief read again line by line; see the last section of
 `docs/phase-notes.md`):
@@ -273,7 +273,15 @@ After the phases (the brief read again line by line; see the last section of
   `docs/data-dictionary.md`. A test fails when a column has no definition. ADR 0021.
 - `analytics/01_eda.ipynb`: the exploratory analysis with charts. Its libraries are the
   dependency group `notebook` (`uv run --group notebook ...`), not installed by default.
-- `tests/test_app.py`: runs every page of the app on the small world.
+- `tests/test_app.py`: runs every page of the app on the small world, also with the
+  network blocked, and plays the Live demo's scripted story.
+- Live demo page (`app/views/demo.py`): accounts whose `activation_stalled` signal is
+  firing come first. In replay mode the scripted story (`STORY`) has stored answers
+  for the first five accounts in that list, and the other suggested questions for the
+  first one. Stored answers match one exact conversation on one account as it is
+  today: regenerating the data or advancing a day breaks the match (the agent then
+  hands off as `agent_unavailable`). Store them again with one `--live` run of the
+  same conversations (about 3 cents each).
 - `docs/screenshots/`: one picture per page.
 
 When a dbt model gains a column: add its meaning (the model's `.yml`, the contract, or

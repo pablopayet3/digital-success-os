@@ -38,7 +38,11 @@ not put in a play."
 
 **4. Play, agent, human fallback (60 seconds). Live demo page.**
 
-Pick an account. Type: `How do I invite my whole team at once?`
+Stay on the first account in the list. Point at the blue box: the signal firing today,
+the play it triggers, and whether this account is in the play or held out.
+
+Type: `How do I invite my whole team at once?` (or press **Run the story**, which sends
+this message and the next one in one click, with no typing to get wrong).
 
 > "A stalled admin. The agent checks their setup, searches the help centre, answers from
 > the article."
@@ -117,5 +121,9 @@ Open the dependency map (drawn as a diagram), the ownership map, then one play s
       Live demo answers anything you type (cached answers are instant, new ones cost
       cents). With no network, add `DSO_LLM_STAND_IN=true` instead and say so.
 - [ ] The app opens with Wi-Fi off (replay or stand-in mode).
-- [ ] The Live demo conversation above has been run once on this machine.
+- [ ] **Run the story** works on the first account of the Live demo page. Then remove the
+      test task: it is a real row (see the note on pictures in `CLAUDE.md`).
+- [ ] Do not press "Advance one day" before the conversation. A new day changes the
+      accounts, and the stored answers no longer match (the agent then says it is
+      unavailable and hands off). With `--live` this does not matter.
 - [ ] A second tab is signed in to the Human console.

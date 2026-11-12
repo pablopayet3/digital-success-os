@@ -86,3 +86,26 @@ def test_the_dependency_map_can_be_drawn_in_the_app():
 def test_a_diagram_the_translator_does_not_know_is_refused_not_guessed():
     with pytest.raises(ValueError, match="cannot read"):
         mermaid_to_dot('flowchart LR\n    A[("a database")] --> B')
+
+
+# --- The Live demo page ------------------------------------------------------------------------
+
+
+def test_the_scripted_story_ends_in_a_task_for_sales(app_data, ops):
+    """One click: a setup question is answered, a price question becomes a task for Sales."""
+    before = {row["cta_id"] for row in ops.rows("SELECT cta_id FROM ctas")}
+    app = AppTest.from_file(str(ROOT / "app" / "views" / "demo.py"), default_timeout=120).run()
+    try:
+        next(button for button in app.button if button.label == "Run the story").click().run()
+        assert not app.exception, [error.value for error in app.exception]
+        handoff = " ".join(warning.value for warning in app.warning)
+        assert "pricing_contract_legal" in handoff and "sales" in handoff
+        assert "hard_rule" in handoff  # code stopped it, before the model was asked
+        (task,) = [row for row in ops.rows("SELECT * FROM ctas") if row["cta_id"] not in before]
+        assert task["queue"] == "sales" and task["source"] == "agent" and task["cta_id"] in handoff
+    finally:
+        # The page writes real rows. Take them out again: other tests share this store.
+        ops.execute("DELETE FROM conversations WHERE scenario = 'live_demo'")
+        for row in ops.rows("SELECT cta_id FROM ctas"):
+            if row["cta_id"] not in before:
+                ops.execute("DELETE FROM ctas WHERE cta_id = :id", id=row["cta_id"])
