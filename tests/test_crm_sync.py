@@ -176,11 +176,16 @@ def fake_tool(monkeypatch, output: str, installed: bool = True) -> list:
 
 
 def test_a_browser_sign_in_is_taken_from_the_command_line_tool(monkeypatch):
+    # The stand-in answers every command with both facts; the code picks the one it asked for.
     session = {"result": {"instanceUrl": "https://acme.example", "accessToken": "a-session"}}
     asked = fake_tool(monkeypatch, json.dumps(session))
     given = sign_in_with(monkeypatch, SALESFORCE_CLI_ORG="demo-org")
     assert given == {"instance_url": "https://acme.example", "session_id": "a-session"}
-    assert asked == [["sf", "org", "display", "--target-org", "demo-org", "--json"]]
+    # Where the org lives comes from one command, the session from another.
+    assert asked == [
+        ["sf", "org", "display", "--target-org", "demo-org", "--json"],
+        ["sf", "org", "auth", "show-access-token", "--target-org", "demo-org", "--json"],
+    ]
 
 
 def test_a_missing_or_signed_out_tool_is_explained_without_showing_its_output(monkeypatch):

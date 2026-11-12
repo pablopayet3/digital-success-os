@@ -202,11 +202,21 @@ def cli_session(org: str) -> dict:
         raise RuntimeError(
             f"{CLI_SETTING} is set, but the Salesforce command-line tool (sf) is not installed."
         )
-    command = [tool, "org", "display", "--target-org", org, "--json"]
-    answer = subprocess.run(command, capture_output=True, text=True, check=False)
+
+    def ask(*command: str) -> dict:
+        answer = subprocess.run(
+            [tool, *command, "--target-org", org, "--json"],
+            capture_output=True, text=True, check=False,
+        )  # fmt: skip
+        return json.loads(answer.stdout)["result"]
+
     try:
-        result = json.loads(answer.stdout)["result"]
-        return {"instanceUrl": result["instanceUrl"], "accessToken": result["accessToken"]}
+        # Two questions: where the org lives, and the current session. (The tool no
+        # longer shows the session in `org display`; it has its own command for it.)
+        return {
+            "instanceUrl": ask("org", "display")["instanceUrl"],
+            "accessToken": ask("org", "auth", "show-access-token")["accessToken"],
+        }
     except (ValueError, KeyError, TypeError):
         # The tool's output is deliberately not shown: it can contain a token.
         raise RuntimeError(

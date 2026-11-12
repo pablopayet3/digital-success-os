@@ -21,8 +21,8 @@ evidence from the experiment report.
 - Work the review queue every week: turn each unnecessary handoff and each thumbs-down
   conversation into an evaluation case with an expected behaviour.
 - Write the help articles the docs-gap list asks for most.
-- Push tasks and scores to the CRM for real (the sync is written and tested on a dry
-  run; the live push needs an org) and load the CS-platform export into a tenant.
+- Load the CS-platform export into a tenant. (The CRM push has run for real against a
+  developer org; next there is custom fields instead of a text description.)
 
 ## Later: what scale would need
 

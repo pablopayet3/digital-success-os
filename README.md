@@ -277,12 +277,17 @@ service, runs the same store tests as on SQLite, copies two simulated days of st
 it, and runs the engine for a third day with its live state there (ADR 0013). The hosted app and API share a hosted
 Postgres database as their store; the API's `/health` says which store is in use.
 
-Written but not yet run against the real thing. Each needs an account or a key.
+Pushed to a real Salesforce Developer Edition org: the CRM sync. Six accounts with their
+health summary and six open tasks, two of them carrying the account-owner brief, were
+written to standard Account and Task objects and read back. A second run updated the
+six accounts and created nothing twice. The sign-in went through the browser, so no
+password or token was typed into the project (ADR 0019).
+
+Written but not yet run against the real thing:
 
 | What | Needs |
 |---|---|
 | Trace export | A tracing key (JSON traces work without one) |
-| The live CRM push | A Salesforce Developer Edition org and its credentials (the dry run and the tests are verified). The sync signs in through the browser, with a consumer key, or with a username and token on orgs that still allow it (ADR 0019) |
 
 ## What I would do differently at scale
 

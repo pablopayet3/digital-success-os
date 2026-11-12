@@ -130,8 +130,8 @@ dbt cross-database macros and the project's own dispatch macros in `dbt/macros/`
 9. Container, deploy and daily workflows: **done and passing on GitHub Actions**
    (github.com/pablopayet3/digital-success-os, public). Hosted on Render from the blueprint
 
-Still not run against the real thing (each needs credentials only the owner can supply):
-the live CRM push, and trace export to a tracing service.
+Still not run against the real thing (needs a key only the owner can supply): trace
+export to a tracing service.
 
 What works after each phase, and what to be able to explain, is in `docs/phase-notes.md`.
 
@@ -253,7 +253,11 @@ Stand-in eval runs write to `evals/reports/stand-in/`, never over the real repor
 
 CRM sync: `integrations/crm_sync.py` (`run.py crm-sync`, dry run by default, `--push`
 to send; standard Account and Task objects; safe to run twice; ADR 0019). The live push
-has not been run (needs `SALESFORCE_*` credentials in `.env`). 188 tests in total.
+has run against a Developer Edition org (6 accounts, 6 tasks; a second run created
+nothing), signed in through the browser with the vendor's command-line tool:
+`SALESFORCE_CLI_ORG=dso-demo` in `.env`, and `sf` must be on the PATH (it installs to
+`%APPDATA%\npm`, which this app's shell does not have on its PATH by default).
+188 tests in total.
 
 After the phases (the brief read again line by line; see the last section of
 `docs/phase-notes.md`):

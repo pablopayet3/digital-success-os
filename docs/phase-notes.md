@@ -702,9 +702,11 @@ missing or only half there. This section is what closed them.
   against a capacity of 8.
 - **Agents page: the docs gap list.** The questions the agent handed off because no
   help article covered them, with what it searched for.
-- **CRM sync: two ways to sign in, and the brief travels.** New orgs refuse the old
-  username-and-password sign-in by default, so the sync also accepts a consumer key
-  (ADR 0019). A task for Sales now carries the account-owner brief in its description.
+- **CRM sync: run for real.** New orgs refuse the old username-and-password sign-in by
+  default, so the sync also accepts a consumer key or a sign-in through the browser
+  (ADR 0019). The live push ran against a developer org: 6 accounts and 6 tasks
+  created, then a second run that created nothing. A task for Sales carries the
+  account-owner brief in its description.
 - **A picture of every page** in `docs/screenshots/`.
 - **Every page of the app is run by a test** on the small world (`tests/test_app.py`),
   and again with the internet blocked, which is the offline promise as a test.

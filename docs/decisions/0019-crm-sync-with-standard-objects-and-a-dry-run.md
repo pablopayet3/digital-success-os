@@ -55,8 +55,14 @@ A refused sign-in prints what to check, in plain words, and sends nothing.
 2. `sf org login web --instance-url <the org's address> --alias dso-demo`. The browser
    opens; approve the request there. The tool keeps the sign-in in its own store.
 3. Put `SALESFORCE_CLI_ORG=dso-demo` in `.env`.
-4. `uv run python run.py crm-sync --push`. The sync asks the tool for the current
-   session and uses it in memory only: it is never printed or written to a file.
+4. `uv run python run.py crm-sync --push`. The sync asks the tool where the org lives
+   (`sf org display`) and for the current session (`sf org auth show-access-token`),
+   and uses the session in memory only: it is never printed or written to a file.
+
+Two things the first real sign-in taught. The sign-in page waits two minutes by
+default, which is short when the login asks for a verification code:
+`SF_WEB_OAUTH_SERVER_TIMEOUT` (milliseconds) lengthens it. And a person with two
+orgs must name the org with `--instance-url`, or the browser offers the wrong one.
 
 This is the same design as the warehouse's browser sign-in (ADR 0012). It suits a
 person at a laptop; a scheduled job needs the consumer key instead.
@@ -97,10 +103,24 @@ The screen labels are the vendor's as of late 2026 and move between releases.
 - Tests use a stand-in CRM and check the mapping and the run-twice rule
   (`tests/test_crm_sync.py`).
 
-## Not yet verified
+## Verified on a real org
 
-The live push has not been run: it needs a Salesforce Developer Edition org and its
-credentials. The dry run and the tests are what has been verified.
+Run on 12 November 2026 against a Salesforce Developer Edition org, signed in through
+the browser. Before sending, the org's type was read back and checked (a developer
+org holding only the vendor's sample data).
+
+- First push: 6 accounts created, 6 tasks created.
+- Second push: 6 accounts updated, 0 tasks created, 6 tasks kept. Safe to run twice.
+- Read back from the org: each account carries its health summary, each task its
+  next step and reason, and the two Sales tasks carry the account-owner brief.
+
+One fault found by the real run: the tool no longer returns the session from
+`org display` (it returns a notice in its place), so the first API call was refused.
+The session now comes from the tool's own command for it. No stand-in test could
+have shown this; the test now expects both commands.
+
+Not verified: the consumer-key and username-and-token routes against a real org.
+Their code paths are tested with a stand-in only.
 
 ## Revisit if
 
