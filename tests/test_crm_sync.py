@@ -96,6 +96,7 @@ def test_an_expansion_task_carries_the_account_owner_brief(simulated):
 EVERY_SETTING = (
     "SALESFORCE_CONSUMER_KEY", "SALESFORCE_CONSUMER_SECRET", "SALESFORCE_DOMAIN",
     "SALESFORCE_USERNAME", "SALESFORCE_PASSWORD", "SALESFORCE_SECURITY_TOKEN",
+    "SALESFORCE_CLI_ORG",
 )  # fmt: skip
 
 
@@ -155,3 +156,43 @@ def test_the_orgs_address_is_understood_however_it_is_pasted():
     assert my_domain(" acme-dev-ed.develop.my ") == wanted
     assert my_domain("login") == "login"
     assert "Enable SOAP API login()" in explain_refusal(Exception("refused"))
+
+
+def fake_tool(monkeypatch, output: str, installed: bool = True) -> list:
+    """Stand in for the vendor's command-line tool. Returns the commands it was asked to run."""
+    import shutil
+    import subprocess
+    from types import SimpleNamespace
+
+    asked = []
+
+    def run(command, **_):
+        asked.append(command)
+        return SimpleNamespace(stdout=output, returncode=0)
+
+    monkeypatch.setattr(shutil, "which", lambda name: "sf" if installed else None)
+    monkeypatch.setattr(subprocess, "run", run)
+    return asked
+
+
+def test_a_browser_sign_in_is_taken_from_the_command_line_tool(monkeypatch):
+    session = {"result": {"instanceUrl": "https://acme.example", "accessToken": "a-session"}}
+    asked = fake_tool(monkeypatch, json.dumps(session))
+    given = sign_in_with(monkeypatch, SALESFORCE_CLI_ORG="demo-org")
+    assert given == {"instance_url": "https://acme.example", "session_id": "a-session"}
+    assert asked == [["sf", "org", "display", "--target-org", "demo-org", "--json"]]
+
+
+def test_a_missing_or_signed_out_tool_is_explained_without_showing_its_output(monkeypatch):
+    import pytest
+
+    fake_tool(monkeypatch, "", installed=False)
+    with pytest.raises(RuntimeError, match="not installed"):
+        sign_in_with(monkeypatch, SALESFORCE_CLI_ORG="demo-org")
+
+    # Signed out: the tool answers, but with no session. Its text may hold a token, so
+    # the message we raise must not repeat it.
+    fake_tool(monkeypatch, json.dumps({"message": "expired", "leak": "a-secret-token"}))
+    with pytest.raises(RuntimeError, match="sf org login web") as refused:
+        sign_in_with(monkeypatch, SALESFORCE_CLI_ORG="demo-org")
+    assert "a-secret-token" not in str(refused.value)

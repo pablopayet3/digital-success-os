@@ -22,12 +22,15 @@ Safe to run twice: accounts are updated, existing tasks are left alone. Only acc
 that have an open task are sent, at most MAX_ACCOUNTS per run, to stay well inside a
 developer org's API limits. Nothing is ever deleted in the CRM.
 
-Signing in (connect, at the bottom of this file) works in two ways, both from .env:
+Signing in (connect, at the bottom of this file) works in three ways, chosen by what is
+in .env:
 
   1. A consumer key and secret (OAuth client credentials). The way the vendor supports
      going forward: no person's password is stored anywhere.
   2. A username, password and security token. Shorter to set up, but orgs created from
      2026 on refuse it until "Enable SOAP API login()" is ticked in the org's Setup.
+  3. A sign-in through the browser, held by the vendor's command-line tool. Nothing
+     secret is typed or stored in this project at all: .env only names the org.
 
 The steps for each are in docs/decisions/0019.
 """
@@ -36,6 +39,8 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import subprocess
 from pathlib import Path
 
 from api.exports import crm_export
@@ -151,9 +156,10 @@ def push(client, payloads: list[dict]) -> dict:
     return done
 
 
-# Two ways to sign in. The first complete set found in .env is used.
+# Three ways to sign in. The first complete set found in .env is used.
 OAUTH_SETTINGS = ("SALESFORCE_CONSUMER_KEY", "SALESFORCE_CONSUMER_SECRET", "SALESFORCE_DOMAIN")
 PASSWORD_SETTINGS = ("SALESFORCE_USERNAME", "SALESFORCE_PASSWORD", "SALESFORCE_SECURITY_TOKEN")
+CLI_SETTING = "SALESFORCE_CLI_ORG"  # the name given to the org at `sf org login web --alias`
 
 
 def connect():
@@ -173,11 +179,40 @@ def connect():
             security_token=os.environ["SALESFORCE_SECURITY_TOKEN"],
             domain=my_domain(os.environ.get("SALESFORCE_DOMAIN") or "login"),
         )
+    if os.environ.get(CLI_SETTING):
+        session = cli_session(os.environ[CLI_SETTING])
+        return Salesforce(instance_url=session["instanceUrl"], session_id=session["accessToken"])
     raise RuntimeError(
         "No complete set of CRM credentials in .env. Add either "
-        f"{', '.join(OAUTH_SETTINGS)} or {', '.join(PASSWORD_SETTINGS)}. "
+        f"{', '.join(OAUTH_SETTINGS)} or {', '.join(PASSWORD_SETTINGS)} or {CLI_SETTING}. "
         "Steps: docs/decisions/0019. Run without --push for a dry run."
     )
+
+
+def cli_session(org: str) -> dict:
+    """The session the vendor's command-line tool holds for an org, after a browser sign-in.
+
+    `sf org login web --alias <org>` opens the browser, the person approves there, and the
+    tool keeps the sign-in in its own store. Here we ask it for the current session. The
+    access token is used in this process only: it is never printed and never written into
+    the project. (The same idea as the warehouse's browser sign-in.)
+    """
+    tool = shutil.which("sf")
+    if tool is None:
+        raise RuntimeError(
+            f"{CLI_SETTING} is set, but the Salesforce command-line tool (sf) is not installed."
+        )
+    command = [tool, "org", "display", "--target-org", org, "--json"]
+    answer = subprocess.run(command, capture_output=True, text=True, check=False)
+    try:
+        result = json.loads(answer.stdout)["result"]
+        return {"instanceUrl": result["instanceUrl"], "accessToken": result["accessToken"]}
+    except (ValueError, KeyError, TypeError):
+        # The tool's output is deliberately not shown: it can contain a token.
+        raise RuntimeError(
+            f"The command-line tool has no usable sign-in for '{org}'. "
+            f"Sign in again with: sf org login web --alias {org}"
+        ) from None
 
 
 def my_domain(value: str) -> str:

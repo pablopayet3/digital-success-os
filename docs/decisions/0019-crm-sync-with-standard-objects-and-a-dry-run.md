@@ -45,8 +45,21 @@ either set of settings from `.env` and uses the first complete one:
 |---|---|---|
 | A consumer key and secret (OAuth client credentials) | `SALESFORCE_CONSUMER_KEY`, `SALESFORCE_CONSUMER_SECRET`, `SALESFORCE_DOMAIN` | The supported way. No person's password is stored |
 | A username, password and security token | `SALESFORCE_USERNAME`, `SALESFORCE_PASSWORD`, `SALESFORCE_SECURITY_TOKEN` | Quickest on a demo org, once the old sign-in is allowed |
+| A sign-in through the browser, held by the vendor's command-line tool | `SALESFORCE_CLI_ORG` (a name for the org, not a secret) | On a person's own machine. Nothing secret is typed or stored in the project |
 
 A refused sign-in prints what to check, in plain words, and sends nothing.
+
+### Steps: sign in through the browser (the least to type)
+
+1. Install the vendor's command-line tool once: `npm install --global @salesforce/cli`.
+2. `sf org login web --instance-url <the org's address> --alias dso-demo`. The browser
+   opens; approve the request there. The tool keeps the sign-in in its own store.
+3. Put `SALESFORCE_CLI_ORG=dso-demo` in `.env`.
+4. `uv run python run.py crm-sync --push`. The sync asks the tool for the current
+   session and uses it in memory only: it is never printed or written to a file.
+
+This is the same design as the warehouse's browser sign-in (ADR 0012). It suits a
+person at a laptop; a scheduled job needs the consumer key instead.
 
 ### Steps: username, password and security token (about five minutes)
 

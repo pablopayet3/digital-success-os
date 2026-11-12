@@ -253,7 +253,7 @@ Stand-in eval runs write to `evals/reports/stand-in/`, never over the real repor
 
 CRM sync: `integrations/crm_sync.py` (`run.py crm-sync`, dry run by default, `--push`
 to send; standard Account and Task objects; safe to run twice; ADR 0019). The live push
-has not been run (needs `SALESFORCE_*` credentials in `.env`). 186 tests in total.
+has not been run (needs `SALESFORCE_*` credentials in `.env`). 188 tests in total.
 
 After the phases (the brief read again line by line; see the last section of
 `docs/phase-notes.md`):
@@ -268,7 +268,9 @@ After the phases (the brief read again line by line; see the last section of
   docs gaps (conversations handed off as `not_in_docs`).
 - `integrations/crm_sync.py::connect` signs in with a consumer key
   (`SALESFORCE_CONSUMER_KEY`, `_SECRET`, `_DOMAIN`) or with a username, password and
-  security token; new orgs need "Enable SOAP API login()" for the second. Steps in
+  security token; new orgs need "Enable SOAP API login()" for the second. A third way
+  needs no secret in the project: `SALESFORCE_CLI_ORG` names an org signed in to through
+  the browser with the vendor's command-line tool (`sf org login web`). Steps in
   ADR 0019. A Sales task carries the account-owner brief.
 - `experiments/analyze.py` also writes `gold.experiment_cohorts` (results by entry week)
   and revenue columns on `gold.experiment_results`.
