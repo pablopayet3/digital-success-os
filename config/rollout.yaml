@@ -5,5 +5,11 @@
 # Scale the pattern by adding a segment: [uncovered, pooled]
 segments: [uncovered]
 
+# The bars for the readiness checklist on the Pilot page (engine/pilot.py). The
+# checklist itself is in docs/pilot-plan.md; these are the two lines that need a number.
+readiness:
+  min_eval_pass_rate: 0.9   # share of onboarding-agent evaluation cases that must pass
+  max_backlog_days: 3       # a queue's open tasks, counted in days of its own capacity
+
 # Offline mode (replay cached LLM responses, never call the API) is an environment
 # setting, not a rollout setting: see config/environments.yaml and DSO_OFFLINE_MODE.

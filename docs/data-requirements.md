@@ -7,6 +7,9 @@ fields. Nothing is asked for "because it might be useful".
 **The join key for everything is `account_id`.** Contacts also carry `contact_id`, and a
 `product_user_id` that ties a contact to their activity in the product.
 
+This document says what is needed and why. What was built, column by column, is in
+`docs/data-dictionary.md`.
+
 In the last column, **Exists** means the source system already has it; **Build** means
 it is requested from the team named.
 

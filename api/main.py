@@ -239,5 +239,5 @@ def export_crm() -> list[dict]:
 
 @app.get("/export/cs-platform")
 def export_cs_platform() -> dict:
-    """Company scorecards and open tasks, in the shape a CS platform imports."""
+    """Company scorecards, people and open tasks, in the shape a CS platform imports."""
     return cs_platform_export(data_dir())

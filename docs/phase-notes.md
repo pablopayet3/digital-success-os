@@ -657,3 +657,89 @@ replaced it. Total spend for the evaluations and the 30-day rebuild is in the RE
   calls counted as free. An unpriced model is now counted at the highest listed price.
 - **What 30 of 30 does not mean.** It is a score on cases the prompt was tuned against.
   The feedback loop from real handoffs is what produces cases it has not seen.
+
+## After the phases: the brief, line by line
+
+Once every phase was done I read the brief again, one line at a time, against what was
+actually in the repository. Most lines were built. Nine were named in the brief and
+missing or only half there. This section is what closed them.
+
+### What works
+
+- **Pilot page: a readiness checklist answered from live data** (`engine/pilot.py`). Six
+  lines: data tested and fresh, consent and the cap enforced, the agent passing its
+  evaluation, queues within capacity, handoffs returning a signal, results current. Each
+  shows whether it holds and the evidence. Below it, weekly review notes: one row per
+  week, with a note written by a rule.
+- **Overview page: the eight measures the brief names**, each defined in
+  `docs/metrics.md`: active users, consumption, prerequisite closure, agent invocation,
+  handoff rate, escalation conversion, retained ARR and expansion sourced, the last two
+  with the holdout's figure beside them.
+- **Plays page: the journey funnel** (`engine/journeys.py::journey_funnel`), results by
+  the week accounts entered (`gold.experiment_cohorts`), and revenue per group with the
+  "still a customer" guardrail. The page opens on the play with the longest ladder.
+- **Agents page: a thumbs up or down on any conversation** (`agents/review.py`). A thumbs
+  down joins the unnecessary handoffs in a review queue, now a tab on the page.
+- **CS-platform export: people as well as companies and tasks**, with a field-by-field
+  mapping table in the README.
+- **The dependency map is drawn in the app**, offline, from the same text the code host
+  draws (`app/diagrams.py`).
+- **A data dictionary** (`docs/data-dictionary.md`, `run.py docs`): 533 columns in silver
+  and gold, each with a definition. dbt's own documentation site is built by the same
+  command.
+- **The exploratory analysis as a notebook** (`analytics/01_eda.ipynb`), saved with its
+  charts so the code host shows them.
+- **A picture of every page** in `docs/screenshots/`.
+- **Every page of the app is run by a test** on the small world (`tests/test_app.py`),
+  and again with the internet blocked, which is the offline promise as a test.
+  178 tests in total.
+
+### How to run
+
+```
+uv run python run.py app      # Pilot, Overview, Plays and Agents pages have the new parts
+uv run python run.py docs     # rebuild the data dictionary and dbt's documentation site
+uv run --group notebook jupyter nbconvert --to notebook --execute --inplace analytics/01_eda.ipynb
+```
+
+### The three decisions to defend
+
+1. *A checklist that is answered, not ticked* (ADR 0020). A tick is true on the day it is
+   made. The consent line does not ask "is the rule in the code": it looks through what
+   was really sent for the two things that must never happen. Today it finds that no
+   contact received more than two touches in seven days, and no email is dated after its
+   contact's opt-out.
+2. *Revenue is always shown next to its holdout.* The Overview could say "$25,447 of
+   expansion sourced by the plays". It also says that this is $286 per treated account
+   against $281 per held-out account, which is no difference. Retained ARR is 94.1% in
+   treatment and 95.5% in the holdout. A dashboard that shows only the first number in
+   each pair is claiming revenue it did not cause.
+3. *Documentation that a test keeps true* (ADR 0021). The first data dictionary showed
+   454 of 533 columns with no written meaning. A glossary filled them in, and a test now
+   fails when a column is added without one, or when the committed document no longer
+   matches the tables.
+
+### More to be able to explain
+
+- **Why the funnel is not a clean staircase.** A branch can skip a step: an account whose
+  setup moved after the email never meets the agent. The funnel counts what happened,
+  from the journey's own log, and says so under the chart.
+- **What "agent invocation" means here.** Treated accounts that had at least one
+  conversation with the agent, divided by treated accounts. Most plays have no agent
+  step, so the number is low by design; per play it is in the funnel.
+- **Why the weekly note is written by a rule.** The same numbers always give the same
+  note, and a rule has no reason to be kind. The first pilot week's note says a queue was
+  over capacity on seven days and 56 tasks were picked up late. That is what happened:
+  every eligible account entered on day one.
+- **Why translate diagrams instead of loading a library** (ADR 0022). The demo must work
+  with the network off. About a hundred lines that understand the diagrams this project
+  has, and show anything else as text instead of guessing.
+- **Why the notebook's libraries are a separate group.** Charting and notebook libraries
+  are only needed to re-run the notebook, so the app, the tests, CI and the container do
+  not install them.
+
+### Decisions recorded
+
+- `0020-pilot-readiness-answered-from-data`
+- `0021-a-generated-data-dictionary-with-a-tested-glossary`
+- `0022-diagrams-drawn-in-the-app-without-the-network`

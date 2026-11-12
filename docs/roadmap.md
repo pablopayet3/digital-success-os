@@ -9,16 +9,20 @@ evidence from the experiment report.
 - Onboarding agent and mailbox triage agent, with hard escalation rules and a human console.
 - Daily pipeline with data tests, a contract on the production table, and freshness checks.
 - Experiment report per play; evaluation report per prompt version.
-- One live run with a real model to replace the stand-in results, then offline replay.
+- One live run with a real model, cached and replayed offline. (Done: the reports and
+  every stored conversation come from it.)
+- The production profile, run for real: the same models on a lakehouse warehouse, the
+  operational store on Postgres, a scheduled daily run, a hosted app and API.
 
 ## Next: prove, then widen
 
 - Scale the plays that worked to the pooled segment (a configuration change), with a 10% holdout.
 - Move edition upgrade and cross-product from slice to full test.
-- Turn "the agent should have handled this" handoffs into evaluation cases every week.
+- Work the review queue every week: turn each unnecessary handoff and each thumbs-down
+  conversation into an evaluation case with an expected behaviour.
 - Write the help articles the docs-gap list asks for most.
-- Run on the production profile: lakehouse warehouse, Postgres operational store, scheduled daily run, hosted app.
-- Sync tasks and scores to the CRM and the CS platform (the export endpoints exist; the sync does not).
+- Push tasks and scores to the CRM for real (the sync is written and tested on a dry
+  run; the live push needs an org) and load the CS-platform export into a tenant.
 
 ## Later: what scale would need
 

@@ -13,6 +13,7 @@ Usage:
     uv run python run.py extracts          write the gold tables as files for a BI tool
     uv run python run.py crm-sync          dry run of the CRM sync (add --push to send)
     uv run python run.py specs             rebuild docs/play-specs/ from the play config
+    uv run python run.py docs              rebuild the data dictionary, and dbt's own docs site
     uv run python run.py app               open the app (http://localhost:8501)
     uv run python run.py api               start the API (http://localhost:8000/docs)
     uv run python run.py demo              build everything from nothing, ready for the app
@@ -36,7 +37,7 @@ import sys
 APP_URL = "http://localhost:8501"
 COMMANDS = [
     "data", "pipeline", "train", "run-day", "run-days", "evals", "experiments", "review",
-    "extracts", "crm-sync", "specs", "app", "api", "demo", "test", "lint",
+    "extracts", "crm-sync", "specs", "docs", "app", "api", "demo", "test", "lint",
 ]  # fmt: skip
 
 
@@ -109,6 +110,14 @@ def main() -> None:
 
         for path in write_play_specs():
             print(f"wrote docs/play-specs/{path.name}")
+    elif args.command == "docs":
+        from analytics.dictionary import write_data_dictionary
+        from ingest.transform import run_dbt
+
+        print(f"wrote docs/{write_data_dictionary().name}")
+        # dbt's own site (lineage graph, every model and test). Open it with:
+        #   uv run dbt docs serve --project-dir dbt --profiles-dir dbt
+        sys.exit(0 if run_dbt(["docs", "generate"]) else 1)
     elif args.command == "test":
         sys.exit(subprocess.call([sys.executable, "-m", "pytest", "-q"]))
     elif args.command == "lint":

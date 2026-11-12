@@ -6,6 +6,7 @@ import streamlit as st
 
 from app import ui
 from engine.catalog import load_catalog
+from engine.journeys import journey_funnel
 
 st.title("Plays and experiments")
 catalog = load_catalog()
@@ -80,21 +81,28 @@ if len(measured):
         "**Lift on the success metric, with its 95% interval.** An interval that crosses zero means the play may have done nothing."
     )
     base = alt.Chart(measured).encode(y=alt.Y("play_name:N", title=None, sort=None))
-    bars = base.mark_errorbar().encode(
+    # Colours are set by hand so the interval and the zero line show on a dark page too.
+    bars = base.mark_errorbar(color="#6f9bd1", thickness=2).encode(
         x=alt.X(
             "ci_low:Q", title="Lift (treatment rate minus holdout rate)", axis=alt.Axis(format="%")
         ),
         x2="ci_high:Q",
     )
-    points = base.mark_circle(size=90).encode(
+    points = base.mark_circle(size=90, color="#6f9bd1").encode(
         x="lift:Q", tooltip=["play_name", "lift", "p_value", "verdict"]
     )
-    zero = alt.Chart(pd.DataFrame({"x": [0]})).mark_rule(strokeDash=[4, 4]).encode(x="x:Q")
+    zero = (
+        alt.Chart(pd.DataFrame({"x": [0]}))
+        .mark_rule(strokeDash=[4, 4], color="#9aa0a6")
+        .encode(x="x:Q")
+    )
     st.altair_chart(bars + points + zero, use_container_width=True)
 
 st.subheader("One play in detail")
 names = {play.name: play for play in catalog.plays}
-play = names[st.selectbox("Play", list(names))]
+# Open on the play with the most rungs in its ladder: it shows the whole pattern.
+longest = max(catalog.plays, key=lambda play: len(play.intervention_ladder))
+play = names[st.selectbox("Play", list(names), index=list(names).index(longest.name))]
 row = results[results["play_id"] == play.id].iloc[0]
 st.write(f"**Objective:** {play.objective}")
 st.write(f"**Success metric:** {play.success_metric['description']}")
@@ -103,6 +111,92 @@ if pd.notna(row["detectable_lift"]):
     st.caption(
         f"Smallest lift this sample could detect: about {row['detectable_lift']:.0%}. Split as designed: {'yes' if row['srm_ok'] else 'NO'}."
     )
+
+left, right = st.columns(2)
+with left:
+    st.write("**Journey funnel** (accounts that reached each step)")
+    funnel = pd.DataFrame(journey_funnel(ui.store(), catalog.journeys[play.journey], play.id))
+    st.altair_chart(
+        alt.Chart(funnel)
+        .mark_bar()
+        .encode(
+            y=alt.Y("stage:N", sort=None, title=None, axis=alt.Axis(labelLimit=320)),
+            x=alt.X("accounts:Q", title="accounts"),
+            tooltip=["stage", "accounts"],
+        ),
+        use_container_width=True,
+    )
+    st.caption(
+        "Read from the journey's own event log. A branch can skip a step, so a later step is not always smaller than the one before."
+    )
+with right:
+    st.write("**How the journeys ended**")
+    endings = ui.rows(
+        "SELECT status, coalesce(exit_reason, 'still running') AS reason, count(*) AS accounts "
+        "FROM enrollments WHERE play_id = :play AND arm = 'treatment' "
+        "GROUP BY status, exit_reason ORDER BY accounts DESC",
+        play=play.id,
+    )
+    st.dataframe(endings, hide_index=True, width="stretch", height=250)
+
+left, right = st.columns(2)
+with left:
+    st.write("**By the week accounts entered** (one odd week cannot hide in the average)")
+    try:
+        weeks = ui.query(
+            f"SELECT * FROM gold.experiment_cohorts WHERE play_id = '{play.id}' ORDER BY week_starting"
+        )
+    except Exception:  # a warehouse built before this table existed
+        weeks = pd.DataFrame()
+    if weeks.empty:
+        st.caption("No cohort has been observed for long enough yet.")
+    else:
+        st.dataframe(
+            pd.DataFrame(
+                {
+                    "week starting": weeks["week_starting"],
+                    "treatment": [
+                        f"{ui.pct(r)} of {n}" if n else "none"
+                        for r, n in zip(weeks["rate_treatment"], weeks["n_treatment"], strict=True)
+                    ],
+                    "holdout": [
+                        f"{ui.pct(r)} of {n}" if n else "none"
+                        for r, n in zip(weeks["rate_holdout"], weeks["n_holdout"], strict=True)
+                    ],
+                }
+            ),
+            hide_index=True,
+            width="stretch",
+        )
+with right:
+    st.write("**Revenue in the 30 days after entry**")
+    if "arr_at_entry_treatment" not in results.columns or not row["n_holdout"]:
+        st.caption("No holdout to compare with.")
+    else:
+        st.dataframe(
+            pd.DataFrame(
+                [
+                    {
+                        "group": arm,
+                        "accounts": int(row[f"n_{arm}"]),
+                        "ARR at entry": f"${row[f'arr_at_entry_{arm}']:,.0f}",
+                        "ARR retained": ui.pct(
+                            row[f"retained_arr_{arm}"] / row[f"arr_at_entry_{arm}"], 1
+                        )
+                        if row[f"arr_at_entry_{arm}"]
+                        else "n/a",
+                        "still a customer": ui.pct(row[f"still_customer_{arm}"]),
+                        "expansion won": f"${row[f'expansion_won_{arm}']:,.0f}",
+                    }
+                    for arm in ("treatment", "holdout")
+                ]
+            ),
+            hide_index=True,
+            width="stretch",
+        )
+        st.caption(
+            "\"Still a customer\" is the guardrail every play is read against: a play that lifts its own metric and loses customers is not working."
+        )
 
 left, right = st.columns(2)
 with left:

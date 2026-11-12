@@ -1,4 +1,7 @@
-"""Pilot: where each play is in its rollout, and how the pattern scales. Synthetic data."""
+"""Pilot: is it ready, where is each play in its rollout, what happened each week.
+
+Synthetic data, fictional company.
+"""
 
 import pandas as pd
 import streamlit as st
@@ -7,6 +10,7 @@ from app import ui
 from common.config import load_yaml
 from common.paths import ROOT
 from engine.catalog import load_catalog
+from engine.pilot import readiness_checks, weekly_notes
 
 st.title("Pilot")
 segments = load_yaml("rollout.yaml")["segments"]
@@ -23,6 +27,20 @@ tiers = ui.query(
 )
 tiers["in_pilot"] = tiers["coverage_tier"].isin(segments)
 st.dataframe(tiers, hide_index=True, width="stretch")
+
+st.subheader("Readiness checklist")
+st.caption(
+    "The checklist of the pilot plan, answered from live data each time this page loads, not ticked by hand. A play moves from a slice to a full test only when every line holds."
+)
+checks = readiness_checks(ui.data_dir())
+ready = sum(check["passed"] for check in checks)
+for check in checks:
+    mark = ":green[**Ready**]" if check["passed"] else ":red[**Not ready**]"
+    st.markdown(f"{mark} &nbsp; **{check['check']}.** {check['detail']}")
+if ready == len(checks):
+    st.success(f"All {len(checks)} checks hold today ({ui.today()}).")
+else:
+    st.warning(f"{ready} of {len(checks)} checks hold today ({ui.today()}). Fix the rest first.")
 
 st.subheader("Rollout stage of each play")
 st.caption(
@@ -73,6 +91,17 @@ handoffs = ui.query(
 )
 st.write("**What the human rung costs: tasks per queue**")
 st.dataframe(handoffs, hide_index=True, width="stretch")
+
+st.subheader("Weekly review notes")
+st.caption(
+    "One row per week of the pilot. The note is written by a rule from the same numbers, so it cannot flatter. In a real review the play owners add the decisions they took."
+)
+notes = pd.DataFrame(weekly_notes(ui.data_dir()))
+if notes.empty:
+    st.info("Nothing has run yet. Simulate a day on the Live demo page.")
+else:
+    notes.columns = [column.replace("_", " ") for column in notes.columns]
+    st.dataframe(notes, hide_index=True, width="stretch")
 
 st.subheader("How the pattern scales")
 st.markdown(

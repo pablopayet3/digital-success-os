@@ -1,10 +1,16 @@
 """Overview: the whole loop on one page. Synthetic data, fictional company."""
 
+from datetime import date, timedelta
+
 import altair as alt
+import pandas as pd
 import streamlit as st
 
 from app import ui
 from common.config import load_yaml
+
+# A task closed with one of these outcomes counts as a handoff that was worth making.
+GOOD_OUTCOMES = ["resolved", "saved", "expansion_opportunity"]
 
 st.title("Digital Success OS")
 st.write(
@@ -39,6 +45,110 @@ two.metric("ARR in the pilot", f"${accounts['arr'] / 1e6:.1f}M")
 three.metric("Health: red", int(accounts["red"]))
 four.metric("In a play now", active, help=f"{held} more are held out for comparison")
 five.metric("Tasks open for people", open_tasks)
+
+st.subheader("The measures the pilot is run on")
+st.caption(
+    "Each one is defined once, with its formula and its source table, in `docs/metrics.md`. Usage is the whole pilot segment, treated or not; only the last two compare treatment with holdout."
+)
+
+
+def usage_on(day: date) -> dict:
+    """Usage of the pilot segment on one day, from the production table."""
+    row = ui.query(
+        f"""
+        SELECT sum(mau_30d) AS mau, sum(assist_credits_30d) AS credits,
+               avg(prerequisite_closure_pct) AS setup
+        FROM gold.account_daily
+        WHERE {in_pilot} AND snapshot_date = DATE '{day.isoformat()}'
+        """
+    ).iloc[0]
+    return {key: 0.0 if pd.isna(value) else float(value) for key, value in row.items()}
+
+
+def kpi(column, label: str, value: str, note: str) -> None:
+    column.metric(label, value)
+    column.caption(note)
+
+
+today = date.fromisoformat(ui.today())
+now, before = usage_on(today), usage_on(today - timedelta(days=30))
+conversations = ui.rows("SELECT account_id, outcome FROM conversations")
+treated = ui.rows("SELECT DISTINCT account_id FROM enrollments WHERE arm = 'treatment'")
+closed = ui.rows("SELECT outcome FROM ctas WHERE status = 'resolved'")
+# Treated accounts that had at least one conversation with the agent.
+talked = (
+    len(set(conversations["account_id"]) & set(treated["account_id"]))
+    if len(conversations) and len(treated)
+    else 0
+)
+handed_off = int((conversations["outcome"] == "escalated").sum()) if len(conversations) else 0
+good = closed["outcome"].isin(GOOD_OUTCOMES).sum() if len(closed) else 0
+
+first = st.columns(4)
+kpi(
+    first[0],
+    "Monthly active users",
+    f"{now['mau']:,.0f}",
+    f"{now['mau'] - before['mau']:+,.0f} against 30 days earlier",
+)
+kpi(
+    first[1],
+    "Consumption: Assist credits, 30 days",
+    f"{now['credits']:,.0f}",
+    f"{now['credits'] - before['credits']:+,.0f} against 30 days earlier",
+)
+kpi(
+    first[2],
+    "Prerequisite closure",
+    ui.pct(now["setup"]),
+    f"{(now['setup'] - before['setup']) * 100:+.1f} points; setup steps done, average",
+)
+kpi(
+    first[3],
+    "Agent invocation",
+    ui.pct(talked / len(treated)) if len(treated) else "n/a",
+    f"{talked} of {len(treated)} treated accounts talked to the agent",
+)
+second = st.columns(4)
+kpi(
+    second[0],
+    "Handoff rate",
+    ui.pct(handed_off / len(conversations)) if len(conversations) else "n/a",
+    f"{handed_off} of {len(conversations)} agent conversations went to a person",
+)
+kpi(
+    second[1],
+    "Escalation conversion",
+    ui.pct(good / len(closed)) if len(closed) else "n/a",
+    f"{good} of {len(closed)} closed tasks ended resolved, saved or as an opportunity",
+)
+try:
+    money = ui.query("SELECT * FROM gold.experiment_results WHERE n_holdout > 0")
+except Exception:  # results not built yet
+    money = pd.DataFrame()
+if money.empty:
+    kpi(second[2], "Retained ARR", "n/a", "Run `uv run python run.py experiments`")
+    kpi(second[3], "Expansion sourced", "n/a", "Run `uv run python run.py experiments`")
+else:
+    kept = {
+        arm: money[f"retained_arr_{arm}"].sum() / money[f"arr_at_entry_{arm}"].sum()
+        for arm in ("treatment", "holdout")
+    }
+    kpi(
+        second[2],
+        "Retained ARR, treatment",
+        ui.pct(kept["treatment"], 1),
+        f"Holdout: {ui.pct(kept['holdout'], 1)}. ARR still under contract 30 days after entry",
+    )
+    sales = money[money["metric"] == "expanded_30d"]
+    won = {arm: sales[f"expansion_won_{arm}"].sum() for arm in ("treatment", "holdout")}
+    each = {arm: won[arm] / max(sales[f"n_{arm}"].sum(), 1) for arm in ("treatment", "holdout")}
+    kpi(
+        second[3],
+        "Expansion sourced by the plays",
+        f"${won['treatment']:,.0f}",
+        f"${each['treatment']:,.0f} per treated account; ${each['holdout']:,.0f} per held-out account",
+    )
 
 st.subheader("From signal to outcome")
 signals_today = ui.query(

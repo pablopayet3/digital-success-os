@@ -1,0 +1,219 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# One plain definition per column, for the data dictionary (analytics/dictionary.py
+# writes docs/data-dictionary.md from this file, the dbt model files and the contract).
+#
+# A definition written next to a model in its own .yml file wins. This file fills in the
+# rest, so that no column in silver or gold is left without a meaning. A test fails when
+# a new column has no definition anywhere.
+#
+#   shared     the column means the same thing in every table it appears in
+#   by_table   the same name means something different in this one table
+
+shared:
+  # keys that join tables
+  contact_id: The person. Joins to gold.dim_contact.
+  play_id: The play, as named in config/plays.yaml.
+  enrollment_id: One account's entry into one play, treatment or holdout.
+  cta_id: The task handed to a person (a CTA, call to action).
+  conversation_id: One conversation between a customer and the onboarding agent.
+  message_id: One message in the shared mailbox.
+  send_id: One lifecycle email sent to one contact.
+
+  # accounts
+  products: The Relay products the account owns, as a comma-separated list.
+  renewal_date: The next contract anniversary.
+  region: Sales region of the account.
+  industry: Industry of the account.
+  account_owner: The seller who owns the account in the CRM.
+  csm: The named success manager. Empty for uncovered accounts.
+  churned_at: The date the CRM recorded the account as lost. Empty while it is a customer.
+  value_tier: "Size by ARR: free (0), low (under 2,000), mid (under 10,000) or high."
+  behaviour_cluster: The usage cluster the account falls in today (k-means on six usage features), by its plain name.
+  signals_firing: The signals firing for the account today, comma-separated, in alphabetical order.
+
+  # contacts
+  full_name: The contact's name.
+  persona: "The contact's part in the account, normalised: admin, champion, end_user or billing."
+  email: The contact's email address, lowercased.
+  persona_raw: The persona tag exactly as the CRM had it, before it was normalised.
+  role: Job title.
+  consent_status: opted_in, opted_out or unknown, as recorded in the CRM.
+  email_valid: False when the address is known to bounce.
+  product_user_id: The contact's user id in the product. Ties a person's product activity to the contact.
+  last_engaged_at: The last time the contact opened, clicked or replied.
+
+  # product usage, per account per day
+  admin_logins: Admin logins on the day.
+  users_invited: Users invited on the day.
+  boards_created: Boards created on the day.
+  doc_like_boards_created: Boards created on the day from a meeting-notes, wiki or knowledge-base template. Doc-style use of Boards.
+  docs_published: Docs published on the day.
+  automation_rules_created: Automation rules created on the day.
+  integrations_connected: Integrations connected on the day.
+  assist_invocations: Times Relay Assist was used on the day.
+  assist_credits: Relay Assist credits used on the day. The consumption measure.
+  events_total: All product events on the day.
+
+  # setup prerequisites
+  days_since_signup: Days from signup to today.
+  board_created_on: The day the first board was created. Empty if not yet.
+  users_invited_on: The day the fifth user was invited. Empty if not yet.
+  integration_connected_on: The day the first integration was connected. Empty if not yet.
+  sso_configured_on: The day single sign-on was configured. Empty if not yet.
+  steps_done: How many of the four setup steps are done.
+
+  # emails and the mailbox
+  campaign: The email campaign. Emails sent by a play start with "play_".
+  subject: The subject line.
+  body: The text of the message.
+
+  # plays, journeys and tasks
+  arm: treatment (the play ran) or holdout (eligible, deliberately left alone for comparison).
+  highest_tier: "The highest rung of the intervention ladder the account reached: digital, agentic or human."
+  play_version: The version of the play's configuration when the account entered. A new version starts a new experiment.
+  rollout_stage: "The play's stage when the account entered: slice (10% of eligible accounts) or full."
+  exit_reason: Why the journey ended. Empty while it is running.
+  trigger_signal: The signal that made the account eligible.
+  enrolled_on: The day the account entered the play, or was held out.
+  closed_on: The day the journey ended.
+  step_id: The journey step, as named in config/journeys.yaml.
+  queue: The team queue a task went to (config/routing.yaml).
+  reason_code: Why the handoff was made. The full list is in config/routing.yaml.
+  prompt_version: The agent prompt in use (prompts/onboarding_agent/).
+  escalated_by: "Who decided to hand off: hard_rule (code), agent (the model asked for a person) or failure (a tool or the model was unavailable)."
+  llm_calls: Model calls made.
+  cost_usd: What those model calls cost, in US dollars. Zero when answers were replayed from the cache.
+
+  # play outcomes
+  metric: The outcome measured. Definitions are in docs/metrics.md.
+  accounts: Accounts in the group.
+  successes: Accounts in the group that reached the outcome.
+  arr_at_entry: ARR on the day the account entered the play.
+  retained_arr: ARR at entry if the account was still a customer at the end of the window, otherwise 0.
+  expansion_amount: Closed-won expansion in the measurement window.
+  window_end: The last day of the measurement window (30 days after entry).
+  window_complete: True once the whole window has passed.
+  days_observed: Days of the window that have data so far. Results count accounts observed for 7 days or more.
+  setup_completed: Setup reached 75% or more on any day in the window.
+  usage_recovered: Monthly active users came back to 90% or more of the level before the drop.
+  retained_30d: Still a customer at the end of the window. The guardrail for every play.
+  valid_admin_restored: The account had an admin we may email on any day in the window.
+  expanded_30d: An expansion opportunity was closed-won in the window.
+  docs_adopted: At least one doc was published in the window.
+
+  # labels the models learn from
+  outcome_observed: True once the 90 days after the snapshot have fully passed. Only these rows are used for training.
+  churned_within_90d: The CRM recorded a churn date in the 90 days after the snapshot.
+  expanded_within_90d: A closed-won expansion opportunity in the 90 days after the snapshot.
+
+by_table:
+  stg_events:
+    occurred_at: When the event happened (UTC).
+    user_id: The product user who did it.
+    properties: Extra details of the event, as JSON (for example the board template, or the Assist credits used).
+    _ingested_at: When the pipeline loaded the row.
+    _source_file: The landing file the row came from.
+  stg_accounts:
+    status: active or churned, as recorded in the CRM.
+  dim_account:
+    status: active or churned, as recorded in the CRM.
+  stg_opportunities:
+    opportunity_id: One CRM opportunity.
+    opportunity_type: new_business, renewal or expansion.
+    opportunity_name: The name the seller gave the opportunity.
+    stage: open, negotiation, closed_won or closed_lost.
+    is_open: True while the stage is open or negotiation.
+    amount: The value of the opportunity in ARR.
+    created_at: When the opportunity was created.
+    close_date: The day it closed, or is expected to close.
+    owner: The seller who owns the opportunity.
+    source: Who created the opportunity.
+  stg_tickets:
+    ticket_id: One support ticket.
+    created_at: When the ticket was opened.
+    created_date: The day the ticket was opened.
+    priority: low, normal, high or urgent.
+    is_high_priority: True for high and urgent tickets.
+    category: What the ticket is about (for example setup_sso, billing, bug).
+    status: open, pending or resolved.
+    resolved_at: When the ticket was resolved. Empty while it is open.
+  stg_nps:
+    response_id: One survey response.
+    score: The answer, 0 to 10.
+    nps_band: promoter (9 or 10), passive (7 or 8) or detractor (0 to 6).
+    comment: What the person wrote. May be empty.
+    responded_at: When the person answered.
+    responded_date: The day the person answered.
+  stg_email_engagement:
+    sent_at: When the email was sent.
+    sent_date: The day the email was sent.
+    delivered: True when the email was delivered.
+    bounced: True when the address rejected the email.
+    opened_at: When the email was opened. Empty if it was not.
+    clicked_at: When a link in the email was clicked. Empty if none was.
+    unsubscribed: True when the recipient unsubscribed from this email.
+  stg_mailbox:
+    received_at: When the reply arrived.
+    received_date: The day the reply arrived.
+    from_email: The address the reply came from.
+    from_name: The sender's name as their mail program shows it.
+    addressed_contact_id: The contact the original email was sent to.
+    sender_is_addressee: True when the reply came from the address we wrote to. False for a colleague or an automatic responder.
+  stg_ops_enrollments:
+    status: active, waiting_on_human, completed, exited, or holdout (held out for comparison).
+  stg_ops_touches:
+    touch_id: One touch delivered to a customer.
+    touch_date: The day it was delivered.
+    channel: email, in_app or agent.
+    tier: "The rung of the intervention ladder: digital or agentic. (Human steps are tasks, in stg_ops_ctas.)"
+    template: The email or in-app template used.
+    outcome: "For an agent touch, how the conversation ended: resolved, escalated or no_uptake. Empty for emails and in-app prompts."
+  stg_ops_ctas:
+    source: "What created the task: a journey step, the agent, or the mailbox triage."
+    priority: urgent, high, normal or low. Worked in that order, then by SLA date.
+    status: open or resolved.
+    created_on: The day the task was created.
+    sla_due_on: The day by which the task must be picked up.
+    picked_up_on: The day a person started on it.
+    resolved_on: The day a person closed it.
+    outcome: "What the person recorded: resolved, saved, expansion_opportunity, not_a_fit, no_response or agent_should_have_handled."
+    next_state: "The return signal, what the journey does next: re_enter_journey, exit or sales_owns."
+  stg_ops_conversations:
+    conversation_date: The day of the conversation.
+    scenario: What kind of customer message started it. In the simulation, the script the simulated customer followed.
+    answered_by: The model that wrote the agent's replies, or a note that a hard rule stopped the conversation first.
+    outcome: resolved (the agent handled it) or escalated (handed to a person).
+    customer_turns: Messages the customer sent.
+    latency_ms: Time spent waiting for the model, in milliseconds.
+  stg_ops_mailbox_triage:
+    processed_on: The day the reply was read and routed.
+    intent: "What the classifier says the reply is: out_of_office, unsubscribe, left_company, product_question, buying_intent, complaint, meeting_request or other."
+    sentiment: positive, neutral or negative.
+    confidence: How sure the classifier is, 0 to 1. Below the bar in config/routing.yaml a person looks at the reply.
+    action: What the routing rules did with the reply (for example opted_out, cta_complaint, agent_answered, human_review).
+  signals:
+    signal_id: The signal that fired. Rules are in docs/metrics.md.
+    signal_value: The number that made the rule fire.
+  dq_summary:
+    sort_order: The order the measures are shown in.
+    stage: "Where in the pipeline it was counted: ingest or silver."
+    measure: What was counted (for example duplicate_events_removed).
+    row_count: How many rows.
+    description: The measure in a sentence.
+  metrics_play_outcomes:
+    status: The enrolment's status today (active, waiting_on_human, completed, exited or holdout).
+  metrics_handoffs:
+    source: "What created the tasks: a journey step, the agent, or the mailbox triage."
+    handoffs: Tasks created.
+    closed: Tasks a person has closed.
+    open_now: Tasks still open today.
+    avg_days_to_pickup: Average days from created to picked up.
+    sla_breaches: Tasks picked up after their SLA date, or still open past it.
+    converted: Tasks closed as resolved, saved or expansion_opportunity. A handoff that was worth making.
+    unnecessary: Tasks closed as "the agent should have handled this".
+  metrics_agent:
+    origin: "Where the conversation came from: a play, or the mailbox."
+    outcome: resolved (the agent handled it) or escalated (handed to a person).
+    conversations: Conversations in the group.
+    avg_customer_turns: Average number of messages the customer sent.

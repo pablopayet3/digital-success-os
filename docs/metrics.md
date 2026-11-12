@@ -3,7 +3,7 @@
 Synthetic data, fictional company. One definition per metric, with its formula, grain,
 owner and source table. If two dashboards disagree, this file decides.
 
-Sections on agent, handoff and experiment metrics are added in the phases that build them.
+What each column of each table means is in `docs/data-dictionary.md`.
 
 ## Lifecycle stage
 
@@ -131,6 +131,53 @@ From `gold.metrics_handoffs` (one row per queue, reason and source).
 | Escalation conversion | Tasks closed as resolved, saved or expansion opportunity, divided by tasks closed |
 | Unnecessary handoff rate | Tasks closed as "the agent should have handled this", divided by tasks closed |
 | Docs gap share | Agent handoffs with reason `not_in_docs`, divided by agent handoffs |
+
+## The measures on the Overview page
+
+The eight numbers the pilot is run on, in the order the page shows them. The first three
+describe the whole pilot segment, treated or not. Only the last two compare groups.
+
+| Measure | Definition | Source |
+|---|---|---|
+| Monthly active users | Sum of MAU over the accounts in the pilot segment, today and 30 days earlier | `gold.account_daily.mau_30d` |
+| Consumption | Sum of Relay Assist credits used in the last 30 days, pilot segment | `gold.account_daily.assist_credits_30d` |
+| Prerequisite closure | Average share of setup steps done, pilot segment | `gold.account_daily.prerequisite_closure_pct` |
+| Agent invocation | Treated accounts that had at least one conversation with the agent, divided by treated accounts | `conversations`, `enrollments` (operational store) |
+| Handoff rate | Agent conversations that ended in a handoff, divided by agent conversations | `conversations` |
+| Escalation conversion | Tasks closed as resolved, saved or expansion opportunity, divided by tasks closed | `ctas` |
+| Retained ARR, treatment against holdout | Retained ARR share per group, summed over the plays that have a holdout | `gold.experiment_results` |
+| Expansion sourced by the plays | Closed-won expansion in the measurement window for accounts treated by the two Sales plays, with the per-account figure for each group | `gold.experiment_results` |
+
+The last two are shown with the holdout's figure beside them on purpose. A total with no
+comparison would claim revenue the plays may not have caused.
+
+## Journey funnel
+
+From `engine/journeys.py::journey_funnel`, per play. Counts are enrolments, read from the
+journey's own event log (`journey_events`).
+
+| Stage | Definition |
+|---|---|
+| Signal fired and eligible | Every account the rules engine let through, treatment and holdout |
+| Entered the journey | The treatment group |
+| One line per customer-facing step | Enrolments for which the step really happened: an email sent, an in-app prompt shown, an agent step run, a task created |
+| Journey completed | Treatment enrolments that ended as completed (goal reached, sequence finished, or closed well by a person) |
+
+A branch can skip a step, so a later step is not always smaller than the one before it.
+
+## Pilot readiness
+
+Six checks, answered from live data on the Pilot page (`engine/pilot.py`, ADR 0020). The
+two bars that need a number are in `config/rollout.yaml`.
+
+| Check | Holds when |
+|---|---|
+| Data tests pass and the data is fresh | Every data test and contract check passes and no source is stale |
+| Consent and the frequency cap are enforced | No contact received more than 2 touches in any 7 days, and no email is dated after its contact opted out |
+| The agent passes its evaluation | The onboarding agent's pass rate on the prompt in use is at or above `min_eval_pass_rate` (0.9) |
+| The human queues can take the work | No queue holds more open tasks than `max_backlog_days` (3) days of its own capacity |
+| Handoffs come back with a return signal | Every closed task carries an outcome and the journey's next step |
+| The results tables are built and current | The results tables have rows and are as of the warehouse's today |
 
 ## Agent evaluation metrics
 

@@ -127,7 +127,9 @@ TABLES = {
         capacity_per_day INTEGER NOT NULL,
         message TEXT NOT NULL
     """,
-    # The feedback loop: handoffs a human judged unnecessary, waiting to become eval cases.
+    # The feedback loop: handoffs a human judged unnecessary, and conversations a person
+    # gave a thumbs down, waiting to become eval cases. `cta_id` holds the id of what is
+    # under review: a task id, or a conversation id (agents/review.py).
     "eval_candidates": """
         cta_id TEXT PRIMARY KEY,
         created_on TEXT NOT NULL,

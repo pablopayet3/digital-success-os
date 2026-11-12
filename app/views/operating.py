@@ -2,6 +2,7 @@
 
 import streamlit as st
 
+from app.diagrams import show_markdown
 from common.paths import ROOT
 
 st.title("Operating model")
@@ -19,7 +20,13 @@ GROUPS = {
         "dependency-map.md",
         "pilot-plan.md",
     ],
-    "What it is": ["prd.md", "roadmap.md", "metrics.md", "data-requirements.md"],
+    "What it is": [
+        "prd.md",
+        "roadmap.md",
+        "metrics.md",
+        "data-requirements.md",
+        "data-dictionary.md",
+    ],
     "Evidence": ["operating-review.md", "eda-report.md", "phase-notes.md"],
 }
 group = st.radio(
@@ -46,4 +53,5 @@ def title_of(path) -> str:
 
 chosen = st.selectbox("Document", files, format_func=title_of)
 st.caption(f"`{chosen.relative_to(ROOT).as_posix()}`")
-st.markdown(chosen.read_text(encoding="utf-8"))
+# Diagrams in the documents are drawn, not shown as code (app/diagrams.py).
+show_markdown(chosen.read_text(encoding="utf-8"))

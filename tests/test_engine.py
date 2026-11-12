@@ -324,3 +324,69 @@ def test_adding_a_segment_scales_the_same_plays_to_it(simulated, tmp_path):
 
     assert enrolled_tiers(["uncovered"], "pilot.db") == {"uncovered"}
     assert enrolled_tiers(["uncovered", "pooled"], "scaled.db") == {"uncovered", "pooled"}
+
+
+# --- Pilot readiness, weekly notes, journey funnel --------------------------------------------
+
+
+def test_the_readiness_checklist_is_answered_from_live_data(simulated, tmp_path):
+    from engine.pilot import readiness_checks
+
+    _, data_dir = simulated
+    checks = {check["check"]: check for check in readiness_checks(data_dir)}
+    assert len(checks) == 6 and all(check["detail"] for check in checks.values())
+    # What the engine promises must hold in what it actually sent.
+    assert checks["Consent and the frequency cap are enforced"]["passed"]
+    assert checks["Data tests pass and the data is fresh"]["passed"]
+
+    # An agent that fails too many cases makes the pilot "not ready".
+    failing = tmp_path / "eval-results.json"
+    totals = {"onboarding agent (v3)": {"run": 30, "passed": 20}}
+    failing.write_text(
+        json.dumps({"prompt_in_use": "v3", "totals": totals, "llm_mode": "test"}), encoding="utf-8"
+    )
+    agent = readiness_checks(data_dir, failing)[2]
+    assert agent["check"] == "The agent passes its evaluation" and not agent["passed"]
+    assert "20 of 30" in agent["detail"]
+
+
+def test_the_frequency_cap_check_counts_inside_any_seven_days():
+    from engine.pilot import most_touches_in_7_days
+
+    def touch(contact, day):
+        return {"contact_id": contact, "touch_date": day}
+
+    spread_out = [touch("C1", "2026-01-01"), touch("C1", "2026-01-08"), touch("C1", "2026-01-15")]
+    assert most_touches_in_7_days(spread_out) == 1
+    bunched = [touch("C1", "2026-01-01"), touch("C1", "2026-01-05"), touch("C1", "2026-01-07")]
+    assert most_touches_in_7_days(bunched + [touch("C2", "2026-01-01")]) == 3
+    assert most_touches_in_7_days([]) == 0
+
+
+def test_weekly_notes_have_one_row_per_week_and_add_up(simulated, ops):
+    from engine.pilot import weekly_notes
+
+    _, data_dir = simulated
+    weeks = weekly_notes(data_dir)
+    starts = [week["week_starting"] for week in weeks]
+    assert starts == sorted(set(starts)) and all(week["note"] for week in weeks)
+    assert all(date.fromisoformat(start).weekday() == 0 for start in starts)  # Mondays
+    entered = ops.one("SELECT count(*) AS n FROM enrollments WHERE arm = 'treatment'")["n"]
+    assert sum(week["entered"] for week in weeks) == entered
+    assert sum(week["handed_to_people"] for week in weeks) == len(ops.rows("SELECT 1 FROM ctas"))
+
+
+def test_the_journey_funnel_follows_the_journey_definition(simulated, ops):
+    from engine.journeys import journey_funnel
+
+    catalog = load_catalog()
+    play = next(play for play in catalog.plays if play.id == "onboarding_rescue")
+    funnel = journey_funnel(ops, catalog.journeys[play.journey], play.id)
+    stages = [row["stage"] for row in funnel]
+    assert stages[0] == "Signal fired and eligible" and stages[-1] == "Journey completed"
+    assert stages[2:-1] == [
+        "email: setup_guide (digital)", "agent: agent_help (agentic)", "cta: csm_handoff (human)",
+    ]  # fmt: skip
+    eligible, entered = funnel[0]["accounts"], funnel[1]["accounts"]
+    assert eligible >= entered > 0
+    assert all(row["accounts"] <= entered for row in funnel[2:])

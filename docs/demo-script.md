@@ -13,8 +13,9 @@ Times are targets. If something breaks, say what should have happened and move o
 > these pieces live across Databricks, Gainsight, Salesforce and Tableau; here they're in
 > one system so you can see how they connect."
 
-Point at the row "From signal to outcome": signals, plays, touches, agent conversations,
-handoffs, closed.
+Point at "The measures the pilot is run on" (usage, agent invocation, handoff rate,
+retained revenue with the holdout beside it), then at the row "From signal to outcome":
+signals, plays, touches, agent conversations, handoffs, closed.
 
 **2. Data (45 seconds). Data quality page.**
 
@@ -62,6 +63,9 @@ Resolve as `expansion_opportunity`.
 > smallest effect this sample could have seen. It is a simulation, so the lift is an
 > assumption coming back out. The measurement is the real part."
 
+Scroll to "One play in detail" (it opens on Onboarding rescue): the journey funnel, the
+result by entry week, and revenue per group with the guardrail "still a customer".
+
 **6. Agent quality (30 seconds). Agents page, Evaluation tab.**
 
 > "Forty-four fixed cases, run against the real model. Code checks first: did it hand
@@ -75,13 +79,14 @@ The report states which model produced the answers. If it ever says stand-in, sa
 
 **7. Pilot (30 seconds). Pilot page.**
 
-> "This is how I'd run the uncovered-accounts pilot: a readiness checklist, a ten percent
-> slice, a full test with a holdout, a weekly review, and a scale, fix or stop call per
-> play. Scaling to the next segment is one line of configuration."
+> "This is how I'd run the uncovered-accounts pilot. The readiness checklist is not
+> ticked by hand: each line is answered from live data when the page opens. Then a ten
+> percent slice, a full test with a holdout, weekly review notes, and a scale, fix or
+> stop call per play. Scaling to the next segment is one line of configuration."
 
 **8. Operating model (15 seconds). Operating model page.**
 
-Open the ownership map, then one play spec.
+Open the dependency map (drawn as a diagram), the ownership map, then one play spec.
 
 > "That's how I'd keep cross-functional delivery moving, and how I'd hand work to the
 > agent engineers."
@@ -99,6 +104,9 @@ Open the ownership map, then one play spec.
 | What does the agent cost? | ADR 0015 | Cached, budgeted, offline by default. One module calls the API |
 | Is the lift real? | ADR 0005, 0016 | No, and the report says so. The measurement system is what is being shown |
 | What would you ask Data Engineering for first? | `docs/data-requirements.md` | Coverage tier, one consent field, account id on every event |
+| What does this column mean? | `docs/data-dictionary.md` (Operating model page) | 533 columns, each with a definition; a test fails when one is missing |
+| Did you look at the data before building? | `analytics/01_eda.ipynb` | Six questions with charts; each signal was kept only because it points the right way |
+| How does the agent get better? | Agents page, Review queue tab | An unnecessary handoff or a thumbs down becomes a draft case the next prompt must pass |
 | What happens when a queue overflows? | Human console, ADR 0004 | Flags follow capacity; an alert fires at two days of backlog |
 | How would this run in production? | `docs/production-architecture.md` | Same code, a `prod` profile; a table of what is real and what is simulated |
 

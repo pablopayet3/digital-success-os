@@ -253,7 +253,31 @@ Stand-in eval runs write to `evals/reports/stand-in/`, never over the real repor
 
 CRM sync: `integrations/crm_sync.py` (`run.py crm-sync`, dry run by default, `--push`
 to send; standard Account and Task objects; safe to run twice; ADR 0019). The live push
-has not been run (needs `SALESFORCE_*` credentials in `.env`). 155 tests in total.
+has not been run (needs `SALESFORCE_*` credentials in `.env`). 178 tests in total.
+
+After the phases (the brief read again line by line; see the last section of
+`docs/phase-notes.md`):
+
+- `engine/pilot.py`: the readiness checklist answered from live data, and the weekly
+  review notes. Bars in `config/rollout.yaml` (`readiness`). ADR 0020.
+- `engine/journeys.py::journey_funnel`: the funnel per journey, from `journey_events`.
+- `experiments/analyze.py` also writes `gold.experiment_cohorts` (results by entry week)
+  and revenue columns on `gold.experiment_results`.
+- `agents/review.py`: thumbs up or down on a stored conversation; a thumbs down goes to
+  `eval_candidates` (whose `cta_id` column then holds the conversation id).
+- `api/exports.py`: the CS-platform export has `people` as well as companies and tasks.
+  The field mapping is in the README.
+- `app/diagrams.py`: draws the Mermaid diagrams of the docs with Graphviz, offline. It
+  understands only what the docs use; anything else is shown as text. ADR 0022.
+- `analytics/dictionary.py` and `dbt/column_glossary.yml`: `run.py docs` writes
+  `docs/data-dictionary.md`. A test fails when a column has no definition. ADR 0021.
+- `analytics/01_eda.ipynb`: the exploratory analysis with charts. Its libraries are the
+  dependency group `notebook` (`uv run --group notebook ...`), not installed by default.
+- `tests/test_app.py`: runs every page of the app on the small world.
+- `docs/screenshots/`: one picture per page.
+
+When a dbt model gains a column: add its meaning (the model's `.yml`, the contract, or
+`dbt/column_glossary.yml`) and run `uv run python run.py docs`, or two tests fail.
 
 Hosting: a Render blueprint from the public repository. Render redeploys both services
 on every push to `main` (seen in its deploy list as "Auto-Deploy"); a change to

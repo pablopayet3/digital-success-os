@@ -528,3 +528,38 @@ def test_a_tracing_service_that_is_down_never_breaks_a_run(tmp_path, monkeypatch
     trace = Trace("onboarding_agent", "A0001", "2026-09-28", [])
     trace.step("customer", text="Hello")
     assert trace.finish("resolved", None, [], tmp_path).exists()
+
+
+# --- The feedback loop: a person's verdict on a conversation ------------------------------------
+
+
+def test_a_thumbs_down_puts_the_conversation_in_the_review_queue(ops, tmp_path):
+    from agents.review import THUMBS_DOWN, rate_conversation
+
+    conversation = ops.one("SELECT * FROM conversations ORDER BY conversation_id LIMIT 1")
+    assert conversation, "the simulated days produced no conversation to rate"
+    chat = conversation["conversation_id"]
+
+    rate_conversation(ops, chat, False, "It should have named the article.", "2026-01-05", tmp_path)
+    queued = ops.one("SELECT * FROM eval_candidates WHERE cta_id = :id", id=chat)
+    assert queued["source"] == THUMBS_DOWN and queued["human_notes"].startswith("It should")
+    assert json.loads(queued["packet"])["transcript"] == json.loads(conversation["transcript"])
+    draft = json.loads((tmp_path / f"{chat}.json").read_text(encoding="utf-8"))
+    assert draft["status"] == "needs_review" and draft["conversation"]["conversation_id"] == chat
+    rated = ops.one("SELECT feedback FROM conversations WHERE conversation_id = :id", id=chat)
+    assert rated["feedback"] == "down"
+
+    # Rating it again does not queue it twice; a thumbs up takes it out of the queue.
+    rate_conversation(ops, chat, False, "Second look.", "2026-01-06", None)
+    assert len(ops.rows("SELECT 1 FROM eval_candidates WHERE cta_id = :id", id=chat)) == 1
+    rate_conversation(ops, chat, True, "", "2026-01-06", None)
+    assert ops.one("SELECT * FROM eval_candidates WHERE cta_id = :id", id=chat) is None
+    rated = ops.one("SELECT feedback FROM conversations WHERE conversation_id = :id", id=chat)
+    assert rated["feedback"] == "up"
+
+
+def test_rating_a_conversation_that_does_not_exist_is_refused(ops):
+    from agents.review import rate_conversation
+
+    with pytest.raises(ValueError, match="no conversation"):
+        rate_conversation(ops, "CNV-99999", False, "", "2026-01-05", None)

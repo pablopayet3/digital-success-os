@@ -85,6 +85,9 @@ continue, and nobody learns which handoffs were unnecessary.
 - **Unnecessary handoffs become test cases.** `agent_should_have_handled` puts the
   conversation in the evaluation review queue; from the Human console it is also written
   to `evals/cases/from_feedback/` as a draft case. The next prompt version has to pass it.
+- **So does a thumbs down.** Anyone reading a conversation on the Agents page can rate
+  it. A thumbs down, with a note on what should have happened, puts the conversation in
+  the same review queue (`agents/review.py`). The queue is a tab on the Agents page.
 - **Missing knowledge becomes a docs gap list.** Handoffs with reason `not_in_docs` are
   counted by question. The most frequent ones are the next help articles to write.
 - **Every conversation is traced** (`agents/tracing.py`): messages, tool calls, retrieved

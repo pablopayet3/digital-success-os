@@ -296,3 +296,49 @@ def _log(ctx, enrollment: dict, step: Step, event: str, detail: str | None) -> N
             "detail": detail,
         },
     )
+
+
+# --- journey analytics ------------------------------------------------------------------
+
+# Events that mean a step actually reached the customer or a person.
+STEP_HAPPENED = ("email_sent", "in_app_shown", "cta_created", "agent_")
+
+
+def journey_funnel(store, journey: Journey, play_id: str) -> list[dict]:
+    """How far accounts got: eligible, entered, each customer-facing step, finished.
+
+    Counts are enrolments, read from the journey's own event log. A step later in the
+    journey is not always smaller than the one before it: a branch can skip a step.
+    """
+    arms = {
+        row["arm"]: row["n"]
+        for row in store.rows(
+            "SELECT arm, count(*) AS n FROM enrollments WHERE play_id = :play GROUP BY arm",
+            play=play_id,
+        )
+    }
+    entered, held_out = arms.get("treatment", 0), arms.get("holdout", 0)
+    events = store.rows(
+        "SELECT step_id, event, enrollment_id FROM journey_events WHERE play_id = :play",
+        play=play_id,
+    )
+    reached: dict[str, set] = {}
+    for row in events:
+        if row["event"].startswith(STEP_HAPPENED):
+            reached.setdefault(row["step_id"], set()).add(row["enrollment_id"])
+    finished = store.one(
+        "SELECT count(*) AS n FROM enrollments "
+        "WHERE play_id = :play AND arm = 'treatment' AND status = 'completed'",
+        play=play_id,
+    )["n"]
+
+    funnel = [
+        {"stage": "Signal fired and eligible", "accounts": entered + held_out},
+        {"stage": "Entered the journey (the rest are held out)", "accounts": entered},
+    ]
+    for step in journey.steps:
+        if step.type in ("email", "in_app", "agent", "cta"):
+            label = f"{step.type.replace('_', '-')}: {step.id} ({step.tier})"
+            funnel.append({"stage": label, "accounts": len(reached.get(step.id, ()))})
+    funnel.append({"stage": "Journey completed", "accounts": finished})
+    return funnel

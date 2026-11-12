@@ -37,7 +37,9 @@ it to Sales with a written summary. The last frame is every play against its hol
 
 ![The demo path: a question, an answer, a handoff, the results](docs/screenshots/demo.gif)
 
-The loop on one page: signals, plays, touches, agent conversations, handoffs, outcomes.
+The Overview: the measures the pilot is run on, then the loop in numbers. Revenue is
+shown with the holdout's figure beside it, so the page cannot claim what the plays did
+not cause.
 
 ![Overview page](docs/screenshots/overview.jpg)
 
@@ -51,6 +53,13 @@ Every play against its holdout: the lift with its 95% interval, and a verdict fr
 written rule. An interval that crosses zero is reported as not proven.
 
 ![Plays and experiments](docs/screenshots/plays-and-experiments.jpg)
+
+The pilot's readiness checklist. Each line is answered from live data when the page
+opens, with the evidence beside it; nothing is ticked by hand.
+
+![Pilot page](docs/screenshots/pilot.jpg)
+
+A picture of every page is in [docs/screenshots](docs/screenshots/).
 
 ## What a clean run produces
 
@@ -71,7 +80,7 @@ From `uv run python run.py demo` (180 days of history, then 30 simulated days of
 | Seat expansion: expansion closed, treatment against holdout | 19% against 21%: **no effect detected** (the sample could only have shown 20 points or more) |
 | Agent evaluation, real model, 44 cases | Onboarding agent 30 of 30 with prompt v3 (v1: 29, v2: 25); mailbox 10 of 10; briefs 4 of 4; classifier 96% on 160 labelled replies |
 | Cost of every real model call behind this (817 calls) | about $3 |
-| Automated tests | 155 |
+| Automated tests | 178 |
 
 Three honest notes. The lift comes from assumptions in `config/sim_effects.yaml`: this
 demonstrates a measurement system, not a result. The agent answers are real: one live
@@ -119,6 +128,7 @@ model responses stored in `cache/llm/`, so it needs no key and no network.
 | `run.py extracts` | Write the gold tables as files for a BI tool: `exports/bi/` |
 | `run.py crm-sync` | Dry run of the CRM sync: writes what would be sent. `--push` sends it |
 | `run.py specs` | Rebuild the play specs from the configuration |
+| `run.py docs` | Rebuild the data dictionary (`docs/data-dictionary.md`) and dbt's own documentation site |
 | `run.py app` / `run.py api` | The app (port 8501) / the API (port 8000, `/docs`) |
 | `run.py test` / `run.py lint` | Tests and style |
 
@@ -129,38 +139,38 @@ file names past the 260-character limit.
 
 | Page | What it shows |
 |---|---|
-| Overview | The loop in numbers: signals, plays, touches, conversations, handoffs, outcomes |
+| Overview | The measures the pilot is run on (active users, consumption, setup closure, agent invocation, handoff rate, escalation conversion, retained revenue and expansion against the holdout), then the loop in numbers |
 | Accounts | One account: health and why, signals with evidence, scores with reasons, everything the system did and every decision not to act |
-| Plays and experiments | The play catalog; each play against its holdout with an interval and a verdict; results per ladder rung; the audit log |
-| Agents | Conversations with tool calls and retrieval; mailbox triage; the evaluation report; the prompt changelog |
+| Plays and experiments | The play catalog; each play against its holdout with an interval and a verdict; the journey funnel; results by entry week and per ladder rung; revenue per group; the audit log |
+| Agents | Conversations with tool calls and retrieval, and a thumbs up or down on each; mailbox triage; the evaluation report; the review queue of cases people sent back; the prompt changelog |
 | Human console | Sign in by role, work a queue, open a handoff packet, resolve it: the return signal |
 | Data quality | What was rejected and why, test results, freshness, the data contract |
-| Pilot | Rollout stage per play, results per rung, how the pattern scales |
-| Operating model | Ownership, change control, principles, play specs, decision records |
+| Pilot | The readiness checklist answered from live data; rollout stage and verdict per play; results per rung; weekly review notes; how the pattern scales |
+| Operating model | Ownership, change control, principles, the dependency map drawn as a diagram, the data dictionary, play specs, decision records |
 | Live demo | Talk to the agent and watch it hand off; advance the world one day |
 
 ## Coverage map: what the role asks for, and where it is here
 
 | The role asks for | What is built | Where |
 |---|---|---|
-| Build a digital success operating system; pilot uncovered accounts, then scale the pattern | Config-driven engine; pilot on the `uncovered` segment; 10% slice, then a full test with a holdout; readiness checklist; scale, fix or stop per play; one line of config extends to `pooled` | `config/rollout.yaml`, `engine/`, `docs/pilot-plan.md`, Pilot page |
+| Build a digital success operating system; pilot uncovered accounts, then scale the pattern | Config-driven engine; pilot on the `uncovered` segment; 10% slice, then a full test with a holdout; a readiness checklist answered from live data; weekly review notes; scale, fix or stop per play; one line of config extends to `pooled` | `config/rollout.yaml`, `engine/`, `engine/pilot.py`, `docs/pilot-plan.md`, Pilot page |
 | Digital, agentic and human interventions | Every play declares its ladder and the rule for moving up; results per rung | `config/plays.yaml`, `gold.metrics_play_ladder` |
 | Requirements for clean account, contact, product, engagement, lifecycle and health data | A spec for the six areas, written backwards from the plays | `docs/data-requirements.md` |
 | Partner with agent engineers and data science | One spec per play, generated from the config so it cannot drift; model cards | `docs/play-specs/`, `docs/model-cards/` |
 | Turn telemetry, lifecycle, health, engagement, sentiment, support and commercial signals into plays, triggers, tasks and handoffs | Signals table, play catalog as configuration, rules engine | `dbt/models/marts/signals.sql`, `config/plays.yaml`, `engine/rules.py` |
 | Close ownership gaps as the accountable owner | RACI for every table, model, play, agent and queue, with gaps and proposed owners | `docs/ownership-map.md` |
 | Protect delivery momentum | Decision records, principles, dependency map, change control with a PR template | `docs/decisions/`, `docs/principles.md`, `docs/dependency-map.md`, `docs/change-control.md` |
-| Data foundation and pipelines | Landing zone, validated ingest with a dead letter, bronze, silver, gold, contact tagging | `ingest/`, `dbt/` |
+| Data foundation and pipelines | Landing zone, validated ingest with a dead letter, bronze, silver, gold, contact tagging; a data dictionary in which every column has a definition, kept complete by a test | `ingest/`, `dbt/`, `docs/data-dictionary.md` |
 | Data engineering fluency | ELT in dbt, tests and freshness, a data contract checked by code, export endpoints, an events endpoint | `dbt/`, `contracts/`, `api/` |
-| Analytics and modelling | Exploratory analysis, segmentation, churn and expansion models with an honest comparison | `analytics/`, `docs/eda-report.md` |
+| Analytics and modelling | Exploratory analysis as a notebook with its charts, segmentation, churn and expansion models with an honest comparison | `analytics/01_eda.ipynb`, `analytics/`, `docs/model-cards/` |
 | Measurement design | Every metric defined once, with its table | `docs/metrics.md`, `dbt/models/marts/metrics_*.sql` |
 | Sentiment and text analysis | Intent, sentiment and confidence for NPS comments, tickets and replies | `agents/classify.py`, `agents/feedback.py` |
 | Agent signal design: plays, prompts, retrieval, escalation, feedback loops | Onboarding agent with tools and retrieval, versioned prompts, escalation rules in code, a review queue | `agents/`, `prompts/` |
-| Model evaluation and human-in-the-loop feedback | Fixed cases, code checks first and a judge second, prompt versions compared, unnecessary handoffs become cases | `evals/` |
+| Model evaluation and human-in-the-loop feedback | Fixed cases, code checks first and a judge second, prompt versions compared; an unnecessary handoff or a thumbs down on a conversation becomes a draft case in a review queue | `evals/`, `agents/review.py` |
 | Rules engines | Audience rules, exclusions, priorities, exclusivity, every decision logged | `engine/rules.py` |
-| Journey orchestration, tasks, shared mailbox, consent, channel triggers | Journey runner with waits, branches and goals; tasks with packets; mailbox triage; consent and frequency caps | `engine/journeys.py`, `agents/mailbox.py`, `engine/consent.py` |
+| Journey orchestration, tasks, shared mailbox, consent, channel triggers, journey analytics | Journey runner with waits, branches and goals; tasks with packets; mailbox triage; consent and frequency caps; a funnel per journey from its own event log | `engine/journeys.py`, `agents/mailbox.py`, `engine/consent.py` |
 | Digital-to-human handoffs: what context moves, what signal returns | Typed handoff packet, queues with SLAs, human console, outcomes that steer the journey | `engine/handoff.py`, `docs/human-fallback.md` |
-| Experimentation: cohorts, tests, operating reviews | Holdout by hash, two-proportion test with an interval, split check, cohorts, a written decision rule | `experiments/` |
+| Experimentation: cohorts, tests, operating reviews | Holdout by hash, two-proportion test with an interval, split check, results by entry week, a written decision rule, a monthly review written from the data | `experiments/`, `docs/operating-review.md` |
 | Human fallback engineering | Tool failure, an unavailable model and "not in the docs" all hand off; handoff-quality metrics | `agents/onboarding.py`, `gold.metrics_handoffs` |
 | Product mindset | PRD, roadmap, prompt changelog, play catalog with owners and metrics | `docs/prd.md`, `docs/roadmap.md`, `prompts/CHANGELOG.md` |
 | Success and sales mindset | An expansion play that hands a seller a brief checked against the data; retained revenue and expansion against the holdout | `agents/briefs.py`, `experiments/` |
@@ -175,11 +185,36 @@ branding or data.
 |---|---|---|
 | Databricks / SQL | Medallion lakehouse, ELT, production tables | DuckDB and dbt (bronze, silver, gold) locally; the same models run on a Databricks Free Edition workspace with `DSO_ENV=prod` |
 | Gainsight Journey Orchestrator | Audience rules, steps, branches, exits | `config/journeys.yaml` and the journey runner |
-| Gainsight CTAs and Cockpit | Tasks for people, with playbooks | The `ctas` table and the Human console |
+| Gainsight CTAs and Cockpit | Tasks for people, with playbooks | The `ctas` table and the Human console; an export of companies, people and open tasks in an import-ready shape (`GET /export/cs-platform`, mapped below) |
 | Salesforce | Accounts, contacts, opportunities, owners | Synthetic CRM tables, export endpoints, and a sync that writes health and open tasks to standard Account and Task objects (`integrations/crm_sync.py`) |
 | Tableau | Dashboards | Streamlit on the gold tables, and a [published Tableau Public dashboard](https://public.tableau.com/views/DigitalSuccesspilotsyntheticdata/DigitalSuccesspilot_Syntheticdatafictionalcompany) built from the same tables (`docs/bi-dashboard-guide.md`) |
 | Shared mailbox | Replies to digital journeys | Mailbox triage agent and routing rules |
 | The company's own AI agents | Agents with tools and retrieval | Claude with tool use, and keyword retrieval over a help centre |
+
+### Field mapping for the CS-platform export
+
+`GET /export/cs-platform` returns three kinds of record: companies, people and open
+tasks. This is how each field would be mapped in the platform's connector. The object
+and field names on the right are Gainsight's standard ones as I read them in its public
+documentation. There is no free sandbox, so this mapping has not been run against a real
+tenant; fields marked "custom" would have to be created there first.
+
+| In the export | From (gold table or store) | Gainsight object and field |
+|---|---|---|
+| Company: `Company ID` | `account_current.account_id` | Company: the external id used to match records |
+| Company: `Company Name` | `account_name` | Company: Name |
+| Company: `ARR`, `Renewal Date`, `CSM` | `arr`, `renewal_date`, `csm` | Company: ARR, Renewal Date, CSM |
+| Company: `Lifecycle Stage` | `lifecycle_stage` | Company: Stage |
+| Company: `Overall Score`, `Overall Score Band` | `health_score`, `health_band` | Scorecard: overall score and its colour |
+| Company: `Scorecard Measures` (five) | `health_adoption`, `health_engagement`, `health_sentiment`, `health_support`, `health_commercial` | Scorecard: one measure each |
+| Company: `Segment`, `Coverage Tier`, `Churn Risk`, `Expansion Likelihood` | `segment`, `coverage_tier`, `churn_risk_score`, `expansion_score` | Company: custom fields |
+| Person: `Name`, `Email` | `dim_contact.full_name`, `email` | Person: Name, Email |
+| Person: `Title`, `Role` | `role`, `persona` | Company Person: Title, Role |
+| Person: `Consent`, `Email Valid`, `Can Email`, `Valid Admin` | `consent_status`, `email_valid`, `can_email`, `is_valid_admin` | Company Person: custom fields (what a journey must check before it sends) |
+| CTA: `Name`, `Reason`, `Priority`, `Status` | `ctas.title`, `reason_code`, `priority`, `status` | Call to Action: Name, Reason, Priority, Status |
+| CTA: `Type` | Expansion for the Sales queue, otherwise Risk | Call to Action: Type |
+| CTA: `Owner Queue`, `Due Date` | `queue`, `sla_due_on` | Call to Action: Owner (a user or pool per queue), Due Date |
+| CTA: `Playbook`, `Source` | `play_id`, `source` | Call to Action: Playbook, Source |
 
 ## How this maps to the real job
 
@@ -205,7 +240,7 @@ which is the gap the triage agent closes.
 
 ## Design decisions
 
-Nineteen decision records in [docs/decisions](docs/decisions/), each with context,
+Twenty-two decision records in [docs/decisions](docs/decisions/), each with context,
 options, the decision, consequences and when to revisit. The ones worth reading first:
 
 | Decision | Record |
@@ -218,13 +253,15 @@ options, the decision, consequences and when to revisit. The ones worth reading 
 | LLM cost controls, and the labelled stand-in | 0015 |
 | A 50% holdout and leading indicators for the pilot; what happened when the split check fired | 0016 |
 | Evals: code checks first, judge second; what the first real-model run taught | 0017 |
+| A readiness checklist answered from live data, not ticked by hand | 0020 |
+| A generated data dictionary, kept complete by a test | 0021 |
 
 What each phase delivered, and three decisions to defend for each, is in
 [docs/phase-notes.md](docs/phase-notes.md).
 
 ## What runs for real, and what has not been run yet
 
-Running on GitHub Actions: CI on every push (lint, 155 tests on Linux, the dbt build, a
+Running on GitHub Actions: CI on every push (lint, 178 tests on Linux, the dbt build, a
 secret scan), the container image build (it generates a demo world inside the image and
 publishes it), and the daily pipeline schedule, which opens an issue when a run fails.
 
@@ -262,8 +299,8 @@ synth/        the world simulator (the only code that knows the hidden truth)
 ingest/       validation, dead letter, bronze loads, dbt runner
 dbt/          silver and gold models, tests, macros for portable SQL
 contracts/    the data contract for the production table, and its checker
-analytics/    features, training, scoring, model cards, exploratory analysis
-engine/       rules, journeys, consent, handoffs, the daily loop, play specs
+analytics/    features, training, scoring, model cards, the EDA notebook, the data dictionary
+engine/       rules, journeys, consent, handoffs, the daily loop, play specs, pilot readiness
 agents/       LLM client with cost controls, onboarding agent, mailbox triage, briefs
 prompts/ kb/  versioned prompts with a changelog; 23 fictional help articles
 evals/        evaluation cases, runner and reports
@@ -271,5 +308,5 @@ experiments/  play results against holdouts
 api/ app/     FastAPI endpoints; the Streamlit app
 integrations/ the CRM sync
 docs/         operating documents, decision records, play specs, model cards
-tests/        155 tests; they generate a small world and run everything on it
+tests/        178 tests; they generate a small world and run everything on it, every app page included
 ```

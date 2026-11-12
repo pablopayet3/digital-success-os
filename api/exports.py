@@ -5,8 +5,10 @@ Two shapes of the same facts:
   crm          one row per account for the CRM: health, scores, lifecycle and the
                signals firing, so a seller sees them on the account page.
   cs_platform  the shape a customer-success platform imports: a company record with an
-               overall score and its scorecard measures, and a list of open tasks (CTAs).
-               (Which commercial tool this maps to is in the README's tool-mapping table.)
+               overall score and its scorecard measures, the people at each company
+               with their role and whether they may be emailed, and the open tasks
+               (CTAs). Which commercial tool this maps to, field by field, is in the
+               README's field-mapping table.
 """
 
 from __future__ import annotations
@@ -36,9 +38,16 @@ def crm_export(data_dir: Path = DATA_DIR) -> list[dict]:
 
 
 def cs_platform_export(data_dir: Path = DATA_DIR) -> dict:
-    """Company records with scorecard measures, and open tasks, in an import-ready shape."""
+    """Companies with scorecard measures, their people, and open tasks, ready to import."""
     warehouse = open_warehouse(data_dir)
     rows = records(warehouse.query(f"SELECT {ACCOUNT_COLUMNS} FROM gold.account_current"))
+    contacts = records(
+        warehouse.query(
+            "SELECT contact_id, account_id, full_name, email, role, persona, consent_status, "
+            "email_valid, can_email, is_valid_admin FROM gold.dim_contact "
+            "WHERE account_id IN (SELECT account_id FROM gold.account_current)"
+        )
+    )
     warehouse.close()
     companies = [
         {
@@ -82,7 +91,23 @@ def cs_platform_export(data_dir: Path = DATA_DIR) -> dict:
         for tasks_of_account in _open_tasks_by_account(data_dir).values()
         for task in tasks_of_account
     ]
-    return {"companies": companies, "ctas": tasks}
+    people = [
+        {
+            "Person ID": contact["contact_id"],
+            "Company ID": contact["account_id"],
+            "Name": contact["full_name"],
+            "Email": contact["email"],
+            "Title": contact["role"],
+            "Role": contact["persona"],
+            "Consent": contact["consent_status"],
+            "Email Valid": bool(contact["email_valid"]),
+            # The two flags a journey tool needs before it sends anything.
+            "Can Email": bool(contact["can_email"]),
+            "Valid Admin": bool(contact["is_valid_admin"]),
+        }
+        for contact in contacts
+    ]
+    return {"companies": companies, "people": people, "ctas": tasks}
 
 
 def _open_tasks_by_account(data_dir: Path) -> dict[str, list[dict]]:

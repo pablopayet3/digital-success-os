@@ -166,3 +166,36 @@ def test_edition_limits_seed_matches_the_generator_config():
             assert int(row["automation_rule_limit"]) == config["automation_rules"]
             assert int(row["integration_limit"]) == config["integrations"]
             assert int(row["assist_credits_per_seat"]) == config["assist_credits_per_seat"]
+
+
+# --- The data dictionary ------------------------------------------------------------------------
+
+
+def _documented_columns(dictionary: str) -> set[tuple[str, str]]:
+    """(table, column) for every column row in a data dictionary."""
+    found, table = set(), None
+    for line in dictionary.splitlines():
+        if line.startswith("### "):
+            table = line.removeprefix("### ")
+        elif line.startswith("| `"):
+            found.add((table, line.split("`")[1]))
+    return found
+
+
+def test_every_column_in_silver_and_gold_has_a_definition(pipeline):
+    from analytics.dictionary import NOT_DOCUMENTED, render
+
+    _, data_dir = pipeline
+    dictionary = render(data_dir)
+    missing = [line for line in dictionary.splitlines() if NOT_DOCUMENTED in line]
+    assert not missing, f"add these to dbt/column_glossary.yml: {missing[:5]}"
+    assert "### gold.account_daily" in dictionary and "### silver.stg_events" in dictionary
+
+
+def test_the_committed_data_dictionary_lists_the_tables_as_they_are(simulated):
+    """A column added or removed without `run.py docs` leaves the document out of date."""
+    from analytics.dictionary import DICTIONARY_PATH, render
+
+    _, data_dir = simulated  # the operational tables exist once a day has been simulated
+    committed = _documented_columns(DICTIONARY_PATH.read_text(encoding="utf-8"))
+    assert committed == _documented_columns(render(data_dir)), "run: uv run python run.py docs"

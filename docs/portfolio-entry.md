@@ -20,7 +20,7 @@ clean run of `uv run python run.py demo`; replace them if the run is repeated.
 | Agent evaluation, real model | 44 cases; onboarding agent 30 of 30 with prompt v3 (v1: 29, v2: 25) |
 | Agent handoff rate | 26% (13 of 50 conversations) |
 | Lift against holdout | +39 points on setup completion (onboarding rescue), 95% interval +25 to +54 |
-| Automated tests | 141 |
+| Automated tests | 178 |
 | Cost of all real model calls | about $3 |
 
 Add this line under the badges: "Agent answers are real model responses, cached and
@@ -75,7 +75,21 @@ API, pytest, ruff, GitHub Actions, Docker.
 
 ## Output
 
-Screenshots to take from the app: Overview, an account page, Plays and experiments (the
-interval chart), a conversation with its handoff, a handoff packet in the Human console,
-Data quality, Pilot. Plus `evals/reports/eval-report.md` and
-`experiments/reports/experiment-report.md`.
+One picture of every page of the app is in `docs/screenshots/`, with a short recording
+of the demo path (`demo.gif`):
+
+| Page | Picture |
+|---|---|
+| Overview | `overview.jpg` |
+| An account | `account.jpg` |
+| Plays and experiments | `plays-and-experiments.jpg`, `play-detail.jpg` |
+| Agents: a conversation, the evaluation | `agent-conversation.jpg`, `agent-evaluation.jpg` |
+| Human console: a handoff packet | `human-console.jpg` |
+| Data quality | `data-quality.jpg` |
+| Pilot | `pilot.jpg` |
+| Operating model | `operating-model.jpg` |
+| Live demo | `live-demo-handoff.jpg` |
+
+Plus the reports: `evals/reports/eval-report.md`,
+`experiments/reports/experiment-report.md`, `docs/operating-review.md`, and the
+notebook `analytics/01_eda.ipynb`, which the code host shows with its charts.

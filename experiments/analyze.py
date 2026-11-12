@@ -243,6 +243,26 @@ def money(treatment: pd.DataFrame, holdout: pd.DataFrame) -> dict:
     return result
 
 
+def money_columns(play: dict) -> dict:
+    """The revenue figures of one play as flat columns, for the results table."""
+    columns = {}
+    for arm in ("treatment", "holdout"):
+        side = play["money"][arm]
+        columns[f"arr_at_entry_{arm}"] = side["arr_at_entry"]
+        columns[f"retained_arr_{arm}"] = side["retained_arr"]
+        columns[f"expansion_won_{arm}"] = side["expansion_won"]
+        # The guardrail: the share of the group that is still a customer after the window.
+        columns[f"still_customer_{arm}"] = play.get("guardrail_retention", {}).get(f"rate_{arm}")
+    return columns
+
+
+# Column types are stated so that an empty table (no cohort old enough yet) still loads.
+COHORT_COLUMNS = {
+    "play_id": "string", "week_starting": "string", "n_treatment": "int64",
+    "rate_treatment": "float64", "n_holdout": "int64", "rate_holdout": "float64",
+}  # fmt: skip
+
+
 # --- all plays, and the report ----------------------------------------------------------------------
 
 
@@ -276,10 +296,17 @@ def analyse(data_dir: Path = DATA_DIR, report_dir: Path = REPORT_DIR, verbose: b
                 )
             }
             | {"srm_ok": play.get("srm", {}).get("ok"), "as_of": as_of}
+            | money_columns(play)
             for play in plays
         ]
     )  # fmt: skip
     warehouse.write_table("gold.experiment_results", table)
+    # One row per play and entry week, for the cohort view in the app.
+    weeks = [{"play_id": play["play_id"], **week} for play in plays for week in play["cohorts"]]
+    warehouse.write_table(
+        "gold.experiment_cohorts",
+        pd.DataFrame(weeks, columns=list(COHORT_COLUMNS)).astype(COHORT_COLUMNS),
+    )
     warehouse.close()
 
     report_dir.mkdir(parents=True, exist_ok=True)

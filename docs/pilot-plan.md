@@ -25,6 +25,10 @@ version through change control, which reshuffles the holdout so results are neve
 
 ## Readiness checklist (all must be true before a play goes to full test)
 
+The lines that data can answer are answered from live data on the app's Pilot page
+(`engine/pilot.py`, ADR 0020), with their bars in `config/rollout.yaml`. The lines that
+need a person's judgement (a spec signed off, the staff briefed) stay here.
+
 - [ ] Data: the pipeline run passes its data tests and the contract check; sources are fresh.
 - [ ] The trigger signal fires on a plausible number of accounts (not zero, not everyone).
 - [ ] The play has an owner, a success metric and a holdout in `config/plays.yaml`.

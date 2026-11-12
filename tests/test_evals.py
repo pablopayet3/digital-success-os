@@ -178,3 +178,22 @@ def test_bi_extracts_are_one_file_per_table_with_no_logic_added(simulated, tmp_p
     assert set(counts) == set(EXTRACTS) and counts["accounts.csv"] > 100
     header = (tmp_path / "bi" / "play_results.csv").read_text(encoding="utf-8").splitlines()[0]
     assert header.startswith("play_id") and "verdict" in header
+
+
+def test_the_results_tables_carry_revenue_and_weekly_cohorts(simulated, tmp_path):
+    import duckdb
+
+    from ingest.load import warehouse_path
+
+    _, data_dir = simulated
+    results = analyse(data_dir, tmp_path, verbose=False)
+    con = duckdb.connect(str(warehouse_path(data_dir)))
+    columns = {row[0] for row in con.execute("DESCRIBE gold.experiment_results").fetchall()}
+    cohort_rows = con.execute("SELECT count(*) FROM gold.experiment_cohorts").fetchone()[0]
+    cohort_plays = con.execute("SELECT DISTINCT play_id FROM gold.experiment_cohorts").fetchall()
+    con.close()
+    for arm in ("treatment", "holdout"):
+        assert {f"arr_at_entry_{arm}", f"retained_arr_{arm}", f"expansion_won_{arm}",
+                f"still_customer_{arm}"} <= columns  # fmt: skip
+    assert cohort_rows == sum(len(play["cohorts"]) for play in results["plays"])
+    assert {play for (play,) in cohort_plays} <= {play["play_id"] for play in results["plays"]}

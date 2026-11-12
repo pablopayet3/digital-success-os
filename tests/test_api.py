@@ -117,6 +117,11 @@ def test_exports_cover_every_account(client, simulated):
         "Support",
         "Commercial",
     }
+    # People travel with their company, and say whether a journey may email them.
+    companies = {company["Company ID"] for company in platform["companies"]}
+    assert platform["people"] and all(p["Company ID"] in companies for p in platform["people"])
+    assert {"Person ID", "Email", "Role", "Can Email", "Valid Admin"} <= set(platform["people"][0])
+    assert all(task["Company ID"] in companies for task in platform["ctas"])
 
 
 def test_log_lines_are_json(capsys):
