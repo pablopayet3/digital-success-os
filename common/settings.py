@@ -53,6 +53,9 @@ def load_settings() -> Settings:
     if env not in ("dev", "prod"):
         raise ValueError(f"DSO_ENV must be 'dev' or 'prod', not '{env}'")
     chosen, limits = config[env], config["llm_limits"]
+    # The catalog can be overridden (DATABRICKS_CATALOG) for a workspace where a new
+    # catalog cannot be created. The landing volume always lives inside that catalog.
+    catalog = os.environ.get("DATABRICKS_CATALOG") or chosen.get("catalog")
 
     return Settings(
         env=env,
@@ -61,8 +64,8 @@ def load_settings() -> Settings:
         operational_store=chosen["operational_store"],
         offline_mode=_flag("DSO_OFFLINE_MODE", chosen["offline_mode"]),
         llm_stand_in=_flag("DSO_LLM_STAND_IN", chosen.get("llm_stand_in", False)),
-        catalog=chosen.get("catalog"),
-        landing_volume=chosen.get("landing_volume"),
+        catalog=catalog,
+        landing_volume=f"/Volumes/{catalog}/bronze/landing" if catalog else None,
         max_llm_calls_per_run=int(_override("MAX_LLM_CALLS_PER_RUN", limits)),
         llm_budget_usd=float(_override("LLM_BUDGET_USD", limits)),
         max_agent_conversations_per_run=int(_override("MAX_AGENT_CONVERSATIONS_PER_RUN", limits)),

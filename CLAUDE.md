@@ -178,7 +178,7 @@ Phase 3b and 4 additions:
 - `agents/briefs.py`: template account-owner brief (Phase 5 adds the LLM version).
 - `synth/reactions.py`: how simulated customers react to touches.
 - `ingest/load_ops.py`: copies the operational store into `bronze.ops_*`.
-- `ingest/load_databricks.py`: prod loader (not yet run).
+- `ingest/load_databricks.py`: prod loader (run for real; see ADR 0012).
 - Tests: `test_environments.py`, `test_engine.py`. The test session simulates six days.
 
 A simulated day: world steps (reacting to yesterday's touches) -> pipeline (checks=False)
@@ -248,7 +248,13 @@ records who answered (`answered_by`). `run.py` takes `--live` and `--stand-in`.
 Stand-in eval runs write to `evals/reports/stand-in/`, never over the real report.
 
 Hosting: a Render blueprint from the public repository (no auto-deploy: use Manual
-sync in Render after a push). Still open: the Databricks target and the Postgres store.
+sync in Render after a push).
+
+Databricks: the prod pipeline has run on a Free Edition workspace (`DSO_ENV=prod uv run
+python run.py pipeline`): 100 of 100 tests, contract 14 of 14, numbers match DuckDB.
+Local sign-in is OAuth through the browser (`common/warehouse.py::databricks_token`);
+`DATABRICKS_TOKEN` is only for CI. For that run `DATABASE_URL` pointed at the local
+SQLite file. Still open: the Postgres operational store.
 
 Ignore rules: anchor file names to the top folder (`/BRIEF.md`). Git on Windows matches
 without regard to case, and an unanchored `BRIEF.md` once hid `prompts/brief.md`.

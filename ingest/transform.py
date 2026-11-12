@@ -54,11 +54,18 @@ def run_dbt(command: list[str], data_dir: Path = DATA_DIR) -> bool:
     from dbt.cli.main import dbtRunner  # imported here because it is slow to load
 
     os.environ["DSO_WAREHOUSE"] = str(warehouse_path(data_dir))
+    settings = load_settings()
+    if settings.warehouse == "databricks":
+        # Make sure dbt has a token (signs in through the browser if none is set).
+        from common.settings import secret
+        from common.warehouse import databricks_token
+
+        databricks_token(secret("DATABRICKS_HOST"))
     arguments = [
         *command,
         "--project-dir", str(DBT_DIR),
         "--profiles-dir", str(DBT_DIR),
-        "--target", load_settings().dbt_target,
+        "--target", settings.dbt_target,
         "--vars", dbt_variables(),
     ]  # fmt: skip
     return dbtRunner().invoke(arguments).success

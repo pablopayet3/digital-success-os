@@ -95,11 +95,11 @@ flowchart TB
 | Experiment statistics | **Real** method, simulated outcomes | The method is what carries over. |
 | Agent answers | **Stand-in** until one live run | Rule-based and labelled as such. With an API key, real model responses are cached and replayed offline. |
 | Emails | **Not sent** | Written to an outbox folder. |
-| Databricks warehouse | **Written, not yet run** | Needs workspace credentials. The same models run on DuckDB today. |
+| Databricks warehouse | **Real** | The whole pipeline ran on a Free Edition workspace: 100 of 100 data tests and the contract pass, and the numbers match DuckDB (ADR 0012). |
 | Postgres operational store | **Written, not yet run** | SQLite in dev; Postgres by URL. |
 | CRM and CS platform sync | **Export only** | Endpoints return import-ready shapes. No live sync. |
 | CI, image build, daily scheduled run | **Real** | They run on GitHub Actions: tests on every push, an image with a demo world built in, a daily pipeline run that opens an issue on failure. |
-| Hosting | **Written, not yet run** | Needs a host connected to the repository. |
+| Hosting | **Real** | The app and the API run on a free host from the repository's blueprint, in stand-in mode. |
 | Dashboards | **Streamlit** instead of a BI tool | One process, no licence. The gold tables are the interface a BI tool would read. |
 
 ## What I would do differently at scale

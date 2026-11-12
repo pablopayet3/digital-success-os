@@ -149,7 +149,7 @@ branding or data.
 
 | Enterprise tool in a role like this | Concept | What this demo uses |
 |---|---|---|
-| Databricks / SQL | Medallion lakehouse, ELT, production tables | DuckDB and dbt (bronze, silver, gold); a `prod` dbt target for Databricks |
+| Databricks / SQL | Medallion lakehouse, ELT, production tables | DuckDB and dbt (bronze, silver, gold) locally; the same models run on a Databricks Free Edition workspace with `DSO_ENV=prod` |
 | Gainsight Journey Orchestrator | Audience rules, steps, branches, exits | `config/journeys.yaml` and the journey runner |
 | Gainsight CTAs and Cockpit | Tasks for people, with playbooks | The `ctas` table and the Human console |
 | Salesforce | Accounts, contacts, opportunities, owners | Synthetic CRM tables and export endpoints |
@@ -198,17 +198,21 @@ options, the decision, consequences and when to revisit. The ones worth reading 
 What each phase delivered, and three decisions to defend for each, is in
 [docs/phase-notes.md](docs/phase-notes.md).
 
-## What runs on GitHub, and what has not been run yet
+## What runs for real, and what has not been run yet
 
 Running on GitHub Actions: CI on every push (lint, 141 tests on Linux, the dbt build, a
 secret scan), the container image build (it generates a demo world inside the image and
 publishes it), and the daily pipeline schedule, which opens an issue when a run fails.
 
+Run against a real Databricks Free Edition workspace: the whole pipeline with
+`DSO_ENV=prod`. The same dbt models passed 100 of 100 data tests there with no change,
+the contract passed, and the results match the local warehouse (ADR 0012). Sign-in is
+through the browser, so no access token is stored.
+
 Written but not yet run against the real thing. Each needs an account or a key.
 
 | What | Needs |
 |---|---|
-| Databricks as the `prod` warehouse | A workspace host, SQL warehouse path and token |
 | Postgres operational store | A database URL |
 | Trace export | A tracing key (JSON traces work without one) |
 

@@ -1,7 +1,7 @@
 # 0012: Databricks Free Edition as the prod warehouse, with portable SQL
 
-Status: accepted (Phase 3b). The prod target is written but **not yet run against a real
-workspace**: it needs `DATABRICKS_HOST`, `DATABRICKS_HTTP_PATH` and `DATABRICKS_TOKEN`.
+Status: accepted (Phase 3b) and **run against a real Free Edition workspace**: see "The
+first real run" at the end.
 Synthetic data, fictional company.
 
 ## Context
@@ -58,6 +58,40 @@ Option 3.
   prod run will likely need small fixes (type names, `read_files` options).
 - The exploratory analysis script (`analytics/eda.py`) is a dev tool and uses DuckDB-only
   SQL on purpose.
+
+## The first real run
+
+The whole pipeline ran against a Databricks Free Edition workspace with `DSO_ENV=prod`:
+landing files uploaded to a Unity Catalog volume, bronze tables created from them, the
+same dbt models built in `relay.silver` and `relay.gold`, scores written back, freshness
+and the contract checked.
+
+| | Result |
+|---|---|
+| dbt models and data tests | 100 of 100 tests pass, first time, with no change to any model |
+| Data contract on `gold.account_daily` | 14 of 14 checks pass |
+| Tables created | 23 bronze, 15 silver, 21 gold |
+| Agreement with DuckDB | 10 of 11 checks identical (row counts, events kept and rejected, ARR, red accounts, signals, churn flags, experiment outcomes). The eleventh, an average health score, differs in the third decimal (68.551 against 68.552): rounding |
+
+What that shows: the portable-SQL rule did its job. Every model was written and tested
+only on DuckDB, and all of them ran unchanged on Databricks.
+
+What broke, and it was Python, not SQL:
+
+- **A column Databricks adds.** `read_files()` adds a `_rescued_data` column. The table
+  writer used it to load Parquet, the column came back on the next read, and the next
+  write failed. The writer now reads the Parquet file directly and drops a stray column.
+
+Two things worked that the ADR had left open:
+
+- **Creating a catalog** is allowed on Free Edition. The code creates `relay` on first
+  run, and `DATABRICKS_CATALOG` points it at an existing one where that is not allowed.
+- **No access token.** Locally the project signs in through the browser (OAuth) and
+  keeps the short-lived token in memory. A personal access token is needed only where
+  there is no browser, as a secret in CI.
+
+Still not done: the operational store used SQLite for this run (`DATABASE_URL` pointed
+at the local file). Postgres has not been run.
 
 ## Revisit if
 

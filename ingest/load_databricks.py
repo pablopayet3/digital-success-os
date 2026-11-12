@@ -2,8 +2,9 @@
 
 Synthetic data, fictional company.
 
-STATUS: written against the Databricks documentation, not yet run against a real
-workspace. It needs DATABRICKS_HOST, DATABRICKS_HTTP_PATH and DATABRICKS_TOKEN.
+STATUS: run against a real Free Edition workspace (docs/decisions/0012). It needs
+DATABRICKS_HOST and DATABRICKS_HTTP_PATH; sign-in is through the browser unless
+DATABRICKS_TOKEN is set.
 
 Same rules as the local loader (ingest/load.py), different mechanics:
 

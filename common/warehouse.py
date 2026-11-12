@@ -17,6 +17,7 @@ the Databricks connection is opened inside the `relay` catalog.
 
 from __future__ import annotations
 
+import os
 import tempfile
 from pathlib import Path
 
@@ -48,6 +49,27 @@ class DuckDBWarehouse:
         self.con.close()
 
 
+def databricks_token(host: str) -> str:
+    """A token for this run, without anyone typing a secret.
+
+    If DATABRICKS_TOKEN is set (a personal access token, or a secret in CI) it is used.
+    Otherwise we sign in through the browser (OAuth): a tab opens, the person who is
+    already logged in to Databricks approves, and a short-lived token comes back. It is
+    kept in this process only, so dbt and the SQL connection can use it; it is never
+    printed or written into the project.
+    """
+    token = os.environ.get("DATABRICKS_TOKEN")
+    if token:
+        return token
+    from databricks.sdk import WorkspaceClient
+
+    client = WorkspaceClient(host=f"https://{host}", auth_type="external-browser")
+    header = client.config.authenticate()  # {"Authorization": "Bearer ..."}
+    token = header["Authorization"].removeprefix("Bearer ")
+    os.environ["DATABRICKS_TOKEN"] = token  # dbt reads it from here, in this process
+    return token
+
+
 class DatabricksWarehouse:
     """Databricks SQL warehouse. Files reach it through a Unity Catalog volume."""
 
@@ -57,13 +79,28 @@ class DatabricksWarehouse:
         from databricks import sql  # imported here: only prod needs it
         from databricks.sdk import WorkspaceClient
 
-        host, token = secret("DATABRICKS_HOST"), secret("DATABRICKS_TOKEN")
+        host = secret("DATABRICKS_HOST")
+        token = databricks_token(host)
         self.volume = settings.landing_volume
         self.con = sql.connect(
             server_hostname=host, http_path=secret("DATABRICKS_HTTP_PATH"), access_token=token
         )
         self.files = WorkspaceClient(host=f"https://{host}", token=token).files
-        self.execute(f"USE CATALOG {settings.catalog}")
+        self._use_catalog(settings.catalog)
+
+    def _use_catalog(self, catalog: str) -> None:
+        """Work inside the project's catalog, creating it on the first run if allowed."""
+        try:
+            self.execute(f"CREATE CATALOG IF NOT EXISTS {catalog}")
+        except Exception:  # no permission to create: fine if the catalog already exists
+            pass
+        try:
+            self.execute(f"USE CATALOG {catalog}")
+        except Exception as error:
+            raise RuntimeError(
+                f"The catalog '{catalog}' does not exist and could not be created. Set "
+                "DATABRICKS_CATALOG to a catalog that exists (Free Edition has 'workspace')."
+            ) from error
 
     def query(self, sql: str) -> pd.DataFrame:
         with self.con.cursor() as cursor:
@@ -83,14 +120,15 @@ class DatabricksWarehouse:
 
     def write_table(self, table: str, frame: pd.DataFrame) -> None:
         """Write the rows as a Parquet file in the volume, then load it as a table."""
+        # Found on the first real run: read_files() adds a `_rescued_data` column, which
+        # then came back in the next read and broke the next write. So the file is read
+        # directly as Parquet (no extra column), and a stray one is dropped on the way in.
+        frame = frame.drop(columns=["_rescued_data"], errors="ignore")
         with tempfile.TemporaryDirectory() as folder:
             local = Path(folder) / f"{table}.parquet"
             frame.to_parquet(local, index=False)
             uploaded = self.upload(local, f"_from_python/{table}.parquet")
-        self.execute(
-            f"CREATE OR REPLACE TABLE {table} AS "
-            f"SELECT * FROM read_files('{uploaded}', format => 'parquet')"
-        )
+        self.execute(f"CREATE OR REPLACE TABLE {table} AS SELECT * FROM parquet.`{uploaded}`")
 
     def close(self) -> None:
         self.con.close()

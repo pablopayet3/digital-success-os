@@ -11,7 +11,7 @@ digital_success_os:
       threads: 4
     prod:
       type: databricks
-      catalog: relay
+      catalog: "{{ env_var('DATABRICKS_CATALOG', 'relay') }}"
       schema: gold
       host: "{{ env_var('DATABRICKS_HOST', '') }}"
       http_path: "{{ env_var('DATABRICKS_HTTP_PATH', '') }}"
