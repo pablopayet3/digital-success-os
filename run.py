@@ -11,6 +11,7 @@ Usage:
     uv run python run.py experiments       compare every play with its holdout
     uv run python run.py review            write the monthly operating review from the data
     uv run python run.py extracts          write the gold tables as files for a BI tool
+    uv run python run.py crm-sync          dry run of the CRM sync (add --push to send)
     uv run python run.py specs             rebuild docs/play-specs/ from the play config
     uv run python run.py app               open the app (http://localhost:8501)
     uv run python run.py api               start the API (http://localhost:8000/docs)
@@ -35,7 +36,7 @@ import sys
 APP_URL = "http://localhost:8501"
 COMMANDS = [
     "data", "pipeline", "train", "run-day", "run-days", "evals", "experiments", "review",
-    "extracts", "specs", "app", "api", "demo", "test", "lint",
+    "extracts", "crm-sync", "specs", "app", "api", "demo", "test", "lint",
 ]  # fmt: skip
 
 
@@ -47,6 +48,7 @@ def main() -> None:
     parser.add_argument("--live", action="store_true", help="call the API when not cached")
     parser.add_argument("--stand-in", action="store_true", help="keyword rules play the model")
     parser.add_argument("--no-browser", action="store_true", help="for app: do not open a tab")
+    parser.add_argument("--push", action="store_true", help="for crm-sync: really send it")
     args = parser.parse_args()
     if args.live and args.stand_in:
         parser.error("choose --live or --stand-in, not both")
@@ -93,6 +95,15 @@ def main() -> None:
 
         for name, rows in write_extracts().items():
             print(f"wrote exports/bi/{name} ({rows:,} rows)")
+    elif args.command == "crm-sync":
+        from integrations import crm_sync
+
+        if args.push:
+            print(crm_sync.push(crm_sync.connect(), crm_sync.build_payloads()))
+        else:
+            counts = crm_sync.dry_run()
+            print(f"dry run: {counts['accounts']} accounts and {counts['tasks']} tasks would be")
+            print("sent. See exports/crm_sync/payloads.json. Add --push to send them.")
     elif args.command == "specs":
         from engine.specs import write_play_specs
 

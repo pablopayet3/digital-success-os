@@ -65,7 +65,7 @@ From `uv run python run.py demo` (180 days of history, then 30 simulated days of
 | Seat expansion: expansion closed, treatment against holdout | 19% against 21%: **no effect detected** (the sample could only have shown 20 points or more) |
 | Agent evaluation, real model, 44 cases | Onboarding agent 30 of 30 with prompt v3 (v1: 29, v2: 25); mailbox 10 of 10; briefs 4 of 4; classifier 96% on 160 labelled replies |
 | Cost of every real model call behind this (817 calls) | about $3 |
-| Automated tests | 148 |
+| Automated tests | 151 |
 
 Three honest notes. The lift comes from assumptions in `config/sim_effects.yaml`: this
 demonstrates a measurement system, not a result. The agent answers are real: one live
@@ -111,6 +111,7 @@ model responses stored in `cache/llm/`, so it needs no key and no network.
 | `run.py evals` | Score the agents on the fixed cases: `evals/reports/` |
 | `run.py review` | Write the monthly operating review from the data: `docs/operating-review.md` |
 | `run.py extracts` | Write the gold tables as files for a BI tool: `exports/bi/` |
+| `run.py crm-sync` | Dry run of the CRM sync: writes what would be sent. `--push` sends it |
 | `run.py specs` | Rebuild the play specs from the configuration |
 | `run.py app` / `run.py api` | The app (port 8501) / the API (port 8000, `/docs`) |
 | `run.py test` / `run.py lint` | Tests and style |
@@ -169,7 +170,7 @@ branding or data.
 | Databricks / SQL | Medallion lakehouse, ELT, production tables | DuckDB and dbt (bronze, silver, gold) locally; the same models run on a Databricks Free Edition workspace with `DSO_ENV=prod` |
 | Gainsight Journey Orchestrator | Audience rules, steps, branches, exits | `config/journeys.yaml` and the journey runner |
 | Gainsight CTAs and Cockpit | Tasks for people, with playbooks | The `ctas` table and the Human console |
-| Salesforce | Accounts, contacts, opportunities, owners | Synthetic CRM tables and export endpoints |
+| Salesforce | Accounts, contacts, opportunities, owners | Synthetic CRM tables, export endpoints, and a sync that writes health and open tasks to standard Account and Task objects (`integrations/crm_sync.py`) |
 | Tableau | Dashboards | Streamlit on the gold tables, and a [published Tableau Public dashboard](https://public.tableau.com/views/DigitalSuccesspilotsyntheticdata/DigitalSuccesspilot_Syntheticdatafictionalcompany) built from the same tables (`docs/bi-dashboard-guide.md`) |
 | Shared mailbox | Replies to digital journeys | Mailbox triage agent and routing rules |
 | The company's own AI agents | Agents with tools and retrieval | Claude with tool use, and keyword retrieval over a help centre |
@@ -198,7 +199,7 @@ which is the gap the triage agent closes.
 
 ## Design decisions
 
-Eighteen decision records in [docs/decisions](docs/decisions/), each with context,
+Nineteen decision records in [docs/decisions](docs/decisions/), each with context,
 options, the decision, consequences and when to revisit. The ones worth reading first:
 
 | Decision | Record |
@@ -217,7 +218,7 @@ What each phase delivered, and three decisions to defend for each, is in
 
 ## What runs for real, and what has not been run yet
 
-Running on GitHub Actions: CI on every push (lint, 148 tests on Linux, the dbt build, a
+Running on GitHub Actions: CI on every push (lint, 151 tests on Linux, the dbt build, a
 secret scan), the container image build (it generates a demo world inside the image and
 publishes it), and the daily pipeline schedule, which opens an issue when a run fails.
 
@@ -236,6 +237,7 @@ Written but not yet run against the real thing. Each needs an account or a key.
 |---|---|
 | A hosted Postgres for the operational store | A database URL (the code is tested on Postgres in CI) |
 | Trace export | A tracing key (JSON traces work without one) |
+| The live CRM push | A Salesforce Developer Edition org and its credentials (the dry run and the tests are verified) |
 
 ## What I would do differently at scale
 
@@ -261,6 +263,7 @@ prompts/ kb/  versioned prompts with a changelog; 23 fictional help articles
 evals/        evaluation cases, runner and reports
 experiments/  play results against holdouts
 api/ app/     FastAPI endpoints; the Streamlit app
+integrations/ the CRM sync
 docs/         operating documents, decision records, play specs, model cards
-tests/        148 tests; they generate a small world and run everything on it
+tests/        151 tests; they generate a small world and run everything on it
 ```

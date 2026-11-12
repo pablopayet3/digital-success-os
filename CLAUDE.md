@@ -23,8 +23,8 @@ human's outcome comes back into the system. Every play has a holdout.
 
 - **Never use real company names, logos or branding** in data, code or screens. Real tool
   names appear only in the README mapping tables, `docs/production-architecture.md`,
-  `docs/demo-script.md`, `docs/bi-dashboard-guide.md` and the ADRs about the production
-  profile (the brief update asked for those). The app does not list those two documents. The employer is never named.
+  `docs/demo-script.md`, `docs/bi-dashboard-guide.md`, `integrations/crm_sync.py` with
+  ADR 0019, and the ADRs about the production profile (the brief update asked for those). The app does not list those two documents. The employer is never named.
 - Every file and screen says "Synthetic data, fictional company".
 - Simple, readable code over clever code. This code is walked through live, line by line.
   Short functions, plain names, comments that say why.
@@ -246,6 +246,10 @@ records who answered (`answered_by`). `run.py` takes `--live` and `--stand-in`.
 `run.py review` writes `docs/operating-review.md`; `run.py extracts` writes
 `exports/bi/` (guide: `docs/bi-dashboard-guide.md`, which names a real BI product).
 Stand-in eval runs write to `evals/reports/stand-in/`, never over the real report.
+
+CRM sync: `integrations/crm_sync.py` (`run.py crm-sync`, dry run by default, `--push`
+to send; standard Account and Task objects; safe to run twice; ADR 0019). The live push
+has not been run (needs `SALESFORCE_*` credentials in `.env`). 151 tests in total.
 
 Hosting: a Render blueprint from the public repository. Render redeploys both services
 on every push to `main` (seen in its deploy list as "Auto-Deploy"); a change to
