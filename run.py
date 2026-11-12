@@ -100,7 +100,15 @@ def main() -> None:
         from integrations import crm_sync
 
         if args.push:
-            print(crm_sync.push(crm_sync.connect(), crm_sync.build_payloads()))
+            from simple_salesforce.exceptions import SalesforceAuthenticationFailed
+
+            try:
+                client = crm_sync.connect()
+            except RuntimeError as error:  # nothing in .env to sign in with
+                sys.exit(str(error))
+            except SalesforceAuthenticationFailed as error:
+                sys.exit(crm_sync.explain_refusal(error))
+            print(crm_sync.push(client, crm_sync.build_payloads()))
         else:
             counts = crm_sync.dry_run()
             print(f"dry run: {counts['accounts']} accounts and {counts['tasks']} tasks would be")

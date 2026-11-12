@@ -335,6 +335,7 @@ def handoff_summary(handoffs: pd.DataFrame) -> dict:
         "sla_breach_rate": _share(handoffs["sla_breaches"].sum(), total),
         "escalation_conversion": _share(handoffs["converted"].sum(), closed),
         "unnecessary_handoff_rate": _share(handoffs["unnecessary"].sum(), closed),
+        "recontact_rate": _share(handoffs["recontacted"].sum(), closed),
         "agent_handoffs": int(from_agent["handoffs"].sum()),
         "docs_gap_share": _share(not_in_docs, from_agent["handoffs"].sum()),
     }
@@ -437,6 +438,8 @@ def render_report(results: dict) -> str:
         f"{_pct(handoffs['escalation_conversion'])} |",
         f'| Unnecessary handoffs ("the agent should have handled this") | '
         f"{_pct(handoffs['unnecessary_handoff_rate'])} |",
+        f"| Re-contact (a new task for the same account within 14 days of one closing) | "
+        f"{_pct(handoffs['recontact_rate'])} |",
         f"| Handoffs from the agent | {handoffs['agent_handoffs']} |",
         f"| Docs gap (agent handoffs because no article covered the question) | "
         f"{_pct(handoffs['docs_gap_share'])} |",

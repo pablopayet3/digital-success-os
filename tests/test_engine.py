@@ -390,3 +390,26 @@ def test_the_journey_funnel_follows_the_journey_definition(simulated, ops):
     eligible, entered = funnel[0]["accounts"], funnel[1]["accounts"]
     assert eligible >= entered > 0
     assert all(row["accounts"] <= entered for row in funnel[2:])
+
+
+def test_the_scaling_preview_decides_like_the_engine_and_writes_nothing(simulated, ops):
+    """Adding a segment is previewed with the engine's own rules, without touching the store."""
+    from engine.rules import preview_segment
+
+    _, data_dir = simulated
+    before = (len(ops.rows("SELECT 1 FROM enrollments")), len(ops.rows("SELECT 1 FROM audit_log")))
+    ctx = load_day(data_dir, ops, load_catalog())
+    rows = {row["play_id"]: row for row in preview_segment(ctx, "pooled")}
+    after = (len(ops.rows("SELECT 1 FROM enrollments")), len(ops.rows("SELECT 1 FROM audit_log")))
+    assert before == after, "a preview must not enrol anyone or write to the audit log"
+    assert set(rows) == {play.id for play in load_catalog().plays}
+
+    eligible = sum(row["would_enter"] + row["would_be_held_out"] for row in rows.values())
+    pooled = sum(1 for account in ctx.accounts.values() if account["coverage_tier"] == "pooled")
+    assert 0 < eligible <= pooled * len(rows)
+    # A play with no holdout holds nobody out; a play that starts with a task names its queue.
+    assert rows["find_the_admin"]["would_be_held_out"] == 0
+    assert rows["find_the_admin"]["first_day_queue"] == "admin_research"
+    assert rows["onboarding_rescue"]["first_day_queue"] is None  # it starts with an email
+    # A tier with no accounts gives zeros, not an error.
+    assert all(row["would_enter"] == 0 for row in preview_segment(ctx, "no_such_tier"))

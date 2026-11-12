@@ -39,6 +39,10 @@ def test_the_pilot_page_shows_the_checklist_and_the_weekly_notes(app_data):
     app = AppTest.from_file(str(ROOT / "app" / "views" / "pilot.py"), default_timeout=120).run()
     headings = [heading.value for heading in app.subheader]
     assert "Readiness checklist" in headings and "Weekly review notes" in headings
+    assert "Handoff quality" in headings
+    labels = [metric.label for metric in app.metric]
+    assert {"Time to pickup", "SLA breach rate", "Re-contact", "Docs gap share"} <= set(labels)
+    assert any("what adding `pooled` would do today" in block.value for block in app.markdown)
     lines = [block.value for block in app.markdown]
     assert sum("**Ready**" in line or "**Not ready**" in line for line in lines) == 6
 

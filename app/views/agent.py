@@ -205,6 +205,35 @@ with tab_review:
         st.caption(f"{len(queue)} waiting for review.")
         st.dataframe(queue, hide_index=True, width="stretch")
 
+    st.write(
+        "**The docs gap list.** Questions the agent handed to a person because no help "
+        "article covered them. Each row is an article to write, or a decision that the "
+        "product does not do this and the agent should say so."
+    )
+    unanswered = (
+        conversations[conversations["reason_code"] == "not_in_docs"]
+        if len(conversations)
+        else conversations
+    )
+    if unanswered.empty:
+        st.info("No question has fallen outside the help centre yet.")
+    else:
+        gaps = []
+        for row in unanswered.itertuples():
+            asked = [turn["text"] for turn in json.loads(row.transcript) if turn["role"] == "customer"]
+            searches = json.loads(row.searches)
+            closest = [result.get("title") for s in searches for result in s.get("results", [])]
+            gaps.append(
+                {
+                    "day": row.day,
+                    "account": row.account_id,
+                    "the customer asked": asked[-1] if asked else "",
+                    "the agent searched for": "; ".join(s.get("query", "") for s in searches),
+                    "closest articles (not close enough)": ", ".join(filter(None, closest[:3])),
+                }
+            )
+        st.dataframe(pd.DataFrame(gaps), hide_index=True, width="stretch")
+
 with tab_prompts:
     st.write(
         "Prompts are versioned like code. The changelog says what changed and why; the evals compare versions on the same cases."

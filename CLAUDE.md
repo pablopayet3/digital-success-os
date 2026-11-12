@@ -253,7 +253,7 @@ Stand-in eval runs write to `evals/reports/stand-in/`, never over the real repor
 
 CRM sync: `integrations/crm_sync.py` (`run.py crm-sync`, dry run by default, `--push`
 to send; standard Account and Task objects; safe to run twice; ADR 0019). The live push
-has not been run (needs `SALESFORCE_*` credentials in `.env`). 179 tests in total.
+has not been run (needs `SALESFORCE_*` credentials in `.env`). 186 tests in total.
 
 After the phases (the brief read again line by line; see the last section of
 `docs/phase-notes.md`):
@@ -261,6 +261,15 @@ After the phases (the brief read again line by line; see the last section of
 - `engine/pilot.py`: the readiness checklist answered from live data, and the weekly
   review notes. Bars in `config/rollout.yaml` (`readiness`). ADR 0020.
 - `engine/journeys.py::journey_funnel`: the funnel per journey, from `journey_events`.
+- `engine/rules.py::preview_segment`: what adding a coverage tier would do today, by the
+  engine's own rules, writing nothing. Shown on the Pilot page with a capacity check.
+- `gold.metrics_handoffs` has `recontacted`, `picked_up` and `days_to_pickup_total`;
+  the Pilot page shows the six handoff-quality measures; the Agents page lists the
+  docs gaps (conversations handed off as `not_in_docs`).
+- `integrations/crm_sync.py::connect` signs in with a consumer key
+  (`SALESFORCE_CONSUMER_KEY`, `_SECRET`, `_DOMAIN`) or with a username, password and
+  security token; new orgs need "Enable SOAP API login()" for the second. Steps in
+  ADR 0019. A Sales task carries the account-owner brief.
 - `experiments/analyze.py` also writes `gold.experiment_cohorts` (results by entry week)
   and revenue columns on `gold.experiment_results`.
 - `agents/review.py`: thumbs up or down on a stored conversation; a thumbs down goes to

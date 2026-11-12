@@ -216,6 +216,7 @@ By week of entry:
 | SLA breach rate | 23% |
 | Escalation conversion (closed with a good outcome) | 62% |
 | Unnecessary handoffs ("the agent should have handled this") | 3% |
+| Re-contact (a new task for the same account within 14 days of one closing) | 6% |
 | Handoffs from the agent | 13 |
 | Docs gap (agent handoffs because no article covered the question) | 8% |
 

@@ -88,6 +88,53 @@ def evaluate_plays(ctx: DayContext) -> dict[str, int]:
     return counts
 
 
+def preview_segment(ctx: DayContext, segment: str) -> list[dict]:
+    """What would happen today if one more coverage tier joined the pilot. Writes nothing.
+
+    The same checks as evaluate_plays, in the same order, on the accounts of that tier.
+    One row per play: how many would enter, how many the hash would hold out, how many
+    a rule would keep out, and the queue the play's first step would load on day one
+    (when that first step is a task for a person).
+    """
+    state = _EngineState(ctx)
+    rows = []
+    for play in ctx.catalog.plays:
+        first_step = ctx.catalog.journeys[play.journey].steps[0]
+        row = {
+            "play_id": play.id,
+            "play": play.name,
+            "would_enter": 0,
+            "would_be_held_out": 0,
+            "kept_out_by_a_rule": 0,
+            "first_day_queue": first_step.queue if first_step.type == "cta" else None,
+        }
+        for account_id, account in ctx.accounts.items():
+            firing = [s for s in play.trigger if s in ctx.signals.get(account_id, {})]
+            if not firing or account["coverage_tier"] != segment:
+                continue
+            reason = why_not(ctx, state, play, account)
+            if reason is None and not in_rollout(account_id, play):
+                reason = "outside the 10% rollout slice"
+            if reason is not None:
+                row["kept_out_by_a_rule"] += 1
+                continue
+            arm = assign_arm(account_id, play)
+            row["would_enter" if arm == "treatment" else "would_be_held_out"] += 1
+            # Kept in memory for the rest of the preview, so that "one exclusive play
+            # per account" holds here as it would in a real run. Never stored.
+            state.remember(
+                {
+                    "account_id": account_id,
+                    "play_id": play.id,
+                    "status": "active" if arm == "treatment" else "holdout",
+                    "enrolled_on": ctx.day,
+                    "closed_on": None,
+                }
+            )
+        rows.append(row)
+    return rows
+
+
 def why_not(ctx: DayContext, state: _EngineState, play: Play, account: dict) -> str | None:
     """The reason this account may not enter this play today, or None if it may."""
     account_id = account["account_id"]

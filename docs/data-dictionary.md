@@ -731,9 +731,12 @@ Handoffs to people by queue, reason and source, with pickup time, SLA breaches a
 | `closed` | hugeint | Tasks a person has closed. |  |
 | `open_now` | hugeint | Tasks still open today. |  |
 | `avg_days_to_pickup` | double | Average days from created to picked up. |  |
+| `picked_up` | hugeint | Tasks a person has started on. |  |
+| `days_to_pickup_total` | hugeint | Days from created to picked up, added over those tasks. Divide by picked_up for the average over several rows. |  |
 | `sla_breaches` | hugeint | Tasks picked up after their SLA date, or still open past it. |  |
 | `converted` | hugeint | Tasks closed as resolved, saved or expansion_opportunity. A handoff that was worth making. |  |
 | `unnecessary` | hugeint | Tasks closed as "the agent should have handled this". |  |
+| `recontacted` | hugeint | Closed tasks followed by a new task for the same account within 14 days. The first handoff did not settle it. |  |
 
 ### gold.metrics_agent
 

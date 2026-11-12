@@ -86,7 +86,12 @@ The report states which model produced the answers. If it ever says stand-in, sa
 > "This is how I'd run the uncovered-accounts pilot. The readiness checklist is not
 > ticked by hand: each line is answered from live data when the page opens. Then a ten
 > percent slice, a full test with a holdout, weekly review notes, and a scale, fix or
-> stop call per play. Scaling to the next segment is one line of configuration."
+> stop call per play. Scaling to the next segment is one line of configuration, and the
+> page already shows what that line would do: who would enter, and which queue could not
+> take the first day."
+
+Scroll to "Handoff quality" if asked about people: time to pickup, SLA breaches,
+re-contact, docs gap.
 
 **8. Operating model (15 seconds). Operating model page.**
 

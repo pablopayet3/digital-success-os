@@ -88,8 +88,10 @@ continue, and nobody learns which handoffs were unnecessary.
 - **So does a thumbs down.** Anyone reading a conversation on the Agents page can rate
   it. A thumbs down, with a note on what should have happened, puts the conversation in
   the same review queue (`agents/review.py`). The queue is a tab on the Agents page.
-- **Missing knowledge becomes a docs gap list.** Handoffs with reason `not_in_docs` are
-  counted by question. The most frequent ones are the next help articles to write.
+- **Missing knowledge becomes a docs gap list.** Each handoff with reason `not_in_docs`
+  is listed on the Agents page (Review queue tab) with the customer's question, what the
+  agent searched for and the closest articles it found. Each row is an article to write,
+  or a decision that the product does not do this.
 - **Every conversation is traced** (`agents/tracing.py`): messages, tool calls, retrieved
   articles, decision, cost, latency, with names and email addresses masked.
 
@@ -103,7 +105,7 @@ continue, and nobody learns which handoffs were unnecessary.
 | Escalation conversion | Handoffs closed as resolved, saved or expansion opportunity, divided by handoffs closed |
 | Unnecessary handoff rate | Handoffs closed as `agent_should_have_handled`, divided by handoffs closed |
 | Docs gap share | Handoffs with reason `not_in_docs`, divided by agent handoffs |
-| Re-contact after handoff | Accounts with a new handoff within 14 days of one being closed |
+| Re-contact after handoff | Closed handoffs followed by a new handoff for the same account within 14 days, divided by handoffs closed |
 
 These are computed in the warehouse from the operational tables (Phase 6) and shown in
 the app (Phase 7).

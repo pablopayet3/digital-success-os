@@ -694,10 +694,21 @@ missing or only half there. This section is what closed them.
   story runs in one click (the brief's "run the story"), or you type. Accounts whose
   setup-stalled signal is firing come first. The Human console shows the signals
   firing on the account for a handoff that came from the agent.
+- **Pilot page: handoff quality and a scaling preview.** Six measures of whether
+  handoffs are worth making, including re-contact (a new task for the same account
+  within 14 days of one closing: 6% here). And a preview of adding the pooled segment,
+  run by the engine's own rules without writing anything: 60 accounts would enter, 25
+  would be held out, and the contact-research queue would get 18 tasks on day one
+  against a capacity of 8.
+- **Agents page: the docs gap list.** The questions the agent handed off because no
+  help article covered them, with what it searched for.
+- **CRM sync: two ways to sign in, and the brief travels.** New orgs refuse the old
+  username-and-password sign-in by default, so the sync also accepts a consumer key
+  (ADR 0019). A task for Sales now carries the account-owner brief in its description.
 - **A picture of every page** in `docs/screenshots/`.
 - **Every page of the app is run by a test** on the small world (`tests/test_app.py`),
   and again with the internet blocked, which is the offline promise as a test.
-  179 tests in total.
+  186 tests in total.
 
 ### How to run
 
@@ -745,6 +756,14 @@ uv run --group notebook jupyter nbconvert --to notebook --execute --inplace anal
   (16 cents of real calls). A price or a request for a person works everywhere,
   because a rule stops those before any model is asked. Anything else is honest: the
   agent says it is unavailable and hands off. `--live` answers anything.
+- **Why a preview instead of just flipping the flag.** Adding a segment is one line,
+  which is exactly why it needs a look first. The preview found that one queue would
+  be over capacity on day one. That is a staffing conversation to have before the
+  change, not an alert to read after it.
+- **Why the CRM sync has two sign-in routes.** I checked before sending anyone to
+  create an org: the vendor is retiring the sign-in the first version used, and orgs
+  created in 2026 refuse it until a setting is ticked. The code now takes the
+  supported route first and explains a refusal in plain words.
 - **Why the notebook's libraries are a separate group.** Charting and notebook libraries
   are only needed to re-run the notebook, so the app, the tests, CI and the container do
   not install them.

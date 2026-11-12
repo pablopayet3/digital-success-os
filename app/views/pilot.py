@@ -10,7 +10,9 @@ from app import ui
 from common.config import load_yaml
 from common.paths import ROOT
 from engine.catalog import load_catalog
+from engine.context import load_day
 from engine.pilot import readiness_checks, weekly_notes
+from engine.rules import preview_segment
 
 st.title("Pilot")
 segments = load_yaml("rollout.yaml")["segments"]
@@ -92,6 +94,58 @@ handoffs = ui.query(
 st.write("**What the human rung costs: tasks per queue**")
 st.dataframe(handoffs, hide_index=True, width="stretch")
 
+st.subheader("Handoff quality")
+st.caption(
+    "A handoff is only worth making if a person picks it up in time and it ends well. Definitions: `docs/metrics.md`, Human-fallback metrics."
+)
+quality = ui.query(
+    """
+    SELECT sum(handoffs) AS handoffs, sum(closed) AS closed, sum(picked_up) AS picked_up,
+           sum(days_to_pickup_total) AS days, sum(sla_breaches) AS late,
+           sum(converted) AS converted, sum(unnecessary) AS unnecessary,
+           sum(recontacted) AS recontacted,
+           sum(CASE WHEN source = 'agent' THEN handoffs ELSE 0 END) AS from_agent,
+           sum(CASE WHEN source = 'agent' AND reason_code = 'not_in_docs' THEN handoffs ELSE 0 END)
+               AS docs_gaps
+    FROM gold.metrics_handoffs
+    """
+).iloc[0]
+
+
+def share(part, whole) -> str:
+    return ui.pct(part / whole) if whole else "n/a"
+
+
+measures = {
+    "Time to pickup": (
+        f"{quality['days'] / quality['picked_up']:.1f} days" if quality["picked_up"] else "n/a",
+        f"average over {int(quality['picked_up'] or 0)} tasks picked up",
+    ),
+    "SLA breach rate": (
+        share(quality["late"], quality["handoffs"]),
+        f"{int(quality['late'] or 0)} of {int(quality['handoffs'] or 0)} picked up late or still open past due",
+    ),
+    "Escalation conversion": (
+        share(quality["converted"], quality["closed"]),
+        "closed as resolved, saved or an opportunity",
+    ),
+    "Unnecessary handoffs": (
+        share(quality["unnecessary"], quality["closed"]),
+        "closed as: the agent should have handled this",
+    ),
+    "Re-contact": (
+        share(quality["recontacted"], quality["closed"]),
+        "a new task for the same account within 14 days of one closing",
+    ),
+    "Docs gap share": (
+        share(quality["docs_gaps"], quality["from_agent"]),
+        f"of {int(quality['from_agent'] or 0)} agent handoffs: no help article covered the question",
+    ),
+}
+for column, (label, (value, note)) in zip(st.columns(6), measures.items(), strict=True):
+    column.metric(label, value)
+    column.caption(note)
+
 st.subheader("Weekly review notes")
 st.caption(
     "One row per week of the pilot. The note is written by a rule from the same numbers, so it cannot flatter. In a real review the play owners add the decisions they took."
@@ -112,6 +166,32 @@ st.markdown(
 4. **Change control.** Each step is a reviewed change to a configuration file, with the experiment report attached (`docs/change-control.md`).
 """
 )
+
+
+@st.cache_data(ttl=60, show_spinner=False)
+def scaling_preview(segment: str, today: str) -> list[dict]:
+    """Today's rules run on one more segment, writing nothing. (`today` keeps the cache honest.)"""
+    return preview_segment(load_day(ui.data_dir(), ui.store(), load_catalog()), segment)
+
+
+for segment in [tier for tier in ("pooled",) if tier not in segments]:
+    preview = pd.DataFrame(scaling_preview(segment, ui.today()))
+    st.write(f"**Preview: what adding `{segment}` would do today**")
+    st.caption(
+        "The same rules engine, run now on one more segment, without writing anything (`engine/rules.py::preview_segment`). It shows day one only: later rungs of each ladder add tasks in the weeks after."
+    )
+    shown = preview.drop(columns="play_id").rename(columns=lambda name: name.replace("_", " "))
+    st.dataframe(shown, hide_index=True, width="stretch")
+    queues = catalog.routing["queues"]
+    first_day = preview.dropna(subset=["first_day_queue"]).groupby("first_day_queue")["would_enter"]
+    for queue, tasks in first_day.sum().items():
+        capacity = queues[queue]["capacity_per_day"]
+        line = f"{queues[queue]['name']}: {int(tasks)} new tasks on day one, capacity {capacity} a day."
+        if tasks > capacity:
+            st.warning(f"{line} More than a day of work: start with a slice, or add people first.")
+        else:
+            st.write(f":green[**Fits**] &nbsp; {line}")
+
 plan = ROOT / "docs" / "pilot-plan.md"
 if plan.exists():
     with st.expander("The pilot plan"):

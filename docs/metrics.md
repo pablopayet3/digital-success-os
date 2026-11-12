@@ -131,6 +131,7 @@ From `gold.metrics_handoffs` (one row per queue, reason and source).
 | Escalation conversion | Tasks closed as resolved, saved or expansion opportunity, divided by tasks closed |
 | Unnecessary handoff rate | Tasks closed as "the agent should have handled this", divided by tasks closed |
 | Docs gap share | Agent handoffs with reason `not_in_docs`, divided by agent handoffs |
+| Re-contact | Closed tasks followed by a new task for the same account within 14 days, divided by tasks closed. The first handoff did not settle the matter |
 
 ## The measures on the Overview page
 

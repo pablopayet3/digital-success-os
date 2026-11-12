@@ -82,7 +82,7 @@ From `uv run python run.py demo` (180 days of history, then 30 simulated days of
 | Seat expansion: expansion closed, treatment against holdout | 19% against 21%: **no effect detected** (the sample could only have shown 20 points or more) |
 | Agent evaluation, real model, 44 cases | Onboarding agent 30 of 30 with prompt v3 (v1: 29, v2: 25); mailbox 10 of 10; briefs 4 of 4; classifier 96% on 160 labelled replies |
 | Cost of every real model call behind this (834 calls) | about $3 |
-| Automated tests | 179 |
+| Automated tests | 186 |
 
 Three honest notes. The lift comes from assumptions in `config/sim_effects.yaml`: this
 demonstrates a measurement system, not a result. The agent answers are real: one live
@@ -144,10 +144,10 @@ file names past the 260-character limit.
 | Overview | The measures the pilot is run on (active users, consumption, setup closure, agent invocation, handoff rate, escalation conversion, retained revenue and expansion against the holdout), then the loop in numbers |
 | Accounts | One account: health and why, signals with evidence, scores with reasons, everything the system did and every decision not to act |
 | Plays and experiments | The play catalog; each play against its holdout with an interval and a verdict; the journey funnel; results by entry week and per ladder rung; revenue per group; the audit log |
-| Agents | Conversations with tool calls and retrieval, and a thumbs up or down on each; mailbox triage; the evaluation report; the review queue of cases people sent back; the prompt changelog |
+| Agents | Conversations with tool calls and retrieval, and a thumbs up or down on each; mailbox triage; the evaluation report; the review queue of cases people sent back and the list of questions no help article answered; the prompt changelog |
 | Human console | Sign in by role, work a queue, open a handoff packet, resolve it: the return signal |
 | Data quality | What was rejected and why, test results, freshness, the data contract |
-| Pilot | The readiness checklist answered from live data; rollout stage and verdict per play; results per rung; weekly review notes; how the pattern scales |
+| Pilot | The readiness checklist answered from live data; rollout stage and verdict per play; results per rung; handoff quality (pickup time, SLA breaches, re-contact, docs gap); weekly review notes; a live preview of what adding the next segment would do |
 | Operating model | Ownership, change control, principles, the dependency map drawn as a diagram, the data dictionary, play specs, decision records |
 | Live demo | One account from signal to task: the signal firing, the play it triggers, a scripted story in one click or your own messages to the agent, the handoff; advance the world one day |
 
@@ -155,7 +155,7 @@ file names past the 260-character limit.
 
 | The role asks for | What is built | Where |
 |---|---|---|
-| Build a digital success operating system; pilot uncovered accounts, then scale the pattern | Config-driven engine; pilot on the `uncovered` segment; 10% slice, then a full test with a holdout; a readiness checklist answered from live data; weekly review notes; scale, fix or stop per play; one line of config extends to `pooled` | `config/rollout.yaml`, `engine/`, `engine/pilot.py`, `docs/pilot-plan.md`, Pilot page |
+| Build a digital success operating system; pilot uncovered accounts, then scale the pattern | Config-driven engine; pilot on the `uncovered` segment; 10% slice, then a full test with a holdout; a readiness checklist answered from live data; weekly review notes; scale, fix or stop per play; one line of config extends to `pooled`, and the Pilot page previews what that line would do with the engine's own rules | `config/rollout.yaml`, `engine/`, `engine/pilot.py`, `docs/pilot-plan.md`, Pilot page |
 | Digital, agentic and human interventions | Every play declares its ladder and the rule for moving up; results per rung | `config/plays.yaml`, `gold.metrics_play_ladder` |
 | Requirements for clean account, contact, product, engagement, lifecycle and health data | A spec for the six areas, written backwards from the plays | `docs/data-requirements.md` |
 | Partner with agent engineers and data science | One spec per play, generated from the config so it cannot drift; model cards | `docs/play-specs/`, `docs/model-cards/` |
@@ -173,7 +173,7 @@ file names past the 260-character limit.
 | Journey orchestration, tasks, shared mailbox, consent, channel triggers, journey analytics | Journey runner with waits, branches and goals; tasks with packets; mailbox triage; consent and frequency caps; a funnel per journey from its own event log | `engine/journeys.py`, `agents/mailbox.py`, `engine/consent.py` |
 | Digital-to-human handoffs: what context moves, what signal returns | Typed handoff packet, queues with SLAs, human console, outcomes that steer the journey | `engine/handoff.py`, `docs/human-fallback.md` |
 | Experimentation: cohorts, tests, operating reviews | Holdout by hash, two-proportion test with an interval, split check, results by entry week, a written decision rule, a monthly review written from the data | `experiments/`, `docs/operating-review.md` |
-| Human fallback engineering | Tool failure, an unavailable model and "not in the docs" all hand off; handoff-quality metrics | `agents/onboarding.py`, `gold.metrics_handoffs` |
+| Human fallback engineering | Tool failure, an unavailable model and "not in the docs" all hand off; handoff quality measured (pickup time, SLA breaches, conversion, unnecessary handoffs, re-contact, docs gap) | `agents/onboarding.py`, `gold.metrics_handoffs` |
 | Product mindset | PRD, roadmap, prompt changelog, play catalog with owners and metrics | `docs/prd.md`, `docs/roadmap.md`, `prompts/CHANGELOG.md` |
 | Success and sales mindset | An expansion play that hands a seller a brief checked against the data; retained revenue and expansion against the holdout | `agents/briefs.py`, `experiments/` |
 
@@ -263,7 +263,7 @@ What each phase delivered, and three decisions to defend for each, is in
 
 ## What runs for real, and what has not been run yet
 
-Running on GitHub Actions: CI on every push (lint, 179 tests on Linux, the dbt build, a
+Running on GitHub Actions: CI on every push (lint, 186 tests on Linux, the dbt build, a
 secret scan), the container image build (it generates a demo world inside the image and
 publishes it), and the daily pipeline schedule, which opens an issue when a run fails.
 
@@ -282,7 +282,7 @@ Written but not yet run against the real thing. Each needs an account or a key.
 | What | Needs |
 |---|---|
 | Trace export | A tracing key (JSON traces work without one) |
-| The live CRM push | A Salesforce Developer Edition org and its credentials (the dry run and the tests are verified) |
+| The live CRM push | A Salesforce Developer Edition org and its credentials (the dry run and the tests are verified). The sync signs in with a consumer key, or with a username and token on orgs that still allow it (ADR 0019) |
 
 ## What I would do differently at scale
 
@@ -310,5 +310,5 @@ experiments/  play results against holdouts
 api/ app/     FastAPI endpoints; the Streamlit app
 integrations/ the CRM sync
 docs/         operating documents, decision records, play specs, model cards
-tests/        179 tests; they generate a small world and run everything on it, every app page included
+tests/        186 tests; they generate a small world and run everything on it, every app page included
 ```

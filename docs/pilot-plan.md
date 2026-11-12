@@ -46,7 +46,10 @@ need a person's judgement (a spec signed off, the staff briefed) stay here.
 2. **Full test (weeks 2 to 8).** Every eligible account in the segment, split by hash
    into treatment and holdout. Question: does it move the metric?
 3. **Decision (weeks 6 to 8).** Scale, fix or stop, per play.
-4. **Next segment.** Add `pooled` to `config/rollout.yaml`. Same plays, same guardrails,
+4. **Next segment.** Look first: the Pilot page previews what adding `pooled` would do
+   today (who would enter each play, and whether each queue can take the first day's
+   tasks), using the engine's own rules and writing nothing. Then add `pooled` to
+   `config/rollout.yaml`. Same plays, same guardrails,
    10% holdout. A test in the repository proves the second segment runs unchanged.
 
 ## Weekly review (30 minutes)

@@ -209,9 +209,12 @@ by_table:
     closed: Tasks a person has closed.
     open_now: Tasks still open today.
     avg_days_to_pickup: Average days from created to picked up.
+    picked_up: Tasks a person has started on.
+    days_to_pickup_total: Days from created to picked up, added over those tasks. Divide by picked_up for the average over several rows.
     sla_breaches: Tasks picked up after their SLA date, or still open past it.
     converted: Tasks closed as resolved, saved or expansion_opportunity. A handoff that was worth making.
     unnecessary: Tasks closed as "the agent should have handled this".
+    recontacted: Closed tasks followed by a new task for the same account within 14 days. The first handoff did not settle it.
   metrics_agent:
     origin: "Where the conversation came from: a play, or the mailbox."
     outcome: resolved (the agent handled it) or escalated (handed to a person).

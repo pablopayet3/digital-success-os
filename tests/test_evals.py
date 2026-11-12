@@ -197,3 +197,25 @@ def test_the_results_tables_carry_revenue_and_weekly_cohorts(simulated, tmp_path
                 f"still_customer_{arm}"} <= columns  # fmt: skip
     assert cohort_rows == sum(len(play["cohorts"]) for play in results["plays"])
     assert {play for (play,) in cohort_plays} <= {play["play_id"] for play in results["plays"]}
+
+
+def test_handoff_metrics_count_recontacts_and_keep_the_parts_of_the_average(simulated):
+    import duckdb
+
+    from ingest.load import warehouse_path
+
+    _, data_dir = simulated
+    con = duckdb.connect(str(warehouse_path(data_dir)))
+    total = con.execute(
+        """
+        SELECT sum(handoffs), sum(closed), sum(picked_up), sum(days_to_pickup_total),
+               sum(recontacted)
+        FROM gold.metrics_handoffs
+        """
+    ).fetchone()
+    tasks = con.execute("SELECT count(*) FROM silver.stg_ops_ctas").fetchone()[0]
+    con.close()
+    handoffs, closed, picked_up, days, recontacted = total
+    assert handoffs == tasks and closed <= handoffs and picked_up <= handoffs
+    assert 0 <= recontacted <= closed  # only a closed task can be followed by a re-contact
+    assert days >= 0

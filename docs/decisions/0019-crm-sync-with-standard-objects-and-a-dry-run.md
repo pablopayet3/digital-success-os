@@ -31,6 +31,51 @@ Option 2, in `integrations/crm_sync.py`, with three rules.
 - **Small on purpose.** Only accounts with an open task, at most 50 per run, so a free
   developer org's API limits are never a concern.
 
+A task for Sales carries the account-owner brief in its description, so the seller reads
+the evidence where they work, not through a link back to this system.
+
+## Signing in: two ways, because the vendor is closing one
+
+The first version signed in with a username, a password and a security token. That
+uses an older sign-in call which the vendor is retiring: orgs created from early 2026 on
+refuse it by default, and it stops for everyone in mid 2027. So `connect()` accepts
+either set of settings from `.env` and uses the first complete one:
+
+| Way | Settings in `.env` | When to use it |
+|---|---|---|
+| A consumer key and secret (OAuth client credentials) | `SALESFORCE_CONSUMER_KEY`, `SALESFORCE_CONSUMER_SECRET`, `SALESFORCE_DOMAIN` | The supported way. No person's password is stored |
+| A username, password and security token | `SALESFORCE_USERNAME`, `SALESFORCE_PASSWORD`, `SALESFORCE_SECURITY_TOKEN` | Quickest on a demo org, once the old sign-in is allowed |
+
+A refused sign-in prints what to check, in plain words, and sends nothing.
+
+### Steps: username, password and security token (about five minutes)
+
+1. Create a Developer Edition org at developer.salesforce.com/signup. Confirm the email
+   and set a password.
+2. In the org: gear icon, Setup. In Quick Find type "User Interface", open it, tick
+   "Enable SOAP API login()", save. A new org refuses the sign-in without this.
+3. Your picture (top right), Settings, "Reset My Security Token". It arrives by email.
+4. Fill the three `SALESFORCE_USERNAME`, `_PASSWORD` and `_SECURITY_TOKEN` lines in `.env`.
+5. `uv run python run.py crm-sync --push`.
+
+### Steps: consumer key and secret
+
+1. Setup, Quick Find "External Client App Manager", New External Client App. Give it a
+   name and a contact email.
+2. Enable OAuth. Callback URL: `https://localhost/callback` (this flow never calls it,
+   but the form requires one). Scope: "Manage user data via APIs (api)". Tick "Enable
+   Client Credentials Flow". Create.
+3. On the app's Policies tab: edit, enable the client credentials flow, and enter your
+   own username under "Run As". Save.
+4. On the Settings tab, under OAuth settings, open "Consumer Key and Secret" (a code is
+   emailed to confirm it is you).
+5. Setup, Quick Find "My Domain": copy the org's own address.
+6. Fill `SALESFORCE_CONSUMER_KEY`, `SALESFORCE_CONSUMER_SECRET` and `SALESFORCE_DOMAIN`
+   (the address from step 5, in any form) in `.env`. A new app can take ten minutes to
+   start working.
+
+The screen labels are the vendor's as of late 2026 and move between releases.
+
 ## Consequences
 
 - It works on any org with no setup, and a seller can read it without training.

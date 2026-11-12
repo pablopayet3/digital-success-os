@@ -612,6 +612,7 @@
   "sla_breach_rate": 0.23387096774193547,
   "escalation_conversion": 0.6174863387978142,
   "unnecessary_handoff_rate": 0.03278688524590164,
+  "recontact_rate": 0.06284153005464481,
   "agent_handoffs": 13,
   "docs_gap_share": 0.07692307692307693
  }
