@@ -49,20 +49,23 @@ gold, and the warehouse never writes to the store.
   engine checks the store's consent changes as well as the CRM snapshot.
 - Two stores can drift. The world and the store are saved after every simulated day, and
   the store is rebuilt whenever the world is regenerated.
-- Postgres has been written for but not yet run against (needs a `DATABASE_URL`).
+- Postgres is run for real, in CI and when hosted (next section).
 
 ## Verified on a real Postgres
 
 A CI job (`store-on-postgres` in `.github/workflows/ci.yml`) starts a Postgres 16
-service on every push and does two things:
+service on every push and does three things:
 
 - runs the store tests (`tests/test_store.py`) on SQLite and on Postgres: the same
   seven tests on each, so the two cannot drift apart;
-- runs the engine for three simulated days with its live state in Postgres (DuckDB
-  stays the warehouse), then checks the rows are really there. On the first run: 107
-  enrolments, 224 audit decisions, 59 tasks and 62 triaged replies, in Postgres.
+- simulates two days on the local store, then copies that state into Postgres with
+  `scripts/seed_store.py`, twice: the second copy must change nothing;
+- runs the engine for one more day with its live state in Postgres (DuckDB stays the
+  warehouse), then checks the rows are really there.
 
-It passed first time. Storing dates as ISO text and JSON as text is what made that
+The first version of the job ran all three days on Postgres and left 107 enrolments,
+224 audit decisions, 59 tasks and 62 triaged replies there. It passed first time.
+Storing dates as ISO text and JSON as text is what made that
 uneventful: the two databases never had to agree on a date or JSON type. One change
 was needed beforehand: the store now keeps one database engine per URL for the whole
 process. Opening a new one on every call was harmless on SQLite and would have leaked

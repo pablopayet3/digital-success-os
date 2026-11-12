@@ -31,6 +31,12 @@ flowchart LR
 
 ## What it looks like
 
+The demo path in twenty seconds. A customer asks the onboarding agent a setup question and
+gets an answer from the help centre. The next message asks for a price: the agent hands
+it to Sales with a written summary. The last frame is every play against its holdout.
+
+![The demo path: a question, an answer, a handoff, the results](docs/screenshots/demo.gif)
+
 The loop on one page: signals, plays, touches, agent conversations, handoffs, outcomes.
 
 ![Overview page](docs/screenshots/overview.jpg)
@@ -228,8 +234,8 @@ the contract passed, and the results match the local warehouse (ADR 0012). Sign-
 through the browser, so no access token is stored.
 
 Run on a real Postgres on every push: the operational store. CI starts a Postgres
-service, runs the same store tests as on SQLite, and runs the engine for three simulated
-days with its live state there (ADR 0013). The hosted app and API share a hosted
+service, runs the same store tests as on SQLite, copies two simulated days of state into
+it, and runs the engine for a third day with its live state there (ADR 0013). The hosted app and API share a hosted
 Postgres database as their store; the API's `/health` says which store is in use.
 
 Written but not yet run against the real thing. Each needs an account or a key.

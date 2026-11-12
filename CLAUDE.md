@@ -119,16 +119,19 @@ dbt cross-database macros and the project's own dispatch macros in `dbt/macros/`
 1. Skeleton and synthetic data: **done**
 2. Pipeline and data quality (ingest, dbt bronze/silver/gold, tests, contract): **done**
 3. Signals, health score, segmentation, churn and expansion models: **done**
-3b. Environments, secrets, CI, Databricks `prod` target, portable SQL: **done** (not yet
-    run against Databricks or GitHub Actions)
+3b. Environments, secrets, CI, Databricks `prod` target, portable SQL: **done** (CI runs
+    on GitHub Actions; the prod pipeline has run on Databricks)
 4. Rules engine, journeys, consent, holdouts, daily loop: **done**
-5. Agents and human fallback, with LLM cost controls: **done** (stand-in model; no real
-   API call yet, there is no key on the build machine)
-6. Evals and experiments: **done** (eval report produced with the stand-in model)
+5. Agents and human fallback, with LLM cost controls: **done** (live run done; the real
+   responses are cached in `cache/llm/` and replayed by default)
+6. Evals and experiments: **done** (eval report from the real model, replayable from the cache)
 7. App and API: **done**
 8. Docs, demo, portfolio: **done** (README, operating documents, demo script, portfolio entry)
 9. Container, deploy and daily workflows: **done and passing on GitHub Actions**
-   (github.com/pablopayet3/digital-success-os, public). Render blueprint: written, not yet run
+   (github.com/pablopayet3/digital-success-os, public). Hosted on Render from the blueprint
+
+Still not run against the real thing (each needs credentials only the owner can supply):
+the live CRM push, and trace export to a tracing service.
 
 What works after each phase, and what to be able to explain, is in `docs/phase-notes.md`.
 
@@ -208,9 +211,10 @@ Phase 5 additions:
   fictional help articles).
 - `engine/specs.py` writes `docs/play-specs/<play_id>.md` from the config
   (`run.py specs`); a test fails when they are out of date.
-- LLM modes: stand-in (dev default for now), offline replay of `cache/llm/` (real
-  responses, committed), live (`DSO_OFFLINE_MODE=false` and `DSO_LLM_STAND_IN=false`
-  with `ANTHROPIC_API_KEY`).
+- LLM modes: offline replay of `cache/llm/` (the default: real responses, committed),
+  stand-in (`--stand-in`; CI, the daily workflow and the container image), live
+  (`--live`: `DSO_OFFLINE_MODE=false` and `DSO_LLM_STAND_IN=false` with
+  `ANTHROPIC_API_KEY`).
 - A simulated day is now: world -> pipeline -> staff -> mailbox triage -> feedback
   classification -> rules -> journeys (agent steps) -> capacity check.
 - Tests: `tests/test_agents.py`, `tests/fake_llm.py`.
@@ -237,7 +241,7 @@ Phases 6 to 9 additions:
 - Docs: `prd`, `roadmap`, `principles`, `ownership-map`, `change-control`,
   `data-requirements`, `pilot-plan`, `dependency-map`, `production-architecture`,
   `demo-script`, `portfolio-entry`. ADRs 0016 to 0018.
-- Tests: `tests/test_evals.py`, `tests/test_api.py`. 141 tests in total.
+- Tests: `tests/test_evals.py`, `tests/test_api.py`.
 - `DSO_DATA_DIR` points the app and the API at another data folder (tests, containers).
 
 The live run is done: `cache/llm/` holds the real model responses (committed), replay
@@ -262,12 +266,20 @@ Local sign-in is OAuth through the browser (`common/warehouse.py::databricks_tok
 SQLite file.
 
 Postgres: the operational store is tested on a real Postgres in CI (job
-`store-on-postgres`: `tests/test_store.py` on both databases, then three simulated days
-with `DSO_OPERATIONAL_STORE=env:DATABASE_URL`). `scripts/check_store.py` prints what a
+`store-on-postgres`: `tests/test_store.py` on both databases, two simulated days on the
+local store, the seeding script run twice, then one more day with
+`DSO_OPERATIONAL_STORE=env:DATABASE_URL`). `scripts/check_store.py` prints what a
 run left in the store. The hosted app and API share a hosted Postgres created by
 `render.yaml`; `scripts/seed_store.py` fills it once at start-up (`scripts/start-app.sh`,
 `scripts/start-api.sh`), with a fallback to the local file. Trace export is tested
 with a stand-in client (masking, and a failing service cannot break a run).
+
+README pictures are in `docs/screenshots/` (three pages and `demo.gif`). Taking them has
+two traps. The Live demo page writes real rows: each handoff adds a conversation
+(`scenario = 'live_demo'`) and a task to the local store, so remove those rows afterwards
+or the Overview counts stop matching the README. And a browser extension can draw its
+icon (a real product's logo) in a corner of the page: check every picture and paint it
+over before committing.
 
 Ignore rules: anchor file names to the top folder (`/BRIEF.md`). Git on Windows matches
 without regard to case, and an unanchored `BRIEF.md` once hid `prompts/brief.md`.
