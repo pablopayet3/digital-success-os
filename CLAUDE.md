@@ -254,7 +254,12 @@ Databricks: the prod pipeline has run on a Free Edition workspace (`DSO_ENV=prod
 python run.py pipeline`): 100 of 100 tests, contract 14 of 14, numbers match DuckDB.
 Local sign-in is OAuth through the browser (`common/warehouse.py::databricks_token`);
 `DATABRICKS_TOKEN` is only for CI. For that run `DATABASE_URL` pointed at the local
-SQLite file. Still open: the Postgres operational store.
+SQLite file.
+
+Postgres: the operational store is tested on a real Postgres in CI (job
+`store-on-postgres`: `tests/test_store.py` on both databases, then three simulated days
+with `DSO_OPERATIONAL_STORE=env:DATABASE_URL`). `scripts/check_store.py` prints what a
+run left in the store. A hosted Postgres has not been connected.
 
 Ignore rules: anchor file names to the top folder (`/BRIEF.md`). Git on Windows matches
 without regard to case, and an unanchored `BRIEF.md` once hid `prompts/brief.md`.

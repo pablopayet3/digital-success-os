@@ -51,6 +51,26 @@ gold, and the warehouse never writes to the store.
   the store is rebuilt whenever the world is regenerated.
 - Postgres has been written for but not yet run against (needs a `DATABASE_URL`).
 
+## Verified on a real Postgres
+
+A CI job (`store-on-postgres` in `.github/workflows/ci.yml`) starts a Postgres 16
+service on every push and does two things:
+
+- runs the store tests (`tests/test_store.py`) on SQLite and on Postgres: the same
+  seven tests on each, so the two cannot drift apart;
+- runs the engine for three simulated days with its live state in Postgres (DuckDB
+  stays the warehouse), then checks the rows are really there. On the first run: 107
+  enrolments, 224 audit decisions, 59 tasks and 62 triaged replies, in Postgres.
+
+It passed first time. Storing dates as ISO text and JSON as text is what made that
+uneventful: the two databases never had to agree on a date or JSON type. One change
+was needed beforehand: the store now keeps one database engine per URL for the whole
+process. Opening a new one on every call was harmless on SQLite and would have leaked
+connections on Postgres.
+
+Not done: a hosted Postgres (a free managed database) has not been connected. That is
+a connection string in `DATABASE_URL`, nothing else.
+
 ## Revisit if
 
 The organisation's CS platform becomes the system of record for CTAs. Then this store
