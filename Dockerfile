@@ -30,4 +30,4 @@ EXPOSE 8501 8000
 
 # The default command starts the app. The API uses the same image with another command
 # (see docker-compose.yml and render.yaml). $PORT is set by the host when there is one.
-CMD ["sh", "-c", "uv run --no-dev streamlit run app/main.py --server.port ${PORT:-8501} --server.address 0.0.0.0 --server.headless true"]
+CMD ["sh", "scripts/start-app.sh"]

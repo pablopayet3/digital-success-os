@@ -88,3 +88,27 @@ def test_a_store_made_by_an_older_version_gains_new_columns(store):
     store.execute("ALTER TABLE conversations DROP COLUMN answered_by")
     Store(str(store.engine.url.render_as_string(hide_password=False)))._add_new_columns()
     assert "answered_by" in store.table("conversations").columns
+
+
+def test_a_host_supplied_postgres_address_is_rewritten_for_our_driver(monkeypatch):
+    import dataclasses
+
+    from common.settings import load_settings
+
+    monkeypatch.setenv("DATABASE_URL", "postgresql://someone@db.example.internal/dso")
+    settings = dataclasses.replace(load_settings(), operational_store="env:DATABASE_URL")
+    assert settings.operational_store_url == "postgresql+psycopg://someone@db.example.internal/dso"
+    local = dataclasses.replace(load_settings(), operational_store="sqlite:///data/ops.db")
+    assert local.operational_store_url == "sqlite:///data/ops.db"
+
+
+def test_seeding_does_nothing_when_the_store_is_the_local_file(monkeypatch):
+    import importlib.util
+    from pathlib import Path
+
+    monkeypatch.delenv("DSO_OPERATIONAL_STORE", raising=False)
+    path = Path(__file__).resolve().parents[1] / "scripts" / "seed_store.py"
+    spec = importlib.util.spec_from_file_location("seed_store", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    assert "nothing to seed" in module.seed()

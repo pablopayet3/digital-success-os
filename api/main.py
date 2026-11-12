@@ -94,7 +94,9 @@ def health() -> dict:
     except Exception as error:  # a missing warehouse is a state to report, not a crash
         status.update(status="degraded", warehouse=f"unavailable: {type(error).__name__}")
     try:
-        open_store(data_dir()).one("SELECT count(*) AS n FROM ctas")
+        store = open_store(data_dir())
+        store.one("SELECT count(*) AS n FROM ctas")
+        status["operational_store"] = f"ok ({store.engine.url.get_backend_name()})"
     except Exception as error:
         status.update(status="degraded", operational_store=f"unavailable: {type(error).__name__}")
     return status

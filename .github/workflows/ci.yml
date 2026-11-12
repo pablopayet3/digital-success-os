@@ -64,13 +64,23 @@ jobs:
       - run: uv sync --frozen
       - name: The same store tests on SQLite and on Postgres
         run: uv run pytest -q tests/test_store.py
-      - name: Three simulated days with the engine's store on Postgres
-        env:
-          DSO_OPERATIONAL_STORE: env:DATABASE_URL
+      - name: Two simulated days on the local store (what the container image carries)
         run: |
           uv run python run.py data --profile small
           uv run python run.py pipeline
           uv run python run.py train
-          uv run python run.py run-days 3
+          uv run python run.py run-days 2
+      - name: Seed the hosted store from it, twice (the second time must change nothing)
+        env:
+          DSO_OPERATIONAL_STORE: env:DATABASE_URL
+        run: |
+          uv run python scripts/seed_store.py
+          uv run python scripts/seed_store.py
+          uv run python scripts/check_store.py postgresql
+      - name: The engine carries on for a day with its store on Postgres
+        env:
+          DSO_OPERATIONAL_STORE: env:DATABASE_URL
+        run: |
+          uv run python run.py run-days 1
           uv run python run.py experiments
           uv run python scripts/check_store.py postgresql

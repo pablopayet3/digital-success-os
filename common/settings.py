@@ -42,9 +42,15 @@ class Settings:
     @property
     def operational_store_url(self) -> str:
         """The database URL of the operational store (resolved only when it is needed)."""
-        if self.operational_store.startswith("env:"):
-            return secret(self.operational_store.removeprefix("env:"))
-        return self.operational_store
+        url = self.operational_store
+        if url.startswith("env:"):
+            url = secret(url.removeprefix("env:"))
+        # Hosts hand out addresses that start with postgres:// or postgresql://. We use
+        # the psycopg driver, so the address is rewritten to name it.
+        for prefix in ("postgres://", "postgresql://"):
+            if url.startswith(prefix):
+                return "postgresql+psycopg://" + url.removeprefix(prefix)
+        return url
 
 
 def load_settings() -> Settings:
