@@ -247,8 +247,9 @@ records who answered (`answered_by`). `run.py` takes `--live` and `--stand-in`.
 `exports/bi/` (guide: `docs/bi-dashboard-guide.md`, which names a real BI product).
 Stand-in eval runs write to `evals/reports/stand-in/`, never over the real report.
 
-Hosting: a Render blueprint from the public repository (no auto-deploy: use Manual
-sync in Render after a push).
+Hosting: a Render blueprint from the public repository. Render redeploys both services
+on every push to `main` (seen in its deploy list as "Auto-Deploy"); a change to
+`render.yaml` itself needs "Manual sync" on the blueprint page and an approval there.
 
 Databricks: the prod pipeline has run on a Free Edition workspace (`DSO_ENV=prod uv run
 python run.py pipeline`): 100 of 100 tests, contract 14 of 14, numbers match DuckDB.
