@@ -70,7 +70,9 @@ def show_task(task, packet: dict) -> None:
         health = snapshot["health"]
         one, two, three = st.columns(3)
         ui.metric(one, "Health", f"{health['score']:.0f}", health["band"], delta_color="off")
-        ui.metric(two, "Seats", f"{snapshot['seats']['assigned']} of {snapshot['seats']['licensed']}")
+        ui.metric(
+            two, "Seats", f"{snapshot['seats']['assigned']} of {snapshot['seats']['licensed']}"
+        )
         ui.metric(three, "Renewal in", f"{snapshot['days_to_renewal']} days")
         st.json(snapshot, expanded=False)
         if packet.get("brief"):
@@ -79,7 +81,7 @@ def show_task(task, packet: dict) -> None:
 
 
 if "console_role" not in st.session_state:
-    st.write("Sign in to work a queue. Each role sees the queues it owns.")
+    st.write("Sign in to work on a queue. Each role sees only the queues it owns.")
     with st.form("login"):
         role = st.selectbox("Role", list(ROLE_QUEUES), help=ui.choices_help("Role"))
         password = st.text_input("Password", type="password")
@@ -88,10 +90,11 @@ if "console_role" not in st.session_state:
             if expected and hmac.compare_digest(password, expected):
                 st.session_state.console_role = role
                 st.rerun()
-            st.error("Wrong password, or this role has no password configured.")
+            st.error("The password is wrong, or this role has no password set.")
     if password_for("CSM") == "demo":
         st.caption(
-            "Local demo: the password for every role is `demo`. When hosted, passwords come from environment variables."
+            "In the local demo, the password for every role is `demo`. On the hosted demo, each "
+            "role has its own password, set by the host."
         )
     # A visitor without a password still sees what a person receives: one task, read-only.
     example = ui.rows(
@@ -101,8 +104,8 @@ if "console_role" not in st.session_state:
     if len(example):
         st.subheader("What a person receives: an example")
         st.caption(
-            "One task from the demo, shown read-only. Signing in opens the whole queue and lets "
-            "you close a task, which sends its outcome back to the journey."
+            "This is one task from the demo, shown read-only. After you sign in, you can open "
+            "the whole queue and close a task, which sends its outcome back to the play."
         )
         show_task(example.iloc[0], json.loads(example.iloc[0]["packet"]))
     st.stop()
@@ -124,8 +127,9 @@ if "console_message" in st.session_state:
 if role == "Admin" and os.environ.get("DSO_HOSTED"):
     with st.expander("Admin: reset the demo data"):
         st.write(
-            "Removes every task and conversation visitors created or closed, and restores "
-            "the demo's starting state. Use it before handing the demo to someone new."
+            "This removes every task and conversation that visitors created or closed, and "
+            "restores the demo's starting state. Use it before you give the demo to someone "
+            "new."
         )
         if st.button("Reset the demo data"):
             from scripts.seed_store import seed
@@ -143,9 +147,10 @@ if len(alerts) and (queues is None or alerts["queue"].isin(queues).any()):
     st.warning(f"Capacity alert ({latest['alert_date']}): {latest['message']}")
 
 if tasks.empty:
-    st.success("Nothing waiting in your queues.")
+    st.success("Nothing is waiting in your queues.")
     st.caption(
-        "To put a task here: open the Live demo page and press Run the story. The price question is handed to Sales."
+        "To create a task here, open the Live demo page and select Run the story. The price "
+        "question is passed to the Sales team."
     )
     st.stop()
 
@@ -153,7 +158,8 @@ order = {"urgent": 0, "high": 1, "normal": 2, "low": 3}
 tasks = tasks.assign(rank=tasks["priority"].map(order), overdue=tasks["sla_due_on"] < today)
 tasks = tasks.sort_values(["rank", "sla_due_on"])
 st.caption(
-    f"{len(tasks)} open tasks, most urgent first. {int(tasks['overdue'].sum())} past their SLA date. Today is {today}."
+    f"{len(tasks)} open tasks, with the most urgent first. {int(tasks['overdue'].sum())} of "
+    f"them are past the date promised for a reply. Today is {today}."
 )
 st.dataframe(
     tasks[
@@ -181,7 +187,8 @@ show_task(task, packet)
 
 st.subheader("Close the task")
 st.caption(
-    "Your outcome is the return signal: it decides whether the journey resumes, ends, or passes to Sales."
+    "The outcome you choose is sent back to the play. It decides whether the customer's "
+    "journey resumes, ends, or passes to the Sales team."
 )
 outcomes = catalog.routing["outcomes"]
 with st.form("resolve"):

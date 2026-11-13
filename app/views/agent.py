@@ -13,11 +13,11 @@ from common.paths import ROOT
 st.title("Agents")
 ui.job_intro("agent")
 st.write(
-    "This page covers two AI agents. The **onboarding agent** answers customers' setup "
-    "questions from the help centre, and passes the customer to a person whenever a rule "
-    "written in code requires it. The **mailbox triage agent** reads every reply that "
-    "lands in the shared mailbox: a model labels the reply, and rules decide what happens "
-    "to it."
+    "This page covers two AI agents. The **onboarding agent** answers customers' "
+    "questions about setting up the product, using the help center. It passes the "
+    "customer to a person whenever a rule written in code requires it. The **mailbox "
+    "triage agent** reads every reply that arrives in the shared mailbox. An AI model "
+    "labels each reply, and rules decide what happens to it."
 )
 
 conversations = ui.rows("SELECT * FROM conversations ORDER BY day DESC, conversation_id DESC")
@@ -29,26 +29,38 @@ one, two, three, four = st.columns(4)
 ui.metric(one, "Agent conversations", len(conversations))
 ui.metric(
     two,
-    "Handoff rate", ui.pct(len(escalated) / len(conversations)) if len(conversations) else "n/a"
+    "Handoff rate",
+    ui.pct(len(escalated) / len(conversations)) if len(conversations) else "n/a",
 )
 ui.metric(three, "Mailbox replies triaged", len(triage))
 ui.metric(
     four,
-    "LLM cost so far", f"${conversations['cost_usd'].sum():.2f}" if len(conversations) else "$0.00"
+    "LLM cost so far",
+    f"${conversations['cost_usd'].sum():.2f}" if len(conversations) else "$0.00",
 )
 # One short line under each number, in its own column.
-one.caption("Exchanges between the onboarding agent and a customer")
-two.caption("Share of conversations the agent passed to a person")
-three.caption("Customers' answers to our emails, sorted by the triage agent")
-four.caption("What the AI model charged for these conversations")
+one.caption("Conversations between the onboarding agent and customers")
+two.caption("The share of conversations that the agent passed to a person")
+three.caption("Customer replies to our emails, sorted by the triage agent")
+four.caption("What the AI model has charged for these conversations")
 
 tab_conversations, tab_mailbox, tab_feedback, tab_evals, tab_review, tab_prompts = st.tabs(
-    ["Conversations", "Mailbox triage", "Customer feedback", "Evaluation", "Review queue", "Prompts"]
+    [
+        "Conversations",
+        "Mailbox triage",
+        "Customer feedback",
+        "Evaluation",
+        "Review queue",
+        "Prompts",
+    ]
 )
 
 with tab_conversations:
     if conversations.empty:
-        st.info("No conversations yet. Simulate a day, or talk to the agent on the Live demo page.")
+        st.info(
+            "There are no conversations yet. Simulate a day, or talk to the agent on the Live "
+            "demo page."
+        )
     else:
         left, right = st.columns(2)
         with left:
@@ -58,9 +70,10 @@ with tab_conversations:
         with right:
             st.write("**Who decided to hand off**")
             st.caption(
-                "Who decided the handoff. hard_rule: a rule written in code stopped the conversation "
-            "before the model could answer. agent: the model itself asked for a person. "
-            "failure: a tool or the model was unavailable, so a person took over."
+                "Who decided on the handoff. hard_rule means that a rule written in code stopped "
+                "the conversation before the model could answer. agent means that the model itself "
+                "asked for a person. failure means that a tool or the model was unavailable, so a "
+                "person took over."
             )
             st.dataframe(
                 escalated.groupby("escalated_by").size().reset_index(name="handoffs"),
@@ -87,7 +100,7 @@ with tab_conversations:
         with st.expander("What the agent did behind the answer"):
             st.write("Tool calls")
             st.json(json.loads(chosen["tool_calls"]))
-            st.write("Help-centre searches and what they returned")
+            st.write("The help center searches, and what they found")
             st.json(json.loads(chosen["searches"]))
             st.caption(
                 f"Prompt {chosen['prompt_version']} | {chosen['llm_calls']} model calls ({chosen['cached_llm_calls']} from cache) | ${chosen['cost_usd']:.4f} | trace file {chosen['trace_file']} (names and emails masked)"
@@ -98,7 +111,7 @@ with tab_conversations:
         if isinstance(rated, str) and rated:
             st.caption(f"Rated: thumbs {rated}.")
         if os.environ.get("DSO_HOSTED"):
-            st.caption("Rating is switched off in the hosted demo, which is read-only.")
+            st.caption("Rating is turned off in the hosted demo, which is read-only.")
         else:
             notes = st.text_input(
                 "For a thumbs down: what should have happened instead?",
@@ -119,8 +132,8 @@ with tab_mailbox:
         st.info("Nothing triaged yet.")
     else:
         st.write(
-            "**What happened to each reply.** The model proposes what the customer wants. A table "
-        "of rules, kept as configuration, decides the action."
+            "**What happened to each reply.** An AI model suggests what the customer wants. A "
+            "table of rules, kept in a configuration file, then decides what to do."
         )
         st.dataframe(
             triage.groupby(["intent", "action"]).size().reset_index(name="replies"),
@@ -128,14 +141,16 @@ with tab_mailbox:
             width="stretch",
         )
         st.caption(
-            "An unsubscribe takes effect the same day. A complaint opens a high-priority task and pauses the account's emails. An unsure label goes to a person."
+            "A request to unsubscribe takes effect the same day. A complaint creates a "
+            "high-priority task and pauses the customer's emails. When the model is unsure of a "
+            "label, the reply goes to a person."
         )
 
 with tab_feedback:
     st.write(
-        "A survey score says how unhappy a customer is. The comment says why. A small AI model "
-        "reads each recent survey comment and each high-priority support ticket once, and "
-        "labels its sentiment and its theme."
+        "A survey score shows how unhappy a customer is, and the comment explains why. A "
+        "small AI model reads each recent survey comment and each high-priority support "
+        "ticket once. It labels the feeling that the text expresses and its subject."
     )
     feedback = ui.rows(
         "SELECT kind, sentiment, theme, count(*) AS texts FROM text_classifications GROUP BY kind, sentiment, theme"
@@ -159,7 +174,7 @@ with tab_feedback:
             st.dataframe(ranked, hide_index=True, width="stretch")
             st.caption(
                 "The owner of a play reads this list before designing the next play, and the Product "
-            "team hears about the themes that recur."
+                "team hears about the themes that recur."
             )
         st.caption(
             f"{int(feedback['texts'].sum())} texts classified: NPS comments and high-priority tickets from the last 30 days of each run."
@@ -168,13 +183,15 @@ with tab_feedback:
 with tab_evals:
     results_file = ROOT / "evals" / "reports" / "eval-results.json"
     if not results_file.exists():
-        st.info("No evaluation yet. Run `uv run python run.py evals`.")
+        st.info("There is no evaluation yet. Run `uv run python run.py evals`.")
     else:
         results = json.loads(results_file.read_text(encoding="utf-8"))
         st.write(f"**Answers produced by:** {results['llm_mode']}")
         if "stand-in" in results["llm_mode"]:
             st.warning(
-                "These results test the code around the model (rules, tools, routing). They say nothing about a real model's answers until one live run replaces them."
+                "These results test the code around the model: the rules, the tools and the "
+                "routing. They say nothing about the answers of a real model until a live run "
+                "replaces them."
             )
         st.dataframe(
             pd.DataFrame(
@@ -201,14 +218,15 @@ with tab_evals:
             hide_index=True,
             width="stretch",
         )
-        st.caption("Full report: `evals/reports/eval-report.md`")
+        st.caption("The full report is in `evals/reports/eval-report.md`.")
 
 with tab_review:
     st.write(
-        "**The feedback loop.** A conversation lands here in two ways: a person closes a "
-        "handoff as \"the agent should have handled this\" in the Human console, or a person "
-        "gives a conversation a thumbs down on this page. Each row is a draft evaluation "
-        "case. A person writes the expected behaviour, and the next prompt version has to pass it."
+        "**The feedback loop.** A conversation arrives here in one of two ways. Either a "
+        'person closed a handoff in the Human console with the outcome "the agent should '
+        'have handled this", or a person gave the conversation a thumbs down on this page. '
+        "Each row is a draft test case. A person writes down what the agent should have "
+        "done, and the next version of the agent's instructions must pass that case."
     )
     queue = ui.rows(
         "SELECT created_on, cta_id AS under_review, source, reason_code, human_notes "
@@ -221,9 +239,10 @@ with tab_review:
         st.dataframe(queue, hide_index=True, width="stretch")
 
     st.write(
-        "**The docs gap list.** Questions the agent handed to a person because no help "
-        "article covered them. Each row is an article to write, or a decision that the "
-        "product does not do this and the agent should say so."
+        "**The documentation gap list.** These are questions that the agent passed to a "
+        "person because no help article covered them. Each row calls for one of two "
+        "decisions: write the article, or confirm that the product does not do this, so "
+        "that the agent can say so."
     )
     unanswered = (
         conversations[conversations["reason_code"] == "not_in_docs"]
@@ -231,11 +250,13 @@ with tab_review:
         else conversations
     )
     if unanswered.empty:
-        st.info("No question has fallen outside the help centre yet.")
+        st.info("So far, a help article has covered every question the agent received.")
     else:
         gaps = []
         for row in unanswered.itertuples():
-            asked = [turn["text"] for turn in json.loads(row.transcript) if turn["role"] == "customer"]
+            asked = [
+                turn["text"] for turn in json.loads(row.transcript) if turn["role"] == "customer"
+            ]
             searches = json.loads(row.searches)
             closest = [result.get("title") for s in searches for result in s.get("results", [])]
             gaps.append(

@@ -40,7 +40,7 @@ if stages:
     shown = shown[shown["lifecycle_stage"].isin(stages)]
 if bands:
     shown = shown[shown["health_band"].isin(bands)]
-st.caption(f"{len(shown):,} accounts. Sorted by health, lowest first.")
+st.caption(f"{len(shown):,} customers, sorted by health with the least healthy first.")
 st.dataframe(shown, hide_index=True, height=260, width="stretch")
 
 if shown.empty:
@@ -56,15 +56,20 @@ st.caption(
     f"renewal in {account['days_to_renewal']} days"
 )
 one, two, three, four = st.columns(4)
-ui.metric(one, "Health", f"{account['health_score']:.0f}", account["health_band"], delta_color="off")
+ui.metric(
+    one, "Health", f"{account['health_score']:.0f}", account["health_band"], delta_color="off"
+)
 ui.metric(two, "Churn risk", ui.pct(account["churn_risk_score"]))
 ui.metric(three, "Expansion likelihood", ui.pct(account["expansion_score"]))
 ui.metric(four, "Seats", f"{account['seats_assigned']} of {account['seats_licensed']}")
 # One short line under each number, in its own column.
-one.caption("A score from 0 to 100, built from the five components below. Red needs attention")
-two.caption("A model's estimate that the customer will cancel within 90 days")
-three.caption("A model's estimate that the customer will buy more within 90 days")
-four.caption("Paid seats in use, out of those bought")
+one.caption(
+    "A score from 0 to 100, built from the five parts below. Red means the customer "
+    "needs attention."
+)
+two.caption("A model's estimate of the chance that the customer will cancel within 90 days")
+three.caption("A model's estimate of the chance that the customer will buy more within 90 days")
+four.caption("The seats in use, out of the seats the customer pays for")
 
 left, right = st.columns(2)
 with left:
@@ -145,8 +150,9 @@ for label, frame in (("Plays", plays), ("Touches", touches), ("Tasks for people"
     else:
         st.caption("None.")
 with st.expander(
-    "Audit log: every decision about this account, including why it was NOT put in a play"
+    "The audit log: every decision about this customer, including each time it was not "
+    "put in a play"
 ):
     st.dataframe(audit, hide_index=True, width="stretch")
-with st.expander("Raw row from gold.account_current"):
+with st.expander("The raw data for this customer (table gold.account_current)"):
     st.json(json.loads(account.to_json(date_format="iso")))

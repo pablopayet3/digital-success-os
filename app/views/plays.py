@@ -82,9 +82,9 @@ st.dataframe(
 measured = results.dropna(subset=["lift"])
 if len(measured):
     st.write(
-        "**The improvement on each play's measure of success, with its margin of error.** Lift is "
-    "the difference between customers in the play and customers held out. A margin that "
-    "crosses zero means the play may have achieved nothing."
+        "**The improvement on each play's measure of success, with its margin of error.** "
+        "Lift is the difference between the customers in the play and the customers held "
+        "out. When the margin crosses zero, the play may have had no effect."
     )
     base = alt.Chart(measured).encode(y=alt.Y("play_name:N", title=None, sort=None))
     # Colours are set by hand so the interval and the zero line show on a dark page too.
@@ -122,7 +122,7 @@ if pd.notna(row["detectable_lift"]):
 
 left, right = st.columns(2)
 with left:
-    st.write("**Journey funnel** (accounts that reached each step)")
+    st.write("**Journey funnel** (the number of customers who reached each step)")
     funnel = pd.DataFrame(journey_funnel(ui.store(), catalog.journeys[play.journey], play.id))
     st.altair_chart(
         alt.Chart(funnel)
@@ -150,8 +150,10 @@ with right:
 
 left, right = st.columns(2)
 with left:
-    st.write("**Results by the week customers entered** (so that one unusual week cannot hide in "
-        "the average)")
+    st.write(
+        "**Results by the week customers entered** (so that one unusual week cannot hide in "
+        "the average)"
+    )
     try:
         weeks = ui.query(
             f"SELECT * FROM gold.experiment_cohorts WHERE play_id = '{play.id}' ORDER BY week_starting"
@@ -159,7 +161,7 @@ with left:
     except Exception:  # a warehouse built before this table existed
         weeks = pd.DataFrame()
     if weeks.empty:
-        st.caption("No cohort has been observed for long enough yet.")
+        st.caption("No weekly group of customers has been observed for long enough yet.")
     else:
         st.dataframe(
             pd.DataFrame(
@@ -181,7 +183,7 @@ with left:
 with right:
     st.write("**Revenue in the 30 days after entry**")
     if "arr_at_entry_treatment" not in results.columns or not row["n_holdout"]:
-        st.caption("No holdout to compare with.")
+        st.caption("This play has no holdout to compare with.")
     else:
         st.dataframe(
             pd.DataFrame(
@@ -205,7 +207,8 @@ with right:
             width="stretch",
         )
         st.caption(
-            "\"Still a customer\" is the guardrail every play is read against: a play that lifts its own metric and loses customers is not working."
+            '"Still a customer" is the safeguard that every play is checked against. A play '
+            "that improves its own measure but loses customers is not working."
         )
 
 left, right = st.columns(2)
@@ -226,7 +229,7 @@ with left:
     for rung in play.intervention_ladder:
         st.caption(f"{rung.tier}: {rung.action} Move up when: {rung.move_up_when}")
 with right:
-    st.write("**Who got in, who was held out, who was kept out and why** (audit log)")
+    st.write("**Who entered, who was held out, who was kept out, and why** (from the audit log)")
     audit = ui.rows(
         "SELECT decision, reason, count(*) AS accounts FROM audit_log WHERE play_id = :play "
         "GROUP BY decision, reason ORDER BY accounts DESC",

@@ -244,7 +244,9 @@ with right:
     # Plain names on the axis, and each signal's definition when the pointer is on its bar.
     meaning = {signal["id"]: signal for signal in load_yaml("job.yaml")["signals"]}
     firing["signal"] = [meaning.get(i, {}).get("name", i) for i in firing["signal_id"]]
-    firing["it fires when"] = [meaning.get(i, {}).get("fires_when", "") for i in firing["signal_id"]]
+    firing["it fires when"] = [
+        meaning.get(i, {}).get("fires_when", "") for i in firing["signal_id"]
+    ]
     st.altair_chart(
         alt.Chart(firing)
         .mark_bar()
@@ -264,4 +266,4 @@ touches = ui.rows(
 if len(touches):
     st.bar_chart(touches, x="day", y="touches", color="channel")
 else:
-    st.info("No touches yet. Simulate a day on the Live demo page.")
+    st.info("No messages have been sent yet. Simulate a day on the Live demo page.")

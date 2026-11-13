@@ -26,8 +26,9 @@ lines:
       have no assigned success manager. Run it as a pilot first, then extend the pattern to
       more customer segments.
     plain: >
-      Look after the customers nobody is assigned to, using data and automation in place of
-      additional staff. Prove it on one group of customers before extending it to others.
+      The system looks after the customers who have no assigned success manager. It uses
+      data and automation instead of hiring more staff. It is proven on one group of
+      customers first, and then extended to the others.
     pages: [pilot]
 
   - line: Turn data into action
@@ -38,7 +39,7 @@ lines:
     plain: >
       A signal is a warning sign or an opportunity found in a customer's data, such as a
       setup that has stalled. A play is the prepared response to one signal. The system
-      connects each signal to the right response.
+      matches each signal with the right response.
     pages: [accounts]
 
   - line: Close ownership gaps
@@ -46,8 +47,8 @@ lines:
       Act as the accountable owner across teams, and establish where the ownership of a
       system or a process is unclear.
     plain: >
-      When several teams share a system, some part of it often belongs to no one. The
-      ownership map finds those parts, so that each can be given an owner.
+      When several teams share a system, some parts of it often belong to no team at all.
+      The ownership map finds those parts, so that each one can be given an owner.
     pages: [operating]
 
   - line: Protect delivery momentum
@@ -56,8 +57,8 @@ lines:
       change-control process, so that agreed decisions are not reopened without a clear
       reason.
     plain: >
-      Record each decision with its reasons, so that the same question is not argued again
-      every month.
+      Each decision is recorded with its reasons, so that the same question is not argued
+      again every month.
     pages: [operating]
 
   - line: Data foundation and pipelines
@@ -66,8 +67,9 @@ lines:
       lifecycle and health data, and work with the Data Engineering and Revenue Operations
       teams on the pipelines and tables.
     plain: >
-      Which data the plays need, and what counts as clean. The requirements are written
-      down, the Data Engineering team builds to them, and automated checks enforce them.
+      This page shows which data the plays need and what counts as clean data. The
+      requirements are written down, the Data Engineering team builds the tables to meet
+      them, and automated checks enforce them.
     pages: [quality]
 
   - line: Analytics and modelling
@@ -76,8 +78,8 @@ lines:
       and the design of measures for adoption, churn, time to value, readiness to expand,
       engagement quality and agent effectiveness.
     plain: >
-      Establish which customers are at risk of leaving, which are ready to buy more, and
-      what evidence supports each conclusion.
+      The models estimate which customers are at risk of leaving and which are ready to
+      buy more. Each estimate comes with the evidence behind it.
     pages: [accounts]
 
   - line: AI-agent signal design
@@ -86,9 +88,9 @@ lines:
       models into practical agent plays, prompts, retrieval logic, escalation rules and
       feedback loops.
     plain: >
-      Decide when an AI agent should step in, what it may answer, and when it must pass the
-      customer to a person. The agent in this demo helps a customer finish setting up the
-      product. It is not a general support agent.
+      These pages show when the AI agent steps in, what it may answer, and when it must
+      pass the customer to a person. The agent in this demonstration helps customers finish
+      setting up the product. It is not a general support agent.
     pages: [demo, agent]
 
   - line: Journey orchestration
@@ -97,8 +99,8 @@ lines:
       the audience rules, consent and contact governance, the channel triggers and the
       journey analytics.
     plain: >
-      A journey is the sequence of steps a play follows: an email, then the AI agent, then
-      a person. Rules govern who enters a journey, who is left out, and how often a
+      A journey is the sequence of steps that a play follows: an email, then the AI agent,
+      then a person. Rules decide who enters a journey, who is left out, and how often a
       customer may be contacted.
     pages: [plays]
 
@@ -107,8 +109,9 @@ lines:
       Define what context moves from digital journeys and AI agents to human teams, and
       what return signal is needed to continue the journey.
     plain: >
-      When automation passes a customer to a person, that person receives everything
-      already known, and the result they record goes back into the system.
+      When the automated steps pass a customer to a person, that person receives
+      everything the system already knows. The outcome that the person records goes back
+      into the system.
     pages: [console]
 
   - line: Measurement and experimentation
@@ -117,39 +120,42 @@ lines:
       show the effect on adoption, monthly active users and consumption, engagement, agent
       invocation, escalation conversion and the closure of setup steps.
     plain: >
-      Prove what worked. Each play is compared with a holdout: similar customers who
-      qualified for it and were deliberately left alone.
+      Each play is measured against a holdout: a group of similar customers who qualified
+      for the play but were deliberately left alone. The difference between the two groups
+      shows what the play achieved.
     pages: [plays]
 
 pages:
   quality: >
-    The data that arrives each day, the records that were rejected and why, and the
-    automated checks every table must pass before a play is allowed to use it.
+    This page shows the data that arrives each day, the records that were rejected and
+    why, and the automated checks that every table must pass before a play may use it.
   accounts: >
-    One customer at a time. At the top are its health score, its risk of leaving and its
-    likelihood of buying more. Below are the signals found in its data today, and a record
-    of every response the system made or decided not to make.
+    This page shows one customer at a time. At the top are its health score, its risk of
+    leaving and its likelihood of buying more. Below are the signals found in its data
+    today, and a record of every action the system took or decided not to take.
   plays: >
-    First the catalogue of plays: for each one, the signal that starts it, its steps, its
-    owner and its measure of success. Then the result of each play against its holdout,
-    and one play in detail.
+    This page starts with the catalog of plays. For each play it shows the signal that
+    starts it, its steps, its owner and how its success is measured. Below are the result
+    of each play against its holdout, and one play in detail.
   demo: >
-    A live conversation with the AI agent, in which you are the administrator of one
-    customer. Ask a setup question, then ask for a price, and watch a rule pass the
-    customer to the Sales team.
+    This page holds a live conversation with the AI agent, in which you play the
+    administrator of one customer. Ask a question about setup, then ask for a price, and
+    watch a rule pass the customer to the Sales team.
   agent: >
-    Every conversation the agent has had, the customer replies it sorted in the shared
-    mailbox, and its results on a fixed set of test conversations.
+    This page shows every conversation the agent has had, the customer replies it sorted
+    in the shared mailbox, and its results on a fixed set of test conversations.
   console: >
-    The queue of tasks waiting for a person, as that person sees it. Each task carries the
-    reason it was raised, the customer's own words, what was already tried and a
-    recommended next step. A sign-in is required because each role sees only its own queue.
+    This page shows the queue of tasks waiting for a person, as that person sees it. Each
+    task explains why it was created, quotes the customer's own words, lists what was
+    already tried, and recommends a next step. A sign-in is required because each role
+    sees only its own queue.
   pilot: >
-    Which customers are in the pilot, whether the pilot is ready to run, how each play is
-    progressing, and what would happen if the next group of customers were added.
+    This page shows which customers are in the pilot, whether the pilot is ready to run,
+    how each play is progressing, and what would happen if the next group of customers
+    were added.
   operating: >
-    The working documents of the programme: who owns what, the decisions taken and why,
-    what each team depends on, and how a decision is changed.
+    This page holds the working documents of the program: who owns what, which decisions
+    were taken and why, what each team depends on, and how a decision can be changed.
 
 # The workflow on the Overview page: each step and the team accountable for it.
 workflow:
@@ -159,7 +165,7 @@ workflow:
     team: Data Science
   - step: Plays decide who receives which help
     team: CS Operations
-  - ladder: Help at the lowest effective cost, in this order
+  - ladder: Help is offered in this order, from the least costly to the most
     rungs:
       - step: 1. An automated email or in-app message
         team: CS Operations
@@ -168,7 +174,7 @@ workflow:
       - step: 3. A person
         team: Scaled CS and Sales
   - step: The customer receives the help
-    note: Outside the company. Never sees this system.
+    note: The customer is outside the company and never sees this system.
   - step: Results are measured, and a decision is made
     team: Analytics and CS Leadership
 
@@ -182,15 +188,15 @@ signals:
   - id: usage_drop
     name: Usage is falling
     kind: Warning
-    fires_when: Monthly active users are down 30% or more against the previous 30 days.
+    fires_when: The customer's monthly active users fell by 30% or more compared with the previous 30 days.
   - id: support_friction
     name: Repeated support problems
     kind: Warning
-    fires_when: Three or more high-priority support tickets in 30 days.
+    fires_when: The customer opened three or more high-priority support tickets in 30 days.
   - id: detractor
     name: Unhappy in a survey
     kind: Warning
-    fires_when: A satisfaction score of 6 or lower, out of 10, in the last 14 days.
+    fires_when: The customer gave a satisfaction score of 6 or lower, out of 10, in the last 14 days.
   - id: churn_risk_high
     name: High risk of leaving
     kind: Warning
@@ -198,11 +204,11 @@ signals:
   - id: no_valid_admin
     name: No contact we may email
     kind: Warning
-    fires_when: No administrator who has agreed to receive email and has a working address.
+    fires_when: The customer has no administrator who has agreed to receive email and has a working address.
   - id: seat_pressure
     name: Seats are nearly full
     kind: Opportunity
-    fires_when: 90% or more of the paid seats are in use.
+    fires_when: The customer uses 90% or more of the seats it pays for.
   - id: edition_fit
     name: Outgrowing the edition
     kind: Opportunity

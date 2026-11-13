@@ -98,9 +98,9 @@ def what_this_is() -> None:
         "the outcome."
     )
     st.markdown(
-        "**Who uses it.** In a company this system is internal. Its teams work in it, and "
-        "customers see only what it sends them. This application exists so that each part can "
-        "be inspected."
+        "**Who uses it.** At a company, this system is internal. Its teams work in it, and "
+        "customers see only the messages it sends them. This application shows each part so "
+        "that it can be inspected."
     )
     st.markdown(
         "**Three terms used on every page.** A *signal* is a warning sign or an opportunity "
@@ -111,7 +111,7 @@ def what_this_is() -> None:
     )
     terms_in_detail(job)
     st.subheader("The workflow, from signal to outcome")
-    st.caption("Each card is one step. The second line names the team accountable for it.")
+    st.caption("Each card is one step. The second line names the team responsible for it.")
     workflow(job["workflow"])
     st.subheader("A guide to the pages")
     # A plain table, so that long sentences wrap and nothing is cut off.

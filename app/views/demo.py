@@ -59,17 +59,18 @@ def first_message(play, account_id: str, evidence: str, enrolment: dict | None) 
         st.markdown(f"**Subject: {subject}**")
         st.markdown(body)
 
+
 st.title("Live demo")
 ui.job_intro("demo")
 tab_chat, tab_day = st.tabs(["Talk to the onboarding agent", "Advance one day"])
 
 with tab_chat:
     st.write(
-        "One play, from start to finish, on one customer. **The system makes the first move.** "
-        "It notices a signal and writes to the customer without being asked. The customer "
-        "replies to that message, the AI agent answers, and a question the agent must not "
-        "answer becomes a task for a person. You play the customer. A handoff creates a real "
-        "task: open it in the Human console."
+        "This page follows one play from start to finish, on one customer. **The system "
+        "makes the first move.** It notices a signal and writes to the customer without "
+        "being asked. The customer replies to that message, and the AI agent answers. A "
+        "question that the agent must not answer becomes a task for a person. You play the "
+        "customer. A handoff creates a real task, which you can open in the Human console."
     )
     llm = get_llm()
     if llm.settings.stand_in_when_unavailable:
@@ -153,11 +154,13 @@ with tab_chat:
         )
         first_message(play, account_id, evidence[signal], enrolment)
     else:
-        st.caption("No signal is firing for this account today. The agent answers all the same.")
+        st.caption(
+            "No signal is firing for this customer today. The agent still answers questions."
+        )
 
     st.markdown("**Step 2. The customer replies to that message.**")
     with st.form("story"):
-        st.write("**The scripted story.** One click, or edit the two messages first.")
+        st.write("**The scripted story.** Run it with one click, or edit the two messages first.")
         # Messages are kept short: on the public demo each one may be sent to a paid model.
         first = st.text_input("The customer replies", STORY[0], max_chars=MAX_MESSAGE)
         second = st.text_input("Then asks", STORY[1], max_chars=MAX_MESSAGE)
@@ -170,15 +173,17 @@ with tab_chat:
             st.session_state.pop("demo_task", None)
 
     st.caption(
-        "Or type your own. Try: Where do I set up single sign-on? | How much are 10 more seats? | Can I talk to someone? | Does Relay do timesheets?"
+        "Or type your own message. For example: Where do I set up single sign-on? How much "
+        "are 10 more seats? Can I talk to someone? Does Relay do timesheets?"
     )
     if "offline" in get_llm().mode:
         st.caption(
-            "Answers are replayed from stored model responses. The scripted story is stored "
-            "for the first five accounts in the list, and the questions on the line above "
-            "for the first one. A price or a request for a person never reaches the model, "
-            "so those work everywhere. For anything else the agent says it is unavailable and "
-            "hands off, which is the safe failure. To have a model answer anything you type, "
+            "Answers are replayed from stored responses of the real model. The scripted story "
+            "is stored for the first five customers in the list, and the example questions "
+            "above are stored for the first customer. A price question or a request for a "
+            "person never reaches the model, so those work for every customer. For any other "
+            "message, the agent says that it is unavailable and passes the customer to a "
+            "person, which is the safe way to fail. To have the model answer anything you type, "
             "start the app with `uv run python run.py app --live`."
         )
     finished = "demo_task" in st.session_state
@@ -211,7 +216,9 @@ with tab_chat:
         with st.expander("What the agent did behind the answer"):
             st.write("Tool calls")
             st.json(conversation.tool_calls)
-            st.write("Help-centre searches (score, and whether an article covers the question)")
+            st.write(
+                "Help center searches, with each score and whether an article covers the question"
+            )
             st.json(conversation.searches)
             models = sorted({c["model"] for c in conversation.llm_log if c["role"] == "agent"})
             st.caption(
@@ -221,20 +228,22 @@ with tab_chat:
 
 with tab_day:
     st.write(
-        "One simulated day, in order: customers react to yesterday's messages, new usage data "
-        "arrives, the pipeline rebuilds the tables, staff work their queues, the shared mailbox "
-        "is sorted, the rules put customers into plays, and the journeys deliver the day's "
-        "steps. It takes about 30 seconds."
+        "One simulated day runs these steps in order. Customers react to yesterday's "
+        "messages. New usage data arrives. The pipeline rebuilds the tables. Staff work on "
+        "their queues. The shared mailbox is sorted. The rules put customers into plays. "
+        "The journeys send the day's messages. It takes about 30 seconds."
     )
     st.caption(f"Simulated today: {ui.today()}")
     if "offline" in get_llm().mode:
         st.caption(
-            "Have the conversation on the other tab first. A new day changes the accounts, so "
-            "the stored answers no longer match them and the agent will say it is unavailable."
+            "Have the conversation on the other tab first. A new day changes the customers' "
+            "data, so the stored answers no longer match, and the agent will say that it is "
+            "unavailable."
         )
     if os.environ.get("DSO_HOSTED"):
         st.info(
-            "Disabled in the hosted demo, which is read-only. Run it locally with `uv run python run.py run-day`."
+            "This is turned off in the hosted demo, which is read-only. To run it locally, use "
+            "`uv run python run.py run-day`."
         )
     elif st.button("Advance one day"):
         from engine.run import run_day

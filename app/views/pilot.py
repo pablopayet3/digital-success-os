@@ -34,9 +34,9 @@ st.dataframe(tiers, hide_index=True, width="stretch")
 
 st.subheader("Readiness checklist")
 st.caption(
-    "Each line is answered from live data every time this page opens. Nobody ticks it by "
-    "hand. A play moves from a small slice of customers to a full test only when every line "
-    "holds."
+    "Each line is checked against live data every time this page opens. Nobody ticks a "
+    "box by hand. A play moves from a small slice of customers to a full test only when "
+    "every line holds."
 )
 checks = readiness_checks(ui.data_dir())
 ready = sum(check["passed"] for check in checks)
@@ -50,9 +50,9 @@ else:
 
 st.subheader("Rollout stage of each play")
 st.caption(
-    "A slice is 10% of the customers who qualify, to confirm that nothing breaks. A full test "
-    "is every customer who qualifies, divided between those who receive the play and those "
-    "held out for comparison."
+    "A slice is 10% of the customers who qualify for a play. It confirms that nothing "
+    "breaks. A full test covers every customer who qualifies, divided between those who "
+    "receive the play and those held out for comparison."
 )
 try:
     results = ui.query(
@@ -79,9 +79,10 @@ st.dataframe(stages.drop(columns="play_id"), hide_index=True, width="stretch")
 
 st.subheader("Results per rung of the intervention ladder")
 st.caption(
-    "Help is tried in order: a digital message first, the AI agent next, a person last. Each "
-    "play is judged on its own measure of success. The customers who reach a person are "
-    "the harder cases, so their results are not comparable with the others."
+    "Help is offered in this order: a digital message first, the AI agent next, and a "
+    "person last. Each play is judged on its own measure of success. The customers who "
+    "reach a person are the hardest cases, so their results cannot be compared with the "
+    "others."
 )
 metric_of = {play.id: play.success_metric["id"] for play in catalog.plays}
 ladder = ui.query(
@@ -99,7 +100,7 @@ if len(ladder):
 handoffs = ui.query(
     "SELECT queue, sum(handoffs) AS handoffs, sum(open_now) AS open_now, sum(sla_breaches) AS sla_breaches FROM gold.metrics_handoffs GROUP BY queue"
 )
-st.write("**What the human rung costs: tasks per queue**")
+st.write("**What the last rung, a person, costs: tasks per queue**")
 st.dataframe(handoffs, hide_index=True, width="stretch")
 
 st.subheader("Handoff quality")
@@ -157,9 +158,9 @@ for column, (label, (value, note)) in zip(st.columns(6), measures.items(), stric
 
 st.subheader("Weekly review notes")
 st.caption(
-    "One row for each week of the pilot. The note is produced by a rule from the same "
-    "numbers, so it cannot flatter the result. In a real review, the owners of the plays "
-    "add the decisions they took."
+    "This table has one row for each week of the pilot. A fixed rule writes each note "
+    "from the numbers, so the note cannot flatter the result. In a real review, the "
+    "owners of the plays add the decisions they took."
 )
 notes = pd.DataFrame(weekly_notes(ui.data_dir()))
 if notes.empty:
@@ -170,12 +171,7 @@ else:
 
 st.subheader("How the pattern scales")
 st.markdown(
-    """
-1. **Slice.** A new play starts on 10% of eligible accounts (`rollout_stage: slice`). The question is "does anything break", not "does it work".
-2. **Full test.** Every eligible account in the pilot segment, half held out. The question is "does it move the metric we named before launch".
-3. **Next segment.** Add `pooled` to `config/rollout.yaml`. The same plays, rules and guardrails run there; a test in the repository proves it. The holdout comes down to 10% and stays.
-4. **Change control.** Each step is a reviewed change to a configuration file, with the experiment report attached (`docs/change-control.md`).
-"""
+    "1. **Slice.** A new play starts on 10% of the customers who qualify (`rollout_stage: slice`). The question at this stage is whether anything breaks, not whether the play works.\n2. **Full test.** Every qualifying customer in the pilot takes part, and half of them are held out. The question is whether the play improves the measure named before launch.\n3. **Next group.** Add `pooled` to `config/rollout.yaml`. The same plays, rules and safeguards then run for those customers, and a test in the repository proves it. The holdout drops to 10% and stays there.\n4. **Change control.** Each step is a reviewed change to a configuration file, with the experiment report attached (`docs/change-control.md`)."
 )
 
 
@@ -189,9 +185,9 @@ for segment in [tier for tier in ("pooled",) if tier not in segments]:
     preview = pd.DataFrame(scaling_preview(segment, ui.today()))
     st.write(f"**Preview: what adding `{segment}` would do today**")
     st.caption(
-        "The same rules, applied today to one more group of customers, without changing "
-        "anything. It shows the first day only: the later steps of each play add tasks in the "
-        "weeks that follow."
+        "This applies the same rules today to one more group of customers, without changing "
+        "anything. It shows the first day only. The later steps of each play add more tasks "
+        "in the weeks that follow."
     )
     shown = preview.drop(columns="play_id").rename(columns=lambda name: name.replace("_", " "))
     st.dataframe(shown, hide_index=True, width="stretch")
@@ -199,11 +195,16 @@ for segment in [tier for tier in ("pooled",) if tier not in segments]:
     first_day = preview.dropna(subset=["first_day_queue"]).groupby("first_day_queue")["would_enter"]
     for queue, tasks in first_day.sum().items():
         capacity = queues[queue]["capacity_per_day"]
-        line = f"{queues[queue]['name']}: {int(tasks)} new tasks on day one, capacity {capacity} a day."
+        line = (
+            f"{queues[queue]['name']}: {int(tasks)} new tasks on the first day, for a team "
+            f"that can handle {capacity} a day."
+        )
         if tasks > capacity:
-            st.warning(f"{line} More than a day of work: start with a slice, or add people first.")
+            st.warning(
+                f"{line} That is more than a day of work. Start with a slice, or add people first."
+            )
         else:
-            st.write(f":green[**Fits**] &nbsp; {line}")
+            st.write(f":green[**The team can handle it.**] &nbsp; {line}")
 
 plan = ROOT / "docs" / "pilot-plan.md"
 if plan.exists():

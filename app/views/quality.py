@@ -18,11 +18,12 @@ ui.metric(two, "Contract checks passing", f"{ok} of {len(contract)}")
 ui.metric(three, "Sources checked for freshness", len(freshness))
 # One short line under each number, in its own column.
 one.caption(
-    "Automated checks a table must pass before any play may use it: no customer twice, "
-    "no missing identifier, every value in its expected range"
+    "Automated checks that a table must pass before any play may use it. For example, "
+    "no customer appears twice, no record is missing its identifier, and every value is "
+    "in its expected range."
 )
-two.caption("The contract is the written list of what the main table promises to contain")
-three.caption("Freshness: each source delivered its data on time")
+two.caption("The contract is the written list of what the main table promises to contain.")
+three.caption("Freshness means that each source delivered its data on time.")
 
 st.subheader("What the pipeline caught")
 st.caption(
