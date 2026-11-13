@@ -5,11 +5,7 @@ import streamlit as st
 from app import ui
 
 st.title("Data quality")
-st.write(
-    "Plays act on data, so the data has to be checked first. Bad rows are rejected at the "
-    "door with a reason, the tables are tested on every run, and the production table has "
-    "a written contract that code checks."
-)
+ui.job_intro("quality")
 
 tests = ui.query("SELECT * FROM gold.dq_test_results")
 contract = ui.query("SELECT * FROM gold.dq_contract_checks")
@@ -20,6 +16,12 @@ one.metric("Data tests passing", f"{passed} of {len(tests)}")
 ok = int(contract["passed"].sum())
 two.metric("Contract checks passing", f"{ok} of {len(contract)}")
 three.metric("Sources checked for freshness", len(freshness))
+st.caption(
+    "A data test is an automated check that a table must pass before any play may use it: "
+    "for example, no customer appears twice, no record lacks its customer identifier, and "
+    "every value lies in its expected range. The contract is the written list of what the "
+    "main table promises to contain. Freshness means each source delivered its data on time."
+)
 
 st.subheader("What the pipeline caught")
 st.caption(

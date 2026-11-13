@@ -17,26 +17,26 @@ from app import tour, ui  # noqa: E402
 
 st.set_page_config(page_title="Digital Success OS (synthetic data)", layout="wide")
 
+# The menu follows the order of the work: data, then models, then the responses, then
+# how it is run. The names are in app/ui.py, so the tour and the pages use the same ones.
+MENU = {
+    "Start here": ["overview"],
+    "1. Data and models": ["quality", "accounts"],
+    "2. Journeys, AI agent, handoffs": ["plays", "demo", "agent", "console"],
+    "3. Pilot, ownership, decisions": ["pilot", "operating"],
+}
 PAGES = {
-    "The system": [
-        st.Page("views/overview.py", title="Overview", default=True),
-        st.Page("views/accounts.py", title="Accounts"),
-        st.Page("views/plays.py", title="Plays and experiments"),
-        st.Page("views/agent.py", title="Agents"),
-        st.Page("views/console.py", title="Human console"),
-    ],
-    "Behind it": [
-        st.Page("views/quality.py", title="Data quality"),
-        st.Page("views/pilot.py", title="Pilot"),
-        st.Page("views/operating.py", title="Operating model"),
-        st.Page("views/demo.py", title="Live demo"),
-    ],
+    section: [
+        st.Page(f"views/{name}.py", title=ui.PAGE_NAMES[name], default=name == "overview")
+        for name in names
+    ]
+    for section, names in MENU.items()
 }
 
 page = st.navigation(PAGES)
 ui.banner()
 if ui.data_is_ready():
-    tour.show()  # the guided tour's window or bar, when a tour is running
+    tour.show(page.title)  # the guided tour's strip, when a tour is running
     page.run()
 else:
     st.title("Digital Success OS")

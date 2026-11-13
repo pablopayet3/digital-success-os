@@ -259,7 +259,7 @@ has run against a Developer Edition org (6 accounts, 6 tasks; a second run creat
 nothing), signed in through the browser with the vendor's command-line tool:
 `SALESFORCE_CLI_ORG=dso-demo` in `.env`, and `sf` must be on the PATH (it installs to
 `%APPDATA%\npm`, which this app's shell does not have on its PATH by default).
-198 tests in total.
+200 tests in total.
 
 After the phases (the brief read again line by line; see the last section of
 `docs/phase-notes.md`):
@@ -299,17 +299,19 @@ After the phases (the brief read again line by line; see the last section of
   today: regenerating the data or advancing a day breaks the match (the agent then
   hands off as `agent_unavailable`). Store them again with one `--live` run of the
   same conversations (about 3 cents each).
-- `app/tour.py` and `config/tour.yaml`: the guided tour, thirteen pop-up windows with
-  Next and Back. Each opens on the page it explains and says what the visitor sees,
-  the real tool at a company and who uses it, what this demo is built with, what the
-  role asks for, and the role's part. The second window draws the whole chain with the
-  team on each step (keep that flowchart free of arrows that go back: one makes the
-  layout jump). There is one tour, not one per kind of user: its reader is the person
-  judging the whole chain. Only the Human console asks for a sign-in.
-  It opens by itself only on the hosted demo (`DSO_HOSTED`); locally it starts from
-  the sidebar button, so a live demo is never interrupted. The words are the YAML.
-- `app/tour_voice.html`: the tour's "Read aloud" button, the browser's own voice, off
-  until pressed (ADR 0023). `app/tour.py::spoken` is what it reads.
+- `config/job.yaml`: the ten lines of the role, in plain words, and the page that shows
+  each. One source for the opening of every page (`app/ui.py::job_intro`), for the top of
+  the Overview (`ui.what_this_is`: what this is, the workflow as cards, the role line by
+  line) and for the menu's order (`app/main.py`). Page names are `ui.PAGE_NAMES`.
+- `app/tour.py` and `config/tour.yaml`: the guided tour, a slim strip at the top of the
+  page with Back, Next and End, one stop per page. It never covers the page. It names
+  the platform and the team at a real company; the page's own opening says the rest. It
+  starts by itself only on the hosted demo (`DSO_HOSTED`).
+- How visitor-facing text is written (the owner's rules of 12 and 13 November 2026):
+  complete sentences, every term defined where it is used, each team named as a team,
+  never the words "cheap" or "thing", no line about the author. The browser-voice
+  "Read aloud" button was removed (ADR 0023): the owner wants a recorded voice instead,
+  which is not built yet.
 - The agent on the public demo (ADR 0024, the owner's decision of 12 November 2026,
   which changes the brief's rule that the hosted app never calls the API): the stand-in
   by default; with `ANTHROPIC_API_KEY` set by the owner in the host's dashboard,

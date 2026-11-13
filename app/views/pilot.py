@@ -15,6 +15,7 @@ from engine.pilot import readiness_checks, weekly_notes
 from engine.rules import preview_segment
 
 st.title("Pilot")
+ui.job_intro("pilot")
 segments = load_yaml("rollout.yaml")["segments"]
 catalog = load_catalog()
 st.write(

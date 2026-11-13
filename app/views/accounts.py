@@ -8,6 +8,7 @@ import streamlit as st
 from app import ui
 
 st.title("Accounts")
+ui.job_intro("accounts")
 
 tier, stage, band = st.columns(3)
 tiers = tier.multiselect(
@@ -51,6 +52,12 @@ one.metric("Health", f"{account['health_score']:.0f}", account["health_band"], d
 two.metric("Churn risk", ui.pct(account["churn_risk_score"]))
 three.metric("Expansion likelihood", ui.pct(account["expansion_score"]))
 four.metric("Seats", f"{account['seats_assigned']} of {account['seats_licensed']}")
+st.caption(
+    "Health is a score from 0 to 100 built from five components, shown below; a red band "
+    "means the customer needs attention. Churn risk is a model's estimate that the customer "
+    "will cancel within 90 days. Expansion likelihood is its estimate that the customer will "
+    "buy more within 90 days. Seats shows how many of the paid seats are in use."
+)
 
 left, right = st.columns(2)
 with left:

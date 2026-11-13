@@ -16,6 +16,7 @@ STORY = ["How do I invite my whole team at once?", "Thanks. How much would 10 mo
 MAX_MESSAGE = 400  # characters a visitor may type in one message
 
 st.title("Live demo")
+ui.job_intro("demo")
 tab_chat, tab_day = st.tabs(["Talk to the onboarding agent", "Advance one day"])
 
 with tab_chat:

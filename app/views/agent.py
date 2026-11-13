@@ -11,6 +11,7 @@ from app import ui
 from common.paths import ROOT
 
 st.title("Agents")
+ui.job_intro("agent")
 st.write(
     "Two agents. The **onboarding agent** answers setup questions from the help centre and "
     "hands off when a hard rule says so. The **mailbox triage agent** reads every reply in the "
@@ -30,6 +31,12 @@ two.metric(
 three.metric("Mailbox replies triaged", len(triage))
 four.metric(
     "LLM cost so far", f"${conversations['cost_usd'].sum():.2f}" if len(conversations) else "$0.00"
+)
+st.caption(
+    "A conversation is one exchange between the onboarding agent and a customer. The handoff "
+    "rate is the share of conversations the agent passed to a person. Mailbox replies are "
+    "customers' answers to our emails, sorted by the triage agent. LLM cost is what the AI "
+    "model charged for these conversations."
 )
 
 tab_conversations, tab_mailbox, tab_feedback, tab_evals, tab_review, tab_prompts = st.tabs(

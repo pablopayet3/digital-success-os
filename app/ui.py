@@ -10,6 +10,7 @@ import pandas as pd
 import streamlit as st
 
 from agents.llm import get_llm
+from common.config import load_yaml
 from common.paths import DATA_DIR
 from common.store import Store, open_store
 from common.warehouse import open_warehouse
@@ -68,6 +69,86 @@ def today() -> str:
 
 def pct(value, digits: int = 0) -> str:
     return "n/a" if value is None or pd.isna(value) else f"{value:.{digits}%}"
+
+
+# The name of each page, as the menu, the tour and the Overview table show it.
+PAGE_NAMES = {
+    "overview": "Overview",
+    "quality": "Data quality",
+    "accounts": "Accounts",
+    "plays": "Plays and experiments",
+    "demo": "Live demo",
+    "agent": "Agents",
+    "console": "Human console",
+    "pilot": "Pilot",
+    "operating": "Operating model",
+}
+
+
+def what_this_is() -> None:
+    """The top of the Overview: what this is, the workflow, and the role line by line."""
+    job = load_yaml("job.yaml")
+    st.markdown(
+        "**What this is.** A working model of a digital customer-success operation, built on "
+        "fictional data. A software company has thousands of customers with no assigned success "
+        "manager. This system looks after them. It reads their data every day, finds the "
+        "customers who need help, and sends that help automatically: an email first, then an AI "
+        "agent, and a person only when one is needed. It then measures whether the help changed "
+        "the outcome."
+    )
+    st.markdown(
+        "**Who uses it.** In a company this system is internal. Its teams work in it, and "
+        "customers see only what it sends them. This application exists so that each part can "
+        "be inspected."
+    )
+    st.markdown(
+        "**Three terms used on every page.** A *signal* is a warning sign or an opportunity "
+        "found in a customer's data, such as a setup that has stalled. A *play* is the prepared "
+        "response to one signal. A *holdout* is a group of similar customers deliberately left "
+        "alone, so that the effect of a play can be measured."
+    )
+    st.subheader("The workflow, from signal to outcome")
+    st.caption("Each card is one step. The second line names the team accountable for it.")
+    workflow(job["workflow"])
+    st.subheader("The role, line by line")
+    # A plain table, so that long sentences wrap and nothing is cut off.
+    table = ["| The role asks for | In plain words | Where to look |", "|---|---|---|"]
+    for line in job["lines"]:
+        pages = ", ".join(PAGE_NAMES[page] for page in line["pages"])
+        table.append(f"| **{line['line']}** | {line['plain'].strip()} | {pages} |")
+    st.markdown("\n".join(table))
+
+
+def workflow(stages: list[dict]) -> None:
+    """The workflow as a row of cards with arrows between them. Each card names its team."""
+    widths = []
+    for index, stage in enumerate(stages):
+        widths += ([1] if index else []) + [5 if "rungs" in stage else 4]
+    slots = iter(st.columns(widths, vertical_alignment="center"))
+    for index, stage in enumerate(stages):
+        if index:
+            next(slots).markdown("**→**")
+        with next(slots):
+            if "rungs" in stage:
+                st.caption(stage["ladder"])
+            for card in stage.get("rungs", [stage]):
+                with st.container(border=True):
+                    st.markdown(f"**{card['step']}**")
+                    st.caption(f"Team: {card['team']}" if "team" in card else card["note"])
+
+
+def job_intro(page: str) -> None:
+    """How every page opens: the line of the role it answers, in plain words, and what is here.
+
+    The words are in config/job.yaml, so the pages, the Overview table and the tour agree.
+    """
+    job = load_yaml("job.yaml")
+    with st.container(border=True):
+        for line in job["lines"]:
+            if page in line["pages"]:
+                st.markdown(f"**The role asks for: {line['line']}.** {line['asks'].strip()}")
+                st.markdown(f"**In plain words.** {line['plain'].strip()}")
+        st.markdown(f"**On this page.** {job['pages'][page].strip()}")
 
 
 def refresh() -> None:

@@ -1,6 +1,8 @@
 # 0023: The guided tour can be read aloud, by the browser's own voice
 
-Status: accepted. Synthetic data, fictional company.
+Status: withdrawn on 13 November 2026. The owner heard the browser's voice and did not
+want it: the tour is to be read by a recorded voice instead (option 1 below), which is
+not built yet. The button and its file were removed. Synthetic data, fictional company.
 
 ## Context
 

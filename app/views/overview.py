@@ -14,11 +14,7 @@ from common.paths import ROOT
 GOOD_OUTCOMES = ["resolved", "saved", "expansion_opportunity"]
 
 st.title("Digital Success OS")
-st.write(
-    "Customer signals become plays. A play is a journey, an AI agent, or a task for a "
-    "person. When the agent cannot help it hands off with full context, and the person's "
-    "outcome comes back into the system. Every play is measured against a holdout."
-)
+ui.what_this_is()
 # For someone handed the link: a five-minute path through the whole loop.
 guide = ROOT / "docs" / "reviewer-guide.md"
 if guide.exists():
@@ -52,6 +48,13 @@ two.metric("ARR in the pilot", f"${accounts['arr'] / 1e6:.1f}M")
 three.metric("Health: red", int(accounts["red"]))
 four.metric("In a play now", active, help=f"{held} more are held out for comparison")
 five.metric("Tasks open for people", open_tasks)
+st.caption(
+    "The pilot covers the customers with no assigned success manager. ARR is annual "
+    "recurring revenue: what these customers pay per year. Health: red counts the customers "
+    "whose health score says they need attention. In a play now counts the customers "
+    "currently receiving a prepared response. Tasks open for people are handoffs waiting "
+    "for a success manager or for Sales."
+)
 
 st.subheader("The measures the pilot is run on")
 st.caption(

@@ -168,57 +168,71 @@ def test_the_overview_opens_with_a_path_for_someone_handed_the_link(app_data):
 # --- The guided tour -----------------------------------------------------------------------------
 
 
-def test_every_tour_window_is_complete_and_opens_on_a_real_page():
-    from app.tour import OPTIONAL, PARTS, steps
+def test_the_role_is_written_once_and_every_page_opens_with_its_line():
+    from app.ui import PAGE_NAMES
+    from common.config import load_yaml
 
-    windows = steps()
-    assert len(windows) >= 10
-    for window in windows:
-        assert (ROOT / "app" / "views" / f"{window['page']}.py").exists(), window["page"]
-        assert window["title"].strip()
-        for part in PARTS:
-            if part in OPTIONAL and part not in window:
-                continue
-            assert window[part].strip(), f"{window['title']}: nothing written for '{part}'"
-    # A visitor who follows the tour has seen every page of the app,
-    assert {window["page"] for window in windows} == set(PAGES)
-    # and has been told, for every page, what this demo is built with.
-    assert {window["page"] for window in windows if "built" in window} == set(PAGES)
-    # The button promises six minutes. That is about 1,500 words to read.
-    words = sum(len(window.get(part, "").split()) for window in windows for part in PARTS)
-    assert words <= 1500, f"the tour has grown to {words} words"
-    # The chain is drawn once, and the picture is one the app can draw.
-    pictures = [window["diagram"] for window in windows if "diagram" in window]
-    assert pictures and all("->" in mermaid_to_dot(picture) for picture in pictures)
+    job = load_yaml("job.yaml")
+    assert len(job["lines"]) == 10  # the ten lines of the role
+    for line in job["lines"]:
+        assert line["line"].strip() and line["asks"].strip() and line["plain"].strip()
+        assert line["pages"] and all(page in job["pages"] for page in line["pages"])
+    # Every page except the Overview answers at least one line, and says what is on it.
+    answered = {page for line in job["lines"] for page in line["pages"]}
+    assert answered == set(PAGES) - {"overview"} == set(job["pages"])
+    assert set(PAGE_NAMES) == set(PAGES)
+    # Words the owner ruled out of anything a visitor reads.
+    text = " ".join(str(value) for line in job["lines"] for value in line.values())
+    text += " ".join(job["pages"].values())
+    assert "cheap" not in text.lower() and " thing" not in text.lower()
 
 
-def test_every_tour_window_can_be_read_aloud():
-    from app.tour import VOICE_BUTTON, spoken, steps
-
-    for window in steps():
-        sentences = spoken(window)
-        assert sentences[0].startswith(window["title"])
-        # One sentence at a time, each short: some browsers cut a long reading off.
-        assert all(0 < len(sentence.split()) <= 45 for sentence in sentences)
-    # The button uses the browser's own voice: it loads nothing from the internet.
-    assert "speechSynthesis" in VOICE_BUTTON and "http" not in VOICE_BUTTON
+def test_every_page_opens_with_the_line_of_the_role_it_answers(app_data):
+    for page in ("quality", "accounts", "plays", "demo", "agent", "console", "pilot", "operating"):
+        app = AppTest.from_file(str(ROOT / "app" / "views" / f"{page}.py"), default_timeout=120)
+        app.run()
+        opening = " ".join(markdown.value for markdown in app.markdown)
+        assert "The role asks for" in opening and "In plain words." in opening, page
+        assert "On this page." in opening, page
 
 
-def test_next_walks_through_every_window_and_finish_ends_the_tour(app_data):
-    from app.tour import steps
+def test_the_overview_says_what_this_is_and_shows_the_workflow(app_data):
+    app = AppTest.from_file(str(ROOT / "app" / "views" / "overview.py"), default_timeout=120).run()
+    assert not app.exception, [error.value for error in app.exception]
+    words = " ".join(markdown.value for markdown in app.markdown)
+    assert "What this is." in words and "Who uses it." in words
+    assert "signal" in words and "holdout" in words  # the terms are defined before they are used
+    assert "Data arrives and is validated" in words  # the first card of the workflow
+    headings = [heading.value for heading in app.subheader]
+    assert "The workflow, from signal to outcome" in headings
+    assert "The role, line by line" in headings
+
+
+def test_every_tour_stop_opens_a_real_page_and_every_page_has_a_stop():
+    from app.tour import stops
+
+    for stop in stops():
+        assert (ROOT / "app" / "views" / f"{stop['page']}.py").exists(), stop["page"]
+        assert stop["company"].strip()
+    # A visitor who follows the tour has seen every page of the app.
+    assert {stop["page"] for stop in stops()} == set(PAGES)
+
+
+def test_next_walks_through_every_stop_and_finish_ends_the_tour(app_data):
+    from app.tour import stops
 
     app = AppTest.from_file(str(ROOT / "app" / "main.py"), default_timeout=120)
-    app.session_state["tour_step"], app.session_state["tour_open"] = 0, True
+    app.session_state["tour_step"] = 0
     app.run()
     seen = []
-    for _ in range(len(steps()) + 1):
+    for _ in range(len(stops()) + 1):
         assert not app.exception, [error.value for error in app.exception]
         forward = [button for button in app.button if button.label in ("Next", "Finish")]
         if app.session_state["tour_step"] is None or not forward:
             break
-        seen.append(app.title[0].value)  # the page the window opened on
+        seen.append(app.title[0].value)  # the page the stop opened
         forward[0].click().run()
-    assert len(seen) == len(steps()) and app.session_state["tour_step"] is None
+    assert len(seen) == len(stops()) and app.session_state["tour_step"] is None
     assert {"Data quality", "Accounts", "Live demo", "Human console", "Pilot"} <= set(seen)
 
 
@@ -226,9 +240,9 @@ def test_the_tour_greets_a_hosted_visitor_but_never_interrupts_a_local_demo(app_
     main = str(ROOT / "app" / "main.py")
     monkeypatch.delenv("DSO_HOSTED", raising=False)
     local = AppTest.from_file(main, default_timeout=120).run()
-    assert "Guided tour (6 minutes)" in [button.label for button in local.button]
-    assert "Next" not in [button.label for button in local.button]  # no window by itself
+    assert "Guided tour" in [button.label for button in local.button]
+    assert "Next" not in [button.label for button in local.button]  # no tour by itself
 
     monkeypatch.setenv("DSO_HOSTED", "1")
     hosted = AppTest.from_file(main, default_timeout=120).run()
-    assert "Next" in [button.label for button in hosted.button]  # the first window is open
+    assert "Next" in [button.label for button in hosted.button]  # the first stop is showing

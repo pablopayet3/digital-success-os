@@ -2,13 +2,12 @@
 
 import streamlit as st
 
+from app import ui
 from app.diagrams import show_markdown
 from common.paths import ROOT
 
 st.title("Operating model")
-st.write(
-    "Who owns what, how changes are made, how a handoff works, and why each design decision was taken."
-)
+ui.job_intro("operating")
 
 DOCS = ROOT / "docs"
 GROUPS = {

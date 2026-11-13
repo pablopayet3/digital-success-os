@@ -1,76 +1,52 @@
-"""The guided tour: pop-up windows that walk a visitor through the app, one Next at a time.
+"""The guided tour: a slim strip at the top of the page that walks a visitor through the app.
 
-Synthetic data, fictional company. The words are in config/tour.yaml; this file only
-shows them. Each window opens on the page it explains and says: what the visitor is
-looking at, which tool does this at a real company and who uses it, what this demo is
-built with, what the role asks for, and what the person in the role does. One window
-draws the whole chain as a flowchart, with the team that owns each step.
+Synthetic data, fictional company. The strip never covers the page. Each stop is one page:
+the strip names the page, says which platform and which team do this at a real company
+(config/tour.yaml), and offers Back, Next and End. What the page is for is said by the page
+itself, in its opening (app/ui.py::job_intro), so the tour has nothing to repeat.
 
-How it behaves:
-  - On the hosted demo the first window opens by itself, once per visit. Locally the
-    tour starts from the button in the sidebar, so a live demo is never interrupted.
-  - Next and Back move between windows and switch to the right page.
-  - A window can be closed to look at the page behind it. A thin bar at the top of the
-    page then offers to reopen it, go on, or end the tour.
-  - "Read aloud" turns on a voice that reads each window (the browser's own, so it needs
-    no service). It stays on from window to window until it is turned off.
+On the hosted demo the tour starts by itself. Locally it starts from the button in the
+sidebar, so a live demo is never interrupted.
 
-Where the tour is: two values in the session, `tour_step` (the window's number, or None
-when no tour is running) and `tour_open` (is the window showing).
+Where the tour is: `tour_step` in the session is the stop's number, or None when no tour
+is running.
 """
 
 from __future__ import annotations
 
-import json
 import os
-import re
-from pathlib import Path
 
 import streamlit as st
 
-from app.diagrams import show_diagram
+from app import ui
 from common.config import load_yaml
 
-# The "Read aloud" button: a little HTML and JavaScript, kept in its own file (ADR 0023).
-VOICE_BUTTON = (Path(__file__).parent / "tour_voice.html").read_text(encoding="utf-8")
 
-# What each part of a window is called on screen, in the order shown.
-PARTS = {
-    "look": "What you are looking at.",
-    "company": "At a real company.",
-    "built": "In this demo.",
-    "job": "What the role asks for.",
-    "mine": "My part in it.",
-}
-# A window about the whole system has no single set of tools to name, so it may leave this out.
-OPTIONAL = {"built"}
+def stops() -> list[dict]:
+    return load_yaml("tour.yaml")["stops"]
 
 
-def steps() -> list[dict]:
-    return load_yaml("tour.yaml")["steps"]
-
-
-def show() -> None:
-    """Draw the tour: the sidebar button, and the window or the bar when a tour is running."""
+def show(current_page: str) -> None:
+    """Draw the sidebar button, and the strip when a tour is running."""
     state = st.session_state
     if "tour_step" not in state:
-        # A visitor of the hosted demo is greeted by the first window. Locally, nothing opens.
+        # A visitor of the hosted demo is greeted by the first stop. Locally, nothing opens.
         state.tour_step = 0 if os.environ.get("DSO_HOSTED") else None
-        state.tour_open = True
-    if st.sidebar.button("Guided tour (6 minutes)", width="stretch"):
+    if st.sidebar.button("Guided tour", width="stretch"):
         _go(0)
     if state.tour_step is None:
         return
-    if state.tour_open:
-        _window(state.tour_step)
-    else:
-        _bar(state.tour_step)
+    # The visitor may have used the menu: the strip then follows them to the page they chose.
+    names = [ui.PAGE_NAMES[stop["page"]] for stop in stops()]
+    if names[state.tour_step] != current_page and current_page in names:
+        state.tour_step = names.index(current_page)
+    _strip(state.tour_step)
 
 
 def _go(index: int) -> None:
-    """Move to a window and to the page it explains."""
-    st.session_state.tour_step, st.session_state.tour_open = index, True
-    st.switch_page(f"views/{steps()[index]['page']}.py")
+    """Move to a stop and to the page it explains."""
+    st.session_state.tour_step = index
+    st.switch_page(f"views/{stops()[index]['page']}.py")
 
 
 def _end() -> None:
@@ -78,73 +54,20 @@ def _end() -> None:
     st.rerun()
 
 
-def _closed() -> None:
-    """The visitor closed the window (the X, Escape, or a click outside it)."""
-    st.session_state.tour_open = False
-
-
-def _window(index: int) -> None:
-    """Open one window. A window with a picture is wide, so the picture can be read."""
-    width = "large" if "diagram" in steps()[index] else "medium"
-    st.dialog("Guided tour", width=width, on_dismiss=_closed)(_contents)(index)
-
-
-def spoken(step: dict) -> list[str]:
-    """What the voice reads for one window: its title, then each part, one sentence at a time."""
-    title = step["title"]
-    said = [title if title.endswith(("?", "!", ".")) else title + "."]
-    said += [f"{label} {step[key].strip()}" for key, label in PARTS.items() if key in step]
-    return [sentence for part in said for sentence in re.split(r"(?<=[.!?])\s+", part)]
-
-
-def _voice(step: dict) -> None:
-    """The "Read aloud" button. The browser's own voice reads the window (ADR 0023)."""
-    sentences = json.dumps(spoken(step)).replace("</", "<\\/")  # safe inside a script tag
-    st.html(VOICE_BUTTON.replace("__SENTENCES__", sentences), unsafe_allow_javascript=True)
-
-
-def _contents(index: int) -> None:
-    all_steps = steps()
-    step, last = all_steps[index], index == len(all_steps) - 1
-    st.caption(f"Window {index + 1} of {len(all_steps)}. Synthetic data, fictional company.")
-    st.subheader(step["title"])
-    _voice(step)
-    parts =[f"**{label}** {step[key].strip()}" for key, label in PARTS.items() if key in step]
-    if "diagram" in step:
-        # The picture on top, the words in two columns under it (the window is wide).
-        show_diagram(step["diagram"])
-        left, right = st.columns(2)
-        half = len(parts) // 2
-        left.markdown("\n\n".join(parts[:half]))
-        right.markdown("\n\n".join(parts[half:]))
-    else:
-        for part in parts:
-            st.markdown(part)
-
-    back, look, forward = st.columns(3)
-    if back.button("Back", disabled=index == 0, width="stretch"):
-        _go(index - 1)
-    if look.button("Look at the page", width="stretch"):
-        _closed()
-        st.rerun()
-    if forward.button("Finish" if last else "Next", type="primary", width="stretch"):
-        if last:
-            _end()
-        _go(index + 1)
-
-
-def _bar(index: int) -> None:
-    """The tour, folded away: one line at the top of the page while the window is closed."""
-    all_steps = steps()
+def _strip(index: int) -> None:
+    all_stops = stops()
+    stop, last = all_stops[index], index == len(all_stops) - 1
     with st.container(border=True):
-        text, reopen, forward, end = st.columns([5, 2, 1, 1])
+        text, back, forward, end = st.columns([7, 1, 1, 1], vertical_alignment="center")
         text.markdown(
-            f"**Guided tour, window {index + 1} of {len(all_steps)}:** {all_steps[index]['title']}"
+            f"**Guided tour, stop {index + 1} of {len(all_stops)}: "
+            f"{ui.PAGE_NAMES[stop['page']]}.** {stop['company'].strip()}"
         )
-        if reopen.button("Show the explanation", width="stretch"):
-            st.session_state.tour_open = True
-            st.rerun()
-        if index < len(all_steps) - 1 and forward.button("Next", type="primary", width="stretch"):
+        if back.button("Back", disabled=index == 0, width="stretch"):
+            _go(index - 1)
+        if forward.button("Finish" if last else "Next", type="primary", width="stretch"):
+            if last:
+                _end()
             _go(index + 1)
         if end.button("End", width="stretch"):
             _end()

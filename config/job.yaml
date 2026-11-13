@@ -1,0 +1,171 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# The ten lines of the role this demo was built for, in plain words, and where each one is
+# shown in the app. This file is the single source for three places:
+#   - the opening of every page (app/ui.py::job_intro),
+#   - the table "The role, line by line" on the Overview page,
+#   - the guided tour (app/tour.py).
+#
+# lines:
+#   line   a short name for the line of the role
+#   asks   what the role asks for (the sense of the posting, without naming a product)
+#   plain  the same in plain words, with every term defined
+#   pages  the pages that show it (files in app/views/)
+# pages:
+#   what a visitor sees on each page, in one or two sentences
+#
+# How it is written: complete sentences, every term defined where it is used, each team
+# named as a team. The reader is a hiring panel reading it for the first time.
+
+lines:
+  - line: Build the Digital Success operating system, pilot it, then scale it
+    asks: >
+      Create the systems, data flows and journey orchestration that support customers who
+      have no assigned success manager. Run it as a pilot first, then extend the pattern to
+      more customer segments.
+    plain: >
+      Look after the customers nobody is assigned to, using data and automation in place of
+      additional staff. Prove it on one group of customers before extending it to others.
+    pages: [pilot]
+
+  - line: Turn data into action
+    asks: >
+      Convert product usage, lifecycle stage, health, contact engagement, sentiment,
+      support and commercial signals into plays, triggers for the AI agent, tasks and
+      handoffs to people.
+    plain: >
+      A signal is a warning sign or an opportunity found in a customer's data, such as a
+      setup that has stalled. A play is the prepared response to one signal. This line is
+      about connecting each signal to the right response.
+    pages: [accounts]
+
+  - line: Close ownership gaps
+    asks: >
+      Act as the accountable owner across teams, and establish where the ownership of a
+      system or a process is unclear.
+    plain: >
+      When several teams share a system, some part of it often belongs to no one. This
+      role finds those parts and makes sure each has an owner.
+    pages: [operating]
+
+  - line: Protect delivery momentum
+    asks: >
+      Maintain the decision log, the architecture principles, the dependency map and the
+      change-control process, so that agreed decisions are not reopened without a clear
+      reason.
+    plain: >
+      Record each decision with its reasons, so that the same question is not argued again
+      every month.
+    pages: [operating]
+
+  - line: Data foundation and pipelines
+    asks: >
+      Define the requirements for clean, reliable account, contact, product, engagement,
+      lifecycle and health data, and work with the Data Engineering and Revenue Operations
+      teams on the pipelines and tables.
+    plain: >
+      State which data the plays need and what counts as clean. The Data Engineering team
+      builds it. This role specifies it and verifies it.
+    pages: [quality]
+
+  - line: Analytics and modelling
+    asks: >
+      Work with the Analytics team on exploratory analysis, segmentation, predictive models
+      and the design of measures for adoption, churn, time to value, readiness to expand,
+      engagement quality and agent effectiveness.
+    plain: >
+      Establish which customers are at risk of leaving, which are ready to buy more, and
+      what evidence supports each conclusion.
+    pages: [accounts]
+
+  - line: AI-agent signal design
+    asks: >
+      Work with the AI Agent Engineering team and the Data Science team to turn metrics and
+      models into practical agent plays, prompts, retrieval logic, escalation rules and
+      feedback loops.
+    plain: >
+      Decide when an AI agent should step in, what it may answer, and when it must pass the
+      customer to a person. The agent in this demo helps a customer finish setting up the
+      product. It is not a general support agent.
+    pages: [demo, agent]
+
+  - line: Journey orchestration
+    asks: >
+      Put into operation the journeys, the tasks for people, the shared-mailbox workflows,
+      the audience rules, consent and contact governance, the channel triggers and the
+      journey analytics.
+    plain: >
+      A journey is the sequence of steps a play follows: an email, then the AI agent, then
+      a person. This line governs who enters a journey, who is left out, and how often a
+      customer may be contacted.
+    pages: [plays]
+
+  - line: Digital-to-human handoffs
+    asks: >
+      Define what context moves from digital journeys and AI agents to human teams, and
+      what return signal is needed to continue the journey.
+    plain: >
+      When automation passes a customer to a person, that person receives everything
+      already known, and the result they record goes back into the system.
+    pages: [console]
+
+  - line: Measurement and experimentation
+    asks: >
+      Work with the Analytics team on cohort analysis, A/B tests and operating reviews that
+      show the effect on adoption, monthly active users and consumption, engagement, agent
+      invocation, escalation conversion and the closure of setup steps.
+    plain: >
+      Prove what worked. Each play is compared with a holdout: similar customers who
+      qualified for it and were deliberately left alone.
+    pages: [plays]
+
+pages:
+  quality: >
+    The data that arrives each day, the records that were rejected and why, and the
+    automated checks every table must pass before a play is allowed to use it.
+  accounts: >
+    One customer at a time. At the top are its health score, its risk of leaving and its
+    likelihood of buying more. Below are the signals found in its data today, and a record
+    of every response the system made or decided not to make.
+  plays: >
+    First the catalogue of plays: for each one, the signal that starts it, its steps, its
+    owner and its measure of success. Then the result of each play against its holdout,
+    and one play in detail.
+  demo: >
+    A live conversation with the AI agent, in which you are the administrator of one
+    customer. Ask a setup question, then ask for a price, and watch a rule pass the
+    customer to the Sales team.
+  agent: >
+    Every conversation the agent has had, the customer replies it sorted in the shared
+    mailbox, and its results on a fixed set of test conversations.
+  console: >
+    The queue of tasks waiting for a person, as that person sees it. Each task carries the
+    reason it was raised, the customer's own words, what was already tried and a
+    recommended next step. A sign-in is required because each role sees only its own queue.
+  pilot: >
+    Which customers are in the pilot, whether the pilot is ready to run, how each play is
+    progressing, and what would happen if the next group of customers were added.
+  operating: >
+    The working documents of the programme: who owns what, the decisions taken and why,
+    what each team depends on, and how a decision is changed.
+
+# The workflow on the Overview page: each step and the team accountable for it.
+workflow:
+  - step: Data arrives and is validated
+    team: Data Engineering
+  - step: Signals and health scores are computed
+    team: Data Science
+  - step: Plays decide who receives which help
+    team: CS Operations
+  - ladder: Help at the lowest effective cost, in this order
+    rungs:
+      - step: 1. An automated email or in-app message
+        team: CS Operations
+      - step: 2. The AI agent
+        team: AI Agent Engineering
+      - step: 3. A person
+        team: Scaled CS and Sales
+  - step: The customer receives the help
+    note: Outside the company. Never sees this system.
+  - step: Results are measured, and a decision is made
+    team: Analytics and CS Leadership

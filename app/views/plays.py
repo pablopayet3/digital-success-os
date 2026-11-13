@@ -9,6 +9,7 @@ from engine.catalog import load_catalog
 from engine.journeys import journey_funnel
 
 st.title("Plays and experiments")
+ui.job_intro("plays")
 catalog = load_catalog()
 
 st.subheader("The play catalog")

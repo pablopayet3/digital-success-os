@@ -20,8 +20,9 @@ app stands for several tools, each used by different people.
 | Agents | The AI agent engineers |
 | Pilot, Operating model | This role |
 
-For a picture of the whole chain, start the **Guided tour** from the sidebar and press
-Next once: the second window draws it, with the team that owns each step.
+The workflow is drawn at the top of the Overview page, with the team accountable for each
+step. Start there: it frames everything that follows. Under it, "The role, line by line"
+lists the ten lines of the role and the page that shows each one.
 
 **1. Frame it (30 seconds). Overview page.**
 

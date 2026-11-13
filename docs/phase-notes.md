@@ -707,19 +707,18 @@ missing or only half there. This section is what closed them.
   (ADR 0019). The live push ran against a developer org: 6 accounts and 6 tasks
   created, then a second run that created nothing. A task for Sales carries the
   account-owner brief in its description.
-- **A guided tour in the app** (`app/tour.py`, words in `config/tour.yaml`): thirteen
-  pop-up windows, one Next at a time. The second draws the whole chain as a flowchart,
-  with the team on each step. Each of the others opens on the page it explains and says
-  what the visitor sees, which tool does this at a real company and who uses it, what
-  this demo is built with, what the role asks for, and the role's own part. One tour,
-  not one per kind of user: the reader is the person judging the whole chain. It greets a visitor of the hosted demo and stays out of
-  the way locally.
+- **The role, line by line** (`config/job.yaml`): the ten lines of the role in plain
+  words. Every page opens with the line it answers, and the Overview says what the
+  system is, draws the workflow with the team on each step, and lists the ten lines.
+- **A guided tour in the app** (`app/tour.py`, words in `config/tour.yaml`): a slim strip
+  at the top of the page, one stop per page, that names the platform and the team at a
+  real company and never covers the page.
 - **A hands-on path for reviewers** (`docs/reviewer-guide.md`) and an admin reset of the
   shared hosted data, so several people can try it without spoiling it for the next.
 - **A picture of every page** in `docs/screenshots/`.
 - **Every page of the app is run by a test** on the small world (`tests/test_app.py`),
   and again with the internet blocked, which is the offline promise as a test.
-  198 tests in total.
+  200 tests in total.
 
 ### How to run
 

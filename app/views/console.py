@@ -20,6 +20,7 @@ ROLE_QUEUES = {
 }
 
 st.title("Human console")
+ui.job_intro("console")
 
 
 def password_for(role: str) -> str | None:
