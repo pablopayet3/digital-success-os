@@ -13,7 +13,7 @@ password per role: CSM, Sales and Admin. They are never written in this reposito
 When you open the app, a guided tour starts: thirteen short windows. The second draws
 the whole chain with the team on each step. The others explain each page: the tool at a
 real company, who uses it, what this demo is built with, and what the role does there.
-It takes three minutes, and you can close it at any point. The button "Guided tour" in
+It takes five minutes, and you can close it at any point. The button "Guided tour" in
 the sidebar starts it again.
 
 Everything below can be done on the hosted app. Nothing you do there can break

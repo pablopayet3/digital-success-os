@@ -49,7 +49,7 @@ def show() -> None:
         # A visitor of the hosted demo is greeted by the first window. Locally, nothing opens.
         state.tour_step = 0 if os.environ.get("DSO_HOSTED") else None
         state.tour_open = True
-    if st.sidebar.button("Guided tour (3 minutes)", width="stretch"):
+    if st.sidebar.button("Guided tour (5 minutes)", width="stretch"):
         _go(0)
     if state.tour_step is None:
         return

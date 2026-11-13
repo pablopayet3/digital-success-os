@@ -17,30 +17,30 @@
 # deciding whether the builder understands the whole chain. Each window says whose screen
 # the page would be at a company.
 #
+# Keep it short. The button promises five minutes, which is about 1,300 words in all, or
+# 100 a window. A test fails when the tour grows past that.
+#
 # Real product names appear here on purpose, as plain text: the tour exists to show how
 # the one app maps onto the several tools a real company uses. Nothing else in the app
 # names them (see the conventions in CLAUDE.md).
 
 steps:
   - page: overview
-    title: A three-minute tour
+    title: A five-minute tour
     look: >
-      This is a small, working version of a digital customer-success system, built on
-      made-up data. One idea runs through all of it: watch what customers do, decide who
-      needs help, send the cheapest help that works (an email, then an AI agent, then a
-      person), and check whether it changed anything.
+      A small, working digital customer-success system, on made-up data. It watches what
+      customers do, decides who needs help, sends the cheapest help that works (an email,
+      then an AI agent, then a person), and checks whether it changed anything.
     company: >
-      There, this is not one app. It is several tools, each run by a different team: a
-      lakehouse (Databricks), a customer-success platform (Gainsight), a CRM (Salesforce),
-      a BI tool (Tableau) and the company's own AI agents. The role this demo is about
-      makes them work as one chain. Each window of this tour names the tool and the people
-      for that step.
+      There, this is several tools run by different teams: Databricks for data, Gainsight
+      for journeys and tasks, Salesforce for customer records, Tableau for dashboards, and
+      the company's own AI agents.
     job: >
-      Build the digital success operating system, pilot it on customers nobody is assigned
-      to, then scale the pattern.
+      Build this operating system, pilot it on customers nobody is assigned to, then
+      scale it.
     mine: >
       I built every step, so I can explain every step. Press Next. You can close a window
-      at any time to look at the page behind it.
+      to look at the page behind it.
 
   - page: overview
     title: The whole chain, and the people on it
@@ -59,247 +59,205 @@ steps:
         Data --> Scores --> Plays
         Plays --> Person & Agent & Email --> Customer --> Results
     look: >
-      The picture is the system, read from left to right. Data comes in, becomes warning
-      signs, and plays decide who gets help. Help goes out as the cheapest thing that
-      works: an email first, then the AI agent, then a person. Then the result is
-      measured. Under each step is the team that owns it.
+      The system, from left to right. Under each step is the team that owns it. Help goes
+      out as the cheapest thing that works: an email, then the AI agent, then a person.
     company: >
-      Nobody opens "this app" there. Three kinds of people touch the chain. Customers
-      receive it: an email, a chat with the agent, a call from a person. They never see a
-      dashboard. Success managers, Sales and customer-success leaders use it every day,
-      each in their own tool. Data engineers, data scientists and AI agent engineers build
-      the parts. Each window that follows says whose screen you are looking at.
+      Nobody opens "this app" there. Customers receive it and never see a dashboard.
+      Success managers, Sales and leaders use it daily, each in their own tool. Engineers
+      and data scientists build the parts.
     job: >
-      Work across all of these teams as the one accountable owner of the chain.
+      Work across all these teams as the one accountable owner.
     mine: >
-      I am the one person who needs every box to connect. I do not own the tools. I own
-      what the chain does, and whether it works.
+      I do not own the tools. I own what the chain does, and whether it works.
 
   - page: overview
     title: The whole loop on one page
     look: >
-      Find the row "From signal to outcome". It is the loop as counts: customers showing a
-      warning sign today, put into a play, reached by email, talking to the agent, handed
-      to a person, closed. Above it are the eight measures a pilot is run on. Revenue is
-      shown with the comparison group beside it, so the page cannot claim what the system
-      did not cause.
+      Find the row "From signal to outcome": the loop as counts, from customers showing a
+      warning sign to tasks closed by a person. Above it are the eight measures a pilot is
+      run on.
     company: >
-      A dashboard in the BI tool (Tableau). Customer-success leadership reads it every
-      week. The Analytics team builds it.
+      A Tableau dashboard, read by customer-success leadership every week and built by
+      Analytics.
     built: >
-      Metric tables written in SQL with dbt, shown with Streamlit.
+      Metric tables in SQL with dbt, shown with Streamlit.
     job: >
       Measurement design: adoption, consumption, setup completion, agent invocation,
       escalation conversion.
     mine: >
-      Define each measure once, with its formula and its source table, so that two
-      dashboards can never disagree about a number.
+      Define each measure once, with its formula and source, so two dashboards never
+      disagree.
 
   - page: quality
     title: First, can the data be trusted?
     look: >
-      Raw product events and CRM files arrive every day. Broken rows are rejected with a
-      reason and kept, never silently dropped: the chart shows how many and why. The
-      cleaned tables pass 100 automatic tests, and the main table has a written contract
-      that code checks on every run.
+      Raw files arrive every day. Broken rows are rejected with a reason and kept, never
+      silently dropped. The clean tables pass 100 automatic tests, and the main table has
+      a written contract.
     company: >
-      The lakehouse (Databricks). Data Engineering builds it, runs it and watches this
-      screen. Everyone downstream just trusts the tables. The pipeline in this demo was
-      also run on a real Databricks workspace, where it passed the same 100 tests.
+      Databricks, built and watched by Data Engineering. This same pipeline ran on a real
+      Databricks workspace and passed the same 100 tests.
     built: >
-      Python and pydantic to check each event, DuckDB as the warehouse, dbt for the tables
-      and their tests.
+      Python and pydantic for the checks, DuckDB as the warehouse, dbt for tables and
+      tests.
     job: >
-      Data foundation and pipelines: account, contact, product, engagement, lifecycle and
-      health data; data quality; production tables.
+      Data foundation, pipelines, data quality, production tables.
     mine: >
-      Write the data requirements backwards from the plays, and the contract for the table
-      everything reads. Data Engineering builds it. I say what "good" means and check it.
+      Write the data requirements and the contract. Data Engineering builds. I say what
+      "good" means.
 
   - page: accounts
     title: One customer, and why it is flagged
     look: >
-      Pick a customer. The health score comes with its five parts, so you can see why it
-      is red. Below it: the signals firing, each with its evidence in words, and two model
-      scores (the risk of leaving, the chance of buying more) with reasons. At the bottom
-      is everything the system did for this customer, and every time it decided not to
-      act.
+      Pick a customer. The health score shows its five parts, so you see why it is red.
+      Below: the signals firing, two predictions, and everything the system did or chose
+      not to do.
     company: >
-      Scores are tables in the lakehouse and appear as health scores in the
-      customer-success platform (Gainsight). A success manager opens this view before
-      talking to a customer. Data Science owns the two models.
+      Health scores in Gainsight, fed by Databricks. A success manager opens this before a
+      customer call. Data Science owns the models.
     built: >
-      SQL in dbt for the health score and the signals, scikit-learn for the two models.
+      SQL in dbt for the score and the signals, scikit-learn for the two models.
     job: >
-      Analytics and modelling: segmentation and predictive models; turning telemetry,
-      health, sentiment and support signals into triggers.
+      Analytics and modelling: segmentation, predictive models, signals as triggers.
     mine: >
-      Define the signals and the health score as plain rules a success manager can argue
-      with. Set the "at risk" cut-off by how many accounts the team can really work, not
-      by a score.
+      Define the signals as plain rules a success manager can argue with. Set "at risk" by
+      how many accounts the team can work.
 
   - page: plays
     title: "Plays: who gets which help"
     look: >
-      The table at the top is the play catalog. Each of the seven plays has a trigger
-      signal, a ladder (digital, then agentic, then human), an owner, a success measure
-      named before launch, and a share of customers deliberately held out for comparison.
-      Plays are configuration, not code.
+      The table is the play catalog: seven plays, each with a trigger, a ladder (digital,
+      then agentic, then human), an owner, a success measure named before launch, and
+      customers held out for comparison.
     company: >
-      Journeys and audience rules in the customer-success platform (Gainsight Journey
-      Orchestrator). CS Operations builds and runs the journeys there. Legal and Privacy
-      set the consent rules. The customer only ever sees the email.
+      Gainsight Journey Orchestrator, run by CS Operations. Legal and Privacy set the
+      consent rules. The customer only ever sees the email.
     built: >
-      Plays written as YAML configuration, read by a rules engine in Python.
+      Plays as YAML configuration, read by a rules engine in Python.
     job: >
-      Journey orchestration, rules engines, audience rules, consent and contact
-      governance, channel triggers.
+      Journey orchestration, audience rules, consent and contact governance, channel
+      triggers.
     mine: >
-      Own the play catalog: decide each play's trigger, ladder and success measure, and
-      make consent and the limit of two contacts a week impossible for any play to skip.
+      Own the catalog, and make consent and the limit of two contacts a week impossible
+      to skip.
 
   - page: demo
     title: The AI agent, and the line it does not cross
     look: >
-      Close this window and press "Run the story". A customer whose setup has stalled asks
-      how to invite their team, and gets an answer from the help centre. Then they ask for
-      a price. The agent does not answer that: a rule written in code hands it to Sales,
-      with a summary, before any model is asked.
+      Close this window and press "Run the story". A stalled customer asks how to invite
+      their team and gets an answer from the help centre. Then they ask for a price: a
+      rule in code hands that to Sales before any model is asked.
     company: >
-      The company's own AI agents, built by the customer-success AI agent engineers. The
-      only person who uses this screen is the customer: on this page you play their part.
+      The company's own AI agents, built by its AI agent engineers. The only user of this
+      screen is the customer: here you play their part.
     built: >
-      Claude with tools, and keyword search over 23 help articles. The line at the top of
-      the page says who is writing the replies right now.
+      Claude with tools, and search over 23 help articles. The line at the top says who is
+      answering right now.
     job: >
-      AI-agent design: plays, prompts, retrieval logic, escalation rules and feedback
-      loops. And human fallback engineering.
+      AI-agent design: prompts, retrieval, escalation rules, feedback loops, human
+      fallback.
     mine: >
-      Write the one-page spec the engineers build from: the trigger, what the agent may
-      read, what it must never answer, the test cases. The escalation rules are code,
-      because a prompt asks and code guarantees.
+      Write the spec the engineers build from. Escalation rules are code, because a prompt
+      asks and code guarantees.
 
   - page: console
     title: The handoff, picked up by a person
     look: >
       Sign in with a role. Each task is a handoff packet: why it is on your desk, the
-      customer's own words, what was already tried, the account at a glance, and a
-      recommended next step. Closing the task with an outcome is the return signal: it
-      tells the journey what to do next.
+      customer's own words, what was tried, a next step. Closing it with an outcome tells
+      the journey what to do next.
     company: >
-      Tasks in the customer-success platform (Gainsight CTAs, in Cockpit) and in the CRM
-      (Salesforce). Success managers and Sales work here all day, each seeing only their
-      own queue. That is why this page, and only this page, asks you to sign in. Tasks
-      from this demo were pushed into a real Salesforce org.
+      Tasks in Gainsight Cockpit and in Salesforce, worked all day by success managers and
+      Sales, each in their own queue. Tasks from this demo were pushed into a real
+      Salesforce org.
     built: >
-      An operational database (SQLite here, Postgres on the hosted demo), and an API built
-      with FastAPI for other systems to write to.
+      A database (SQLite here, Postgres when hosted) and an API built with FastAPI.
     job: >
-      Digital-to-human handoffs: what context moves with the customer, and what return
-      signal continues the journey.
+      Digital-to-human handoffs: what context moves, and what signal comes back.
     mine: >
-      Design the packet, the queues and how much each can take, and the outcomes people
-      record, so that no handoff is a dead end and the agent learns from the unnecessary
-      ones.
+      Design the packet, the queues and the outcomes, so no handoff is a dead end.
 
   - page: plays
     title: Did it work?
     look: >
       Scroll to "Results against the holdout". Each play is compared with customers who
-      qualified but were deliberately left alone. The chart shows the lift with its margin
-      of error. When the line crosses zero the play may have done nothing, and the verdict
-      says so. One play is proven here. The others read "too early" or "no effect
-      detected".
+      qualified but were left alone. When the margin of error crosses zero, the verdict
+      says the play may have done nothing.
     company: >
-      Dashboards in the BI tool (Tableau). Customer-success leadership reads them, and the
-      Analytics team checks the statistics. This demo also has a real, public Tableau
-      dashboard built from the same tables.
+      Tableau dashboards, read by customer-success leadership and checked by Analytics.
+      This demo also has a real, public Tableau dashboard.
     built: >
-      Outcome tables in dbt, and a significance test written in Python.
+      Outcome tables in dbt, and a significance test in Python.
     job: >
       Measurement and experimentation: cohort analysis, A/B tests, operating reviews.
     mine: >
-      Name the success measure before launch, keep a holdout on every play, and bring a
-      scale, fix or stop decision to the review instead of an opinion. The lift here comes
-      from a simulation. The measurement is the real part.
+      Name the measure before launch, keep a holdout, and bring a scale, fix or stop
+      decision. The lift here is simulated. The measurement is real.
 
   - page: agent
     title: How do we know the agent is good?
     look: >
-      Open the Evaluation tab. The agent was run on 30 fixed conversations with the real
-      model. Code checks first: did it hand off when it must, and for the right reason?
-      Then a second model scores the wording. Three versions of the agent's instructions
-      were compared, and the one expected to win lost, so it was not used. The Review
-      queue tab holds the cases people sent back, waiting to become new tests.
+      Open the Evaluation tab. The agent ran on 30 fixed conversations with the real
+      model. Code checks the handoffs, then a second model scores the wording. Three
+      versions of its instructions were compared, and the tests picked the winner.
     company: >
-      An evaluation suite owned together with the AI agent engineers, who run it before
-      every change. The people who work the queues feed it.
+      An evaluation suite shared with the AI agent engineers, who run it before every
+      change.
     built: >
-      Fixed test cases in YAML, checks in code, and a second Claude model as the judge.
+      Test cases in YAML, checks in code, a second Claude model as the judge.
     job: >
       Model evaluation and human-in-the-loop feedback.
     mine: >
-      Decide what "good" means for the agent, turn every unnecessary handoff into a test
-      case, and let the tests choose the instructions, not the author.
+      Decide what "good" means, and turn every unnecessary handoff into a new test.
 
   - page: pilot
     title: Is it ready, and how does it scale?
     look: >
-      The readiness checklist is not ticked by hand: each line is answered from live data
-      when the page opens. Below it are the stage and the verdict of each play. At the
-      bottom is a preview of adding the next group of customers: who would enter, and
-      which team's queue could not take the first day's work.
+      The readiness checklist is answered from live data, not ticked by hand. Below: each
+      play's stage and verdict, and a preview of adding the next group of customers, with
+      the queue that could not take the work.
     company: >
-      The pilot plan and the weekly review: usually a page in the company wiki
-      (Confluence), with decisions tracked as tickets (Jira). The person in this role
-      presents it to customer-success leadership.
+      The pilot plan and weekly review: a page in Confluence with decisions tracked in
+      Jira, presented to customer-success leadership.
     built: >
-      Python that answers each line from the live tables. The bars are configuration.
+      Python that answers each line from the live tables.
     job: >
-      Pilot the accounts nobody covers, then scale the pattern; choose between digital,
-      agentic and human interventions.
+      Pilot the accounts nobody covers, then scale the pattern.
     mine: >
-      Run the pilot: a 10% slice first, then a full test with a holdout, a weekly review,
-      and one line of configuration to extend it once it is proven.
+      Run it: a 10% slice, then a full test with a holdout, a weekly review, and one line
+      of configuration to extend it.
 
   - page: operating
     title: Who owns what, and how decisions are kept
     look: >
-      These are the documents that make this a programme and not a script. The ownership
-      map gives every table, play, agent and queue a named owner, with the gaps flagged.
-      The dependency map shows which team waits for which. Change control says how an
-      agreed decision gets reopened. And every design decision has a record with the
-      options that were considered.
+      The documents that make this a programme and not a script: who owns each table, play
+      and queue, which team waits for which, how a decision gets reopened, and a record of
+      every design decision.
     company: >
-      The company wiki and the ticket tracker (Confluence and Jira). Every team in the
-      chain reads these when it asks who owns something.
+      Confluence and Jira, read by every team in the chain.
     built: >
-      Markdown files kept in the repository, next to the code they describe.
+      Markdown files in the repository, next to the code.
     job: >
-      Close ownership gaps as the accountable owner; protect delivery momentum with a
-      decision log, architecture principles, a dependency map and change control.
+      Close ownership gaps; keep delivery moving with a decision log, a dependency map and
+      change control.
     mine: >
-      Be the one accountable owner across the teams: write down who owns what, stop
-      decisions being reopened by accident, and unblock the next dependency.
+      Write down who owns what, stop decisions being reopened by accident, and unblock the
+      next dependency.
 
   - page: overview
     title: What is real, and what is simulated
     look: >
-      Real: the code and its automated tests, the pipeline run on a real Databricks
-      workspace, the push into a real Salesforce org, the public Tableau dashboard, and
-      the AI model's answers in the recorded demo and in the evaluation. Simulated: the
-      customers and how they react, so the measured lift is an assumption coming back out.
-      Gainsight has no free version, so the app plays its part. The line at the top of
-      every page says who is writing the agent's replies right now.
+      Real: the code and its tests, the pipeline run on Databricks, the push into
+      Salesforce, the public Tableau dashboard, and the AI model's answers in the
+      recording and the evaluation. Simulated: the customers, so the measured lift is an
+      assumption. Gainsight has no free version, so the app plays its part.
     company: >
-      The table that maps each piece to the real tool, and the full list of what was run
-      for real, are in the README of the repository.
+      The README maps every piece to the real tool.
     built: >
-      All of it is Python and SQL: dbt on DuckDB, scikit-learn, the Claude API, Streamlit,
-      FastAPI and Postgres, in a Docker container hosted on Render. GitHub Actions runs
-      the tests on every change and the pipeline every day.
+      Python and SQL: dbt on DuckDB, scikit-learn, the Claude API, Streamlit, FastAPI,
+      Postgres, Docker. GitHub Actions runs the tests on every change.
     job: >
       Every window of this tour answers a line of the role.
     mine: >
-      Now try it yourself. The expander at the top of this page, "First time here?", is a
-      five-minute hands-on path: make the agent hand you a task, pick it up, close it.
+      Now try it: open "First time here?" at the top of this page for a five-minute
+      hands-on path.

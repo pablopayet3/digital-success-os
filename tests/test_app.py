@@ -156,6 +156,9 @@ def test_every_tour_window_is_complete_and_opens_on_a_real_page():
     assert {window["page"] for window in windows} == set(PAGES)
     # and has been told, for every page, what this demo is built with.
     assert {window["page"] for window in windows if "built" in window} == set(PAGES)
+    # The button promises five minutes. That is about 1,300 words to read.
+    words = sum(len(window.get(part, "").split()) for window in windows for part in PARTS)
+    assert words <= 1400, f"the tour has grown to {words} words"
     # The chain is drawn once, and the picture is one the app can draw.
     pictures = [window["diagram"] for window in windows if "diagram" in window]
     assert pictures and all("->" in mermaid_to_dot(picture) for picture in pictures)
@@ -183,7 +186,7 @@ def test_the_tour_greets_a_hosted_visitor_but_never_interrupts_a_local_demo(app_
     main = str(ROOT / "app" / "main.py")
     monkeypatch.delenv("DSO_HOSTED", raising=False)
     local = AppTest.from_file(main, default_timeout=120).run()
-    assert "Guided tour (3 minutes)" in [button.label for button in local.button]
+    assert "Guided tour (5 minutes)" in [button.label for button in local.button]
     assert "Next" not in [button.label for button in local.button]  # no window by itself
 
     monkeypatch.setenv("DSO_HOSTED", "1")
