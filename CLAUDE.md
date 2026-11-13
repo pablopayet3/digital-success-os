@@ -299,9 +299,13 @@ After the phases (the brief read again line by line; see the last section of
   today: regenerating the data or advancing a day breaks the match (the agent then
   hands off as `agent_unavailable`). Store them again with one `--live` run of the
   same conversations (about 3 cents each).
-- `app/tour.py` and `config/tour.yaml`: the guided tour, twelve pop-up windows with
+- `app/tour.py` and `config/tour.yaml`: the guided tour, thirteen pop-up windows with
   Next and Back. Each opens on the page it explains and says what the visitor sees,
-  the real tool and team at a company, what the role asks for, and the role's part.
+  the real tool at a company and who uses it, what this demo is built with, what the
+  role asks for, and the role's part. The second window draws the whole chain with the
+  team on each step (keep that flowchart free of arrows that go back: one makes the
+  layout jump). There is one tour, not one per kind of user: its reader is the person
+  judging the whole chain. Only the Human console asks for a sign-in.
   It opens by itself only on the hosted demo (`DSO_HOSTED`); locally it starts from
   the sidebar button, so a live demo is never interrupted. The words are the YAML.
 - `docs/screenshots/`: one picture per page.

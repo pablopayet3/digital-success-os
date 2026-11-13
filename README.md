@@ -95,7 +95,7 @@ the evaluation harness that the stand-in could never have shown (ADR 0017).
 
 - **The app:** https://digital-success-os-app.onrender.com (free hosting: the first load can take a minute; it runs the labelled stand-in, not the real model)
 - **The API:** https://digital-success-os-api.onrender.com/health
-- **A guided tour opens by itself** on the hosted app: twelve short windows, one Next at a time, each naming the real tool and the team that would own that step at a company.
+- **A guided tour opens by itself** on the hosted app: thirteen short windows, one Next at a time. The second draws the whole chain with the team on each step. Each of the others names the real tool at a company, who uses it, and what this demo is built with.
 - **Try the whole loop yourself in five minutes:** [docs/reviewer-guide.md](docs/reviewer-guide.md). Make the agent hand you a task, pick it up in the Human console as Sales, close it, and see the system remember. The console's sign-in details are shared on request, never in this repository.
 - **The dashboard:** [Digital Success pilot on Tableau Public](https://public.tableau.com/views/DigitalSuccesspilotsyntheticdata/DigitalSuccesspilot_Syntheticdatafictionalcompany)
 

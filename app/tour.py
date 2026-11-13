@@ -1,9 +1,10 @@
 """The guided tour: pop-up windows that walk a visitor through the app, one Next at a time.
 
 Synthetic data, fictional company. The words are in config/tour.yaml; this file only
-shows them. Each window opens on the page it explains and says four things: what the
-visitor is looking at, which tool and team do this at a real company, what the role asks
-for, and what the person in the role does.
+shows them. Each window opens on the page it explains and says: what the visitor is
+looking at, which tool does this at a real company and who uses it, what this demo is
+built with, what the role asks for, and what the person in the role does. One window
+draws the whole chain as a flowchart, with the team that owns each step.
 
 How it behaves:
   - On the hosted demo the first window opens by itself, once per visit. Locally the
@@ -22,15 +23,19 @@ import os
 
 import streamlit as st
 
+from app.diagrams import show_diagram
 from common.config import load_yaml
 
 # What each part of a window is called on screen, in the order shown.
 PARTS = {
     "look": "What you are looking at.",
     "company": "At a real company.",
+    "built": "In this demo.",
     "job": "What the role asks for.",
     "mine": "My part in it.",
 }
+# A window about the whole system has no single set of tools to name, so it may leave this out.
+OPTIONAL = {"built"}
 
 
 def steps() -> list[dict]:
@@ -70,14 +75,28 @@ def _closed() -> None:
     st.session_state.tour_open = False
 
 
-@st.dialog("Guided tour", width="medium", on_dismiss=_closed)
 def _window(index: int) -> None:
+    """Open one window. A window with a picture is wide, so the picture can be read."""
+    width = "large" if "diagram" in steps()[index] else "medium"
+    st.dialog("Guided tour", width=width, on_dismiss=_closed)(_contents)(index)
+
+
+def _contents(index: int) -> None:
     all_steps = steps()
     step, last = all_steps[index], index == len(all_steps) - 1
     st.caption(f"Window {index + 1} of {len(all_steps)}. Synthetic data, fictional company.")
     st.subheader(step["title"])
-    for key, label in PARTS.items():
-        st.markdown(f"**{label}** {step[key].strip()}")
+    parts = [f"**{label}** {step[key].strip()}" for key, label in PARTS.items() if key in step]
+    if "diagram" in step:
+        # The picture on top, the words in two columns under it (the window is wide).
+        show_diagram(step["diagram"])
+        left, right = st.columns(2)
+        half = len(parts) // 2
+        left.markdown("\n\n".join(parts[:half]))
+        right.markdown("\n\n".join(parts[half:]))
+    else:
+        for part in parts:
+            st.markdown(part)
 
     back, look, forward = st.columns(3)
     if back.button("Back", disabled=index == 0, width="stretch"):

@@ -6,6 +6,23 @@ locally).
 
 Times are targets. If something breaks, say what should have happened and move on.
 
+**Whose screen is it?** Say it as each page opens. It tells the listener that this one
+app stands for several tools, each used by different people.
+
+| Page | At a company, this is the screen of |
+|---|---|
+| Overview; results on Plays and experiments | Customer-success leadership (a BI dashboard) |
+| Data quality | Data Engineering |
+| Accounts | A success manager before a customer call. Data Science owns the scores |
+| Play catalog on Plays and experiments | CS Operations, who run the journeys |
+| Live demo | The customer. Nobody else sees this conversation live |
+| Human console | Success managers and Sales. The only page with a sign-in |
+| Agents | The AI agent engineers |
+| Pilot, Operating model | This role |
+
+For a picture of the whole chain, start the **Guided tour** from the sidebar and press
+Next once: the second window draws it, with the team that owns each step.
+
 **1. Frame it (30 seconds). Overview page.**
 
 > "I built a small version of this role last week, on fictional data, to make sure I

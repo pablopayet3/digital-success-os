@@ -141,7 +141,7 @@ def test_the_overview_opens_with_a_path_for_someone_handed_the_link(app_data):
 
 
 def test_every_tour_window_is_complete_and_opens_on_a_real_page():
-    from app.tour import PARTS, steps
+    from app.tour import OPTIONAL, PARTS, steps
 
     windows = steps()
     assert len(windows) >= 10
@@ -149,9 +149,16 @@ def test_every_tour_window_is_complete_and_opens_on_a_real_page():
         assert (ROOT / "app" / "views" / f"{window['page']}.py").exists(), window["page"]
         assert window["title"].strip()
         for part in PARTS:
+            if part in OPTIONAL and part not in window:
+                continue
             assert window[part].strip(), f"{window['title']}: nothing written for '{part}'"
-    # A visitor who follows the tour has seen every page of the app.
+    # A visitor who follows the tour has seen every page of the app,
     assert {window["page"] for window in windows} == set(PAGES)
+    # and has been told, for every page, what this demo is built with.
+    assert {window["page"] for window in windows if "built" in window} == set(PAGES)
+    # The chain is drawn once, and the picture is one the app can draw.
+    pictures = [window["diagram"] for window in windows if "diagram" in window]
+    assert pictures and all("->" in mermaid_to_dot(picture) for picture in pictures)
 
 
 def test_next_walks_through_every_window_and_finish_ends_the_tour(app_data):

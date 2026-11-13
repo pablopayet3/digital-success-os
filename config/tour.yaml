@@ -5,10 +5,17 @@
 #
 #   page     the page the window opens on (a file in app/views/)
 #   title    the window's heading
+#   diagram  a flowchart drawn above the words (optional; Mermaid, the small part of it
+#            that app/diagrams.py understands). A window with one opens wide.
 #   look     what the visitor is looking at, and what to notice
-#   company  which tool does this at a real company, and which team owns it
+#   company  which tool does this at a real company, who uses it, and who builds it
+#   built    what this demo uses for the step (optional)
 #   job      what the role asks for at this step
 #   mine     what the person in the role does here
+#
+# There is one tour, not one per kind of user, because its reader is one person: someone
+# deciding whether the builder understands the whole chain. Each window says whose screen
+# the page would be at a company.
 #
 # Real product names appear here on purpose, as plain text: the tour exists to show how
 # the one app maps onto the several tools a real company uses. Nothing else in the app
@@ -26,7 +33,7 @@ steps:
       There, this is not one app. It is several tools, each run by a different team: a
       lakehouse (Databricks), a customer-success platform (Gainsight), a CRM (Salesforce),
       a BI tool (Tableau) and the company's own AI agents. The role this demo is about
-      makes them work as one chain. Each window of this tour names the tool and the team
+      makes them work as one chain. Each window of this tour names the tool and the people
       for that step.
     job: >
       Build the digital success operating system, pilot it on customers nobody is assigned
@@ -34,6 +41,39 @@ steps:
     mine: >
       I built every step, so I can explain every step. Press Next. You can close a window
       at any time to look at the page behind it.
+
+  - page: overview
+    title: The whole chain, and the people on it
+    diagram: |
+      flowchart LR
+        Data["Data comes in<br/>and is checked<br/>Data Engineering"]
+        Scores["Warning signs<br/>and scores<br/>Data Science"]
+        Plays["Plays decide<br/>who gets which help<br/>CS Operations"]
+        subgraph Ladder["The cheapest help that works"]
+          Person["3. A person<br/>success managers, Sales"]
+          Agent["2. The AI agent<br/>AI agent engineers"]
+          Email["1. Email or in-app message<br/>sent automatically"]
+        end
+        Customer["The customer"]
+        Results["Did it work?<br/>CS leadership, Analytics<br/>Scale it, fix it or stop it"]
+        Data --> Scores --> Plays
+        Plays --> Person & Agent & Email --> Customer --> Results
+    look: >
+      The picture is the system, read from left to right. Data comes in, becomes warning
+      signs, and plays decide who gets help. Help goes out as the cheapest thing that
+      works: an email first, then the AI agent, then a person. Then the result is
+      measured. Under each step is the team that owns it.
+    company: >
+      Nobody opens "this app" there. Three kinds of people touch the chain. Customers
+      receive it: an email, a chat with the agent, a call from a person. They never see a
+      dashboard. Success managers, Sales and customer-success leaders use it every day,
+      each in their own tool. Data engineers, data scientists and AI agent engineers build
+      the parts. Each window that follows says whose screen you are looking at.
+    job: >
+      Work across all of these teams as the one accountable owner of the chain.
+    mine: >
+      I am the one person who needs every box to connect. I do not own the tools. I own
+      what the chain does, and whether it works.
 
   - page: overview
     title: The whole loop on one page
@@ -44,8 +84,10 @@ steps:
       shown with the comparison group beside it, so the page cannot claim what the system
       did not cause.
     company: >
-      A dashboard in the BI tool (Tableau), read by customer-success leadership every
-      week.
+      A dashboard in the BI tool (Tableau). Customer-success leadership reads it every
+      week. The Analytics team builds it.
+    built: >
+      Metric tables written in SQL with dbt, shown with Streamlit.
     job: >
       Measurement design: adoption, consumption, setup completion, agent invocation,
       escalation conversion.
@@ -61,8 +103,12 @@ steps:
       cleaned tables pass 100 automatic tests, and the main table has a written contract
       that code checks on every run.
     company: >
-      The lakehouse (Databricks), built and run by Data Engineering. The pipeline in this
-      demo was also run on a real Databricks workspace, where it passed the same 100 tests.
+      The lakehouse (Databricks). Data Engineering builds it, runs it and watches this
+      screen. Everyone downstream just trusts the tables. The pipeline in this demo was
+      also run on a real Databricks workspace, where it passed the same 100 tests.
+    built: >
+      Python and pydantic to check each event, DuckDB as the warehouse, dbt for the tables
+      and their tests.
     job: >
       Data foundation and pipelines: account, contact, product, engagement, lifecycle and
       health data; data quality; production tables.
@@ -80,7 +126,10 @@ steps:
       act.
     company: >
       Scores are tables in the lakehouse and appear as health scores in the
-      customer-success platform (Gainsight). Data Science owns the models.
+      customer-success platform (Gainsight). A success manager opens this view before
+      talking to a customer. Data Science owns the two models.
+    built: >
+      SQL in dbt for the health score and the signals, scikit-learn for the two models.
     job: >
       Analytics and modelling: segmentation and predictive models; turning telemetry,
       health, sentiment and support signals into triggers.
@@ -98,7 +147,10 @@ steps:
       Plays are configuration, not code.
     company: >
       Journeys and audience rules in the customer-success platform (Gainsight Journey
-      Orchestrator). CS Operations runs the tool. Legal and Privacy set the consent rules.
+      Orchestrator). CS Operations builds and runs the journeys there. Legal and Privacy
+      set the consent rules. The customer only ever sees the email.
+    built: >
+      Plays written as YAML configuration, read by a rules engine in Python.
     job: >
       Journey orchestration, rules engines, audience rules, consent and contact
       governance, channel triggers.
@@ -114,8 +166,11 @@ steps:
       a price. The agent does not answer that: a rule written in code hands it to Sales,
       with a summary, before any model is asked.
     company: >
-      The company's own AI agents, built by the customer-success AI agent engineers. Here
-      the agent is Claude with tools and a small help centre.
+      The company's own AI agents, built by the customer-success AI agent engineers. The
+      only person who uses this screen is the customer: on this page you play their part.
+    built: >
+      Claude with tools, and keyword search over 23 help articles. The line at the top of
+      the page says who is writing the replies right now.
     job: >
       AI-agent design: plays, prompts, retrieval logic, escalation rules and feedback
       loops. And human fallback engineering.
@@ -132,9 +187,13 @@ steps:
       recommended next step. Closing the task with an outcome is the return signal: it
       tells the journey what to do next.
     company: >
-      Tasks for people in the customer-success platform (Gainsight CTAs, in Cockpit) and
-      tasks in the CRM (Salesforce). The scaled success team and Sales work them. Tasks
+      Tasks in the customer-success platform (Gainsight CTAs, in Cockpit) and in the CRM
+      (Salesforce). Success managers and Sales work here all day, each seeing only their
+      own queue. That is why this page, and only this page, asks you to sign in. Tasks
       from this demo were pushed into a real Salesforce org.
+    built: >
+      An operational database (SQLite here, Postgres on the hosted demo), and an API built
+      with FastAPI for other systems to write to.
     job: >
       Digital-to-human handoffs: what context moves with the customer, and what return
       signal continues the journey.
@@ -152,8 +211,11 @@ steps:
       says so. One play is proven here. The others read "too early" or "no effect
       detected".
     company: >
-      Dashboards in the BI tool (Tableau), and experiment reads with the Analytics team.
-      This demo also has a real, public Tableau dashboard built from the same tables.
+      Dashboards in the BI tool (Tableau). Customer-success leadership reads them, and the
+      Analytics team checks the statistics. This demo also has a real, public Tableau
+      dashboard built from the same tables.
+    built: >
+      Outcome tables in dbt, and a significance test written in Python.
     job: >
       Measurement and experimentation: cohort analysis, A/B tests, operating reviews.
     mine: >
@@ -170,8 +232,10 @@ steps:
       were compared, and the one expected to win lost, so it was not used. The Review
       queue tab holds the cases people sent back, waiting to become new tests.
     company: >
-      An evaluation suite owned together with the AI agent engineers, fed by the people
-      who work the queues.
+      An evaluation suite owned together with the AI agent engineers, who run it before
+      every change. The people who work the queues feed it.
+    built: >
+      Fixed test cases in YAML, checks in code, and a second Claude model as the judge.
     job: >
       Model evaluation and human-in-the-loop feedback.
     mine: >
@@ -187,7 +251,10 @@ steps:
       which team's queue could not take the first day's work.
     company: >
       The pilot plan and the weekly review: usually a page in the company wiki
-      (Confluence), with decisions tracked as tickets (Jira).
+      (Confluence), with decisions tracked as tickets (Jira). The person in this role
+      presents it to customer-success leadership.
+    built: >
+      Python that answers each line from the live tables. The bars are configuration.
     job: >
       Pilot the accounts nobody covers, then scale the pattern; choose between digital,
       agentic and human interventions.
@@ -204,7 +271,10 @@ steps:
       agreed decision gets reopened. And every design decision has a record with the
       options that were considered.
     company: >
-      The company wiki and the ticket tracker (Confluence and Jira).
+      The company wiki and the ticket tracker (Confluence and Jira). Every team in the
+      chain reads these when it asks who owns something.
+    built: >
+      Markdown files kept in the repository, next to the code they describe.
     job: >
       Close ownership gaps as the accountable owner; protect delivery momentum with a
       decision log, architecture principles, a dependency map and change control.
@@ -224,6 +294,10 @@ steps:
     company: >
       The table that maps each piece to the real tool, and the full list of what was run
       for real, are in the README of the repository.
+    built: >
+      All of it is Python and SQL: dbt on DuckDB, scikit-learn, the Claude API, Streamlit,
+      FastAPI and Postgres, in a Docker container hosted on Render. GitHub Actions runs
+      the tests on every change and the pipeline every day.
     job: >
       Every window of this tour answers a line of the role.
     mine: >

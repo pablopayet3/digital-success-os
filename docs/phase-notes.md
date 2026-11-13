@@ -707,10 +707,12 @@ missing or only half there. This section is what closed them.
   (ADR 0019). The live push ran against a developer org: 6 accounts and 6 tasks
   created, then a second run that created nothing. A task for Sales carries the
   account-owner brief in its description.
-- **A guided tour in the app** (`app/tour.py`, words in `config/tour.yaml`): twelve
-  pop-up windows, one Next at a time. Each opens on the page it explains and says what
-  the visitor sees, which tool and team do this at a real company, what the role asks
-  for, and the role's own part. It greets a visitor of the hosted demo and stays out of
+- **A guided tour in the app** (`app/tour.py`, words in `config/tour.yaml`): thirteen
+  pop-up windows, one Next at a time. The second draws the whole chain as a flowchart,
+  with the team on each step. Each of the others opens on the page it explains and says
+  what the visitor sees, which tool does this at a real company and who uses it, what
+  this demo is built with, what the role asks for, and the role's own part. One tour,
+  not one per kind of user: the reader is the person judging the whole chain. It greets a visitor of the hosted demo and stays out of
   the way locally.
 - **A hands-on path for reviewers** (`docs/reviewer-guide.md`) and an admin reset of the
   shared hosted data, so several people can try it without spoiling it for the next.

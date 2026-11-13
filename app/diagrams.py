@@ -115,7 +115,12 @@ def show_markdown(text: str) -> None:
             if part.strip():
                 st.markdown(part)
             continue
-        try:
-            st.graphviz_chart(mermaid_to_dot(part), use_container_width=True)
-        except ValueError:  # a kind of diagram this translator does not know: show the text
-            st.code(part, language="text")
+        show_diagram(part)
+
+
+def show_diagram(source: str) -> None:
+    """Draw one Mermaid flowchart (the documents' diagrams, and the guided tour's picture)."""
+    try:
+        st.graphviz_chart(mermaid_to_dot(source), use_container_width=True)
+    except ValueError:  # a kind of diagram this translator does not know: show the text
+        st.code(source, language="text")
