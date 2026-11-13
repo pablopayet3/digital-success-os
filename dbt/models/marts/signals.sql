@@ -60,7 +60,8 @@ select
     'advocate_ready',
     cast(latest_nps_score as double),
     'NPS score of ' || {{ text('latest_nps_score') }} || ' on '
-        || {{ text('latest_nps_date') }} || ', health ' || {{ text('round(health_score)') }}
+        || {{ text('latest_nps_date') }} || ', health '
+        || {{ text('cast(round(health_score) as integer)') }}
         || ', no open high-priority tickets'
 from accounts
 where latest_nps_score >= 9

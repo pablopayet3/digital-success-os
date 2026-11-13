@@ -73,7 +73,9 @@ Switch to the Human console tab. Open the new task.
 
 **5. Nothing risky is sent without a person (40 seconds). Human console, still signed in.**
 
-Scroll to "Drafts waiting for approval". Open one draft.
+Scroll to "Drafts waiting for approval" and open one draft. If none is waiting (the
+simulated staff may have decided them all), sign out: the page then shows "A draft
+waiting for approval: an example", read-only.
 
 > "Some messages carry more risk. This one asks a happy customer to act as a reference.
 > It only fires when the customer has earned it: a score of 9 or 10, green health, no open
