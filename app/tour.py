@@ -12,6 +12,8 @@ How it behaves:
   - Next and Back move between windows and switch to the right page.
   - A window can be closed to look at the page behind it. A thin bar at the top of the
     page then offers to reopen it, go on, or end the tour.
+  - "Read aloud" turns on a voice that reads each window (the browser's own, so it needs
+    no service). It stays on from window to window until it is turned off.
 
 Where the tour is: two values in the session, `tour_step` (the window's number, or None
 when no tour is running) and `tour_open` (is the window showing).
@@ -19,12 +21,18 @@ when no tour is running) and `tour_open` (is the window showing).
 
 from __future__ import annotations
 
+import json
 import os
+import re
+from pathlib import Path
 
 import streamlit as st
 
 from app.diagrams import show_diagram
 from common.config import load_yaml
+
+# The "Read aloud" button: a little HTML and JavaScript, kept in its own file (ADR 0023).
+VOICE_BUTTON = (Path(__file__).parent / "tour_voice.html").read_text(encoding="utf-8")
 
 # What each part of a window is called on screen, in the order shown.
 PARTS = {
@@ -49,7 +57,7 @@ def show() -> None:
         # A visitor of the hosted demo is greeted by the first window. Locally, nothing opens.
         state.tour_step = 0 if os.environ.get("DSO_HOSTED") else None
         state.tour_open = True
-    if st.sidebar.button("Guided tour (5 minutes)", width="stretch"):
+    if st.sidebar.button("Guided tour (6 minutes)", width="stretch"):
         _go(0)
     if state.tour_step is None:
         return
@@ -81,12 +89,27 @@ def _window(index: int) -> None:
     st.dialog("Guided tour", width=width, on_dismiss=_closed)(_contents)(index)
 
 
+def spoken(step: dict) -> list[str]:
+    """What the voice reads for one window: its title, then each part, one sentence at a time."""
+    title = step["title"]
+    said = [title if title.endswith(("?", "!", ".")) else title + "."]
+    said += [f"{label} {step[key].strip()}" for key, label in PARTS.items() if key in step]
+    return [sentence for part in said for sentence in re.split(r"(?<=[.!?])\s+", part)]
+
+
+def _voice(step: dict) -> None:
+    """The "Read aloud" button. The browser's own voice reads the window (ADR 0023)."""
+    sentences = json.dumps(spoken(step)).replace("</", "<\\/")  # safe inside a script tag
+    st.html(VOICE_BUTTON.replace("__SENTENCES__", sentences), unsafe_allow_javascript=True)
+
+
 def _contents(index: int) -> None:
     all_steps = steps()
     step, last = all_steps[index], index == len(all_steps) - 1
     st.caption(f"Window {index + 1} of {len(all_steps)}. Synthetic data, fictional company.")
     st.subheader(step["title"])
-    parts = [f"**{label}** {step[key].strip()}" for key, label in PARTS.items() if key in step]
+    _voice(step)
+    parts =[f"**{label}** {step[key].strip()}" for key, label in PARTS.items() if key in step]
     if "diagram" in step:
         # The picture on top, the words in two columns under it (the window is wide).
         show_diagram(step["diagram"])

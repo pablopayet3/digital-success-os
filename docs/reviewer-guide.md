@@ -13,7 +13,7 @@ password per role: CSM, Sales and Admin. They are never written in this reposito
 When you open the app, a guided tour starts: thirteen short windows. The second draws
 the whole chain with the team on each step. The others explain each page: the tool at a
 real company, who uses it, what this demo is built with, and what the role does there.
-It takes five minutes, and you can close it at any point. The button "Guided tour" in
+It takes six minutes, and you can close it at any point. The button "Guided tour" in
 the sidebar starts it again.
 
 Everything below can be done on the hosted app. Nothing you do there can break
@@ -28,7 +28,9 @@ anything: it is a shared demo, and an admin can reset it.
 3. The agent does not answer that. A rule written in code hands it to Sales before any
    model is asked, and a task is created. Note its number (for example `CTA-00087`).
 
-On the hosted app the agent's replies come from a labelled stand-in (keyword rules), so
+The line at the top of every page says who answers as the agent. With a key in the
+host's settings it is the real model, within a small budget. Without one, the replies
+come from a labelled stand-in (keyword rules), so
 that the public demo needs no key and costs nothing. The real model's answers to the same
 story are in the recording at the top of the README, and the real model's evaluation is
 on the Agents page.

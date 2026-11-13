@@ -719,7 +719,7 @@ missing or only half there. This section is what closed them.
 - **A picture of every page** in `docs/screenshots/`.
 - **Every page of the app is run by a test** on the small world (`tests/test_app.py`),
   and again with the internet blocked, which is the offline promise as a test.
-  194 tests in total.
+  198 tests in total.
 
 ### How to run
 

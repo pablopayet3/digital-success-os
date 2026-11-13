@@ -38,6 +38,8 @@ class Settings:
     max_llm_calls_per_run: int
     llm_budget_usd: float
     max_agent_conversations_per_run: int
+    # The public demo only (ADR 0024): when the model cannot answer, the labelled stand-in does.
+    stand_in_when_unavailable: bool = False
 
     @property
     def operational_store_url(self) -> str:
@@ -77,6 +79,7 @@ def load_settings() -> Settings:
         max_llm_calls_per_run=int(_override("MAX_LLM_CALLS_PER_RUN", limits)),
         llm_budget_usd=float(_override("LLM_BUDGET_USD", limits)),
         max_agent_conversations_per_run=int(_override("MAX_AGENT_CONVERSATIONS_PER_RUN", limits)),
+        stand_in_when_unavailable=_flag("DSO_STAND_IN_WHEN_UNAVAILABLE", False),
     )
 
 

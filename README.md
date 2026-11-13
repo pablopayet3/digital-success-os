@@ -82,7 +82,7 @@ From `uv run python run.py demo` (180 days of history, then 30 simulated days of
 | Seat expansion: expansion closed, treatment against holdout | 19% against 21%: **no effect detected** (the sample could only have shown 20 points or more) |
 | Agent evaluation, real model, 44 cases | Onboarding agent 30 of 30 with prompt v3 (v1: 29, v2: 25); mailbox 10 of 10; briefs 4 of 4; classifier 96% on 160 labelled replies |
 | Cost of every real model call behind this (834 calls) | about $3 |
-| Automated tests | 194 |
+| Automated tests | 198 |
 
 Three honest notes. The lift comes from assumptions in `config/sim_effects.yaml`: this
 demonstrates a measurement system, not a result. The agent answers are real: one live
@@ -93,7 +93,7 @@ the evaluation harness that the stand-in could never have shown (ADR 0017).
 
 ## See it without installing anything
 
-- **The app:** https://digital-success-os-app.onrender.com (free hosting: the first load can take a minute; it runs the labelled stand-in, not the real model)
+- **The app:** https://digital-success-os-app.onrender.com (free hosting: the first load can take a minute; the line at the top of every page says who answers as the agent: the real model when the host has a key, otherwise a labelled stand-in)
 - **The API:** https://digital-success-os-api.onrender.com/health
 - **A guided tour opens by itself** on the hosted app: thirteen short windows, one Next at a time. The second draws the whole chain with the team on each step. Each of the others names the real tool at a company, who uses it, and what this demo is built with.
 - **Try the whole loop yourself in five minutes:** [docs/reviewer-guide.md](docs/reviewer-guide.md). Make the agent hand you a task, pick it up in the Human console as Sales, close it, and see the system remember. The console's sign-in details are shared on request, never in this repository.
@@ -255,17 +255,19 @@ options, the decision, consequences and when to revisit. The ones worth reading 
 | A data contract checked in both directions | 0010 |
 | Plays as configuration, holdouts by hash | 0014 |
 | LLM cost controls, and the labelled stand-in | 0015 |
+| The real model on the public demo, capped, with the stand-in behind it | 0024 |
 | A 50% holdout and leading indicators for the pilot; what happened when the split check fired | 0016 |
 | Evals: code checks first, judge second; what the first real-model run taught | 0017 |
 | A readiness checklist answered from live data, not ticked by hand | 0020 |
 | A generated data dictionary, kept complete by a test | 0021 |
+| The guided tour read aloud by the browser's own voice | 0023 |
 
 What each phase delivered, and three decisions to defend for each, is in
 [docs/phase-notes.md](docs/phase-notes.md).
 
 ## What runs for real, and what has not been run yet
 
-Running on GitHub Actions: CI on every push (lint, 194 tests on Linux, the dbt build, a
+Running on GitHub Actions: CI on every push (lint, 198 tests on Linux, the dbt build, a
 secret scan), the container image build (it generates a demo world inside the image and
 publishes it), and the daily pipeline schedule, which opens an issue when a run fails.
 
@@ -317,5 +319,5 @@ experiments/  play results against holdouts
 api/ app/     FastAPI endpoints; the Streamlit app
 integrations/ the CRM sync
 docs/         operating documents, decision records, play specs, model cards
-tests/        194 tests; they generate a small world and run everything on it, every app page included
+tests/        198 tests; they generate a small world and run everything on it, every app page included
 ```

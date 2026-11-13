@@ -115,6 +115,34 @@ def test_the_scripted_story_ends_in_a_task_for_sales(app_data, ops):
                 ops.execute("DELETE FROM ctas WHERE cta_id = :id", id=row["cta_id"])
 
 
+def test_the_public_demo_says_on_screen_when_the_model_budget_is_used_up(app_data, tmp_path):
+    """ADR 0024. The visitor is told, on the page, that the stand-in has taken over."""
+    import dataclasses
+
+    from agents.ledger import SpendLedger
+    from agents.llm import LLM, get_llm, set_llm
+    from common.settings import load_settings
+    from common.store import Store
+
+    usual = get_llm()
+    public = dataclasses.replace(
+        load_settings(), offline_mode=False, llm_stand_in=False, stand_in_when_unavailable=True
+    )
+    ledger = SpendLedger(Store(f"sqlite:///{(tmp_path / 'spend.db').as_posix()}"))
+    demo = str(ROOT / "app" / "views" / "demo.py")
+    try:
+        set_llm(LLM(settings=public, cache_dir=tmp_path, ledger=ledger))
+        app = AppTest.from_file(demo, default_timeout=120).run()
+        assert any("Used so far: $0.00" in caption.value for caption in app.caption)
+        assert not any("used up" in warning.value for warning in app.warning)
+
+        ledger.add("agent", "a-model", public.llm_budget_usd)  # the whole budget is spent
+        app = AppTest.from_file(demo, default_timeout=120).run()
+        assert any("is used up" in warning.value for warning in app.warning)
+    finally:
+        set_llm(usual)
+
+
 # --- The shared, hosted demo ---------------------------------------------------------------------
 
 
@@ -156,12 +184,24 @@ def test_every_tour_window_is_complete_and_opens_on_a_real_page():
     assert {window["page"] for window in windows} == set(PAGES)
     # and has been told, for every page, what this demo is built with.
     assert {window["page"] for window in windows if "built" in window} == set(PAGES)
-    # The button promises five minutes. That is about 1,300 words to read.
+    # The button promises six minutes. That is about 1,500 words to read.
     words = sum(len(window.get(part, "").split()) for window in windows for part in PARTS)
-    assert words <= 1400, f"the tour has grown to {words} words"
+    assert words <= 1500, f"the tour has grown to {words} words"
     # The chain is drawn once, and the picture is one the app can draw.
     pictures = [window["diagram"] for window in windows if "diagram" in window]
     assert pictures and all("->" in mermaid_to_dot(picture) for picture in pictures)
+
+
+def test_every_tour_window_can_be_read_aloud():
+    from app.tour import VOICE_BUTTON, spoken, steps
+
+    for window in steps():
+        sentences = spoken(window)
+        assert sentences[0].startswith(window["title"])
+        # One sentence at a time, each short: some browsers cut a long reading off.
+        assert all(0 < len(sentence.split()) <= 45 for sentence in sentences)
+    # The button uses the browser's own voice: it loads nothing from the internet.
+    assert "speechSynthesis" in VOICE_BUTTON and "http" not in VOICE_BUTTON
 
 
 def test_next_walks_through_every_window_and_finish_ends_the_tour(app_data):
@@ -186,7 +226,7 @@ def test_the_tour_greets_a_hosted_visitor_but_never_interrupts_a_local_demo(app_
     main = str(ROOT / "app" / "main.py")
     monkeypatch.delenv("DSO_HOSTED", raising=False)
     local = AppTest.from_file(main, default_timeout=120).run()
-    assert "Guided tour (5 minutes)" in [button.label for button in local.button]
+    assert "Guided tour (6 minutes)" in [button.label for button in local.button]
     assert "Next" not in [button.label for button in local.button]  # no window by itself
 
     monkeypatch.setenv("DSO_HOSTED", "1")

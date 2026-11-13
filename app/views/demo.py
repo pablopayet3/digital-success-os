@@ -13,6 +13,7 @@ from engine.context import load_day, records
 
 # The two messages of the demo path: a setup question, then a question about price.
 STORY = ["How do I invite my whole team at once?", "Thanks. How much would 10 more seats cost?"]
+MAX_MESSAGE = 400  # characters a visitor may type in one message
 
 st.title("Live demo")
 tab_chat, tab_day = st.tabs(["Talk to the onboarding agent", "Advance one day"])
@@ -23,6 +24,21 @@ with tab_chat:
         "talks to the admin, and a question the agent must not answer becomes a task for a "
         "person. You are the admin. A handoff creates a real task: open it in the Human console."
     )
+    llm = get_llm()
+    if llm.settings.stand_in_when_unavailable:
+        # The public demo with the real model: say what it may spend, and when that is gone.
+        budget = llm.settings.llm_budget_usd
+        if llm.limit_reached:
+            st.warning(
+                f"**The real model's budget for this public demo (${budget:.2f}) is used up.** "
+                "From here on a labelled stand-in answers (keyword rules, not an AI model). "
+                "The handoff rules are code, so they work exactly as before."
+            )
+        else:
+            st.caption(
+                f"The real model answers here. This public demo may spend ${budget:.2f} on it "
+                f"in total. Used so far: ${llm.total_spent_usd:.2f}."
+            )
     stalled = ui.query(
         """
         SELECT account_id, account_name, edition, prerequisite_closure_pct
@@ -86,8 +102,9 @@ with tab_chat:
 
     with st.form("story"):
         st.write("**The scripted story.** One click, or edit the two messages first.")
-        first = st.text_input("The admin asks", STORY[0])
-        second = st.text_input("Then asks", STORY[1])
+        # Messages are kept short: on the public demo each one may be sent to a paid model.
+        first = st.text_input("The admin asks", STORY[0], max_chars=MAX_MESSAGE)
+        second = st.text_input("Then asks", STORY[1], max_chars=MAX_MESSAGE)
         run, _, over = st.columns([1, 4, 1])
         if run.form_submit_button("Run the story"):
             st.session_state.demo_messages = [first, second]
@@ -109,7 +126,7 @@ with tab_chat:
             "start the app with `uv run python run.py app --live`."
         )
     finished = "demo_task" in st.session_state
-    message = st.chat_input("Your message to the agent", disabled=finished)
+    message = st.chat_input("Your message to the agent", disabled=finished, max_chars=MAX_MESSAGE)
     if message:
         st.session_state.demo_messages.append(message)
 

@@ -448,6 +448,66 @@ def test_stand_in_mode_is_labelled_and_never_needs_a_key(tmp_path, monkeypatch):
     assert "stand-in" in llm.mode and "$0" in llm.summary()
 
 
+def test_on_the_public_demo_the_stand_in_answers_when_the_model_cannot(tmp_path, monkeypatch):
+    """ADR 0024. A wrong key, a spent budget or an outage must not leave a visitor unanswered."""
+    from agents.stand_in import STAND_IN_MODEL
+
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)  # so no real call can be made
+    live = dataclasses.replace(load_settings(), offline_mode=False, llm_stand_in=False)
+    with pytest.raises(LLMUnavailable):  # everywhere else, no answer is the safe failure
+        LLM(settings=live, cache_dir=tmp_path).call(*REQUEST)
+
+    public = dataclasses.replace(live, stand_in_when_unavailable=True)
+    llm = LLM(settings=public, cache_dir=tmp_path)
+    response = llm.call(*REQUEST)
+    assert response.model == STAND_IN_MODEL and response.cost_usd == 0
+    assert llm.paid_calls == 0 and llm.spent_usd == 0
+    assert not list(tmp_path.iterdir())  # never saved among the real model's responses
+    assert "stand-in" in llm.mode  # and the screen says so
+
+    spent = LLM(settings=dataclasses.replace(public, llm_budget_usd=0.0), cache_dir=tmp_path)
+    assert spent.call(*REQUEST).model == STAND_IN_MODEL  # the same when the budget is spent
+
+
+def test_the_public_demo_budget_survives_a_restart_and_an_admin_reset(tmp_path):
+    """ADR 0024. The total is kept in the store, so starting the app again cannot reset it."""
+    from agents.ledger import SpendLedger
+    from agents.stand_in import STAND_IN_MODEL
+    from common.store import TABLES
+
+    def ten_cents(request):  # a paid answer: a million input tokens of the small model
+        usage = {"input_tokens": 1_000_000, "output_tokens": 0}
+        text = [{"type": "text", "text": "hello"}]
+        return {"content": text, "model": "claude-haiku-5-5", "usage": usage}
+
+    def ask(llm, words):
+        return llm.call("classifier", "You classify.", [{"role": "user", "content": words}])
+
+    public = dataclasses.replace(
+        load_settings(),
+        offline_mode=False,
+        llm_stand_in=False,
+        stand_in_when_unavailable=True,
+        llm_budget_usd=0.15,
+    )
+    store = Store(f"sqlite:///{(tmp_path / 'ops.db').as_posix()}")
+
+    first_run = LLM(public, tmp_path / "a", transport=ten_cents, ledger=SpendLedger(store))
+    assert ask(first_run, "one").cost_usd == pytest.approx(0.10)
+    assert ask(first_run, "two").cost_usd == pytest.approx(0.10)  # 0.10 was still under 0.15
+    assert first_run.limit_reached and "used up" in first_run.mode
+
+    # The app restarts: a new client, nothing in memory, the same store.
+    second_run = LLM(public, tmp_path / "b", transport=ten_cents, ledger=SpendLedger(store))
+    assert second_run.spent_usd == 0 and second_run.total_spent_usd == pytest.approx(0.20)
+    blocked = ask(second_run, "three")
+    assert blocked.model == STAND_IN_MODEL and blocked.cost_usd == 0  # no more paid calls
+    assert second_run.total_spent_usd == pytest.approx(0.20)
+
+    # An admin's reset of the demo data empties the demo tables only: not this one.
+    assert "llm_spend" not in TABLES
+
+
 def test_play_specs_on_disk_match_the_configuration():
     """The specs are generated from the play config. If this fails, run: run.py specs"""
     from engine.specs import SPEC_DIR, render_all

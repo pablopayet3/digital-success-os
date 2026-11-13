@@ -5,7 +5,8 @@
 #   1. Every response is cached on disk (cache/llm/). A re-run reads the cache and costs nothing.
 #   2. A run stops cleanly when it reaches MAX_LLM_CALLS_PER_RUN or LLM_BUDGET_USD
 #      (config/environments.yaml), and logs what it spent.
-#   3. Offline mode is the default: demos, CI and the hosted app never call the API.
+#   3. Offline mode is the default: demos and CI never call the API. The hosted app does
+#      only when its owner gives it a key, and then within tighter limits (ADR 0024).
 
 # One entry per job ("role"). effort controls how much the model thinks: low is enough for
 # short support replies and classification, and it is the cheapest.

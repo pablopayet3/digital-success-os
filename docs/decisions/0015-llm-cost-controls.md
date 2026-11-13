@@ -21,6 +21,7 @@ anyone who clones the repo can replay the demo without a key.
 sent. The caller gets `LLMUnavailable` and takes its documented fallback: an agent hands
 off to a human, a brief falls back to its template, a classifier leaves the item for later.
 Demos, CI and the hosted app run offline, so they never call the API and hold no key.
+(Changed for the hosted app on 12 November 2026: see ADR 0024.)
 
 **3. A run stops at its limits.** `MAX_LLM_CALLS_PER_RUN` (400) and `LLM_BUDGET_USD` (5)
 are checked before every paid call. At either limit `LLMBudgetReached` is raised, the call

@@ -16,6 +16,10 @@ calls the Anthropic SDK directly. That makes four rules impossible to forget:
                         before the call is made, and the spend is logged.
   4. Models are config.  config/llm.yaml says which model does which job ("role").
 
+One exception to rule 2, for the public demo only (ADR 0024): when its host has been
+given a key, the real model answers within a small budget, and a request it cannot
+answer goes to the labelled stand-in instead of failing.
+
 Tests and CI pass in a fake `transport`, so they never need a key or a network.
 """
 
@@ -63,6 +67,7 @@ class LLM:
     settings: Settings = field(default_factory=load_settings)
     cache_dir: Path = CACHE_DIR
     transport: object = None  # a function(request) -> response dict; None = the real API
+    ledger: object = None  # the public demo's stored total (agents/ledger.py); None = count here
     paid_calls: int = 0
     cached_calls: int = 0
     spent_usd: float = 0.0
@@ -104,13 +109,27 @@ class LLM:
             self.cached_calls += 1
             response = self._to_response(raw, cached=True, latency_ms=0)
         else:
-            self._check_allowed()
             started = time.time()
-            raw = self._send(request)
-            response = self._to_response(raw, cached=False, latency_ms=_ms_since(started))
-            self.paid_calls += 1
-            self.spent_usd += response.cost_usd
-            self._save(cache_file, role, purpose, request, raw)
+            try:
+                self._check_allowed()
+                raw = self._send(request)
+            except LLMUnavailable:
+                if not self.settings.stand_in_when_unavailable:
+                    raise
+                # The public demo never leaves a visitor without an answer: when the model
+                # cannot be reached, or the budget is spent, the labelled stand-in replies.
+                # Its answer costs nothing and is never saved among the real responses.
+                from agents.stand_in import stand_in_transport
+
+                response = self._to_response(stand_in_transport(request), False, _ms_since(started))
+                response.cost_usd = 0.0
+            else:
+                response = self._to_response(raw, cached=False, latency_ms=_ms_since(started))
+                self.paid_calls += 1
+                self.spent_usd += response.cost_usd
+                if self.ledger:
+                    self.ledger.add(role, response.model, response.cost_usd)
+                self._save(cache_file, role, purpose, request, raw)
 
         self.log.append(
             {
@@ -133,7 +152,29 @@ class LLM:
             return "stand-in (keyword rules, not an LLM)"
         if self.transport is None and self.settings.offline_mode:
             return "offline (replaying cached model responses)"
+        if self.settings.stand_in_when_unavailable:
+            if self.limit_reached:
+                return (
+                    "stand-in (keyword rules, not an LLM): "
+                    "the budget for the real model is used up"
+                )
+            return "live (calling the API; a labelled stand-in answers when it cannot)"
         return "live (calling the API)"
+
+    @property
+    def total_spent_usd(self) -> float:
+        """Paid so far: this run's total, or the public demo's stored total."""
+        return self.ledger.spent() if self.ledger else self.spent_usd
+
+    @property
+    def limit_reached(self) -> bool:
+        """True when no more paid calls will be made (a screen can say so)."""
+        if self.settings.llm_stand_in:
+            return False
+        return (
+            self.paid_calls >= self.settings.max_llm_calls_per_run
+            or self.total_spent_usd >= self.settings.llm_budget_usd
+        )
 
     def summary(self) -> str:
         """One line for the end of a run: how many calls, how many were free, what it cost."""
@@ -159,7 +200,7 @@ class LLM:
             raise LLMUnavailable("offline mode: no cached response for this request")
         if self.paid_calls >= self.settings.max_llm_calls_per_run:
             raise LLMBudgetReached(f"call limit reached. {self.summary()}")
-        if self.spent_usd >= self.settings.llm_budget_usd:
+        if self.total_spent_usd >= self.settings.llm_budget_usd:
             raise LLMBudgetReached(f"budget reached. {self.summary()}")
 
     def _send(self, request: dict) -> dict:
@@ -274,6 +315,12 @@ def get_llm() -> LLM:
         # The stand-in's answers go to their own folder, never into the cache of real responses.
         folder = ROOT / "cache" / "stand_in" if settings.llm_stand_in else CACHE_DIR
         _shared = LLM(settings, folder)
+        if settings.stand_in_when_unavailable:
+            # The public demo: its spend is kept in the store, so a restart cannot reset it.
+            from agents.ledger import SpendLedger
+            from common.store import open_store
+
+            _shared.ledger = SpendLedger(open_store())
     return _shared
 
 
