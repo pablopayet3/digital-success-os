@@ -19,6 +19,7 @@ signals:
   no_valid_admin: No admin contact with a working email address and consent.
   churn_risk_high: The churn model's score is above today's capacity cut-off (top 40 accounts in the pilot segment).
   expansion_ready: The expansion model's score is above today's capacity cut-off (top 60 accounts in the pilot segment).
+  advocate_ready: Latest NPS of 9 or 10 within 90 days, health band green, account at least 90 days old, no open high-priority ticket, and not flagged by the churn model.
 
 # What each exclusion means (engine/rules.py).
 exclusions:
@@ -115,3 +116,13 @@ plays:
     must_not: [Escalate to a person. This play stays digital.]
     test_cases:
       - tests/test_engine.py (the frequency cap holds across plays)
+
+  advocacy_ask:
+    job: >
+      Ask a happy, healthy customer to act as a reference, once, and only when it has been
+      earned. The system writes the request; a success manager approves it before it is
+      sent. A rejected draft ends the play for that customer.
+    automation_may_use: [Latest NPS score and date, health score and band, open high-priority tickets, churn model flag]
+    must_not: [Send the request without a person's approval., Chase a customer who does not answer., Ask a customer who is unhappy or at risk.]
+    test_cases:
+      - tests/test_engine.py (the request waits as a draft until a person approves it; a rejected draft ends the play)

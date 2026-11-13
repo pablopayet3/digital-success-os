@@ -28,7 +28,7 @@ from agents.llm import get_llm
 from analytics.train import MODEL_DIR
 from common.paths import DATA_DIR
 from common.store import Store, open_store
-from engine import handoff, humans, journeys, rules
+from engine import approvals, handoff, humans, journeys, rules
 from engine.catalog import load_catalog
 from engine.context import load_day
 from ingest.pipeline import run_pipeline
@@ -60,6 +60,7 @@ def run_day(
     summary = {
         "date": ctx.day,
         "resolved_by_staff": sum(humans.work_queues(ctx).values()),
+        "drafts_decided_by_staff": approvals.work_approvals(ctx),
         "mailbox_replies_triaged": sum(mailbox.triage_new_replies(ctx).values()),
         "feedback_classified": feedback.classify_new_feedback(ctx),
         **rules.evaluate_plays(ctx),

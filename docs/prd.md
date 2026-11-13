@@ -34,7 +34,7 @@ time, and when automation does reach a customer nobody can say whether it helped
 
 ## Scope
 
-Seven plays (`config/plays.yaml`), each with a ladder of digital, agentic and human
+Eight plays (`config/plays.yaml`), each with a ladder of digital, agentic and human
 steps; two agents (onboarding, mailbox triage); account briefs for Sales; a human console;
 an experiment report and an agent evaluation report.
 

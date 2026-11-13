@@ -688,6 +688,7 @@ What happened to every account that entered a play, treatment and holdout alike.
 | `valid_admin_restored` | boolean | The account had an admin we may email on any day in the window. |  |
 | `expanded_30d` | boolean | An expansion opportunity was closed-won in the window. |  |
 | `docs_adopted` | boolean | At least one doc was published in the window. |  |
+| `advocate_responded` | boolean | The contact accepted the reference request (clicked its "Yes" link) in the window. Only the reference request play can score it. |  |
 | `expansion_amount` | hugeint | Closed-won expansion in the measurement window. |  |
 | `retained_arr` | integer | ARR at entry if the account was still a customer at the end of the window, otherwise 0. |  |
 

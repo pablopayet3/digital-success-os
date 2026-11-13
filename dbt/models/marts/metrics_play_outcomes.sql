@@ -97,6 +97,23 @@ expansions as (
 
 ),
 
+advocacy as (
+
+    -- The reference request was accepted: its "Yes" link was clicked in the window.
+    select
+        enrolments.enrollment_id,
+        count(*) as accepted
+    from enrolments
+    inner join {{ ref('stg_email_engagement') }} as emails
+        on enrolments.account_id = emails.account_id
+        and emails.campaign = 'play_' || enrolments.play_id
+        and emails.clicked_at is not null
+        and emails.sent_date >= enrolments.enrolled_on
+        and emails.sent_date <= enrolments.window_end
+    group by enrolments.enrollment_id
+
+),
+
 outcomes as (
 
     select
@@ -122,12 +139,15 @@ outcomes as (
         coalesce(in_window.had_valid_admin = 1, false) as valid_admin_restored,
         coalesce(expansions.expansions_won, 0) > 0 as expanded_30d,
         coalesce(docs.docs_published, 0) > 0 as docs_adopted,
+        coalesce(advocacy.accepted, 0) > 0 and enrolments.play_id = 'advocacy_ask'
+            as advocate_responded,
         coalesce(expansions.expansion_amount, 0) as expansion_amount
     from enrolments
     left join at_entry on enrolments.enrollment_id = at_entry.enrollment_id
     left join in_window on enrolments.enrollment_id = in_window.enrollment_id
     left join docs on enrolments.enrollment_id = docs.enrollment_id
     left join expansions on enrolments.enrollment_id = expansions.enrollment_id
+    left join advocacy on enrolments.enrollment_id = advocacy.enrollment_id
     left join {{ ref('stg_accounts') }} as accounts
         on enrolments.account_id = accounts.account_id
 

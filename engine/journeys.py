@@ -10,6 +10,7 @@ Once a day, for each active enrolment whose next action is due:
          wait   until a date
          agent  until the conversation ends (it may escalate)
          cta    until a human resolves the task (the return signal resumes it)
+         email with `approval`: until a person approves the draft (engine/approvals.py)
 
 Before any email, the runner re-checks consent, the frequency cap and whether the
 account is paused. A touch that is not allowed today is deferred to tomorrow, and
@@ -20,7 +21,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from engine import channels, consent
+from engine import approvals, channels, consent
 from engine.catalog import Journey, Step
 from engine.context import DayContext
 from engine.handoff import create_cta
@@ -31,8 +32,8 @@ MAX_STEPS_PER_DAY = 10  # a guard against a journey that loops
 
 def advance_journeys(ctx: DayContext) -> dict[str, int]:
     """Run every due journey step. Returns counts of what happened."""
-    counts = {"emails": 0, "in_app": 0, "agent_conversations": 0, "ctas": 0, "deferred": 0,
-              "goal_reached": 0, "exited": 0}  # fmt: skip
+    counts = {"emails": 0, "in_app": 0, "agent_conversations": 0, "ctas": 0, "drafts": 0,
+              "deferred": 0, "goal_reached": 0, "exited": 0}  # fmt: skip
     _close_finished_holdouts(ctx)
 
     due = ctx.store.rows(
@@ -92,8 +93,23 @@ def run_step(ctx, enrollment: dict, journey: Journey, step: Step, account: dict,
             counts["deferred"] += 1
             return False
 
+    if step.type == "email" and step.approval and not approvals.approved_draft(
+        ctx, enrollment, step
+    ):
+        # A person must approve this message first (engine/approvals.py).
+        draft_id = approvals.create_draft(ctx, enrollment, step, account, contact)
+        _log(ctx, enrollment, step, "draft_created", f"{draft_id} -> {step.approval}")
+        ctx.store.update(
+            "enrollments", {"enrollment_id": enrollment["enrollment_id"]}, status="waiting_on_human"
+        )
+        enrollment["status"] = "waiting_on_human"
+        counts["drafts"] = counts.get("drafts", 0) + 1
+        return False
+
     if step.type == "email":
         subject = channels.send_email(ctx, enrollment, step, account, contact)
+        if step.approval:
+            approvals.mark_sent(ctx, enrollment, step)
         _log(ctx, enrollment, step, "email_sent", subject)
         counts["emails"] += 1
     elif step.type == "in_app":

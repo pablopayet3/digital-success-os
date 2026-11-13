@@ -221,3 +221,7 @@ signals:
     name: Likely to buy more
     kind: Opportunity
     fires_when: The prediction model ranks the customer among those most likely to buy more, up to the number the team can handle that day.
+  - id: advocate_ready
+    name: Ready to be a reference
+    kind: Opportunity
+    fires_when: The customer gave a score of 9 or 10 in a survey in the last 90 days, its health is green, it has been a customer for at least 90 days, it has no open high-priority ticket, and the model does not flag it as likely to cancel.

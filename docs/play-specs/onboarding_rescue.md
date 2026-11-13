@@ -7,7 +7,7 @@ Synthetic data, fictional company. Generated from `config/plays.yaml`, `config/j
 | Play id | `onboarding_rescue` (version 1) |
 | Owner | Digital Success Portfolio Lead |
 | Objective | Get stalled accounts through setup (board, five users, integration, SSO). |
-| Priority | 3 of 7 (1 claims an account first) |
+| Priority | 3 of 8 (1 claims an account first) |
 | Exclusive | Yes. An account is in one exclusive play at a time. |
 | Rollout stage | Full test: every eligible account, split into treatment and holdout. |
 | Holdout | 50% of eligible accounts |

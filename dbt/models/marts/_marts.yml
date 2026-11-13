@@ -86,6 +86,7 @@ models:
                   - no_valid_admin
                   - churn_risk_high
                   - expansion_ready
+                  - advocate_ready
       - name: evidence
         description: The reason in words, for a human or an agent.
         data_tests: [not_null]

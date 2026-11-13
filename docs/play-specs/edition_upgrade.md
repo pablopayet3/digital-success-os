@@ -7,7 +7,7 @@ Synthetic data, fictional company. Generated from `config/plays.yaml`, `config/j
 | Play id | `edition_upgrade` (version 1) |
 | Owner | Digital Success Portfolio Lead, with Sales |
 | Objective | Help accounts that have outgrown their edition see the value of the next one. |
-| Priority | 5 of 7 (1 claims an account first) |
+| Priority | 5 of 8 (1 claims an account first) |
 | Exclusive | Yes. An account is in one exclusive play at a time. |
 | Rollout stage | Slice: 10% of eligible accounts, chosen by hash. |
 | Holdout | 50% of eligible accounts |

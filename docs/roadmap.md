@@ -5,7 +5,8 @@ evidence from the experiment report.
 
 ## Now: the pilot on uncovered accounts
 
-- Seven plays live on the uncovered segment; five on a full test, two on a 10% slice.
+- Eight plays live on the uncovered segment; five on a full test, three on a 10% slice. The
+  newest, the reference request, waits for a success manager's approval before each email.
 - Onboarding agent and mailbox triage agent, with hard escalation rules and a human console.
 - Daily pipeline with data tests, a contract on the production table, and freshness checks.
 - Experiment report per play; evaluation report per prompt version.

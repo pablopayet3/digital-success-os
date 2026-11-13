@@ -104,6 +104,24 @@ TABLES = {
         resolved_by TEXT,
         next_state TEXT
     """,
+    # Emails that wait for a person's approval before they are sent (engine/approvals.py).
+    "drafts": """
+        draft_id TEXT PRIMARY KEY,
+        created_on TEXT NOT NULL,
+        account_id TEXT NOT NULL,
+        contact_id TEXT,
+        play_id TEXT NOT NULL,
+        enrollment_id TEXT NOT NULL,
+        step_id TEXT NOT NULL,
+        queue TEXT NOT NULL,
+        recipient TEXT,
+        subject TEXT NOT NULL,
+        body TEXT NOT NULL,
+        status TEXT NOT NULL,
+        decided_on TEXT,
+        decided_by TEXT,
+        notes TEXT
+    """,
     # Consent changes the system made itself (for example an "unsubscribe" reply).
     "consent_changes": """
         changed_on TEXT NOT NULL,

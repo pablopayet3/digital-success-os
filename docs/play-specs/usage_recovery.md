@@ -7,7 +7,7 @@ Synthetic data, fictional company. Generated from `config/plays.yaml`, `config/j
 | Play id | `usage_recovery` (version 1) |
 | Owner | Digital Success Portfolio Lead |
 | Objective | Reverse a drop in usage before it becomes churn. |
-| Priority | 4 of 7 (1 claims an account first) |
+| Priority | 4 of 8 (1 claims an account first) |
 | Exclusive | Yes. An account is in one exclusive play at a time. |
 | Rollout stage | Full test: every eligible account, split into treatment and holdout. |
 | Holdout | 50% of eligible accounts |

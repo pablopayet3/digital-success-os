@@ -241,6 +241,20 @@ stops:
       entering a play are probably too strict.
 
   - page: overview
+    target: What the system did, in plain words
+    title: The event log
+    what: >
+      This list shows the latest actions of the system, newest first. Each line names the
+      customer, says what the system did, and gives the signal that started it. No code
+      or table name appears, so anyone can read it.
+    who: >
+      CS Leadership and the CS Operations team read it to see the system at work. A success
+      manager reads the same record for one customer on the Accounts page.
+    example: >
+      "Wexyx Energy was sent an email. Why: setup has stalled, in the play Onboarding
+      rescue." That one line tells the whole story of a step.
+
+  - page: overview
     target: Health by coverage tier
     title: Health by coverage tier
     what: >
@@ -612,6 +626,22 @@ stops:
     example: >
       A task created for a price question shows the customer's exact question and the
       number of seats in use, so a reply can be written in a minute.
+
+  - page: console
+    target: "A draft waiting for approval: an example"
+    title: Nothing risky is sent without a person
+    what: >
+      Some messages carry more risk than a setup guide. A request to act as a reference is
+      one of them. For those, the system writes a draft and waits. Nothing reaches the
+      customer until a success manager approves the draft. A rejected draft ends the play
+      for that customer.
+    who: >
+      The Scaled CS team approves or rejects the drafts. The CS Operations team decides
+      which steps of which plays need an approval.
+    example: >
+      A customer gave a score of 10 in a survey, is healthy, and has no open problem. The
+      system drafts a reference request. A success manager knows that the customer's
+      renewal talks start next week, so they reject the draft, and nothing is sent.
 
   # --- Pilot ------------------------------------------------------------------------------
   - page: pilot

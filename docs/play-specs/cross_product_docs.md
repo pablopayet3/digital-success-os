@@ -7,7 +7,7 @@ Synthetic data, fictional company. Generated from `config/plays.yaml`, `config/j
 | Play id | `cross_product_docs` (version 1) |
 | Owner | Digital Success Portfolio Lead |
 | Objective | Show teams that use boards as documents what Relay Docs would give them. |
-| Priority | 7 of 7 (1 claims an account first) |
+| Priority | 7 of 8 (1 claims an account first) |
 | Exclusive | Yes. An account is in one exclusive play at a time. |
 | Rollout stage | Slice: 10% of eligible accounts, chosen by hash. |
 | Holdout | 50% of eligible accounts |

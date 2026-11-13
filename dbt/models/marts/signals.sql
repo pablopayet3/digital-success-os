@@ -52,6 +52,26 @@ where seat_utilisation >= 0.9
 
 union all
 
+-- Ready to advocate: a promoter in the last 90 days, healthy, settled and not at risk.
+-- Asking a customer to be a reference is only done when it has been earned.
+select
+    snapshot_date,
+    account_id,
+    'advocate_ready',
+    cast(latest_nps_score as double),
+    'NPS score of ' || {{ text('latest_nps_score') }} || ' on '
+        || {{ text('latest_nps_date') }} || ', health ' || {{ text('round(health_score)') }}
+        || ', no open high-priority tickets'
+from accounts
+where latest_nps_score >= 9
+    and latest_nps_date >= {{ days_before('snapshot_date', 90) }}
+    and health_band = 'green'
+    and account_age_days >= 90
+    and coalesce(open_high_priority_tickets, 0) = 0
+    and not churn_risk_high
+
+union all
+
 -- Outgrowing the edition: at a limit that the next edition up would lift.
 select
     snapshot_date,

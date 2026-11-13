@@ -7,7 +7,7 @@ Synthetic data, fictional company. Generated from `config/plays.yaml`, `config/j
 | Play id | `detractor_save` (version 1) |
 | Owner | Scaled CS team lead |
 | Objective | Talk to an unhappy customer within 48 hours, with full context. |
-| Priority | 2 of 7 (1 claims an account first) |
+| Priority | 2 of 8 (1 claims an account first) |
 | Exclusive | Yes. An account is in one exclusive play at a time. |
 | Rollout stage | Full test: every eligible account, split into treatment and holdout. |
 | Holdout | 20% of eligible accounts |

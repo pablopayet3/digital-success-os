@@ -8,7 +8,9 @@ database instead, that database starts empty. This copies the demo state into it
 
 Rules:
   - If the store is the local file, there is nothing to do.
-  - If the hosted store already has data, nothing is touched.
+  - If the hosted store already holds this image's demo state, nothing is touched.
+  - If it holds the state of an earlier image (a new deploy), it is emptied and filled
+    again, so the hosted demo always matches the code it runs. Visitors' changes go.
   - Two services start at the same time, so the copy holds a database lock: only one of
     them copies, the other finds the data there.
   - With --reset (or the Admin's button in the Human console) the hosted store is emptied
@@ -18,6 +20,7 @@ Exit code 0 means the hosted store is ready (or not in use). Any other code tell
 start script to fall back to the local file, so the demo still comes up.
 """
 
+import hashlib
 import sys
 from pathlib import Path
 
@@ -46,13 +49,22 @@ def seed(data_dir: Path = DATA_DIR, reset: bool = False) -> str:
         return "no demo state in this image: the hosted store stays empty"
     source = Store(f"sqlite:///{source_file.as_posix()}")
 
+    # Which demo state this image carries. A new deploy with a different demo state
+    # replaces the hosted one, so the hosted demo always matches the code it runs.
+    fingerprint = hashlib.sha256(source_file.read_bytes()).hexdigest()[:16]
     with target.engine.begin() as con:
         con.execute(text(f"SELECT pg_advisory_xact_lock({SEED_LOCK})"))
-        if reset:
+        con.execute(text("CREATE TABLE IF NOT EXISTS demo_seed (fingerprint TEXT NOT NULL)"))
+        seeded = con.execute(text("SELECT fingerprint FROM demo_seed")).scalar()
+        has_data = con.execute(text("SELECT count(*) FROM enrollments")).scalar()
+        if not reset and has_data and seeded == fingerprint:
+            return "the hosted store already has this image's demo state: left as it is"
+        if reset or has_data:
+            reset = reset or "new image"
             for table in TABLES:
                 con.execute(text(f"DELETE FROM {table}"))
-        elif con.execute(text("SELECT count(*) FROM enrollments")).scalar():
-            return "the hosted store already has data: left as it is"
+        con.execute(text("DELETE FROM demo_seed"))
+        con.execute(text("INSERT INTO demo_seed (fingerprint) VALUES (:f)"), {"f": fingerprint})
         copied = 0
         for table in TABLES:
             rows = source.rows(f"SELECT * FROM {table}")
@@ -64,7 +76,12 @@ def seed(data_dir: Path = DATA_DIR, reset: bool = False) -> str:
                 text(f"INSERT INTO {table} ({', '.join(names)}) VALUES ({placeholders})"), rows
             )
             copied += len(rows)
-    done = "reset the hosted store to the demo's starting state" if reset else "seeded"
+    if reset == "new image":
+        done = "replaced the hosted store with this image's demo state"
+    elif reset:
+        done = "reset the hosted store to the demo's starting state"
+    else:
+        done = "seeded"
     return f"{done}: copied {copied} rows of demo state into the hosted store"
 
 

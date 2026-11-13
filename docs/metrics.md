@@ -68,6 +68,7 @@ the evidence in words.
 | `no_valid_admin` | No admin contact who has opted in and has a working email address |
 | `churn_risk_high` | Churn score at or above the day's capacity cut-off |
 | `expansion_ready` | Expansion score at or above the day's capacity cut-off |
+| `advocate_ready` | Latest NPS of 9 or 10 within 90 days, health band green, account at least 90 days old, no open high-priority ticket, not flagged by the churn model |
 
 ## Core usage metrics
 

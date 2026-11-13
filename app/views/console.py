@@ -9,6 +9,7 @@ import streamlit as st
 
 from app import ui
 from common.settings import load_settings
+from engine.approvals import decide
 from engine.catalog import load_catalog
 from engine.handoff import resolve_cta
 
@@ -80,6 +81,55 @@ def show_task(task, packet: dict) -> None:
             st.text(packet["brief"])
 
 
+def show_approvals(queues: list[str] | None, role: str, today: str) -> None:
+    """Drafts the system wrote that a person must approve before they are sent (ADR 0029)."""
+    drafts = ui.rows("SELECT * FROM drafts WHERE status = 'pending' ORDER BY created_on, draft_id")
+    if len(drafts) and queues:
+        drafts = drafts[drafts["queue"].isin(queues)]
+    st.subheader("Drafts waiting for approval")
+    st.caption(
+        "Some messages carry more risk than a setup guide, such as a request to act as a "
+        "reference. The system writes them as drafts, and nothing is sent until a person "
+        "approves. An approved draft is sent at the next daily run, after consent and the "
+        "contact limit are checked again. A rejected draft ends the play for that customer."
+    )
+    if drafts.empty:
+        st.caption("No draft is waiting for approval in your queues.")
+        return
+    names = dict(
+        ui.query("SELECT account_id, account_name FROM gold.account_current").itertuples(
+            index=False
+        )
+    )
+    plays = {play.id: play.name for play in load_catalog().plays}
+    for draft in drafts.itertuples():
+        title = f"{names.get(draft.account_id, draft.account_id)}: {draft.subject}"
+        with st.expander(f"{title} (written {draft.created_on})"):
+            st.caption(
+                f"Draft {draft.draft_id}, from the play {plays.get(draft.play_id, draft.play_id)}, "
+                f"to {draft.recipient}."
+            )
+            st.markdown(draft.body)
+            notes = st.text_input(
+                "A note for the record (optional)", key=f"draft_note_{draft.draft_id}"
+            )
+            approve, reject = st.columns(2)
+            choice = None
+            if approve.button("Approve", key=f"approve_{draft.draft_id}", type="primary"):
+                choice = True
+            if reject.button("Reject", key=f"reject_{draft.draft_id}"):
+                choice = False
+            if choice is not None:
+                decide(ui.store(), draft.draft_id, choice, today, role, notes)
+                verdict = (
+                    "approved. It will be sent at the next daily run"
+                    if choice
+                    else "rejected. The play ends for this customer"
+                )
+                st.session_state.console_message = f"Draft {draft.draft_id} {verdict}."
+                ui.refresh()
+
+
 if "console_role" not in st.session_state:
     st.write("Sign in to work on a queue. Each role sees only the queues it owns.")
     with st.form("login"):
@@ -108,6 +158,20 @@ if "console_role" not in st.session_state:
             "the whole queue and close a task, which sends its outcome back to the play."
         )
         show_task(example.iloc[0], json.loads(example.iloc[0]["packet"]))
+    # And one draft that waits for a person's approval, also read-only.
+    st.subheader("A draft waiting for approval: an example")
+    st.caption(
+        "Some messages are sent only after a person approves them, such as a request to act "
+        "as a reference. After you sign in as CSM or Admin, you can approve or reject them."
+    )
+    draft = ui.rows("SELECT * FROM drafts ORDER BY status = 'pending' DESC, created_on DESC LIMIT 1")
+    if len(draft):
+        with st.container(border=True):
+            st.caption(f"Draft {draft.iloc[0]['draft_id']}, status: {draft.iloc[0]['status']}.")
+            st.markdown(f"**Subject: {draft.iloc[0]['subject']}**")
+            st.markdown(draft.iloc[0]["body"])
+    else:
+        st.caption("No draft has been written yet.")
     st.stop()
 
 role = st.session_state.console_role
@@ -146,6 +210,9 @@ if len(alerts) and (queues is None or alerts["queue"].isin(queues).any()):
     latest = alerts.iloc[0]
     st.warning(f"Capacity alert ({latest['alert_date']}): {latest['message']}")
 
+show_approvals(queues, role, today)
+
+st.subheader("Tasks in your queues")
 if tasks.empty:
     st.success("Nothing is waiting in your queues.")
     st.caption(

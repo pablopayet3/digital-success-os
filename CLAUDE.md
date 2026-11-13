@@ -323,6 +323,18 @@ After the phases (the brief read again line by line; see the last section of
   pointer; `ui.choices_help` puts the same words on the filter's question mark, and
   `ui.choices_table` shows them as a table. A test fails for a choice without a meaning.
   The script's file is read when `app/ui.py` is imported: restart the app after editing it.
+- Drafts that wait for a person (ADR 0029): an email step with `approval: <queue>` is
+  written into the store's `drafts` table and parks the journey (`waiting_on_human`);
+  the Human console lists the drafts of the role's queues with Approve and Reject
+  (`engine/approvals.py`). Approved: the next run re-checks consent and sends it.
+  Rejected: the play ends (`draft_rejected`). Simulated staff decide drafts each day
+  (85% approved).
+- The reference request play `advocacy_ask` and its signal `advocate_ready` (ADR 0030):
+  a recent survey score of 9 or 10, green health, 90 days or older, no open urgent
+  ticket, no churn flag. One email, approved by the Scaled CS team. Success measure
+  `advocate_responded` (the "Yes" link clicked). Eight plays in total.
+- The event log on the Overview (`app/events.py`, ADR 0031): the latest actions as
+  sentences, from `journey_events` and the enrolments. Words per event in `ACTIONS`.
 - The Overview's top (`ui.what_this_is`): what this is, three expanders (every signal,
   one play taken apart, how a holdout works), the workflow as cards, a guide to the
   pages. The Live demo opens with the message the system sent first, because the play
@@ -374,7 +386,10 @@ local store, the seeding script run twice, then one more day with
 `DSO_OPERATIONAL_STORE=env:DATABASE_URL`). `scripts/check_store.py` prints what a
 run left in the store. The hosted app and API share a hosted Postgres created by
 `render.yaml`; `scripts/seed_store.py` fills it once at start-up (`scripts/start-app.sh`,
-`scripts/start-api.sh`), with a fallback to the local file. Trace export is tested
+`scripts/start-api.sh`), with a fallback to the local file. It records a fingerprint of
+the image's demo state (table `demo_seed`): a deploy whose demo state differs empties the
+hosted store and fills it again, so visitors' changes do not survive a new deploy (the
+`llm_spend` total does, it is not in `TABLES`). Trace export is tested
 with a stand-in client (masking, and a failing service cannot break a run).
 
 README pictures are in `docs/screenshots/` (three pages and `demo.gif`). Taking them has

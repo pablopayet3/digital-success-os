@@ -23,6 +23,7 @@ Tier = Literal["digital", "agentic", "human"]
 KNOWN_SIGNALS = {
     "activation_stalled", "usage_drop", "seat_pressure", "edition_fit", "cross_product",
     "detractor", "support_friction", "no_valid_admin", "churn_risk_high", "expansion_ready",
+    "advocate_ready",
 }  # fmt: skip
 KNOWN_EXCLUSIONS = {
     "already_in_this_play", "in_another_play", "open_escalation", "renewal_in_negotiation",
@@ -35,6 +36,7 @@ class Step(BaseModel):
     type: Literal["email", "in_app", "agent", "wait", "branch", "cta", "exit"]
     tier: Tier | None = None
     template: str | None = None  # email, in_app
+    approval: str | None = None  # email: the queue that must approve the draft first
     agent: str | None = None  # agent
     days: int | None = None  # wait
     condition: str | None = Field(default=None, alias="if")  # branch
@@ -148,6 +150,11 @@ def find_problems(catalog: Catalog) -> list[str]:
             if step.type in ("email", "in_app"):
                 if not (TEMPLATE_DIR / f"{step.template}.md").exists():
                     problems.append(f"{where}: template '{step.template}' not found")
+            if step.approval is not None:
+                if step.type != "email":
+                    problems.append(f"{where}: only an email can wait for approval")
+                elif step.approval not in catalog.routing["queues"]:
+                    problems.append(f"{where}: unknown approval queue '{step.approval}'")
             if step.type == "wait" and not step.days:
                 problems.append(f"{where}: a wait needs a number of days")
             if step.type == "branch":

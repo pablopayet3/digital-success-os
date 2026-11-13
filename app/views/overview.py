@@ -6,9 +6,10 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-from app import ui
+from app import events, ui
 from common.config import load_yaml
 from common.paths import ROOT
+from engine.catalog import load_catalog
 
 # A task closed with one of these outcomes counts as a handoff that was worth making.
 GOOD_OUTCOMES = ["resolved", "saved", "expansion_opportunity"]
@@ -205,6 +206,37 @@ counts = {
 slots = st.columns(4) + st.columns(4)
 for column, (label, value) in zip(slots, counts.items(), strict=False):
     ui.metric(column, label, f"{value:,}")
+
+st.subheader("What the system did, in plain words")
+st.caption(
+    "The latest actions, newest first. Each line names the customer, what the system did, "
+    "and the signal that started it. The same record is kept for every customer on the "
+    "Accounts page."
+)
+recent = events.latest_events(ui.store())
+if recent:
+    names = dict(
+        ui.query("SELECT account_id, account_name FROM gold.account_current").itertuples(
+            index=False
+        )
+    )
+    signal_names = {signal["id"]: signal["name"] for signal in load_yaml("job.yaml")["signals"]}
+    play_names = {play.id: play.name for play in load_catalog().plays}
+    # A wrapped list, not a table, so that every sentence can be read in full.
+    lines = [
+        f"- **{event['day']}**: "
+        + events.sentence(
+            event,
+            names.get(event["account_id"], event["account_id"]),
+            signal_names.get(event["trigger_signal"], event["trigger_signal"] or ""),
+            play_names.get(event["play_id"], event["play_id"]),
+        )
+        for event in recent
+    ]
+    with st.container(border=True, height=320):
+        st.markdown("\n".join(lines))
+else:
+    st.info("Nothing has happened yet. Simulate a day on the Live demo page.")
 
 left, right = st.columns(2)
 with left:

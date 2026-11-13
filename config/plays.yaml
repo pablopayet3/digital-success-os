@@ -205,3 +205,30 @@ plays:
       id: docs_adopted
       description: The account publishes its first doc within 30 days.
     version: 1
+
+  - id: advocacy_ask
+    name: Reference request
+    owner: Scaled CS team lead
+    objective: Ask happy, healthy customers to act as a reference, only when it is earned.
+    trigger: [advocate_ready]
+    audience:
+      lifecycle: [adopting, mature, expansion]
+    exclusions: [already_in_this_play, renewal_in_negotiation, in_another_play, open_escalation, no_emailable_contact]
+    intervention_ladder:
+      - tier: digital
+        action: >
+          A reference request by email, drafted by the system and approved by a success
+          manager before it is sent.
+        move_up_when: >
+          This play stays digital. A person approves every request, and nobody is chased
+          after a request goes unanswered.
+    channel_sequence: [email]
+    journey: advocacy_ask
+    priority: 8
+    exclusive: true
+    holdout_pct: 0.1         # small: the holdout only checks that asking does no harm
+    rollout_stage: slice     # new play: starts on the 10% slice
+    success_metric:
+      id: advocate_responded
+      description: The contact accepts the reference request (clicks "Yes") within 30 days.
+    version: 1

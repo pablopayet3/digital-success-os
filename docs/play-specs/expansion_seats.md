@@ -7,7 +7,7 @@ Synthetic data, fictional company. Generated from `config/plays.yaml`, `config/j
 | Play id | `expansion_seats` (version 1) |
 | Owner | Sales lead, with Digital Success |
 | Objective | Give account owners a ready brief when an account is running out of seats. |
-| Priority | 6 of 7 (1 claims an account first) |
+| Priority | 6 of 8 (1 claims an account first) |
 | Exclusive | No. It may run alongside another play. |
 | Rollout stage | Full test: every eligible account, split into treatment and holdout. |
 | Holdout | 50% of eligible accounts |

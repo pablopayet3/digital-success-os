@@ -30,7 +30,7 @@ def catalog() -> Catalog:
 
 
 def test_every_play_declares_its_ladder_rollout_and_holdout(catalog):
-    assert len(catalog.plays) == 7
+    assert len(catalog.plays) == 8
     for play in catalog.plays:
         assert play.intervention_ladder, play.id
         assert play.rollout_stage in ("slice", "full")
@@ -413,3 +413,105 @@ def test_the_scaling_preview_decides_like_the_engine_and_writes_nothing(simulate
     assert rows["onboarding_rescue"]["first_day_queue"] is None  # it starts with an email
     # A tier with no accounts gives zeros, not an error.
     assert all(row["would_enter"] == 0 for row in preview_segment(ctx, "no_such_tier"))
+
+
+# --- Drafts that wait for a person's approval (ADR 0029) ---------------------------------
+
+
+def test_a_draft_waits_for_approval_and_nothing_is_sent_before(simulated, catalog, tmp_path):
+    from engine import approvals, consent
+
+    _, data_dir = simulated
+    store = Store(f"sqlite:///{(tmp_path / 'approvals.db').as_posix()}")
+    ctx = load_day(data_dir, store, catalog)
+    # Two customers we may email, put straight into the reference request play.
+    chosen = []
+    for account_id in sorted(ctx.accounts):
+        contact = consent.best_contact(ctx, account_id)
+        if contact and consent.can_email(ctx, contact) and account_id not in ctx.paused:
+            chosen.append((account_id, contact))
+        if len(chosen) == 2:
+            break
+    for number, (account_id, contact) in enumerate(chosen):
+        store.insert(
+            "enrollments",
+            {"enrollment_id": f"E-TEST-{number}", "account_id": account_id,
+             "play_id": "advocacy_ask", "play_version": 1, "arm": "treatment",
+             "rollout_stage": "slice", "status": "active", "trigger_signal": "advocate_ready",
+             "trigger_evidence": "NPS score of 10", "contact_id": contact["contact_id"],
+             "current_step": "reference_request", "next_action_on": ctx.day,
+             "enrolled_on": ctx.day},
+        )  # fmt: skip
+    counts = journeys.advance_journeys(ctx)
+
+    # The request is written as a draft for the success managers' queue. Nothing is sent.
+    drafts = store.rows("SELECT * FROM drafts ORDER BY enrollment_id")
+    assert counts["drafts"] == 2 and [d["status"] for d in drafts] == ["pending", "pending"]
+    assert all(d["queue"] == "pooled_csm" and d["subject"] and d["body"] for d in drafts)
+    assert store.rows("SELECT * FROM touches WHERE play_id = 'advocacy_ask'") == []
+
+    def status(enrollment_id: str) -> str:
+        row = store.one(
+            "SELECT status FROM enrollments WHERE enrollment_id = :id", id=enrollment_id
+        )
+        return row["status"]
+
+    assert status("E-TEST-0") == status("E-TEST-1") == "waiting_on_human"
+
+    # Approved: the journey resumes and the next run sends the email, once.
+    approvals.decide(store, drafts[0]["draft_id"], True, ctx.day, "CSM", "Good moment.")
+    assert status("E-TEST-0") == "active"
+    journeys.advance_journeys(ctx)
+    sent = store.rows("SELECT * FROM touches WHERE enrollment_id = 'E-TEST-0'")
+    assert len(sent) == 1 and sent[0]["channel"] == "email"
+    assert (
+        store.one("SELECT status FROM drafts WHERE enrollment_id = 'E-TEST-0'")["status"] == "sent"
+    )
+
+    # Rejected: the play ends for that customer, and nothing is ever sent.
+    approvals.decide(store, drafts[1]["draft_id"], False, ctx.day, "CSM", "Not now.")
+    assert status("E-TEST-1") == "exited"
+    assert store.rows("SELECT * FROM touches WHERE enrollment_id = 'E-TEST-1'") == []
+    with pytest.raises(ValueError, match="not waiting"):
+        approvals.decide(store, drafts[1]["draft_id"], True, ctx.day, "CSM")
+
+
+def test_only_an_email_can_wait_for_approval_and_only_for_a_real_queue(catalog):
+    broken = catalog.model_copy(deep=True)
+    steps = broken.journeys["advocacy_ask"].steps
+    steps[0].approval = "no_such_queue"
+    steps[1].approval = "pooled_csm"  # a wait step
+    problems = find_problems(broken)
+    assert any("unknown approval queue" in problem for problem in problems)
+    assert any("only an email can wait for approval" in problem for problem in problems)
+
+
+def test_the_reference_request_is_only_for_customers_who_earned_it(simulated):
+    """The signal's rule, checked against the warehouse: every customer it names is a
+    recent promoter, green, settled, with no open urgent ticket and no churn flag."""
+    _, data_dir = simulated
+    with duckdb.connect(str(warehouse_path(data_dir))) as con:
+        wrong = con.execute(
+            """
+            SELECT count(*) FROM gold.signals AS s
+            JOIN gold.account_daily AS a
+              ON s.account_id = a.account_id AND s.snapshot_date = a.snapshot_date
+            WHERE s.signal_id = 'advocate_ready'
+              AND NOT (a.latest_nps_score >= 9 AND a.health_band = 'green'
+                       AND a.account_age_days >= 90 AND NOT a.churn_risk_high
+                       AND coalesce(a.open_high_priority_tickets, 0) = 0
+                       AND a.latest_nps_date >= a.snapshot_date - INTERVAL 90 DAY)
+            """
+        ).fetchone()[0]
+    assert wrong == 0
+
+
+def test_the_event_log_says_what_happened_in_plain_words(ops):
+    from app import events
+
+    recent = events.latest_events(ops, limit=20)
+    assert recent, "six simulated days should leave a record"
+    assert [r["day"] for r in recent] == sorted((r["day"] for r in recent), reverse=True)
+    line = events.sentence(recent[0], "Wexyx Energy", "Setup has stalled", "Onboarding rescue")
+    assert line.startswith("Wexyx Energy ") and line.endswith("in the play Onboarding rescue.")
+    assert "->" not in line and "_" not in line.split("Why")[0]

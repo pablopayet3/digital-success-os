@@ -724,6 +724,11 @@ missing or only half there. This section is what closed them.
   ADR 0026): a request every five minutes from 06:00 to 22:00 US Eastern time, so a
   reviewer does not wait a minute for the first page. A test keeps the schedule inside
   the host's free hours.
+- **Risky messages wait for a person** (ADR 0029): an email step can require an
+  approval; the Human console lists the drafts. Nothing is sent before a person approves.
+- **A reference request play** (ADR 0030) for customers who have earned it, approved by
+  a success manager before it is sent.
+- **An event log in plain words** on the Overview (ADR 0031).
 - **A picture of every page** in `docs/screenshots/`.
 - **Every page of the app is run by a test** on the small world (`tests/test_app.py`),
   and again with the internet blocked, which is the offline promise as a test.
@@ -797,3 +802,6 @@ uv run --group notebook jupyter nbconvert --to notebook --execute --inplace anal
 - `0025-a-tour-of-every-element-with-a-recorded-voice`
 - `0026-the-hosted-app-kept-awake-by-a-scheduled-request`
 - `0027-the-meaning-of-each-choice-in-a-filter-shown-on-hover`
+- `0029-risky-messages-wait-for-a-persons-approval`
+- `0030-a-reference-request-play-for-customers-who-earned-it`
+- `0031-an-event-log-in-plain-words`

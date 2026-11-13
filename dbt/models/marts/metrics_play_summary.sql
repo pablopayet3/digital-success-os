@@ -7,7 +7,7 @@
 
 {% set metrics = [
     'setup_completed', 'usage_recovered', 'retained_30d',
-    'valid_admin_restored', 'expanded_30d', 'docs_adopted'
+    'valid_admin_restored', 'expanded_30d', 'docs_adopted', 'advocate_responded'
 ] %}
 
 {% for metric in metrics %}

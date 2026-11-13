@@ -11,6 +11,9 @@
 #   cta     create a task for a human; the journey waits for the outcome
 #   exit    leave the journey with a reason
 #
+# An email step may carry `approval: <queue>`: the email is written as a draft and waits
+# until a person in that queue approves it (engine/approvals.py). Nothing is sent before.
+#
 # Every step that touches a customer has a `tier` (digital, agentic or human), so
 # results can be reported per rung of the intervention ladder.
 #
@@ -121,3 +124,9 @@ journeys:
         title: No admin we can email
         next_step: Identify the current admin, confirm consent, update the CRM.
         pause_account: true      # other plays' emails wait until this is fixed
+
+  advocacy_ask:
+    steps:
+      - {id: reference_request, type: email, template: reference_request, tier: digital, approval: pooled_csm}
+      - {id: wait_for_answer, type: wait, days: 14}
+      - {id: done, type: exit, reason: sequence_finished}

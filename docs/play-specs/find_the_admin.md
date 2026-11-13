@@ -7,7 +7,7 @@ Synthetic data, fictional company. Generated from `config/plays.yaml`, `config/j
 | Play id | `find_the_admin` (version 1) |
 | Owner | CS Operations lead |
 | Objective | Make sure every account has an admin we are allowed to email. |
-| Priority | 1 of 7 (1 claims an account first) |
+| Priority | 1 of 8 (1 claims an account first) |
 | Exclusive | No. It may run alongside another play. |
 | Rollout stage | Full test: every eligible account, split into treatment and holdout. |
 | Holdout | None. This play is data hygiene, not an experiment. |

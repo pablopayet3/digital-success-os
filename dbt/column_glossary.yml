@@ -101,6 +101,7 @@ shared:
   valid_admin_restored: The account had an admin we may email on any day in the window.
   expanded_30d: An expansion opportunity was closed-won in the window.
   docs_adopted: At least one doc was published in the window.
+  advocate_responded: The contact accepted the reference request (clicked its "Yes" link) in the window. Only the reference request play can score it.
 
   # labels the models learn from
   outcome_observed: True once the 90 days after the snapshot have fully passed. Only these rows are used for training.
