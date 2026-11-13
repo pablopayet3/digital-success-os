@@ -28,7 +28,7 @@ Tasks open for people: >
 Monthly active users: >
   People who used the product at least once in the last 30 days, across all customers in
   the pilot. It shows whether customers are adopting the product.
-"Consumption: Assist credits, 30 days": >
+AI credits used, 30 days: >
   How much customers used the product's AI feature in the last 30 days, counted in credits.
   It shows depth of use, beyond simply logging in.
 Prerequisite closure: >
@@ -46,26 +46,20 @@ Escalation conversion: >
   task. This is the share of closed tasks that ended well: the problem was resolved, the
   customer was kept, or a sales opportunity was found. It shows whether the escalations
   were worth a person's time.
-Retained ARR, treatment: >
+Revenue retained: >
   Of the yearly revenue of customers who entered a play, the share still under contract 30
   days later. It is shown next to the same figure for the holdout: similar customers who
   were deliberately left alone.
-Retained ARR: >
-  Of the yearly revenue of customers who entered a play, the share still under contract 30
-  days later, compared with similar customers who were deliberately left alone.
-Expansion sourced by the plays: >
+Expansion from the plays: >
   New revenue won from customers within 30 days of entering a play, compared with similar
   customers who were deliberately left alone. The difference is what the plays may have
   added.
-Expansion sourced: >
-  New revenue won from customers within 30 days of entering a play, compared with similar
-  customers who were deliberately left alone.
 
 # --- Overview: from signal to outcome
-Accounts with a signal today: >
+Customers with a signal: >
   Customers showing at least one signal today. A signal is a warning sign or an opportunity
   found in a customer's data, such as a setup that has stalled.
-Entered a play (treatment): >
+Entered a play: >
   Customers who qualified for a play and were put into it. They receive the prepared
   response.
 Held out: >

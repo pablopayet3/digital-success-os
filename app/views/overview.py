@@ -109,7 +109,7 @@ kpi(
 )
 kpi(
     first[1],
-    "Consumption: Assist credits, 30 days",
+    "AI credits used, 30 days",
     f"{now['credits']:,.0f}",
     f"Use of the product's AI feature, in credits. "
     f"{now['credits'] - before['credits']:+,.0f} against 30 days earlier",
@@ -147,8 +147,8 @@ try:
 except Exception:  # results not built yet
     money = pd.DataFrame()
 if money.empty:
-    kpi(second[2], "Retained ARR", "n/a", "Run `uv run python run.py experiments`")
-    kpi(second[3], "Expansion sourced", "n/a", "Run `uv run python run.py experiments`")
+    kpi(second[2], "Revenue retained", "n/a", "Run `uv run python run.py experiments`")
+    kpi(second[3], "Expansion from the plays", "n/a", "Run `uv run python run.py experiments`")
 else:
     kept = {
         arm: money[f"retained_arr_{arm}"].sum() / money[f"arr_at_entry_{arm}"].sum()
@@ -156,7 +156,7 @@ else:
     }
     kpi(
         second[2],
-        "Retained ARR, treatment",
+        "Revenue retained",
         ui.pct(kept["treatment"], 1),
         "Revenue still under contract 30 days after entering a play. Customers left alone "
         f"for comparison: {ui.pct(kept['holdout'], 1)}",
@@ -166,7 +166,7 @@ else:
     each = {arm: won[arm] / max(sales[f"n_{arm}"].sum(), 1) for arm in ("treatment", "holdout")}
     kpi(
         second[3],
-        "Expansion sourced by the plays",
+        "Expansion from the plays",
         f"${won['treatment']:,.0f}",
         f"New revenue from customers in a play: ${each['treatment']:,.0f} each, against "
         f"${each['holdout']:,.0f} for customers left alone",
@@ -182,8 +182,8 @@ signals_today = ui.query(
     """
 )["n"][0]
 counts = {
-    "Accounts with a signal today": int(signals_today),
-    "Entered a play (treatment)": int(enrolments[enrolments["arm"] == "treatment"]["n"].sum())
+    "Customers with a signal": int(signals_today),
+    "Entered a play": int(enrolments[enrolments["arm"] == "treatment"]["n"].sum())
     if len(enrolments)
     else 0,
     "Held out": held,
@@ -192,12 +192,19 @@ counts = {
     "Handed to a person": int(tasks["n"].sum()) if len(tasks) else 0,
     "Closed by a person": int(tasks[tasks["status"] == "resolved"]["n"].sum()) if len(tasks) else 0,
 }
-for column, (label, value) in zip(st.columns(len(counts)), counts.items(), strict=True):
+# Two rows, so that every label can be read in full.
+slots = st.columns(4) + st.columns(4)
+for column, (label, value) in zip(slots, counts.items(), strict=False):
     ui.metric(column, label, f"{value:,}")
 
 left, right = st.columns(2)
 with left:
     st.subheader("Health by coverage tier")
+    st.caption(
+        "A coverage tier is the level of human attention a customer receives. high_touch: a "
+        "named success manager. pooled: a shared team of success managers. uncovered: no "
+        "success manager. The pilot runs on the uncovered customers."
+    )
     health = ui.query(
         "SELECT coverage_tier, health_band, count(*) AS accounts FROM gold.account_current "
         "GROUP BY coverage_tier, health_band"
@@ -229,7 +236,21 @@ with right:
         GROUP BY signals.signal_id ORDER BY accounts DESC
         """
     )
-    st.bar_chart(firing, x="signal_id", y="accounts", horizontal=True)
+    # Plain names on the axis, and each signal's definition when the pointer is on its bar.
+    meaning = {signal["id"]: signal for signal in load_yaml("job.yaml")["signals"]}
+    firing["signal"] = [meaning.get(i, {}).get("name", i) for i in firing["signal_id"]]
+    firing["it fires when"] = [meaning.get(i, {}).get("fires_when", "") for i in firing["signal_id"]]
+    st.altair_chart(
+        alt.Chart(firing)
+        .mark_bar()
+        .encode(
+            y=alt.Y("signal:N", sort="-x", title=None, axis=alt.Axis(labelLimit=260)),
+            x=alt.X("accounts:Q", title="customers"),
+            tooltip=["signal", "it fires when", "accounts"],
+        ),
+        use_container_width=True,
+    )
+    st.caption("Point at a bar to read what the signal means.")
 
 st.subheader("What the system did each day")
 touches = ui.rows(

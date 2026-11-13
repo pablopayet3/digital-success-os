@@ -171,3 +171,47 @@ workflow:
     note: Outside the company. Never sees this system.
   - step: Results are measured, and a decision is made
     team: Analytics and CS Leadership
+
+# Every signal the system looks for, in plain words (the exact rules are in docs/metrics.md).
+# Shown on the Overview page, under the three terms.
+signals:
+  - id: activation_stalled
+    name: Setup has stalled
+    kind: Warning
+    fires_when: The customer signed up at least 7 days ago and has completed fewer than half of the setup steps.
+  - id: usage_drop
+    name: Usage is falling
+    kind: Warning
+    fires_when: Monthly active users are down 30% or more against the previous 30 days.
+  - id: support_friction
+    name: Repeated support problems
+    kind: Warning
+    fires_when: Three or more high-priority support tickets in 30 days.
+  - id: detractor
+    name: Unhappy in a survey
+    kind: Warning
+    fires_when: A satisfaction score of 6 or lower, out of 10, in the last 14 days.
+  - id: churn_risk_high
+    name: High risk of leaving
+    kind: Warning
+    fires_when: The prediction model ranks the customer among those most likely to cancel, up to the number the team can handle that day.
+  - id: no_valid_admin
+    name: No contact we may email
+    kind: Warning
+    fires_when: No administrator who has agreed to receive email and has a working address.
+  - id: seat_pressure
+    name: Seats are nearly full
+    kind: Opportunity
+    fires_when: 90% or more of the paid seats are in use.
+  - id: edition_fit
+    name: Outgrowing the edition
+    kind: Opportunity
+    fires_when: The customer has reached a limit of its edition, such as automation rules, integrations or AI credits, and is not on the top edition.
+  - id: cross_product
+    name: Ready for a second product
+    kind: Opportunity
+    fires_when: The customer does not own the documents product and has created three or more document-style boards in 60 days.
+  - id: expansion_ready
+    name: Likely to buy more
+    kind: Opportunity
+    fires_when: The prediction model ranks the customer among those most likely to buy more, up to the number the team can handle that day.

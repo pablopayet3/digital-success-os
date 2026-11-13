@@ -12,7 +12,10 @@ ui.job_intro("accounts")
 
 tier, stage, band = st.columns(3)
 tiers = tier.multiselect(
-    "Coverage tier", ["uncovered", "pooled", "high_touch"], default=["uncovered"]
+    "Coverage tier",
+    ["uncovered", "pooled", "high_touch"],
+    default=["uncovered"],
+    help="A coverage tier is the level of human attention a customer receives. high_touch: the customer has a named success manager. pooled: the customer shares a team of success managers. uncovered: the customer has no success manager. The pilot runs on the uncovered customers.",
 )
 stages = stage.multiselect(
     "Lifecycle stage", ["onboarding", "adopting", "mature", "expansion", "renewal", "at_risk"]

@@ -107,6 +107,7 @@ def what_this_is() -> None:
         "response to one signal. A *holdout* is a group of similar customers deliberately left "
         "alone, so that the effect of a play can be measured."
     )
+    terms_in_detail(job)
     st.subheader("The workflow, from signal to outcome")
     st.caption("Each card is one step. The second line names the team accountable for it.")
     workflow(job["workflow"])
@@ -117,6 +118,55 @@ def what_this_is() -> None:
         covers = "; ".join(line["line"] for line in job["lines"] if page in line["pages"])
         table.append(f"| **{PAGE_NAMES[page]}** | {covers} | {found.strip()} |")
     st.markdown("\n".join(table))
+
+
+def terms_in_detail(job: dict) -> None:
+    """Three expanders under the three terms: every signal, one play taken apart, the holdout."""
+    from engine.catalog import load_catalog  # imported here: only the Overview needs it
+
+    plays = load_catalog().plays
+    with st.expander("See every signal the system looks for"):
+        table = ["| Signal | Kind | It fires when |", "|---|---|---|"]
+        for signal in job["signals"]:
+            table.append(
+                f"| **{signal['name']}** | {signal['kind']} | {signal['fires_when'].strip()} |"
+            )
+        st.markdown("\n".join(table))
+    with st.expander("See what a play is made of"):
+        play = max(plays, key=lambda play: len(play.intervention_ladder))
+        names = {signal["id"]: signal["name"] for signal in job["signals"]}
+        starts = ", ".join(names.get(trigger, trigger) for trigger in play.trigger)
+        steps = "\n".join(
+            f"   - *{str(rung.tier).capitalize()}.* {rung.action} {rung.move_up_when}"
+            for rung in play.intervention_ladder
+        )
+        st.markdown(
+            f"Every play has the same five parts. This one is **{play.name}**: "
+            f"{play.objective}\n\n"
+            f"1. **The signal that starts it.** {starts}.\n"
+            "2. **Who may enter.** Customers in the pilot, unless a rule keeps them out: for "
+            "example a customer already in this play, or one in the middle of a renewal "
+            "negotiation.\n"
+            "3. **The steps, in order.** Each step is tried before the next, more costly "
+            f"one.\n{steps}\n"
+            f"4. **The holdout.** {play.holdout_pct:.0%} of the customers who qualify are "
+            "deliberately left alone, for comparison.\n"
+            "5. **The measure of success, named before launch.** "
+            f"{play.success_metric['description']}"
+        )
+        st.caption("All the plays are listed on the Plays and experiments page.")
+    with st.expander("See how a holdout works"):
+        st.markdown(
+            "When a customer qualifies for a play, a fixed rule decides whether the customer "
+            "enters the play or is held out. The rule works from the customer's identifier, so "
+            "nobody chooses, and the same customer always lands on the same side.\n\n"
+            "A held-out customer receives nothing from that play. After 30 days the two groups "
+            "are compared on the measure named before launch. If the customers in the play did "
+            "no better than those left alone, the play did not work, whatever the raw numbers "
+            "suggest."
+        )
+        shares = ", ".join(f"{play.name} {play.holdout_pct:.0%}" for play in plays)
+        st.caption(f"Share of qualifying customers held out, by play: {shares}.")
 
 
 def workflow(stages: list[dict]) -> None:

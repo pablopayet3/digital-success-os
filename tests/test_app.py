@@ -50,7 +50,7 @@ def test_the_pilot_page_shows_the_checklist_and_the_weekly_notes(app_data):
 def test_the_overview_shows_the_measures_the_brief_names(app_data):
     app = AppTest.from_file(str(ROOT / "app" / "views" / "overview.py"), default_timeout=120).run()
     labels = " | ".join(metric.label for metric in app.metric)
-    for measure in ("Monthly active users", "Consumption", "Prerequisite closure",
+    for measure in ("Monthly active users", "AI credits used", "Prerequisite closure",
                     "Agent invocation", "Handoff rate", "Escalation conversion"):  # fmt: skip
         assert measure in labels, f"missing on the Overview: {measure}"
 
