@@ -154,9 +154,9 @@ with right:
     snapshot = packet["account_snapshot"]
     health = snapshot["health"]
     one, two, three = st.columns(3)
-    one.metric("Health", f"{health['score']:.0f}", health["band"], delta_color="off")
-    two.metric("Seats", f"{snapshot['seats']['assigned']} of {snapshot['seats']['licensed']}")
-    three.metric("Renewal in", f"{snapshot['days_to_renewal']} days")
+    ui.metric(one, "Health", f"{health['score']:.0f}", health["band"], delta_color="off")
+    ui.metric(two, "Seats", f"{snapshot['seats']['assigned']} of {snapshot['seats']['licensed']}")
+    ui.metric(three, "Renewal in", f"{snapshot['days_to_renewal']} days")
     st.json(snapshot, expanded=False)
     if packet.get("brief"):
         st.subheader("Brief")

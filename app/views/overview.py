@@ -43,22 +43,27 @@ held = int(enrolments[enrolments["arm"] == "holdout"]["n"].sum()) if len(enrolme
 open_tasks = int(tasks[tasks["status"] != "resolved"]["n"].sum()) if len(tasks) else 0
 
 one, two, three, four, five = st.columns(5)
-one.metric("Accounts in the pilot", f"{int(accounts['accounts']):,}")
-two.metric("ARR in the pilot", f"${accounts['arr'] / 1e6:.1f}M")
-three.metric("Health: red", int(accounts["red"]))
-four.metric("In a play now", active, help=f"{held} more are held out for comparison")
-five.metric("Tasks open for people", open_tasks)
-st.caption(
-    "The pilot covers the customers with no assigned success manager. ARR is annual "
-    "recurring revenue: what these customers pay per year. Health: red counts the customers "
-    "whose health score says they need attention. In a play now counts the customers "
-    "currently receiving a prepared response. Tasks open for people are handoffs waiting "
-    "for a success manager or for Sales."
+ui.metric(one, "Accounts in the pilot", f"{int(accounts['accounts']):,}")
+ui.metric(two, "ARR in the pilot", f"${accounts['arr'] / 1e6:.1f}M")
+ui.metric(three, "Health: red", int(accounts["red"]))
+in_play = (
+    f"{ui.define('In a play now')} {held} more customers qualified and are deliberately "
+    "left alone for comparison."
 )
+ui.metric(four, "In a play now", active, help=in_play)
+ui.metric(five, "Tasks open for people", open_tasks)
+# One short line under each number, in its own column.
+one.caption("Customers with no assigned success manager")
+two.caption("Annual recurring revenue: what these customers pay per year")
+three.caption("Customers whose health score says they need attention")
+four.caption("Customers currently receiving a prepared response")
+five.caption("Handoffs waiting for a success manager or for Sales")
 
 st.subheader("The measures the pilot is run on")
 st.caption(
-    "Each one is defined once, with its formula and its source table, in `docs/metrics.md`. Usage is the whole pilot segment, treated or not; only the last two compare treatment with holdout."
+    "Each measure is defined once, with its formula and its source table, in "
+    "`docs/metrics.md`. The first three cover every customer in the pilot. Only the last "
+    "two compare customers in a play with customers deliberately left alone."
 )
 
 
@@ -76,7 +81,7 @@ def usage_on(day: date) -> dict:
 
 
 def kpi(column, label: str, value: str, note: str) -> None:
-    column.metric(label, value)
+    ui.metric(column, label, value)
     column.caption(note)
 
 
@@ -99,38 +104,43 @@ kpi(
     first[0],
     "Monthly active users",
     f"{now['mau']:,.0f}",
+    f"People who used the product in the last 30 days. "
     f"{now['mau'] - before['mau']:+,.0f} against 30 days earlier",
 )
 kpi(
     first[1],
     "Consumption: Assist credits, 30 days",
     f"{now['credits']:,.0f}",
+    f"Use of the product's AI feature, in credits. "
     f"{now['credits'] - before['credits']:+,.0f} against 30 days earlier",
 )
 kpi(
     first[2],
     "Prerequisite closure",
     ui.pct(now["setup"]),
-    f"{(now['setup'] - before['setup']) * 100:+.1f} points; setup steps done, average",
+    f"Share of setup steps customers have completed. "
+    f"{(now['setup'] - before['setup']) * 100:+.1f} points in 30 days",
 )
 kpi(
     first[3],
     "Agent invocation",
     ui.pct(talked / len(treated)) if len(treated) else "n/a",
-    f"{talked} of {len(treated)} treated accounts talked to the agent",
+    f"{talked} of the {len(treated)} customers in a play had a conversation with the AI "
+    "agent. The others were helped by email alone, or have not reached that step",
 )
 second = st.columns(4)
 kpi(
     second[0],
     "Handoff rate",
     ui.pct(handed_off / len(conversations)) if len(conversations) else "n/a",
-    f"{handed_off} of {len(conversations)} agent conversations went to a person",
+    f"{handed_off} of {len(conversations)} agent conversations were passed to a person",
 )
 kpi(
     second[1],
     "Escalation conversion",
     ui.pct(good / len(closed)) if len(closed) else "n/a",
-    f"{good} of {len(closed)} closed tasks ended resolved, saved or as an opportunity",
+    f"{good} of {len(closed)} tasks handed to a person ended well: resolved, saved, or a "
+    "sales opportunity",
 )
 try:
     money = ui.query("SELECT * FROM gold.experiment_results WHERE n_holdout > 0")
@@ -148,7 +158,8 @@ else:
         second[2],
         "Retained ARR, treatment",
         ui.pct(kept["treatment"], 1),
-        f"Holdout: {ui.pct(kept['holdout'], 1)}. ARR still under contract 30 days after entry",
+        "Revenue still under contract 30 days after entering a play. Customers left alone "
+        f"for comparison: {ui.pct(kept['holdout'], 1)}",
     )
     sales = money[money["metric"] == "expanded_30d"]
     won = {arm: sales[f"expansion_won_{arm}"].sum() for arm in ("treatment", "holdout")}
@@ -157,7 +168,8 @@ else:
         second[3],
         "Expansion sourced by the plays",
         f"${won['treatment']:,.0f}",
-        f"${each['treatment']:,.0f} per treated account; ${each['holdout']:,.0f} per held-out account",
+        f"New revenue from customers in a play: ${each['treatment']:,.0f} each, against "
+        f"${each['holdout']:,.0f} for customers left alone",
     )
 
 st.subheader("From signal to outcome")
@@ -181,7 +193,7 @@ counts = {
     "Closed by a person": int(tasks[tasks["status"] == "resolved"]["n"].sum()) if len(tasks) else 0,
 }
 for column, (label, value) in zip(st.columns(len(counts)), counts.items(), strict=True):
-    column.metric(label, f"{value:,}")
+    ui.metric(column, label, f"{value:,}")
 
 left, right = st.columns(2)
 with left:

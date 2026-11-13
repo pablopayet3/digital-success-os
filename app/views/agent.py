@@ -24,20 +24,21 @@ escalated = (
     conversations[conversations["outcome"] == "escalated"] if len(conversations) else conversations
 )
 one, two, three, four = st.columns(4)
-one.metric("Agent conversations", len(conversations))
-two.metric(
+ui.metric(one, "Agent conversations", len(conversations))
+ui.metric(
+    two,
     "Handoff rate", ui.pct(len(escalated) / len(conversations)) if len(conversations) else "n/a"
 )
-three.metric("Mailbox replies triaged", len(triage))
-four.metric(
+ui.metric(three, "Mailbox replies triaged", len(triage))
+ui.metric(
+    four,
     "LLM cost so far", f"${conversations['cost_usd'].sum():.2f}" if len(conversations) else "$0.00"
 )
-st.caption(
-    "A conversation is one exchange between the onboarding agent and a customer. The handoff "
-    "rate is the share of conversations the agent passed to a person. Mailbox replies are "
-    "customers' answers to our emails, sorted by the triage agent. LLM cost is what the AI "
-    "model charged for these conversations."
-)
+# One short line under each number, in its own column.
+one.caption("Exchanges between the onboarding agent and a customer")
+two.caption("Share of conversations the agent passed to a person")
+three.caption("Customers' answers to our emails, sorted by the triage agent")
+four.caption("What the AI model charged for these conversations")
 
 tab_conversations, tab_mailbox, tab_feedback, tab_evals, tab_review, tab_prompts = st.tabs(
     ["Conversations", "Mailbox triage", "Customer feedback", "Evaluation", "Review queue", "Prompts"]

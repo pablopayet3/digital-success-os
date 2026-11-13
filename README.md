@@ -82,7 +82,7 @@ From `uv run python run.py demo` (180 days of history, then 30 simulated days of
 | Seat expansion: expansion closed, treatment against holdout | 19% against 21%: **no effect detected** (the sample could only have shown 20 points or more) |
 | Agent evaluation, real model, 44 cases | Onboarding agent 30 of 30 with prompt v3 (v1: 29, v2: 25); mailbox 10 of 10; briefs 4 of 4; classifier 96% on 160 labelled replies |
 | Cost of every real model call behind this (834 calls) | about $3 |
-| Automated tests | 200 |
+| Automated tests | 201 |
 
 Three honest notes. The lift comes from assumptions in `config/sim_effects.yaml`: this
 demonstrates a measurement system, not a result. The agent answers are real: one live
@@ -267,7 +267,7 @@ What each phase delivered, and three decisions to defend for each, is in
 
 ## What runs for real, and what has not been run yet
 
-Running on GitHub Actions: CI on every push (lint, 200 tests on Linux, the dbt build, a
+Running on GitHub Actions: CI on every push (lint, 201 tests on Linux, the dbt build, a
 secret scan), the container image build (it generates a demo world inside the image and
 publishes it), and the daily pipeline schedule, which opens an issue when a run fails.
 
@@ -319,5 +319,5 @@ experiments/  play results against holdouts
 api/ app/     FastAPI endpoints; the Streamlit app
 integrations/ the CRM sync
 docs/         operating documents, decision records, play specs, model cards
-tests/        200 tests; they generate a small world and run everything on it, every app page included
+tests/        201 tests; they generate a small world and run everything on it, every app page included
 ```

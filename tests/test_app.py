@@ -192,8 +192,23 @@ def test_every_page_opens_with_the_line_of_the_role_it_answers(app_data):
         app = AppTest.from_file(str(ROOT / "app" / "views" / f"{page}.py"), default_timeout=120)
         app.run()
         opening = " ".join(markdown.value for markdown in app.markdown)
-        assert "The role asks for" in opening and "In plain words." in opening, page
         assert "On this page." in opening, page
+        # It reads as a guide to the page, never as notes about a job posting.
+        assert "The role asks for" not in opening and "In plain words" not in opening, page
+
+
+def test_every_number_in_the_app_has_a_definition_to_hover_over(app_data):
+    from common.config import load_yaml
+
+    glossary = load_yaml("glossary.yaml")
+    shown = 0
+    for page in PAGES:
+        view = str(ROOT / "app" / "views" / f"{page}.py")
+        app = AppTest.from_file(view, default_timeout=120).run()
+        for number in app.metric:
+            assert number.label in glossary, f"{page}: no definition for '{number.label}'"
+            shown += 1
+    assert shown >= 25  # the test is looking at real numbers
 
 
 def test_the_overview_says_what_this_is_and_shows_the_workflow(app_data):
@@ -205,7 +220,7 @@ def test_the_overview_says_what_this_is_and_shows_the_workflow(app_data):
     assert "Data arrives and is validated" in words  # the first card of the workflow
     headings = [heading.value for heading in app.subheader]
     assert "The workflow, from signal to outcome" in headings
-    assert "The role, line by line" in headings
+    assert "A guide to the pages" in headings
 
 
 def test_every_tour_stop_opens_a_real_page_and_every_page_has_a_stop():

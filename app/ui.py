@@ -86,7 +86,7 @@ PAGE_NAMES = {
 
 
 def what_this_is() -> None:
-    """The top of the Overview: what this is, the workflow, and the role line by line."""
+    """The top of the Overview: what this is, the workflow, and a guide to the pages."""
     job = load_yaml("job.yaml")
     st.markdown(
         "**What this is.** A working model of a digital customer-success operation, built on "
@@ -110,12 +110,12 @@ def what_this_is() -> None:
     st.subheader("The workflow, from signal to outcome")
     st.caption("Each card is one step. The second line names the team accountable for it.")
     workflow(job["workflow"])
-    st.subheader("The role, line by line")
+    st.subheader("A guide to the pages")
     # A plain table, so that long sentences wrap and nothing is cut off.
-    table = ["| The role asks for | In plain words | Where to look |", "|---|---|---|"]
-    for line in job["lines"]:
-        pages = ", ".join(PAGE_NAMES[page] for page in line["pages"])
-        table.append(f"| **{line['line']}** | {line['plain'].strip()} | {pages} |")
+    table = ["| Page | What it covers | What you will find |", "|---|---|---|"]
+    for page, found in job["pages"].items():
+        covers = "; ".join(line["line"] for line in job["lines"] if page in line["pages"])
+        table.append(f"| **{PAGE_NAMES[page]}** | {covers} | {found.strip()} |")
     st.markdown("\n".join(table))
 
 
@@ -137,8 +137,20 @@ def workflow(stages: list[dict]) -> None:
                     st.caption(f"Team: {card['team']}" if "team" in card else card["note"])
 
 
+def define(label: str) -> str | None:
+    """What a number means, in a sentence or two (config/glossary.yaml)."""
+    meaning = load_yaml("glossary.yaml").get(label)
+    return meaning.strip() if meaning else None
+
+
+def metric(column, label: str, value, *args, **kwargs) -> None:
+    """Show a number with its definition: hovering over its question mark explains it."""
+    kwargs.setdefault("help", define(label))
+    column.metric(label, value, *args, **kwargs)
+
+
 def job_intro(page: str) -> None:
-    """How every page opens: the line of the role it answers, in plain words, and what is here.
+    """How every page opens: what the page covers, in plain words, and what is on it.
 
     The words are in config/job.yaml, so the pages, the Overview table and the tour agree.
     """
@@ -146,8 +158,7 @@ def job_intro(page: str) -> None:
     with st.container(border=True):
         for line in job["lines"]:
             if page in line["pages"]:
-                st.markdown(f"**The role asks for: {line['line']}.** {line['asks'].strip()}")
-                st.markdown(f"**In plain words.** {line['plain'].strip()}")
+                st.markdown(f"**{line['line']}.** {line['plain'].strip()}")
         st.markdown(f"**On this page.** {job['pages'][page].strip()}")
 
 

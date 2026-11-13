@@ -202,4 +202,4 @@ with tab_day:
             "goal_reached",
         ]
         for column, key in zip(st.columns(5) * 2, keys, strict=True):
-            column.metric(key.replace("_", " "), summary.get(key, 0))
+            ui.metric(column, key.replace("_", " "), summary.get(key, 0))

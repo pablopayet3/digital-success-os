@@ -1,0 +1,136 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# What each number in the app means. A visitor reads it by hovering over the question mark
+# next to the number (app/ui.py::metric). One entry per label, exactly as the label is
+# written on screen. A test fails when a number is shown without a definition.
+#
+# How it is written: one or two complete sentences, every term defined, no jargon. Say what
+# is counted, out of what, and why the number matters.
+
+# --- Overview: the pilot at a glance
+Accounts in the pilot: >
+  The number of customers in the pilot. The pilot covers the customers who have no assigned
+  success manager.
+ARR in the pilot: >
+  Annual recurring revenue: the total that the customers in the pilot pay per year for
+  their subscriptions.
+"Health: red": >
+  The number of pilot customers whose health score is in the red band, which means they
+  need attention. The health score runs from 0 to 100 and is explained on the Accounts page.
+In a play now: >
+  The number of customers currently receiving a prepared response, called a play. A play
+  starts with an email, moves to the AI agent, and reaches a person only when one is needed.
+Tasks open for people: >
+  Handoffs waiting for a person. Each one is a to-do item for a success manager or for
+  Sales, created when the automated steps could not, or must not, handle the matter.
+
+# --- Overview: the measures the pilot is run on
+Monthly active users: >
+  People who used the product at least once in the last 30 days, across all customers in
+  the pilot. It shows whether customers are adopting the product.
+"Consumption: Assist credits, 30 days": >
+  How much customers used the product's AI feature in the last 30 days, counted in credits.
+  It shows depth of use, beyond simply logging in.
+Prerequisite closure: >
+  The average share of setup steps that customers have completed, such as inviting users or
+  connecting an integration. Finishing setup is the first sign that a customer will get
+  value from the product.
+Agent invocation: >
+  Of the customers in a play, the share who had a conversation with the AI agent. It shows
+  how much the agent step is used. It does not measure how good the agent is.
+Handoff rate: >
+  Of all conversations with the AI agent, the share the agent passed to a person. Too high
+  means the agent helps too little. Too low may mean it answers questions it should not.
+Escalation conversion: >
+  An escalation is the moment automation passes a customer to a person, which creates a
+  task. This is the share of closed tasks that ended well: the problem was resolved, the
+  customer was kept, or a sales opportunity was found. It shows whether the escalations
+  were worth a person's time.
+Retained ARR, treatment: >
+  Of the yearly revenue of customers who entered a play, the share still under contract 30
+  days later. It is shown next to the same figure for the holdout: similar customers who
+  were deliberately left alone.
+Retained ARR: >
+  Of the yearly revenue of customers who entered a play, the share still under contract 30
+  days later, compared with similar customers who were deliberately left alone.
+Expansion sourced by the plays: >
+  New revenue won from customers within 30 days of entering a play, compared with similar
+  customers who were deliberately left alone. The difference is what the plays may have
+  added.
+Expansion sourced: >
+  New revenue won from customers within 30 days of entering a play, compared with similar
+  customers who were deliberately left alone.
+
+# --- Overview: from signal to outcome
+Accounts with a signal today: >
+  Customers showing at least one signal today. A signal is a warning sign or an opportunity
+  found in a customer's data, such as a setup that has stalled.
+Entered a play (treatment): >
+  Customers who qualified for a play and were put into it. They receive the prepared
+  response.
+Held out: >
+  Customers who qualified for a play but were deliberately left alone, so that the effect
+  of the play can be measured by comparison. This group is called the holdout.
+Touches delivered: >
+  Messages actually delivered to customers: emails, in-app messages and conversations with
+  the AI agent.
+Agent conversations: >
+  Conversations between the onboarding AI agent and a customer.
+Handed to a person: >
+  Tasks created for a person. They come from a journey, from the AI agent, or from a
+  customer's reply in the shared mailbox.
+Closed by a person: >
+  Tasks that a person has finished and closed with a recorded outcome.
+
+# --- Data quality
+Data tests passing: >
+  Automated checks that every table must pass before any play may use it. For example: no
+  customer appears twice, no record lacks its customer identifier, and every value lies in
+  its expected range.
+Contract checks passing: >
+  The data contract is the written list of what the main table promises to contain: its
+  columns, their types and their allowed values. Code checks each promise on every run.
+Sources checked for freshness: >
+  Freshness means the data arrived on time. A source that stops delivering is flagged
+  before out-of-date data can trigger a play.
+
+# --- Accounts, and the handoff packet
+Health: >
+  A score from 0 to 100 that summarises how well the customer is doing, built from five
+  components. Green is healthy, yellow needs watching, and red needs attention.
+Churn risk: >
+  A model's estimate of the probability that this customer cancels within the next 90
+  days, based on its usage, setup, support and engagement history. Churn means a customer
+  leaving.
+Expansion likelihood: >
+  A model's estimate of the probability that this customer buys more, such as extra seats
+  or a higher edition, within the next 90 days.
+Seats: >
+  Seats in use, out of seats paid for. Nearly full means the customer may need more.
+  Mostly empty means the product is not being adopted.
+Renewal in: >
+  The number of days until this customer's contract is due for renewal.
+
+# --- Agents
+Mailbox replies triaged: >
+  Customers' replies to our emails, which land in a shared mailbox. A model labels each
+  reply, and rules decide where it goes. Triage means sorting by urgency and type.
+LLM cost so far: >
+  What the AI model charged to produce these conversations. LLM stands for large language
+  model, the kind of AI behind the agent.
+
+# --- Pilot: handoff quality
+Time to pickup: >
+  The average time between a task being created and a person starting to work on it.
+SLA breach rate: >
+  The share of tasks not picked up within the time agreed for their queue. SLA stands for
+  service-level agreement: the promised response time.
+Unnecessary handoffs: >
+  The share of closed tasks that the person marked as something the AI agent should have
+  handled. Each one becomes a new test case for the agent.
+Re-contact: >
+  The share of closed tasks followed by a new task for the same customer within 14 days.
+  A high figure means the first handoff did not settle the matter.
+Docs gap share: >
+  Of the handoffs made by the AI agent, the share made because no help article covered the
+  question. Each one points to an article that should be written.

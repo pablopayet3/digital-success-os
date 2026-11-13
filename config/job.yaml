@@ -3,22 +3,24 @@
 # The ten lines of the role this demo was built for, in plain words, and where each one is
 # shown in the app. This file is the single source for three places:
 #   - the opening of every page (app/ui.py::job_intro),
-#   - the table "The role, line by line" on the Overview page,
+#   - the table "A guide to the pages" on the Overview page,
 #   - the guided tour (app/tour.py).
 #
 # lines:
-#   line   a short name for the line of the role
-#   asks   what the role asks for (the sense of the posting, without naming a product)
-#   plain  the same in plain words, with every term defined
+#   line   a short name for the capability (shown on screen)
+#   asks   the sense of the posting's line (kept for reference; never shown on screen)
+#   plain  the capability in plain words, with every term defined (shown on screen)
 #   pages  the pages that show it (files in app/views/)
 # pages:
 #   what a visitor sees on each page, in one or two sentences
 #
 # How it is written: complete sentences, every term defined where it is used, each team
-# named as a team. The reader is a hiring panel reading it for the first time.
+# named as a team. The reader is a hiring panel reading it for the first time. On screen
+# it must read as a guide to the app's pages, never as notes about a job posting: the
+# owner's rule of 13 November 2026.
 
 lines:
-  - line: Build the Digital Success operating system, pilot it, then scale it
+  - line: Pilot, then scale
     asks: >
       Create the systems, data flows and journey orchestration that support customers who
       have no assigned success manager. Run it as a pilot first, then extend the pattern to
@@ -35,8 +37,8 @@ lines:
       handoffs to people.
     plain: >
       A signal is a warning sign or an opportunity found in a customer's data, such as a
-      setup that has stalled. A play is the prepared response to one signal. This line is
-      about connecting each signal to the right response.
+      setup that has stalled. A play is the prepared response to one signal. The system
+      connects each signal to the right response.
     pages: [accounts]
 
   - line: Close ownership gaps
@@ -44,8 +46,8 @@ lines:
       Act as the accountable owner across teams, and establish where the ownership of a
       system or a process is unclear.
     plain: >
-      When several teams share a system, some part of it often belongs to no one. This
-      role finds those parts and makes sure each has an owner.
+      When several teams share a system, some part of it often belongs to no one. The
+      ownership map finds those parts, so that each can be given an owner.
     pages: [operating]
 
   - line: Protect delivery momentum
@@ -64,8 +66,8 @@ lines:
       lifecycle and health data, and work with the Data Engineering and Revenue Operations
       teams on the pipelines and tables.
     plain: >
-      State which data the plays need and what counts as clean. The Data Engineering team
-      builds it. This role specifies it and verifies it.
+      Which data the plays need, and what counts as clean. The requirements are written
+      down, the Data Engineering team builds to them, and automated checks enforce them.
     pages: [quality]
 
   - line: Analytics and modelling
@@ -96,7 +98,7 @@ lines:
       journey analytics.
     plain: >
       A journey is the sequence of steps a play follows: an email, then the AI agent, then
-      a person. This line governs who enters a journey, who is left out, and how often a
+      a person. Rules govern who enters a journey, who is left out, and how often a
       customer may be contacted.
     pages: [plays]
 

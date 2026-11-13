@@ -48,16 +48,15 @@ st.caption(
     f"renewal in {account['days_to_renewal']} days"
 )
 one, two, three, four = st.columns(4)
-one.metric("Health", f"{account['health_score']:.0f}", account["health_band"], delta_color="off")
-two.metric("Churn risk", ui.pct(account["churn_risk_score"]))
-three.metric("Expansion likelihood", ui.pct(account["expansion_score"]))
-four.metric("Seats", f"{account['seats_assigned']} of {account['seats_licensed']}")
-st.caption(
-    "Health is a score from 0 to 100 built from five components, shown below; a red band "
-    "means the customer needs attention. Churn risk is a model's estimate that the customer "
-    "will cancel within 90 days. Expansion likelihood is its estimate that the customer will "
-    "buy more within 90 days. Seats shows how many of the paid seats are in use."
-)
+ui.metric(one, "Health", f"{account['health_score']:.0f}", account["health_band"], delta_color="off")
+ui.metric(two, "Churn risk", ui.pct(account["churn_risk_score"]))
+ui.metric(three, "Expansion likelihood", ui.pct(account["expansion_score"]))
+ui.metric(four, "Seats", f"{account['seats_assigned']} of {account['seats_licensed']}")
+# One short line under each number, in its own column.
+one.caption("A score from 0 to 100, built from the five components below. Red needs attention")
+two.caption("A model's estimate that the customer will cancel within 90 days")
+three.caption("A model's estimate that the customer will buy more within 90 days")
+four.caption("Paid seats in use, out of those bought")
 
 left, right = st.columns(2)
 with left:

@@ -144,7 +144,7 @@ measures = {
     ),
 }
 for column, (label, (value, note)) in zip(st.columns(6), measures.items(), strict=True):
-    column.metric(label, value)
+    ui.metric(column, label, value)
     column.caption(note)
 
 st.subheader("Weekly review notes")

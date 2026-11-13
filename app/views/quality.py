@@ -12,16 +12,17 @@ contract = ui.query("SELECT * FROM gold.dq_contract_checks")
 freshness = ui.query("SELECT * FROM gold.dq_freshness")
 passed = int((tests["status"] == "pass").sum())
 one, two, three = st.columns(3)
-one.metric("Data tests passing", f"{passed} of {len(tests)}")
+ui.metric(one, "Data tests passing", f"{passed} of {len(tests)}")
 ok = int(contract["passed"].sum())
-two.metric("Contract checks passing", f"{ok} of {len(contract)}")
-three.metric("Sources checked for freshness", len(freshness))
-st.caption(
-    "A data test is an automated check that a table must pass before any play may use it: "
-    "for example, no customer appears twice, no record lacks its customer identifier, and "
-    "every value lies in its expected range. The contract is the written list of what the "
-    "main table promises to contain. Freshness means each source delivered its data on time."
+ui.metric(two, "Contract checks passing", f"{ok} of {len(contract)}")
+ui.metric(three, "Sources checked for freshness", len(freshness))
+# One short line under each number, in its own column.
+one.caption(
+    "Automated checks a table must pass before any play may use it: no customer twice, "
+    "no missing identifier, every value in its expected range"
 )
+two.caption("The contract is the written list of what the main table promises to contain")
+three.caption("Freshness: each source delivered its data on time")
 
 st.subheader("What the pipeline caught")
 st.caption(
