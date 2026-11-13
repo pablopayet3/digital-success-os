@@ -114,11 +114,17 @@ with st.container(key="dso_voice"):  # the voice panel is drawn inside this cont
 
 st.subheader("Example questions, by team")
 st.caption("Each team asks questions like these every week. Select one to see Claude's answer.")
-for team, questions in examples().items():
-    st.markdown(f"**{team}**")
-    for column, question in zip(st.columns(len(questions)), questions, strict=True):
-        if column.button(question, key=f"example-{question}", width="stretch"):
-            answer_and_keep(question)
+# Long questions wrap onto a second line instead of being cut off with "...".
+st.html(
+    "<style>.st-key-ask_examples button * { white-space: normal !important; "
+    "overflow: visible !important; text-overflow: clip !important; }</style>"
+)
+with st.container(key="ask_examples"):
+    for team, questions in examples().items():
+        st.markdown(f"**{team}**")
+        for column, question in zip(st.columns(len(questions)), questions, strict=True):
+            if column.button(question, key=f"example-{question}", width="stretch"):
+                answer_and_keep(question)
 
 st.subheader("Answers")
 llm = get_llm()
