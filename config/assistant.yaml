@@ -1,0 +1,77 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# The "Ask the data" assistant (ADR 0028): the hiring team, or any team, asks a question
+# about the data or about how the program is run, by typing or by voice.
+#
+#   Claude answers. It reads the warehouse with one read-only SQL statement at a time, and
+#   searches the program's documents (agents/assistant.py). The model is set in
+#   config/llm.yaml (role "assistant") and its spend counts against the same budget as
+#   the onboarding agent.
+#
+#   The voice copies the owner's Alizee applications: a live speech-to-speech session
+#   between the browser and the voice service, which hands every question to Claude and
+#   reads the answer aloud (app/assistant_voice.html). It has its own budget, below.
+
+# Where the app finds the API, which mints voice sessions and answers spoken questions.
+# DSO_API_URL overrides it. The hosted value is used when DSO_HOSTED is set.
+api_url:
+  local: http://localhost:8000
+  hosted: https://digital-success-os-api.onrender.com
+
+# Web pages allowed to call the assistant's endpoints (CORS). DSO_APP_ORIGIN adds one more.
+app_origins:
+  - http://localhost:8501
+  - http://127.0.0.1:8501
+  - https://digital-success-os-app.onrender.com
+
+# The answer loop: how many rounds of tool use Claude may take, and how much a tool may return.
+max_tool_rounds: 6
+sql_row_limit: 50
+max_tool_output_chars: 6000
+
+# The voice, as in the owner's Alizee applications.
+voice:
+  model: gpt-realtime-2.1-mini
+  voice: marin
+  transcription_model: gpt-4o-mini-transcribe
+  # A session ends after this long with nobody speaking, and after this long in any case.
+  idle_minutes: 5
+  max_minutes: 10
+  # What a minute of conversation is assumed to cost, in US dollars, to keep the voice
+  # inside its budget. Set high on purpose: the budget may be over-counted, never
+  # under-counted. Each new session reserves its full maximum length at this price; when
+  # the session ends, the page reports its real length and the reservation shrinks to it.
+  usd_per_minute: 0.06
+  # The voice's own budget for the public demo, in total. VOICE_BUDGET_USD overrides it.
+  budget_usd: 5.00
+  style: >
+    Your voice: sound light, bright and warm, with a smile in your voice, like a friendly
+    guide who enjoys this. Speak clear, natural American English. Keep an easy, lively pace,
+    and slow down a little for numbers and for the names of teams.
+
+# The example questions on the page, by team. Their answers were written once by Claude,
+# from the same demonstration data the hosted app uses, and are stored in
+# app/assistant_examples.json (scripts/assistant_examples.py). A test fails when an
+# example has no stored answer.
+examples:
+  CS Leadership:
+    - Which uncovered customers are most at risk of leaving right now, and why?
+    - How much annual revenue do the customers in the pilot represent, and how much of it is in the red health band?
+  CS Operations:
+    - Which play has the most customers in it right now?
+    - How many customers were kept out of a play, and for what reasons?
+  Data Engineering:
+    - Did any data test fail in the last pipeline run?
+    - Which records were rejected when the data arrived, and why?
+  Data Science:
+    - What are the five parts of the health score, and how much does each one weigh?
+    - Which signal is firing for the most customers today?
+  AI Agent Engineering:
+    - How many conversations did the AI agent have, and why were some passed to a person?
+    - When must the AI agent hand a conversation to a person?
+  Sales:
+    - Which customers are close to using all of their seats?
+    - How many tasks are waiting for the Sales team?
+  Analytics:
+    - Did the onboarding play work against its holdout?
+    - How is a holdout chosen, and why does it matter?

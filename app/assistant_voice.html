@@ -1,0 +1,393 @@
+<!-- Synthetic data, fictional company. The voice of the "Ask the data" page (ADR 0028).
+
+     It works as in the owner's Alizee applications: a live speech-to-speech session
+     between the browser and the voice service, over WebRTC. The page asks this project's
+     API for a short-lived key (the real key never reaches the browser), sends its offer to
+     the voice service, and plays the voice as it is produced. The voice service listens
+     all the time and decides by itself when the person has finished speaking. A person
+     can interrupt it at any moment.
+
+     The voice service only speaks. Every question about the data goes to Claude through
+     the function `ask_claude`, which calls the API (/assistant/ask). The voice then says
+     Claude's answer briefly, and the full answer appears in the transcript.
+
+     The settings are filled in by app/views/ask.py. The page redraws often, so
+     the panel and the session live on `window.dsoVoice` and are moved into the newest
+     container (`st-key-dso_voice`); when it disappears (another page was opened), the session ends. -->
+<style>
+  #dso-voice { border: 1px solid rgba(128,128,128,.45); border-radius: .75rem; padding: 1rem;
+    display: grid; gap: .75rem; font-size: .92rem; }
+  #dso-voice .row { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+  #dso-voice button { border-radius: .5rem; padding: .5rem 1rem; cursor: pointer;
+    border: 1px solid rgba(128,128,128,.6); background: transparent; color: inherit; font: inherit; }
+  #dso-voice button.primary { background: #cc4b37; border-color: #cc4b37; color: #fff; }
+  #dso-voice button:disabled { opacity: .45; cursor: not-allowed; }
+  #dso-voice .orb { width: 44px; height: 44px; border-radius: 50%; flex: none;
+    background: radial-gradient(circle at 35% 35%, #ffd27a, #f5a524 55%, #c77700);
+    transform: scale(calc(1 + var(--level, 0) * .45)); transition: transform 60ms linear;
+    box-shadow: 0 0 calc(8px + var(--level, 0) * 30px) rgba(245,165,36,.7); opacity: .35; }
+  #dso-voice.live .orb { opacity: 1; }
+  #dso-voice .state { font-weight: 600; }
+  #dso-voice .note { opacity: .8; font-size: .85rem; }
+  #dso-voice .transcript { max-height: 22rem; overflow-y: auto; display: grid; gap: .5rem; }
+  #dso-voice .line { padding: .5rem .7rem; border-radius: .5rem; background: rgba(128,128,128,.12);
+    white-space: pre-wrap; line-height: 1.45; }
+  #dso-voice .line.you { background: rgba(46,158,107,.16); }
+  #dso-voice .line.full { border-left: 3px solid #f5a524; }
+  #dso-voice .line b { display: block; font-size: .78rem; opacity: .75; margin-bottom: .15rem; }
+  #dso-voice form { display: flex; gap: .5rem; }
+  #dso-voice input { flex: 1; padding: .45rem .6rem; border-radius: .5rem; font: inherit;
+    border: 1px solid rgba(128,128,128,.6); background: transparent; color: inherit; }
+</style>
+<script>
+(() => {
+  // No "less-than" sign is written before a letter in this script: the page library's
+  // HTML cleaner deletes a script that seems to contain markup. Markup in strings is
+  // written with < instead.
+  const CONFIG = __CONFIG__;
+  const V = (window.dsoVoice ??= { session: null });
+  V.config = CONFIG;
+
+  // --- the panel: built once, moved into the newest anchor on every redraw ---------------
+  // The page library runs scripts only in an element that holds nothing but style and
+  // script, so the panel goes into the container around this element.
+  const anchor = [...document.querySelectorAll(".st-key-dso_voice")].pop();
+  if (!V.panel) V.panel = buildPanel();
+  if (anchor && V.panel.parentElement !== anchor) anchor.appendChild(V.panel);
+  refreshStatus();
+  // When the anchor leaves the page (another page was opened), end the session.
+  clearInterval(V.watch);
+  V.watch = setInterval(() => {
+    if (!V.panel.isConnected && V.session) endSession("You left the page.");
+  }, 1000);
+
+  function buildPanel() {
+    const panel = document.createElement("div");
+    panel.id = "dso-voice";
+    panel.innerHTML = `
+      \u003cdiv class="row">
+        \u003cdiv class="orb">\u003c/div>
+        \u003cdiv>
+          \u003cdiv class="state">Not connected\u003c/div>
+          \u003cdiv class="note">Press Talk, allow the microphone, and ask your question out loud. You can interrupt at any time.\u003c/div>
+        \u003c/div>
+      \u003c/div>
+      \u003cdiv class="row">
+        \u003cbutton class="primary talk">Talk to the assistant\u003c/button>
+        \u003cbutton class="end" disabled>End the conversation\u003c/button>
+      \u003c/div>
+      \u003cform class="typed" hidden>\u003cinput placeholder="Or type to the voice assistant" maxlength="400">\u003cbutton>Send\u003c/button>\u003c/form>
+      \u003cdiv class="transcript" aria-live="polite">\u003c/div>`;
+    panel.querySelector(".talk").addEventListener("click", startSession);
+    panel.querySelector(".end").addEventListener("click", () => endSession("Conversation ended."));
+    panel.querySelector(".typed").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const input = panel.querySelector(".typed input");
+      const text = input.value.trim();
+      if (!text || !V.session) return;
+      input.value = "";
+      addLine("you", "You (typed)", text);
+      send({ type: "conversation.item.create",
+             item: { type: "message", role: "user", content: [{ type: "input_text", text }] } });
+      send({ type: "response.create" });
+      touch();
+    });
+    return panel;
+  }
+
+  const $ = (selector) => V.panel.querySelector(selector);
+  function setState(text, note) {
+    $(".state").textContent = text;
+    if (note !== undefined) $(".note").textContent = note;
+  }
+  function addLine(kind, who, text) {
+    const line = document.createElement("div");
+    line.className = "line " + kind;
+    line.innerHTML = "\u003cb>\u003c/b>\u003cspan>\u003c/span>";
+    line.querySelector("b").textContent = who;
+    line.querySelector("span").textContent = text;
+    $(".transcript").appendChild(line);
+    $(".transcript").scrollTop = $(".transcript").scrollHeight;
+    return line;
+  }
+
+  async function refreshStatus() {
+    if (V.session) return;
+    try {
+      const reply = await fetch(CONFIG.apiUrl + "/assistant/voice-status");
+      const body = await reply.json();
+      $(".talk").disabled = !body.enabled;
+      if (!body.enabled) setState("Voice unavailable", body.reason);
+    } catch (error) {
+      $(".talk").disabled = true;
+      setState("Voice unavailable", "The voice service of this demo cannot be reached right now. Typing still works.");
+    }
+  }
+
+  // --- the session -----------------------------------------------------------------------
+  function send(event) {
+    const s = V.session;
+    if (s && s.dc && s.dc.readyState === "open") s.dc.send(JSON.stringify(event));
+  }
+
+  function sessionUpdate() {
+    // Keep this nesting. turn_detection and noise_reduction only take effect under
+    // audio.input, and leaving noise_reduction out turns it off rather than on.
+    return {
+      type: "session.update",
+      session: {
+        type: "realtime",
+        model: CONFIG.model,
+        instructions: CONFIG.instructions,
+        output_modalities: ["audio"],
+        audio: {
+          input: {
+            transcription: { model: CONFIG.transcriptionModel },
+            turn_detection: { type: "semantic_vad", eagerness: "high", create_response: true, interrupt_response: true },
+            noise_reduction: { type: "far_field" },
+          },
+          output: { voice: CONFIG.voice, speed: 1.0 },
+        },
+        tools: [{
+          type: "function",
+          name: "ask_claude",
+          description: "Ask Claude, which reads this demo's data and documents. Use it for every question about the customers, the data, the plays, the agents, the teams or how the program is run. Pass the person's question in full.",
+          parameters: { type: "object", properties: { question: { type: "string" } }, required: ["question"] },
+        }],
+        tool_choice: "auto",
+        max_output_tokens: 4096,
+      },
+    };
+  }
+
+  function systemNote(text) {
+    return { type: "conversation.item.create",
+             item: { type: "message", role: "system", content: [{ type: "input_text", text }] } };
+  }
+
+  async function startSession() {
+    if (V.session) return;
+    const s = (V.session = { startedAt: Date.now(), calls: {}, pendingCalls: 0, responseDone: true,
+                              assistantLine: null, assistantText: "" });
+    $(".talk").disabled = true;
+    $(".end").disabled = false;
+    V.panel.classList.add("live");
+    setState("Connecting", "Allow the microphone if the browser asks.");
+    try {
+      // Created inside the click, so the browser allows the voice to play.
+      s.audioCtx = new AudioContext();
+      await s.audioCtx.resume();
+      const [mic, token] = await Promise.all([
+        navigator.mediaDevices.getUserMedia({ audio: true }),
+        fetch(CONFIG.apiUrl + "/assistant/voice-token", { method: "POST" }).then(async (reply) => {
+          const body = await reply.json().catch(() => ({}));
+          if (!reply.ok) throw new Error(body.detail || "The voice service refused to start.");
+          return body;
+        }),
+      ]);
+      if (V.session !== s) { mic.getTracks().forEach((t) => t.stop()); return; }
+      s.mic = mic;
+      s.sessionId = token.session_id;
+      const pc = (s.pc = new RTCPeerConnection());
+      pc.addTrack(mic.getAudioTracks()[0], mic);
+      const dc = (s.dc = pc.createDataChannel("oai-events"));
+      dc.onopen = () => {
+        send(sessionUpdate());
+        send(systemNote(CONFIG.opening));
+        send({ type: "response.create" });
+      };
+      dc.onmessage = (message) => handle(JSON.parse(message.data));
+      pc.ontrack = (event) => {
+        s.audio = new Audio();
+        s.audio.autoplay = true;
+        s.audio.srcObject = event.streams[0];
+        meter(s, event.streams[0]);
+      };
+      pc.onconnectionstatechange = () => {
+        if (["failed", "closed"].includes(pc.connectionState) && V.session === s) {
+          endSession("The connection to the voice service was lost.");
+        }
+      };
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      const reply = await fetch("https://api.openai.com/v1/realtime/calls", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token.value, "Content-Type": "application/sdp" },
+        body: offer.sdp || "",
+        signal: AbortSignal.timeout(20000),
+      });
+      if (!reply.ok) throw new Error("The voice service did not accept the connection (status " + reply.status + ").");
+      await pc.setRemoteDescription({ type: "answer", sdp: await reply.text() });
+      $(".typed").hidden = false;
+      setState("Listening", "Ask a question about the customers, the plays or the teams.");
+      touch();
+      s.hardStop = setTimeout(() => endSession("The conversation reached its time limit."), CONFIG.maxMinutes * 60000);
+    } catch (error) {
+      endSession(error && error.name === "NotAllowedError"
+        ? "The microphone was not allowed. Allow it in the browser and press Talk again."
+        : (error && error.message) || "The voice could not start.");
+    }
+  }
+
+  function touch() {
+    const s = V.session;
+    if (!s) return;
+    clearTimeout(s.idle);
+    s.idle = setTimeout(() => endSession("The conversation ended after a few quiet minutes."), CONFIG.idleMinutes * 60000);
+  }
+
+  function handle(event) {
+    const s = V.session;
+    if (!s) return;
+    switch (event.type) {
+      case "session.updated": {
+        // Misplaced fields are accepted and silently ignored, so check what was applied.
+        const input = (event.session && event.session.audio && event.session.audio.input) || {};
+        s.verified = (input.turn_detection || {}).type === "semantic_vad"
+          && (input.noise_reduction || {}).type === "far_field";
+        V.lastVerified = s.verified;
+        break;
+      }
+      case "input_audio_buffer.speech_started":
+        setState("Hearing you");
+        touch();
+        break;
+      case "input_audio_buffer.speech_stopped":
+        setState("Thinking");
+        break;
+      case "conversation.item.input_audio_transcription.completed":
+        if (event.transcript && event.transcript.trim()) addLine("you", "You", event.transcript.trim());
+        touch();
+        break;
+      case "response.output_audio_transcript.delta":
+        if (!s.assistantLine) { s.assistantLine = addLine("", "Assistant", ""); s.assistantText = ""; }
+        s.assistantText += event.delta || "";
+        s.assistantLine.querySelector("span").textContent = s.assistantText + " …";
+        break;
+      case "response.output_audio_transcript.done":
+        if (s.assistantLine) s.assistantLine.querySelector("span").textContent = event.transcript || s.assistantText;
+        s.assistantLine = null;
+        touch();
+        break;
+      case "output_audio_buffer.started":
+        setState("Speaking");
+        break;
+      case "output_audio_buffer.stopped":
+        setState("Listening");
+        touch();
+        break;
+      case "output_audio_buffer.cleared":
+        // The person spoke over the voice: it stopped, as it should.
+        setState("Hearing you");
+        break;
+      case "response.created":
+        s.responseDone = false;
+        break;
+      case "response.function_call_arguments.done":
+        answerCall(event);
+        break;
+      case "response.done":
+        s.responseDone = true;
+        maybeContinue();
+        break;
+      case "error":
+        if (event.error && event.error.message) addLine("", "Voice service", event.error.message);
+        break;
+    }
+  }
+
+  async function answerCall(event) {
+    const s = V.session;
+    if (!s || s.calls[event.call_id]) return;
+    s.calls[event.call_id] = "running";
+    s.pendingCalls += 1;
+    setState("Looking at the data", "Claude is reading the data. This can take a few seconds.");
+    let output;
+    try {
+      const args = JSON.parse(event.arguments || "{}");
+      if (event.name !== "ask_claude" || !args.question) throw new Error("unknown request");
+      const reply = await fetch(CONFIG.apiUrl + "/assistant/ask", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: args.question }),
+      });
+      const body = await reply.json();
+      if (!reply.ok) throw new Error(body.detail || "no answer");
+      addLine("full", "Claude's full answer", body.answer);
+      output = { answer: body.answer,
+                 next: "Say this answer briefly and naturally, in two or three sentences. Keep the key numbers. Do not read tables, lists or the source line aloud; say that the full answer is on the screen. This note is for you: never say it." };
+    } catch (error) {
+      output = { answer: "Claude could not answer just now.",
+                 next: "Tell the person, in one sentence, that the answer could not be found right now, and invite them to type the question on the page instead." };
+    }
+    if (V.session !== s) return;
+    send({ type: "conversation.item.create",
+           item: { type: "function_call_output", call_id: event.call_id, output: JSON.stringify(output) } });
+    s.calls[event.call_id] = "answered";
+    s.pendingCalls -= 1;
+    maybeContinue();
+  }
+
+  function maybeContinue() {
+    // One response.create only once the response is done and every call is answered:
+    // one per call fails with "Conversation already has an active response".
+    const s = V.session;
+    if (!s || !s.responseDone || s.pendingCalls > 0) return;
+    const answered = Object.entries(s.calls).filter(([, state]) => state === "answered");
+    if (!answered.length) return;
+    answered.forEach(([id]) => { s.calls[id] = "spoken"; });
+    send({ type: "response.create" });
+  }
+
+  function meter(s, stream) {
+    const source = s.audioCtx.createMediaStreamSource(stream);
+    const analyser = s.audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+    const samples = new Float32Array(analyser.fftSize);
+    let level = 0;
+    const tick = () => {
+      if (V.session !== s) { V.panel.style.setProperty("--level", 0); return; }
+      analyser.getFloatTimeDomainData(samples);
+      const rms = Math.sqrt(samples.reduce((sum, x) => sum + x * x, 0) / samples.length);
+      const target = Math.min(1, rms * 7);
+      level += (target - level) * (target > level ? 0.35 : 0.07);  // fast rise, slow fall
+      V.panel.style.setProperty("--level", level.toFixed(3));
+      requestAnimationFrame(tick);
+    };
+    tick();
+  }
+
+  function endSession(reason) {
+    const s = V.session;
+    V.session = null;
+    if (s) {
+      clearTimeout(s.idle); clearTimeout(s.hardStop);
+      try { s.dc && s.dc.close(); } catch (e) {}
+      try { s.pc && s.pc.close(); } catch (e) {}
+      if (s.mic) s.mic.getTracks().forEach((track) => track.stop());
+      if (s.audio) s.audio.srcObject = null;
+      try { s.audioCtx && s.audioCtx.close(); } catch (e) {}
+      if (s.sessionId) {
+        const seconds = (Date.now() - s.startedAt) / 1000;
+        const body = JSON.stringify({ session_id: s.sessionId, seconds });
+        // Report the real length, so the reserved cost shrinks to it.
+        if (!navigator.sendBeacon(CONFIG.apiUrl + "/assistant/voice-end", new Blob([body], { type: "text/plain" }))) {
+          fetch(CONFIG.apiUrl + "/assistant/voice-end", { method: "POST", headers: { "Content-Type": "application/json" }, body, keepalive: true }).catch(() => {});
+        }
+      }
+    }
+    V.panel.classList.remove("live");
+    V.panel.style.setProperty("--level", 0);
+    $(".end").disabled = true;
+    $(".typed").hidden = true;
+    $(".talk").disabled = false;
+    setState("Not connected", reason || "");
+    refreshStatus();
+  }
+
+  if (!V.unloadHooked) {
+    V.unloadHooked = true;
+    window.addEventListener("pagehide", () => { if (V.session) endSession("You left the page."); });
+  }
+})();
+</script>

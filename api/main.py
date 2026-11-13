@@ -10,6 +10,9 @@ Run with:  uv run python run.py api      (http://localhost:8000/docs lists the e
     POST /cta/{id}/resolve     a person closes a task; the outcome goes back to the journey
     GET  /export/crm           account health, scores and signals, for the CRM
     GET  /export/cs-platform   company scorecards and open tasks, for a CS platform
+    POST /assistant/ask        Claude answers a question about the data (used by the voice)
+    GET  /assistant/voice-status, POST /assistant/voice-token, POST /assistant/voice-end
+                               short-lived voice sessions, within the voice budget (ADR 0028)
 
 Writing endpoints need the X-API-Token header when the API_TOKEN environment variable
 is set (it always is when hosted). Every request is logged as one JSON line.
@@ -23,12 +26,15 @@ import time
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from agents import mailbox
+from agents import assistant, mailbox, voice
 from agents.classify import classify_replies
+from agents.ledger import VoiceLedger
 from agents.llm import get_llm
 from api.exports import crm_export, cs_platform_export
+from common.config import load_yaml
 from common.logs import get_logger
 from common.paths import DATA_DIR
 from common.settings import load_settings
@@ -46,6 +52,23 @@ app = FastAPI(
     version="1.0",
 )
 log = get_logger("api")
+
+
+def app_origins() -> list[str]:
+    """The web addresses of the app, whose pages may call the API from a browser."""
+    origins = list(load_yaml("assistant.yaml")["app_origins"])
+    if os.environ.get("DSO_APP_ORIGIN"):
+        origins.append(os.environ["DSO_APP_ORIGIN"])
+    return origins
+
+
+# The "Ask the data" page calls the assistant's endpoints from the visitor's browser.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=app_origins(),
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
+)
 
 
 def data_dir() -> Path:
@@ -241,3 +264,62 @@ def export_crm() -> list[dict]:
 def export_cs_platform() -> dict:
     """Company scorecards, people and open tasks, in the shape a CS platform imports."""
     return cs_platform_export(data_dir())
+
+
+# --- the "Ask the data" assistant (ADR 0028) --------------------------------------------------
+# The app's page calls these from the visitor's browser, so they are open to the app's own
+# web addresses (CORS, above) and need no token. Both are limited by a spending budget.
+
+
+class Question(BaseModel):
+    question: str
+
+
+class VoiceEnd(BaseModel):
+    session_id: str
+    seconds: float
+
+
+@app.post("/assistant/ask")
+def assistant_ask(question: Question) -> dict:
+    """Claude answers one question about the data or the program (used by the voice)."""
+    if not question.question.strip():
+        raise HTTPException(status_code=400, detail="The question is empty.")
+    return assistant.ask(question.question, data_dir()).to_dict()
+
+
+@app.get("/assistant/voice-status")
+def assistant_voice_status() -> dict:
+    """Whether the voice can be used now, and why not when it cannot."""
+    current = voice.status(VoiceLedger(open_store(data_dir())))
+    return {
+        "enabled": current.enabled,
+        "reason": current.reason,
+        "budget_usd": current.budget_usd,
+        "spent_usd": round(current.spent_usd, 4),
+        **{key: voice.config()[key] for key in ("idle_minutes", "max_minutes")},
+    }
+
+
+@app.post("/assistant/voice-token")
+def assistant_voice_token() -> dict:
+    """A short-lived key for one voice session. The real key never leaves this server."""
+    try:
+        return voice.start_session(VoiceLedger(open_store(data_dir())))
+    except voice.VoiceUnavailable as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+
+
+@app.post("/assistant/voice-end")
+async def assistant_voice_end(request: Request) -> dict:
+    """The page reports how long a session lasted, so its reserved cost can shrink.
+
+    The page sends this as it closes, with the browser's "beacon", which can only send
+    plain text. So the body is read as text and checked here.
+    """
+    try:
+        end = VoiceEnd.model_validate_json(await request.body())
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail="Expected session_id and seconds.") from error
+    done = voice.finish_session(VoiceLedger(open_store(data_dir())), end.session_id, end.seconds)
+    return {"recorded": done}

@@ -260,7 +260,7 @@ has run against a Developer Edition org (6 accounts, 6 tasks; a second run creat
 nothing), signed in through the browser with the vendor's command-line tool:
 `SALESFORCE_CLI_ORG=dso-demo` in `.env`, and `sf` must be on the PATH (it installs to
 `%APPDATA%\npm`, which this app's shell does not have on its PATH by default).
-208 tests in total.
+238 tests in total.
 
 After the phases (the brief read again line by line; see the last section of
 `docs/phase-notes.md`):
@@ -317,6 +317,20 @@ After the phases (the brief read again line by line; see the last section of
   stop's words, run the script again. The app only plays the files.
 - `config/glossary.yaml` and `ui.metric`: every number is drawn through `ui.metric`,
   which adds its definition as a hover text. A test fails for a number without one.
+- "Ask the data" (ADR 0028): `app/views/ask.py`, `agents/assistant.py` (Claude, role
+  `assistant`; tools `run_sql` with a guard that allows one SELECT on gold/silver only,
+  `describe_tables`, `search_docs`), `prompts/assistant.md`, `config/assistant.yaml`
+  (examples by team, voice settings, API address, allowed origins). Example answers are
+  stored in `app/assistant_examples.json`, written by `scripts/assistant_examples.py` on
+  the same world the Dockerfile builds (`run.py demo 10 --profile small`); a test fails
+  for an example without one. The voice is `app/assistant_voice.html` (live
+  speech-to-speech over WebRTC, as in the owner's Alizee apps; it calls `ask_claude`,
+  which posts to the API's `/assistant/ask`). The API mints short-lived voice keys
+  (`agents/voice.py`, `/assistant/voice-token`) within `VOICE_BUDGET_USD` (table
+  `voice_spend`, `agents/ledger.py::VoiceLedger`). Hosted, the API service needs
+  `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` in the host's dashboard. The page library
+  deletes a script that seems to contain markup: no raw "<" before a letter in the
+  voice script.
 - `config/options.yaml`, `app/option_hints.html` and `ui.option_hints` (ADR 0027): what
   each choice of a filter means (coverage tier, lifecycle stage, health band, console
   role, task outcome). A short script shows the meaning beside the choice under the

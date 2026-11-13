@@ -75,6 +75,7 @@ def pct(value, digits: int = 0) -> str:
 # The name of each page, as the menu, the tour and the Overview table show it.
 PAGE_NAMES = {
     "overview": "Overview",
+    "ask": "Ask the data",
     "quality": "Data quality",
     "accounts": "Accounts",
     "plays": "Plays and experiments",

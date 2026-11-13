@@ -715,6 +715,11 @@ missing or only half there. This section is what closed them.
   element it explains. Each stop says what it is, who uses it, and gives an example.
   Each stop can be read by a recorded voice (`scripts/tour_voice.py`, ADR 0025).
 - **A definition behind every number** (`config/glossary.yaml`), as a hover text.
+- **Ask the data** (`app/views/ask.py`, `agents/assistant.py`, ADR 0028): Claude answers
+  any question about the data and the program with read-only SQL and a document search,
+  typed or spoken. The voice copies the owner's other applications (a live
+  speech-to-speech session that hands each question to Claude). Example questions for
+  seven teams have stored answers, so they work without a key.
 - **A definition behind every choice of a filter** (`config/options.yaml`, ADR 0027):
   resting the pointer on `pooled`, `at_risk` or `yellow` says what it means. The word
   "pilot" is defined on the Overview and on the Pilot page, where it is first used.
@@ -727,7 +732,7 @@ missing or only half there. This section is what closed them.
 - **A picture of every page** in `docs/screenshots/`.
 - **Every page of the app is run by a test** on the small world (`tests/test_app.py`),
   and again with the internet blocked, which is the offline promise as a test.
-  208 tests in total.
+  238 tests in total.
 
 ### How to run
 
@@ -797,3 +802,4 @@ uv run --group notebook jupyter nbconvert --to notebook --execute --inplace anal
 - `0025-a-tour-of-every-element-with-a-recorded-voice`
 - `0026-the-hosted-app-kept-awake-by-a-scheduled-request`
 - `0027-the-meaning-of-each-choice-in-a-filter-shown-on-hover`
+- `0028-a-voice-assistant-for-questions-about-the-data`

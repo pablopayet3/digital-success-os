@@ -15,7 +15,7 @@ from common.paths import ROOT
 from experiments.analyze import analyse
 
 PAGES = [
-    "overview", "accounts", "plays", "agent", "console", "quality", "pilot", "operating", "demo",
+    "overview", "accounts", "plays", "agent", "console", "quality", "pilot", "operating", "demo", "ask",
 ]  # fmt: skip
 
 
@@ -188,7 +188,7 @@ def test_the_role_is_written_once_and_every_page_opens_with_its_line():
 
 
 def test_every_page_opens_with_the_line_of_the_role_it_answers(app_data):
-    for page in ("quality", "accounts", "plays", "demo", "agent", "console", "pilot", "operating"):
+    for page in [page for page in PAGES if page != "overview"]:
         app = AppTest.from_file(str(ROOT / "app" / "views" / f"{page}.py"), default_timeout=120)
         app.run()
         opening = " ".join(markdown.value for markdown in app.markdown)

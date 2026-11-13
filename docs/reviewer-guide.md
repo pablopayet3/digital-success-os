@@ -19,6 +19,10 @@ element is, who uses it, and gives an example. "Next" moves to the following sto
 to the next page after the last stop of a page. You can end the tour at any stop. The button "Guided tour" in the sidebar starts it again. Hovering
 over the question mark beside any number gives its definition.
 
+To ask your own question about the data, open the page "Ask the data". Claude answers it
+from the warehouse and the documents, by text or out loud, and shows how it found each
+answer.
+
 Everything below can be done on the hosted app. Nothing you do there can break
 anything: it is a shared demo, and an admin can reset it.
 

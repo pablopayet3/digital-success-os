@@ -81,6 +81,13 @@ good answers. A judge has to see what the agent saw.
 
 Articles only.
 
+## assistant
+
+### v1 (current)
+
+First version (ADR 0028): answers questions about the data and the program with three
+read-only tools, cites its source, and never states a number that no tool returned.
+
 ## brief, customer_simulator
 
 ### v1 (current)
