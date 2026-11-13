@@ -1,126 +1,113 @@
-# Demo script: five minutes
+# Demo script: a six-minute video
 
-Synthetic data, fictional company. Start the app first: `uv run python run.py app`.
-Have the Human console signed in as Sales in a second browser tab (password `demo`
-locally).
+Synthetic data, fictional company. This is what to show, in what order, and what to say,
+for a recorded video of the hosted app (https://digital-success-os-app.onrender.com).
+The same order works live, in an interview.
 
-Times are targets. If something breaks, say what should have happened and move on.
+## Before recording
 
-**Whose screen is it?** Say it as each page opens. It tells the listener that this one
-app stands for several tools, each used by different people.
+- [ ] Open the app once a few minutes before, so that it is awake and every page has
+      loaded once. Between 06:00 and 22:00 US Eastern time a scheduled request keeps it
+      awake.
+- [ ] Close the guided tour ("End the tour"), so that it does not cover the pages. Say
+      at the end that the tour exists and reads itself aloud.
+- [ ] In a second tab, open the Human console and sign in as **CSM** (the hosted
+      passwords are on the app service's Environment page in the host's dashboard).
+- [ ] Check the browser shows no extension icon in a corner of the page (a real product's
+      logo must not appear in the video).
+- [ ] Record the browser window only, at a width of about 1,400 pixels.
+- [ ] After recording, reset the hosted demo as Admin (Human console, "Reset the demo
+      data"), so that the next visitor starts clean.
 
-| Page | At a company, this is the screen of |
-|---|---|
-| Overview; results on Plays and experiments | Customer-success leadership (a BI dashboard) |
-| Data quality | Data Engineering |
-| Accounts | A success manager before a customer call. Data Science owns the scores |
-| Play catalog on Plays and experiments | CS Operations, who run the journeys |
-| Live demo | The customer. Nobody else sees this conversation live |
-| Human console | Success managers and Sales. The only page with a sign-in |
-| Agents | The AI agent engineers |
-| Pilot, Operating model | This role |
+## The script
 
-The workflow is drawn at the top of the Overview page, with the team accountable for each
-step. Start there: it frames everything that follows. Under it, "A guide to the pages"
-lists each page, what it covers and what you will find on it.
+Times are targets. If something does not respond, say what should have happened and
+move on.
 
-**1. Frame it (30 seconds). Overview page.**
+**1. What this is (40 seconds). Overview page, top.**
 
-> "I built a small version of this role last week, on fictional data, to make sure I
-> could do every piece of the job description, not just talk about it. In the real job
-> these pieces live across Databricks, Gainsight, Salesforce and Tableau; here they're in
-> one system so you can see how they connect."
+Show the three paragraphs and the workflow cards.
 
-Point at "The measures the pilot is run on" (usage, agent invocation, handoff rate,
-retained revenue with the holdout beside it), then at the row "From signal to outcome":
-signals, plays, touches, agent conversations, handoffs, closed.
+> "This is a working model of a digital customer-success operation, on fictional data.
+> A software company has thousands of customers with no assigned success manager. This
+> system watches their data every day, finds the ones who need help, and helps them
+> automatically: an email first, then an AI agent, and a person only when one is needed.
+> Then it measures whether the help made a difference. Each card is one step, with the
+> team responsible for it. At a real company each step runs in a different platform;
+> here they sit side by side so you can see how they connect."
 
-**2. Data (45 seconds). Data quality page.**
+**2. What it did today (40 seconds). Overview page, lower down.**
 
-> "Raw telemetry lands and is validated. Bad events go to a dead-letter table with a
-> reason; nothing is silently dropped. dbt builds the production tables with a hundred
-> tests, and the main table has a written contract that code checks on every run."
+Scroll to "The measures the pilot is run on", then to "What the system did, in plain
+words".
 
-Show the rejected-by-reason chart and the contract checks.
+> "These eight measures decide whether the pilot is working: adoption, setup, how often
+> the agent is used, how often it hands off, and revenue kept, always next to the
+> customers we deliberately left alone. And this is the system at work, in plain
+> sentences: which customer, what was done, and the signal behind it."
 
-**3. Signals and models (45 seconds). Accounts page.**
+**3. One customer (40 seconds). Accounts page.**
 
-Filter to health band red, open the first account.
+Choose health band **red** in the filter. Rest the pointer on a choice to show its
+definition. Open the first customer.
 
-> "One account. The health score and why: five components. The signals firing, each with
-> its evidence. Churn and expansion scores with reasons in plain words. The churn flag is
-> not a fixed threshold: the team can work forty accounts, so the top forty are flagged."
+> "One customer, before a call. The health score and the five parts behind it, the risk
+> that they cancel, the chance that they buy more, the signals firing today with their
+> evidence, and every decision the system took about them, including why it chose not to
+> act."
 
-Open the audit log expander: "And every decision about this account, including why it was
-not put in a play."
+**4. The play, the agent and the handoff (75 seconds). Live demo page.**
 
-**4. Play, agent, human fallback (60 seconds). Live demo page.**
+Show "Step 1. The system writes first", then press **Run the story**.
 
-Stay on the first account in the list. Point at the blue box: the signal firing today,
-the play it triggers, and whether this account is in the play or held out.
+> "The system makes the first move: this customer stalled in setup, so the onboarding
+> play wrote to them. They reply. The agent checks their setup, searches the help center
+> and answers. Then they ask for a price. A rule written in code passes that to Sales
+> before the model is even asked, with a summary for the salesperson."
 
-Type: `How do I invite my whole team at once?` (or press **Run the story**, which sends
-this message and the next one in one click, with no typing to get wrong).
+Switch to the Human console tab. Open the new task.
 
-> "A stalled admin. The agent checks their setup, searches the help centre, answers from
-> the article."
+> "This is what the person receives: why the task exists, the customer's own words, what
+> was already tried, and a recommended next step. The outcome they record goes back into
+> the journey."
 
-Type: `Thanks. How much would 10 more seats cost?`
+**5. Nothing risky is sent without a person (40 seconds). Human console, still signed in.**
 
-> "Pricing. A hard rule in code hands off to Sales before the model is even asked. It
-> cannot be talked out of it."
+Scroll to "Drafts waiting for approval". Open one draft.
 
-Switch to the Human console tab, open the new task.
+> "Some messages carry more risk. This one asks a happy customer to act as a reference.
+> It only fires when the customer has earned it: a score of 9 or 10, green health, no open
+> problem, no risk of leaving. Even then, the system only writes a draft. A success
+> manager approves it, or rejects it, and nothing reaches the customer before that."
 
-> "This is what the seller sees: why it is on their desk, the customer's own words, what
-> was already tried, the account at a glance, a recommended next step. I resolve it, and
-> the outcome goes back to the journey."
+**6. Did it work? (45 seconds). Plays and experiments page.**
 
-Resolve as `expansion_opportunity`.
+Show the chart "Results against the holdout", then "One play in detail".
 
-**5. Measurement (45 seconds). Plays and experiments page.**
+> "Every play is measured against a holdout, on a measure named before launch: the
+> difference, its margin of error, and a verdict from a written rule. The customers are
+> simulated, so the size of the effect is an assumption. The method is the real part, and
+> it is the part most AI demos leave out."
 
-> "Every play against its holdout, on a metric named before launch. The lift, its
-> interval, and a verdict from a written rule: working, too early, or no effect, with the
-> smallest effect this sample could have seen. It is a simulation, so the lift is an
-> assumption coming back out. The measurement is the real part."
+**7. Ask the data (40 seconds). Ask the data page.**
 
-Scroll to "One play in detail" (it opens on Onboarding rescue): the journey funnel, the
-result by entry week, and revenue per group with the guardrail "still a customer".
+Press one example button, then type or say one question of your own.
 
-**6. Agent quality (30 seconds). Agents page, Evaluation tab.**
+> "Any team can ask questions here, by typing or by voice. Claude answers from the
+> warehouse and the documents, and says which table or document it used. These examples
+> are the questions each team asks every week."
 
-> "Forty-four fixed cases, run against the real model. Code checks first: did it hand
-> off, for the right reason, to the right queue. A judge model only scores the wording of
-> answers that already passed. Three prompt versions ran on the same cases: the one I
-> expected to win scored 25 of 30, the baseline 29, and the third, written from the
-> failures, 30. The evals picked the prompt, not me."
+**8. Pilot and ownership (30 seconds). Pilot page, then Operating model.**
 
-The report states which model produced the answers. If it ever says stand-in, say so:
-"this run proves the rules and the routing, not the answers."
+> "The readiness checklist is answered from live data, not ticked by hand. Each play
+> starts on ten percent of customers, then a full test. This preview shows what adding
+> the next group would do to each team's queue. And these are the working documents:
+> who owns what, the decisions and their reasons, and what each team waits for."
 
-**7. Pilot (30 seconds). Pilot page.**
+**Close (10 seconds).**
 
-> "This is how I'd run the uncovered-accounts pilot. The readiness checklist is not
-> ticked by hand: each line is answered from live data when the page opens. Then a ten
-> percent slice, a full test with a holdout, weekly review notes, and a scale, fix or
-> stop call per play. Scaling to the next segment is one line of configuration, and the
-> page already shows what that line would do: who would enter, and which queue could not
-> take the first day."
-
-Scroll to "Handoff quality" if asked about people: time to pickup, SLA breaches,
-re-contact, docs gap.
-
-**8. Operating model (15 seconds). Operating model page.**
-
-Open the dependency map (drawn as a diagram), the ownership map, then one play spec.
-
-> "That's how I'd keep cross-functional delivery moving, and how I'd hand work to the
-> agent engineers."
-
-**Close.**
-
-> "Everything here maps to a line in your JD. Happy to go deeper on any piece."
+> "A guided tour, read aloud, walks through every element if you want to explore on your
+> own. Thank you."
 
 ## If they ask to go deeper
 
@@ -128,25 +115,18 @@ Open the dependency map (drawn as a diagram), the ownership map, then one play s
 |---|---|---|
 | How do you know the model is any good? | `docs/model-cards/` | Time-based split, compared with a benchmark, precision at the team's capacity, reasons in words |
 | Why not let the model decide when to escalate? | ADR 0003 | A prompt asks, code guarantees. Each rule has a test that needs no model |
-| What does the agent cost? | ADR 0015 | Cached, budgeted, offline by default. One module calls the API |
+| What does the agent cost? | ADR 0015, 0024 | Cached, budgeted, capped at five dollars on the public demo. One module calls the API |
 | Is the lift real? | ADR 0005, 0016 | No, and the report says so. The measurement system is what is being shown |
+| Why do some messages need an approval? | ADR 0029, 0030 | Only where the cost of being wrong is high. Everything else stays automatic |
 | What would you ask Data Engineering for first? | `docs/data-requirements.md` | Coverage tier, one consent field, account id on every event |
-| What does this column mean? | `docs/data-dictionary.md` (Operating model page) | 533 columns, each with a definition; a test fails when one is missing |
-| Did you look at the data before building? | `analytics/01_eda.ipynb` | Six questions with charts; each signal was kept only because it points the right way |
-| How does the agent get better? | Agents page, Review queue tab | An unnecessary handoff or a thumbs down becomes a draft case the next prompt must pass |
+| What does this column mean? | `docs/data-dictionary.md` (Operating model page) | Every column has a definition; a test fails when one is missing |
+| How does the agent get better? | Agents page, Review queue tab | An unnecessary handoff or a thumbs down becomes a case the next prompt must pass |
 | What happens when a queue overflows? | Human console, ADR 0004 | Flags follow capacity; an alert fires at two days of backlog |
 | How would this run in production? | `docs/production-architecture.md` | Same code, a `prod` profile; a table of what is real and what is simulated |
 
-## Before the interview
+## Running it locally instead
 
-- [ ] `uv run python run.py test` passes.
-- [ ] Decide the mode. With the key in `.env`, add the line `DSO_OFFLINE_MODE=false` so the
-      Live demo answers anything you type (cached answers are instant, new ones cost
-      cents). With no network, add `DSO_LLM_STAND_IN=true` instead and say so.
-- [ ] The app opens with Wi-Fi off (replay or stand-in mode).
-- [ ] **Run the story** works on the first account of the Live demo page. Then remove the
-      test task: it is a real row (see the note on pictures in `CLAUDE.md`).
-- [ ] Do not press "Advance one day" before the conversation. A new day changes the
-      accounts, and the stored answers no longer match (the agent then says it is
-      unavailable and hands off). With `--live` this does not matter.
-- [ ] A second tab is signed in to the Human console.
+Start the app with `uv run python run.py app` (and the API with `uv run python run.py api`
+for voice on the Ask the data page). Locally the console password for every role is
+`demo`. Do not press "Advance one day" before the conversation: a new day changes the
+customers, and the stored answers no longer match. With `--live` this does not matter.
