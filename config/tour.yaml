@@ -1,0 +1,231 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# The guided tour: a series of pop-up windows that walk a visitor through the app
+# (app/tour.py shows them). One entry per window, in order.
+#
+#   page     the page the window opens on (a file in app/views/)
+#   title    the window's heading
+#   look     what the visitor is looking at, and what to notice
+#   company  which tool does this at a real company, and which team owns it
+#   job      what the role asks for at this step
+#   mine     what the person in the role does here
+#
+# Real product names appear here on purpose, as plain text: the tour exists to show how
+# the one app maps onto the several tools a real company uses. Nothing else in the app
+# names them (see the conventions in CLAUDE.md).
+
+steps:
+  - page: overview
+    title: A three-minute tour
+    look: >
+      This is a small, working version of a digital customer-success system, built on
+      made-up data. One idea runs through all of it: watch what customers do, decide who
+      needs help, send the cheapest help that works (an email, then an AI agent, then a
+      person), and check whether it changed anything.
+    company: >
+      There, this is not one app. It is several tools, each run by a different team: a
+      lakehouse (Databricks), a customer-success platform (Gainsight), a CRM (Salesforce),
+      a BI tool (Tableau) and the company's own AI agents. The role this demo is about
+      makes them work as one chain. Each window of this tour names the tool and the team
+      for that step.
+    job: >
+      Build the digital success operating system, pilot it on customers nobody is assigned
+      to, then scale the pattern.
+    mine: >
+      I built every step, so I can explain every step. Press Next. You can close a window
+      at any time to look at the page behind it.
+
+  - page: overview
+    title: The whole loop on one page
+    look: >
+      Find the row "From signal to outcome". It is the loop as counts: customers showing a
+      warning sign today, put into a play, reached by email, talking to the agent, handed
+      to a person, closed. Above it are the eight measures a pilot is run on. Revenue is
+      shown with the comparison group beside it, so the page cannot claim what the system
+      did not cause.
+    company: >
+      A dashboard in the BI tool (Tableau), read by customer-success leadership every
+      week.
+    job: >
+      Measurement design: adoption, consumption, setup completion, agent invocation,
+      escalation conversion.
+    mine: >
+      Define each measure once, with its formula and its source table, so that two
+      dashboards can never disagree about a number.
+
+  - page: quality
+    title: First, can the data be trusted?
+    look: >
+      Raw product events and CRM files arrive every day. Broken rows are rejected with a
+      reason and kept, never silently dropped: the chart shows how many and why. The
+      cleaned tables pass 100 automatic tests, and the main table has a written contract
+      that code checks on every run.
+    company: >
+      The lakehouse (Databricks), built and run by Data Engineering. The pipeline in this
+      demo was also run on a real Databricks workspace, where it passed the same 100 tests.
+    job: >
+      Data foundation and pipelines: account, contact, product, engagement, lifecycle and
+      health data; data quality; production tables.
+    mine: >
+      Write the data requirements backwards from the plays, and the contract for the table
+      everything reads. Data Engineering builds it. I say what "good" means and check it.
+
+  - page: accounts
+    title: One customer, and why it is flagged
+    look: >
+      Pick a customer. The health score comes with its five parts, so you can see why it
+      is red. Below it: the signals firing, each with its evidence in words, and two model
+      scores (the risk of leaving, the chance of buying more) with reasons. At the bottom
+      is everything the system did for this customer, and every time it decided not to
+      act.
+    company: >
+      Scores are tables in the lakehouse and appear as health scores in the
+      customer-success platform (Gainsight). Data Science owns the models.
+    job: >
+      Analytics and modelling: segmentation and predictive models; turning telemetry,
+      health, sentiment and support signals into triggers.
+    mine: >
+      Define the signals and the health score as plain rules a success manager can argue
+      with. Set the "at risk" cut-off by how many accounts the team can really work, not
+      by a score.
+
+  - page: plays
+    title: "Plays: who gets which help"
+    look: >
+      The table at the top is the play catalog. Each of the seven plays has a trigger
+      signal, a ladder (digital, then agentic, then human), an owner, a success measure
+      named before launch, and a share of customers deliberately held out for comparison.
+      Plays are configuration, not code.
+    company: >
+      Journeys and audience rules in the customer-success platform (Gainsight Journey
+      Orchestrator). CS Operations runs the tool. Legal and Privacy set the consent rules.
+    job: >
+      Journey orchestration, rules engines, audience rules, consent and contact
+      governance, channel triggers.
+    mine: >
+      Own the play catalog: decide each play's trigger, ladder and success measure, and
+      make consent and the limit of two contacts a week impossible for any play to skip.
+
+  - page: demo
+    title: The AI agent, and the line it does not cross
+    look: >
+      Close this window and press "Run the story". A customer whose setup has stalled asks
+      how to invite their team, and gets an answer from the help centre. Then they ask for
+      a price. The agent does not answer that: a rule written in code hands it to Sales,
+      with a summary, before any model is asked.
+    company: >
+      The company's own AI agents, built by the customer-success AI agent engineers. Here
+      the agent is Claude with tools and a small help centre.
+    job: >
+      AI-agent design: plays, prompts, retrieval logic, escalation rules and feedback
+      loops. And human fallback engineering.
+    mine: >
+      Write the one-page spec the engineers build from: the trigger, what the agent may
+      read, what it must never answer, the test cases. The escalation rules are code,
+      because a prompt asks and code guarantees.
+
+  - page: console
+    title: The handoff, picked up by a person
+    look: >
+      Sign in with a role. Each task is a handoff packet: why it is on your desk, the
+      customer's own words, what was already tried, the account at a glance, and a
+      recommended next step. Closing the task with an outcome is the return signal: it
+      tells the journey what to do next.
+    company: >
+      Tasks for people in the customer-success platform (Gainsight CTAs, in Cockpit) and
+      tasks in the CRM (Salesforce). The scaled success team and Sales work them. Tasks
+      from this demo were pushed into a real Salesforce org.
+    job: >
+      Digital-to-human handoffs: what context moves with the customer, and what return
+      signal continues the journey.
+    mine: >
+      Design the packet, the queues and how much each can take, and the outcomes people
+      record, so that no handoff is a dead end and the agent learns from the unnecessary
+      ones.
+
+  - page: plays
+    title: Did it work?
+    look: >
+      Scroll to "Results against the holdout". Each play is compared with customers who
+      qualified but were deliberately left alone. The chart shows the lift with its margin
+      of error. When the line crosses zero the play may have done nothing, and the verdict
+      says so. One play is proven here. The others read "too early" or "no effect
+      detected".
+    company: >
+      Dashboards in the BI tool (Tableau), and experiment reads with the Analytics team.
+      This demo also has a real, public Tableau dashboard built from the same tables.
+    job: >
+      Measurement and experimentation: cohort analysis, A/B tests, operating reviews.
+    mine: >
+      Name the success measure before launch, keep a holdout on every play, and bring a
+      scale, fix or stop decision to the review instead of an opinion. The lift here comes
+      from a simulation. The measurement is the real part.
+
+  - page: agent
+    title: How do we know the agent is good?
+    look: >
+      Open the Evaluation tab. The agent was run on 30 fixed conversations with the real
+      model. Code checks first: did it hand off when it must, and for the right reason?
+      Then a second model scores the wording. Three versions of the agent's instructions
+      were compared, and the one expected to win lost, so it was not used. The Review
+      queue tab holds the cases people sent back, waiting to become new tests.
+    company: >
+      An evaluation suite owned together with the AI agent engineers, fed by the people
+      who work the queues.
+    job: >
+      Model evaluation and human-in-the-loop feedback.
+    mine: >
+      Decide what "good" means for the agent, turn every unnecessary handoff into a test
+      case, and let the tests choose the instructions, not the author.
+
+  - page: pilot
+    title: Is it ready, and how does it scale?
+    look: >
+      The readiness checklist is not ticked by hand: each line is answered from live data
+      when the page opens. Below it are the stage and the verdict of each play. At the
+      bottom is a preview of adding the next group of customers: who would enter, and
+      which team's queue could not take the first day's work.
+    company: >
+      The pilot plan and the weekly review: usually a page in the company wiki
+      (Confluence), with decisions tracked as tickets (Jira).
+    job: >
+      Pilot the accounts nobody covers, then scale the pattern; choose between digital,
+      agentic and human interventions.
+    mine: >
+      Run the pilot: a 10% slice first, then a full test with a holdout, a weekly review,
+      and one line of configuration to extend it once it is proven.
+
+  - page: operating
+    title: Who owns what, and how decisions are kept
+    look: >
+      These are the documents that make this a programme and not a script. The ownership
+      map gives every table, play, agent and queue a named owner, with the gaps flagged.
+      The dependency map shows which team waits for which. Change control says how an
+      agreed decision gets reopened. And every design decision has a record with the
+      options that were considered.
+    company: >
+      The company wiki and the ticket tracker (Confluence and Jira).
+    job: >
+      Close ownership gaps as the accountable owner; protect delivery momentum with a
+      decision log, architecture principles, a dependency map and change control.
+    mine: >
+      Be the one accountable owner across the teams: write down who owns what, stop
+      decisions being reopened by accident, and unblock the next dependency.
+
+  - page: overview
+    title: What is real, and what is simulated
+    look: >
+      Real: the code and its automated tests, the pipeline run on a real Databricks
+      workspace, the push into a real Salesforce org, the public Tableau dashboard, and
+      the AI model's answers in the recorded demo and in the evaluation. Simulated: the
+      customers and how they react, so the measured lift is an assumption coming back out.
+      Gainsight has no free version, so the app plays its part. The line at the top of
+      every page says who is writing the agent's replies right now.
+    company: >
+      The table that maps each piece to the real tool, and the full list of what was run
+      for real, are in the README of the repository.
+    job: >
+      Every window of this tour answers a line of the role.
+    mine: >
+      Now try it yourself. The expander at the top of this page, "First time here?", is a
+      five-minute hands-on path: make the agent hand you a task, pick it up, close it.

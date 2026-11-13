@@ -24,7 +24,9 @@ human's outcome comes back into the system. Every play has a holdout.
 - **Never use real company names, logos or branding** in data, code or screens. Real tool
   names appear only in the README mapping tables, `docs/production-architecture.md`,
   `docs/demo-script.md`, `docs/bi-dashboard-guide.md`, `integrations/crm_sync.py` with
-  ADR 0019, and the ADRs about the production profile (the brief update asked for those). The app does not list those two documents. The employer is never named.
+  ADR 0019, the ADRs about the production profile (the brief update asked for those),
+  and `config/tour.yaml`: the app's guided tour names them as plain text, with no
+  logos, because the owner asked for it on 12 November 2026. No other screen does. The app does not list those two documents. The employer is never named.
 - Every file and screen says "Synthetic data, fictional company".
 - Simple, readable code over clever code. This code is walked through live, line by line.
   Short functions, plain names, comments that say why.
@@ -257,7 +259,7 @@ has run against a Developer Edition org (6 accounts, 6 tasks; a second run creat
 nothing), signed in through the browser with the vendor's command-line tool:
 `SALESFORCE_CLI_ORG=dso-demo` in `.env`, and `sf` must be on the PATH (it installs to
 `%APPDATA%\npm`, which this app's shell does not have on its PATH by default).
-191 tests in total.
+194 tests in total.
 
 After the phases (the brief read again line by line; see the last section of
 `docs/phase-notes.md`):
@@ -297,6 +299,11 @@ After the phases (the brief read again line by line; see the last section of
   today: regenerating the data or advancing a day breaks the match (the agent then
   hands off as `agent_unavailable`). Store them again with one `--live` run of the
   same conversations (about 3 cents each).
+- `app/tour.py` and `config/tour.yaml`: the guided tour, twelve pop-up windows with
+  Next and Back. Each opens on the page it explains and says what the visitor sees,
+  the real tool and team at a company, what the role asks for, and the role's part.
+  It opens by itself only on the hosted demo (`DSO_HOSTED`); locally it starts from
+  the sidebar button, so a live demo is never interrupted. The words are the YAML.
 - `docs/screenshots/`: one picture per page.
 - `docs/reviewer-guide.md`: a five-minute hands-on path for someone given the hosted
   link (also an expander at the top of the Overview page). Every example in it was

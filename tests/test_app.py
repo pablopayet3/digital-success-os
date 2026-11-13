@@ -135,3 +135,50 @@ def test_the_overview_opens_with_a_path_for_someone_handed_the_link(app_data):
     (guide,) = [e for e in app.expander if e.label.startswith("First time here?")]
     text = " ".join(block.value for block in guide.markdown)
     assert "Run the story" in text and "Human console" in text and "Synthetic data" in text
+
+
+# --- The guided tour -----------------------------------------------------------------------------
+
+
+def test_every_tour_window_is_complete_and_opens_on_a_real_page():
+    from app.tour import PARTS, steps
+
+    windows = steps()
+    assert len(windows) >= 10
+    for window in windows:
+        assert (ROOT / "app" / "views" / f"{window['page']}.py").exists(), window["page"]
+        assert window["title"].strip()
+        for part in PARTS:
+            assert window[part].strip(), f"{window['title']}: nothing written for '{part}'"
+    # A visitor who follows the tour has seen every page of the app.
+    assert {window["page"] for window in windows} == set(PAGES)
+
+
+def test_next_walks_through_every_window_and_finish_ends_the_tour(app_data):
+    from app.tour import steps
+
+    app = AppTest.from_file(str(ROOT / "app" / "main.py"), default_timeout=120)
+    app.session_state["tour_step"], app.session_state["tour_open"] = 0, True
+    app.run()
+    seen = []
+    for _ in range(len(steps()) + 1):
+        assert not app.exception, [error.value for error in app.exception]
+        forward = [button for button in app.button if button.label in ("Next", "Finish")]
+        if app.session_state["tour_step"] is None or not forward:
+            break
+        seen.append(app.title[0].value)  # the page the window opened on
+        forward[0].click().run()
+    assert len(seen) == len(steps()) and app.session_state["tour_step"] is None
+    assert {"Data quality", "Accounts", "Live demo", "Human console", "Pilot"} <= set(seen)
+
+
+def test_the_tour_greets_a_hosted_visitor_but_never_interrupts_a_local_demo(app_data, monkeypatch):
+    main = str(ROOT / "app" / "main.py")
+    monkeypatch.delenv("DSO_HOSTED", raising=False)
+    local = AppTest.from_file(main, default_timeout=120).run()
+    assert "Guided tour (3 minutes)" in [button.label for button in local.button]
+    assert "Next" not in [button.label for button in local.button]  # no window by itself
+
+    monkeypatch.setenv("DSO_HOSTED", "1")
+    hosted = AppTest.from_file(main, default_timeout=120).run()
+    assert "Next" in [button.label for button in hosted.button]  # the first window is open

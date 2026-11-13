@@ -2,8 +2,8 @@
 
 Run with:  uv run python run.py app      (opens http://localhost:8501)
 
-Each page is a file in app/views/. This file only sets up the navigation and puts
-the "synthetic data" banner on every page.
+Each page is a file in app/views/. This file only sets up the navigation, puts the
+"synthetic data" banner on every page, and shows the guided tour (app/tour.py).
 """
 
 import sys
@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # so pages can imp
 
 import streamlit as st  # noqa: E402
 
-from app import ui  # noqa: E402
+from app import tour, ui  # noqa: E402
 
 st.set_page_config(page_title="Digital Success OS (synthetic data)", layout="wide")
 
@@ -36,6 +36,7 @@ PAGES = {
 page = st.navigation(PAGES)
 ui.banner()
 if ui.data_is_ready():
+    tour.show()  # the guided tour's window or bar, when a tour is running
     page.run()
 else:
     st.title("Digital Success OS")

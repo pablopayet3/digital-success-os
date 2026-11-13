@@ -10,6 +10,11 @@ not watch a demo of it.
 **Sign-in details** for the Human console are sent to you separately. There is one
 password per role: CSM, Sales and Admin. They are never written in this repository.
 
+When you open the app, a guided tour starts: twelve short windows that explain each
+page, the tool and the team behind it at a real company, and what the role does there.
+It takes three minutes, and you can close it at any point. The button "Guided tour" in
+the sidebar starts it again.
+
 Everything below can be done on the hosted app. Nothing you do there can break
 anything: it is a shared demo, and an admin can reset it.
 
