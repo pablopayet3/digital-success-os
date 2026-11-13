@@ -35,6 +35,7 @@ PAGES = {
 
 page = st.navigation(PAGES)
 ui.banner()
+ui.option_hints()  # the meaning of each choice in a filter, when the pointer rests on it
 if ui.data_is_ready():
     tour.show(page.title)  # the guided tour's strip, when a tour is running
     page.run()

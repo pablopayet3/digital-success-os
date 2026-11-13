@@ -79,7 +79,9 @@ stops:
     group: true
     title: The pilot at a glance
     what: >
-      Five numbers describe the pilot today: the customers it covers, what they pay per
+      A pilot is a first trial on a limited group of customers, run to prove that the
+      approach works before it is extended to the others. Five numbers describe this pilot
+      today: the customers it covers, what they pay per
       year, how many need attention, how many are receiving a play, and how many handoffs
       are waiting for a person. Hover over the question mark beside a number for its
       definition.
@@ -184,15 +186,18 @@ stops:
     target: Revenue retained
     title: Revenue retained
     what: >
-      Of the yearly revenue of the customers who entered a play, the share still under
-      contract 30 days later. The line beneath gives the same figure for the holdout: the
-      similar customers deliberately left alone.
+      This number shows how much revenue the plays helped to keep. It takes the customers
+      who entered a play, adds up what they paid per year when they entered, and shows the
+      share they were still paying 30 days later. The line beneath gives the same share for
+      the holdout, a group of similar customers who were deliberately left alone.
     who: >
-      CS Leadership and Finance read it. Only the difference between the two groups can be
+      CS Leadership and the Finance team read it. They compare the customers in a play with
+      the customers left alone. Only the difference between those two groups can be
       credited to the plays.
     example: >
-      If both groups keep 95% of their revenue, the plays changed nothing, however good
-      95% looks.
+      Suppose that customers in a play kept 95% of their revenue and customers left alone
+      also kept 95%. Then the plays made no difference, even though 95% looks like a good
+      result.
 
   - page: overview
     target: Expansion from the plays

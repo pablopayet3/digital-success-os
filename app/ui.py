@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import time
 from pathlib import Path
@@ -104,8 +105,9 @@ def what_this_is() -> None:
     st.markdown(
         "**Three terms used on every page.** A *signal* is a warning sign or an opportunity "
         "found in a customer's data, such as a setup that has stalled. A *play* is the prepared "
-        "response to one signal. A *holdout* is a group of similar customers deliberately left "
-        "alone, so that the effect of a play can be measured."
+        "response to one signal, and a customer is *in a play* while it is receiving that "
+        "response. A *holdout* is a group of similar customers deliberately left alone, so "
+        "that the effect of a play can be measured."
     )
     terms_in_detail(job)
     st.subheader("The workflow, from signal to outcome")
@@ -197,6 +199,43 @@ def metric(column, label: str, value, *args, **kwargs) -> None:
     """Show a number with its definition: hovering over its question mark explains it."""
     kwargs.setdefault("help", define(label))
     column.metric(label, value, *args, **kwargs)
+
+
+def choices_help(label: str) -> str:
+    """The hover text of a filter's question mark: what it filters, then one line per choice."""
+    block = load_yaml("options.yaml")[label]
+    lines = [f"- **{choice}**: {meaning.strip()}" for choice, meaning in block["choices"].items()]
+    return block["about"].strip() + "\n\n" + "\n".join(lines)
+
+
+def choices_table(label: str) -> None:
+    """The choices of a filter as a small table: one per line, not one long sentence."""
+    block = load_yaml("options.yaml")[label]
+    st.caption(block["about"].strip())
+    table = [f"| {label} | What it means |", "|---|---|"]
+    table += [f"| `{choice}` | {meaning.strip()} |" for choice, meaning in block["choices"].items()]
+    st.markdown("\n".join(table))
+
+
+# The script that shows a choice's meaning when the pointer rests on it.
+HINTS = (Path(__file__).parent / "option_hints.html").read_text(encoding="utf-8")
+
+
+def option_hints() -> None:
+    """On every page: resting the pointer on a choice of a filter shows what it means.
+
+    The page library has no hover text for one choice of a list, so a short script adds it
+    (app/option_hints.html). The question mark beside the filter carries the same words
+    (choices_help), for someone who does not use a pointer.
+    """
+    hints = {
+        choice: meaning.strip()
+        for block in load_yaml("options.yaml").values()
+        for choice, meaning in block["choices"].items()
+    }
+    told = json.dumps(hints).replace("</", "<\\/")  # safe inside a script tag
+    with st.container(key="option_hints"):
+        st.html(HINTS.replace("__HINTS__", told), unsafe_allow_javascript=True)
 
 
 def job_intro(page: str) -> None:

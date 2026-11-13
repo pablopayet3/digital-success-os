@@ -18,8 +18,11 @@ ARR in the pilot: >
   The number of pilot customers whose health score is in the red band, which means they
   need attention. The health score runs from 0 to 100 and is explained on the Accounts page.
 In a play now: >
-  The number of customers currently receiving a prepared response, called a play. A play
-  starts with an email, moves to the AI agent, and reaches a person only when one is needed.
+  The number of customers who are in a play today. A customer is in a play when its data
+  showed a signal, it passed the rules for entry (it has agreed to be contacted, for
+  example), and the system has started sending it the response prepared for that signal:
+  an email first, then the AI agent, and a person only when one is needed. The customer
+  leaves the play when the goal is reached or the steps run out.
 Tasks open for people: >
   Handoffs waiting for a person. Each one is a to-do item for a success manager or for
   Sales, created when the automated steps could not, or must not, handle the matter.
@@ -47,9 +50,10 @@ Escalation conversion: >
   customer was kept, or a sales opportunity was found. It shows whether the escalations
   were worth a person's time.
 Revenue retained: >
-  Of the yearly revenue of customers who entered a play, the share still under contract 30
-  days later. It is shown next to the same figure for the holdout: similar customers who
-  were deliberately left alone.
+  The share of yearly revenue that customers in a play were still paying 30 days after they
+  entered it. The line beneath gives the same share for similar customers who were
+  deliberately left alone. Only the difference between the two can be credited to the
+  plays.
 Expansion from the plays: >
   New revenue won from customers within 30 days of entering a play, compared with similar
   customers who were deliberately left alone. The difference is what the plays may have

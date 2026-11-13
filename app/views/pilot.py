@@ -19,9 +19,10 @@ ui.job_intro("pilot")
 segments = load_yaml("rollout.yaml")["segments"]
 catalog = load_catalog()
 st.write(
-    f"The pilot runs on one group of customers: **{', '.join(segments)}**, the customers "
-    "with no named success manager. The pattern is proven there first. Extending it to "
-    "another group is then a change of configuration, not new software."
+    "A pilot is a first trial on a limited group of customers, run to prove that the "
+    "approach works before it is extended to the others. This pilot runs on one group of "
+    f"customers: **{', '.join(segments)}**, the customers with no named success manager. "
+    "Extending it to another group is then a change of configuration, not new software."
 )
 
 tiers = ui.query(

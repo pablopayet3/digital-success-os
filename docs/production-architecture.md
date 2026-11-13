@@ -98,7 +98,7 @@ flowchart TB
 | Databricks warehouse | **Real** | The whole pipeline ran on a Free Edition workspace: 100 of 100 data tests and the contract pass, and the numbers match DuckDB (ADR 0012). |
 | Postgres operational store | **Real** | The hosted app and API share a hosted Postgres database, seeded once at start-up. Every push also runs the store tests, the seeding and a day of the engine on a Postgres service in CI. |
 | CRM and CS platform sync | **Export only** | Endpoints return import-ready shapes. No live sync. |
-| CI, image build, daily scheduled run | **Real** | They run on GitHub Actions: tests on every push, an image with a demo world built in, a daily pipeline run that opens an issue on failure. |
+| CI, image build, daily scheduled run | **Real** | They run on GitHub Actions: tests on every push, an image with a demo world built in, a daily pipeline run that opens an issue on failure, and a request every five minutes that keeps the free hosted app awake during the day (ADR 0026). |
 | Hosting | **Real** | The app and the API run on a free host from the repository's blueprint, in stand-in mode, or with the real model when the owner puts a key in the host's dashboard (ADR 0024). |
 | Dashboards | **Streamlit** instead of a BI tool | One process, no licence. The gold tables are the interface a BI tool would read. |
 

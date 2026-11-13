@@ -93,9 +93,9 @@ the evaluation harness that the stand-in could never have shown (ADR 0017).
 
 ## See it without installing anything
 
-- **The app:** https://digital-success-os-app.onrender.com (free hosting: the first load can take a minute; the line at the top of every page says who answers as the agent: the real model when the host has a key, otherwise a labelled stand-in)
+- **The app:** https://digital-success-os-app.onrender.com (free hosting: a scheduled request keeps it awake from 06:00 to 22:00 US Eastern time, and at other hours the first load can take a minute, see ADR 0026; the line at the top of every page says who answers as the agent: the real model when the host has a key, otherwise a labelled stand-in)
 - **The API:** https://digital-success-os-api.onrender.com/health
-- **A guided tour opens by itself** on the hosted app: a small window in a corner that explains one metric or one section at a time, with a frame around it on the page: what it is, who uses it, and an example. Every number also has its definition as a hover text.
+- **A guided tour opens by itself** on the hosted app: a small window in a corner that explains one metric or one section at a time, with a frame around it on the page: what it is, who uses it, and an example. Every number has its definition as a hover text, and so does every choice in a filter.
 - **Try the whole loop yourself in five minutes:** [docs/reviewer-guide.md](docs/reviewer-guide.md). Make the agent hand you a task, pick it up in the Human console as Sales, close it, and see the system remember. The console's sign-in details are shared on request, never in this repository.
 - **The dashboard:** [Digital Success pilot on Tableau Public](https://public.tableau.com/views/DigitalSuccesspilotsyntheticdata/DigitalSuccesspilot_Syntheticdatafictionalcompany)
 
@@ -267,7 +267,7 @@ What each phase delivered, and three decisions to defend for each, is in
 
 ## What runs for real, and what has not been run yet
 
-Running on GitHub Actions: CI on every push (lint, 202 tests on Linux, the dbt build, a
+Running on GitHub Actions: CI on every push (lint, 208 tests on Linux, the dbt build, a
 secret scan), the container image build (it generates a demo world inside the image and
 publishes it), and the daily pipeline schedule, which opens an issue when a run fails.
 
@@ -319,5 +319,5 @@ experiments/  play results against holdouts
 api/ app/     FastAPI endpoints; the Streamlit app
 integrations/ the CRM sync
 docs/         operating documents, decision records, play specs, model cards
-tests/        202 tests; they generate a small world and run everything on it, every app page included
+tests/        208 tests; they generate a small world and run everything on it, every app page included
 ```

@@ -5,15 +5,18 @@ This page is for someone who was given the link and wants to test the system by 
 not watch a demo of it.
 
 **The app:** https://digital-success-os-app.onrender.com
-(free hosting: the first page can take a minute to wake up)
+
+The hosting is free, and a free service goes to sleep when nobody visits it. A scheduled
+request keeps the app awake from 06:00 to 22:00 US Eastern time. At other hours the first
+page can take a minute to appear.
 
 **Sign-in details** for the Human console are sent to you separately. There is one
 password per role: CSM, Sales and Admin. They are never written in this repository.
 
 When you open the app, a guided tour starts: a small window in a corner that explains
 one metric or one section at a time, and frames it on the page. Each stop says what the
-element is, who uses it, and gives an example. "Next page" skips ahead, and you can end
-the tour at any stop. The button "Guided tour" in the sidebar starts it again. Hovering
+element is, who uses it, and gives an example. "Next" moves to the following stop, and
+to the next page after the last stop of a page. You can end the tour at any stop. The button "Guided tour" in the sidebar starts it again. Hovering
 over the question mark beside any number gives its definition.
 
 Everything below can be done on the hosted app. Nothing you do there can break

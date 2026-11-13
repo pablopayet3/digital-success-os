@@ -239,7 +239,8 @@ Phases 6 to 9 additions:
   `CONSOLE_PASSWORD_CSM/SALES/ADMIN`; locally `demo` when unset; none when `DSO_HOSTED` is set.
 - `run.py demo [days] [--profile small]` builds everything from nothing.
 - `Dockerfile`, `docker-compose.yml`, `render.yaml`, `.github/workflows/deploy.yml`,
-  `.github/workflows/daily.yml`, `.github/pull_request_template.md`.
+  `.github/workflows/daily.yml`, `.github/workflows/keep-awake.yml`,
+  `.github/pull_request_template.md`.
 - Docs: `prd`, `roadmap`, `principles`, `ownership-map`, `change-control`,
   `data-requirements`, `pilot-plan`, `dependency-map`, `production-architecture`,
   `demo-script`, `portfolio-entry`. ADRs 0016 to 0018.
@@ -259,7 +260,7 @@ has run against a Developer Edition org (6 accounts, 6 tasks; a second run creat
 nothing), signed in through the browser with the vendor's command-line tool:
 `SALESFORCE_CLI_ORG=dso-demo` in `.env`, and `sf` must be on the PATH (it installs to
 `%APPDATA%\npm`, which this app's shell does not have on its PATH by default).
-202 tests in total.
+208 tests in total.
 
 After the phases (the brief read again line by line; see the last section of
 `docs/phase-notes.md`):
@@ -316,6 +317,12 @@ After the phases (the brief read again line by line; see the last section of
   stop's words, run the script again. The app only plays the files.
 - `config/glossary.yaml` and `ui.metric`: every number is drawn through `ui.metric`,
   which adds its definition as a hover text. A test fails for a number without one.
+- `config/options.yaml`, `app/option_hints.html` and `ui.option_hints` (ADR 0027): what
+  each choice of a filter means (coverage tier, lifecycle stage, health band, console
+  role, task outcome). A short script shows the meaning beside the choice under the
+  pointer; `ui.choices_help` puts the same words on the filter's question mark, and
+  `ui.choices_table` shows them as a table. A test fails for a choice without a meaning.
+  The script's file is read when `app/ui.py` is imported: restart the app after editing it.
 - The Overview's top (`ui.what_this_is`): what this is, three expanders (every signal,
   one play taken apart, how a holdout works), the workflow as cards, a guide to the
   pages. The Live demo opens with the message the system sent first, because the play
@@ -346,6 +353,14 @@ When a dbt model gains a column: add its meaning (the model's `.yml`, the contra
 Hosting: a Render blueprint from the public repository. Render redeploys both services
 on every push to `main` (seen in its deploy list as "Auto-Deploy"); a change to
 `render.yaml` itself needs "Manual sync" on the blueprint page and an approval there.
+
+Keeping the hosted app awake (ADR 0026): the free host stops the app after 15 minutes
+without a visitor, and the next first page then takes about a minute.
+`.github/workflows/keep-awake.yml` asks for the app's front page every five minutes from
+06:00 to 22:00 US Eastern Standard Time (the cron line is in UTC). The app and the API
+share 750 free running hours a month, and the host suspends both when they run out, so
+`tests/test_keep_awake.py` fails if the schedule would use more than 550. Only the app is
+kept awake. To stop it: disable the workflow in the Actions tab.
 
 Databricks: the prod pipeline has run on a Free Edition workspace (`DSO_ENV=prod uv run
 python run.py pipeline`): 100 of 100 tests, contract 14 of 14, numbers match DuckDB.

@@ -263,6 +263,12 @@ def test_every_tour_stop_points_at_something_that_is_on_its_page(app_data):
             assert stop["tab"] in shown[page], f"{page}: no tab called '{stop['tab']}'"
 
 
+def ui_name(page: str) -> str:
+    from app.ui import PAGE_NAMES
+
+    return PAGE_NAMES[page] if page != "overview" else "Digital Success OS"
+
+
 def test_the_tour_moves_stop_by_stop_and_page_by_page_and_can_be_ended(app_data):
     from app.tour import stops
 
@@ -276,13 +282,19 @@ def test_the_tour_moves_stop_by_stop_and_page_by_page_and_can_be_ended(app_data)
 
     press("Next")
     assert app.session_state["tour_step"] == 1 and app.title[0].value == "Digital Success OS"
-    # "Next page" jumps to the first stop of each following page, in the order of the menu.
-    seen = [app.title[0].value]
-    while not next(button for button in app.button if button.label == "Next page").disabled:
-        press("Next page")
-        seen.append(app.title[0].value)
-    assert {"Data quality", "Accounts", "Live demo", "Human console", "Pilot"} <= set(seen)
-    assert app.session_state["tour_step"] == len(stops()) - 1  # the closing stop
+    # "Next" on the last stop of a page opens the next page, in the order of the menu.
+    all_stops = stops()
+    # The last stop of the Overview's first run of stops (the closing stop is on it too).
+    last_on_overview = next(i for i, stop in enumerate(all_stops) if stop["page"] != "overview") - 1
+    app.session_state["tour_step"] = last_on_overview
+    app.run()
+    press("Next")
+    assert app.title[0].value == ui_name(all_stops[last_on_overview + 1]["page"])
+    # The last stop (on the Overview) says "Finish", and finishing ends the tour.
+    app = AppTest.from_file(str(ROOT / "app" / "main.py"), default_timeout=120)
+    app.session_state["tour_step"] = len(all_stops) - 1
+    app.run()
+    assert "Next page" not in [button.label for button in app.button]
     press("Finish")
     assert app.session_state["tour_step"] is None
     assert "Next" not in [button.label for button in app.button]
@@ -298,3 +310,53 @@ def test_the_tour_greets_a_hosted_visitor_but_never_interrupts_a_local_demo(app_
     monkeypatch.setenv("DSO_HOSTED", "1")
     hosted = AppTest.from_file(main, default_timeout=120).run()
     assert "Next" in [button.label for button in hosted.button]  # the first stop is showing
+
+
+def test_every_choice_of_a_filter_has_a_meaning_to_hover_over(app_data):
+    """A filter named in config/options.yaml must explain every choice it offers, and carry
+    the same words on its question mark."""
+    from common.config import load_yaml
+
+    meanings = load_yaml("options.yaml")
+    checked = 0
+    for page in PAGES:
+        view = str(ROOT / "app" / "views" / f"{page}.py")
+        app = AppTest.from_file(view, default_timeout=120).run()
+        for one in [*app.multiselect, *app.selectbox]:
+            if one.label not in meanings:
+                continue  # a list of accounts, tasks or documents, not a list of terms
+            assert one.help, f"{page}: '{one.label}' has no question mark"
+            for choice in one.options:
+                known = meanings[one.label]["choices"]
+                assert choice in known, f"{page}: '{one.label}' does not explain '{choice}'"
+                checked += 1
+    assert checked >= 15  # the three filters of the Accounts page and the console's roles
+
+
+def test_the_meanings_of_the_choices_agree_with_the_configuration():
+    from common.config import load_yaml
+
+    meanings = load_yaml("options.yaml")
+    # Every outcome a person can record is explained, and no other.
+    assert set(meanings["Outcome"]["choices"]) == set(load_yaml("routing.yaml")["outcomes"])
+    # The health bands in words use the thresholds the pipeline uses.
+    bands, words = load_yaml("health.yaml")["bands"], meanings["Health band"]["choices"]
+    assert f"{bands['green']} or more" in words["green"]
+    assert f"from {bands['yellow']} to {bands['green'] - 1}" in words["yellow"]
+    assert f"below {bands['yellow']}" in words["red"]
+    # Complete sentences, and none of the words the owner ruled out.
+    for block in meanings.values():
+        for meaning in [block["about"], *block["choices"].values()]:
+            assert meaning.strip().endswith("."), meaning
+            assert "cheap" not in meaning.lower() and " thing" not in meaning.lower(), meaning
+
+
+def test_the_script_that_shows_a_meaning_is_given_every_meaning(app_data):
+    from common.config import load_yaml
+
+    app = AppTest.from_file(str(ROOT / "app" / "main.py"), default_timeout=120).run()
+    assert not app.exception, [error.value for error in app.exception]
+    script = next(str(html.proto.body) for html in app.get("html") if "dsoOptionHints" in str(html.proto.body))
+    for block in load_yaml("options.yaml").values():
+        for choice in block["choices"]:
+            assert f'"{choice}"' in script, choice

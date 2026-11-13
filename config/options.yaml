@@ -1,0 +1,81 @@
+# Synthetic data, fictional company (Lumen Labs / Relay).
+#
+# What each choice in a filter or a list means. A visitor reads it by resting the pointer
+# on the choice (app/option_hints.html), or on the question mark beside the filter
+# (app/ui.py::choices_help). One block per filter, named exactly as the filter is labelled
+# on screen. One entry per choice, exactly as the choice is written on screen.
+# A test fails when a filter named here offers a choice that has no meaning here.
+#
+# How it is written: one or two complete sentences, every term defined, no jargon.
+
+Coverage tier:
+  about: A coverage tier is the level of human attention a customer receives.
+  choices:
+    high_touch: The customer has a named success manager.
+    pooled: The customer shares a team of success managers with other customers.
+    uncovered: The customer has no success manager. The pilot runs on these customers.
+
+# The rules, and the order in which they are applied, are in docs/metrics.md.
+Lifecycle stage:
+  about: >
+    A lifecycle stage says where a customer stands with the product. Every customer is in
+    exactly one stage, decided again each day by fixed rules.
+  choices:
+    onboarding: >
+      The customer signed up less than 30 days ago, or has finished fewer than 75% of the
+      setup steps.
+    adopting: >
+      The customer has finished setup and is still building the habit of using the product.
+    mature: >
+      The customer is at least 90 days old, and at least half of its assigned seats are
+      active this month.
+    expansion: >
+      The customer may need more seats: 90% or more of its seats are assigned, or the model
+      that predicts growth flags it.
+    renewal: A paying customer within 90 days of the anniversary of its contract.
+    at_risk: >
+      The customer may leave: the model that predicts cancellations flags it, or its
+      monthly active users have halved in 30 days.
+
+# The two thresholds are set in config/health.yaml. A test fails if they differ from here.
+Health band:
+  about: >
+    The health score runs from 0 to 100. It combines how much the product is used, how the
+    customer responds to messages, its survey answers, its support tickets and its seats.
+    The band is that score read as a colour.
+  choices:
+    green: A health score of 70 or more. The customer is doing well.
+    yellow: A health score from 50 to 69. The customer is worth watching.
+    red: A health score below 50. The customer needs attention.
+
+Role:
+  about: A role decides which tasks a person sees. Each team works its own queues.
+  choices:
+    CSM: >
+      A customer success manager. Sees the tasks for the shared success team, for Support,
+      for the research of a missing contact, and the customer replies that a person must
+      read.
+    Sales: >
+      A salesperson who owns accounts. Sees only the tasks sent to Sales, such as a
+      customer who asked for a price.
+    Admin: The administrator of this system. Sees the tasks of every team.
+
+# What happens next for each outcome is set in config/routing.yaml (`next_state`).
+Outcome:
+  about: >
+    The outcome is what the person records when closing a task. It tells the system what
+    to do next with the customer.
+  choices:
+    resolved: The problem is solved. The customer goes back into the play's journey.
+    saved: >
+      A customer who was about to leave has stayed. The customer goes back into the play's
+      journey.
+    expansion_opportunity: >
+      There is a real opportunity to sell more. Sales takes the customer from here, and the
+      automated journey stops.
+    not_a_fit: >
+      There is no opportunity, or no way to help. The journey ends for this customer.
+    no_response: The customer could not be reached. The journey ends for this customer.
+    agent_should_have_handled: >
+      A person was not needed. The conversation becomes a test case for the AI agent, and
+      the customer goes back into the play's journey.

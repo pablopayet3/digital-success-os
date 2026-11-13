@@ -23,7 +23,13 @@ if guide.exists():
         st.markdown("\n".join(steps))
 segments = load_yaml("rollout.yaml")["segments"]
 in_pilot = "coverage_tier IN (" + ", ".join(f"'{s}'" for s in segments) + ")"
-st.caption(f"Simulated today: {ui.today()}. Pilot segment: {', '.join(segments)}.")
+# "Pilot" is defined here, where the page first uses the word.
+st.markdown(
+    "**The pilot.** A pilot is a first trial on a limited group of customers, run to prove "
+    "that the approach works before it is extended to the others. This pilot covers the "
+    "customers with no assigned success manager."
+)
+st.caption(f"Simulated today: {ui.today()}. Coverage tier in the pilot: {', '.join(segments)}.")
 
 accounts = ui.query(
     f"""
@@ -56,13 +62,15 @@ ui.metric(five, "Tasks open for people", open_tasks)
 one.caption("Customers with no assigned success manager")
 two.caption("Annual recurring revenue: what these customers pay per year")
 three.caption("Customers whose health score says they need attention")
-four.caption("Customers currently receiving a prepared response")
+four.caption("Customers who showed a signal and are receiving the response prepared for it")
 five.caption("Handoffs waiting for a success manager or for Sales")
 
 st.subheader("The measures the pilot is run on")
 st.caption(
-    "Each measure is defined once, with its formula and its source table, in "
-    "`docs/metrics.md`. The first three cover every customer in the pilot. Only the last "
+    "These measures show whether the pilot, the first trial of this system on a limited "
+    "group of customers, is working. Each measure is defined once, with its formula and its "
+    "source table, in `docs/metrics.md`. The first three cover every customer in the pilot. "
+    "Only the last "
     "two compare customers in a play with customers deliberately left alone."
 )
 
@@ -158,8 +166,9 @@ else:
         second[2],
         "Revenue retained",
         ui.pct(kept["treatment"], 1),
-        "Revenue still under contract 30 days after entering a play. Customers left alone "
-        f"for comparison: {ui.pct(kept['holdout'], 1)}",
+        "Of the yearly revenue of the customers who entered a play, the share they were "
+        "still paying 30 days later. For similar customers left alone for comparison, "
+        f"the share was {ui.pct(kept['holdout'], 1)}",
     )
     sales = money[money["metric"] == "expanded_30d"]
     won = {arm: sales[f"expansion_won_{arm}"].sum() for arm in ("treatment", "holdout")}
@@ -200,11 +209,7 @@ for column, (label, value) in zip(slots, counts.items(), strict=False):
 left, right = st.columns(2)
 with left:
     st.subheader("Health by coverage tier")
-    st.caption(
-        "A coverage tier is the level of human attention a customer receives. high_touch: a "
-        "named success manager. pooled: a shared team of success managers. uncovered: no "
-        "success manager. The pilot runs on the uncovered customers."
-    )
+    ui.choices_table("Coverage tier")  # one tier per line, with what it means
     health = ui.query(
         "SELECT coverage_tier, health_band, count(*) AS accounts FROM gold.account_current "
         "GROUP BY coverage_tier, health_band"

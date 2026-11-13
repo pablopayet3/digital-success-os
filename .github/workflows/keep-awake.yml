@@ -1,0 +1,50 @@
+# Keeps the hosted app awake during the day. Synthetic data, fictional company.
+# See docs/decisions/0026 for why, and for what it uses of the host's free hours.
+#
+# The free host puts the app to sleep after 15 minutes without a visitor, and the next
+# visitor then waits about a minute for the first page. This workflow asks for the app's
+# front page every five minutes, from 06:00 to 22:00 US Eastern Standard Time (11:00 to
+# 03:00 UTC; one hour later on the clock in summer), so a visitor finds it running.
+#
+# To stop it: the Actions tab > "Keep the hosted app awake" > "Disable workflow".
+# To change the hours: the hour field of the cron line. tests/test_keep_awake.py fails
+# if the new hours would not fit in the host's free allowance.
+name: Keep the hosted app awake
+
+on:
+  schedule:
+    # Minutes 3, 8, ... 58 of each hour. Scheduled runs start late most often at the start
+    # of an hour, so the schedule avoids minute 0.
+    - cron: "3-58/5 11-23,0-2 * * *"
+  workflow_dispatch:
+
+# The job reads nothing from the repository and writes nothing to it.
+permissions: {}
+
+# One request at a time: a run that starts late does not pile up on the one before it.
+concurrency:
+  group: keep-awake
+  cancel-in-progress: false
+
+env:
+  APP_URL: https://digital-success-os-app.onrender.com/
+
+jobs:
+  ping:
+    name: Ask for the app's front page
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: One request, with time to wake the app if it was asleep
+        run: |
+          # A sleeping app takes about a minute to answer, so the request may wait three.
+          answer=$(curl --silent --output /dev/null \
+            --write-out "%{http_code} in %{time_total} seconds" \
+            --max-time 180 "$APP_URL" || true)
+          echo "The app answered: $answer"
+          # A bad answer is a warning, not a failed run: a failed scheduled run sends an
+          # email, and twelve an hour would be noise while the host is having trouble.
+          case "$answer" in
+            200*) ;;
+            *) echo "::warning::The hosted app did not answer with 200 ($answer)." ;;
+          esac

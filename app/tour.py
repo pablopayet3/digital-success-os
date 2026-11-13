@@ -92,8 +92,6 @@ def _end() -> None:
 def _window(index: int) -> None:
     all_stops = stops()
     stop, last = all_stops[index], index == len(all_stops) - 1
-    # The first stop of the next page, for a visitor who wants to move faster.
-    later = [i for i in range(index + 1, len(all_stops)) if all_stops[i]["page"] != stop["page"]]
     with st.container(key="tour_card"):
         st.caption(
             f"Guided tour · {ui.PAGE_NAMES[stop['page']]} · stop {index + 1} of {len(all_stops)}"
@@ -112,10 +110,7 @@ def _window(index: int) -> None:
             if last:
                 _end()
             _go(index + 1)
-        skip, end = st.columns(2)
-        if skip.button("Next page", type="tertiary", disabled=not later, width="stretch"):
-            _go(later[0])
-        if end.button("End the tour", type="tertiary", width="stretch"):
+        if st.button("End the tour", type="tertiary", width="stretch"):
             _end()
         # Scroll to the element only when the stop has changed, not on every redraw.
         moved = st.session_state.get("tour_drawn") != index

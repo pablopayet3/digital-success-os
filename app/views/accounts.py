@@ -15,12 +15,17 @@ tiers = tier.multiselect(
     "Coverage tier",
     ["uncovered", "pooled", "high_touch"],
     default=["uncovered"],
-    help="A coverage tier is the level of human attention a customer receives. high_touch: the customer has a named success manager. pooled: the customer shares a team of success managers. uncovered: the customer has no success manager. The pilot runs on the uncovered customers.",
+    help=ui.choices_help("Coverage tier"),
 )
+# Each choice also shows its meaning when the pointer rests on it (ui.option_hints).
 stages = stage.multiselect(
-    "Lifecycle stage", ["onboarding", "adopting", "mature", "expansion", "renewal", "at_risk"]
+    "Lifecycle stage",
+    ["onboarding", "adopting", "mature", "expansion", "renewal", "at_risk"],
+    help=ui.choices_help("Lifecycle stage"),
 )
-bands = band.multiselect("Health band", ["green", "yellow", "red"])
+bands = band.multiselect(
+    "Health band", ["green", "yellow", "red"], help=ui.choices_help("Health band")
+)
 
 accounts = ui.query(
     """

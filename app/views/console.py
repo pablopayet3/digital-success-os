@@ -81,7 +81,7 @@ def show_task(task, packet: dict) -> None:
 if "console_role" not in st.session_state:
     st.write("Sign in to work a queue. Each role sees the queues it owns.")
     with st.form("login"):
-        role = st.selectbox("Role", list(ROLE_QUEUES))
+        role = st.selectbox("Role", list(ROLE_QUEUES), help=ui.choices_help("Role"))
         password = st.text_input("Password", type="password")
         if st.form_submit_button("Sign in"):
             expected = password_for(role)
@@ -185,11 +185,9 @@ st.caption(
 )
 outcomes = catalog.routing["outcomes"]
 with st.form("resolve"):
-    outcome = st.selectbox(
-        "Outcome",
-        list(outcomes),
-        format_func=lambda key: f"{key}: journey will {outcomes[key]['next_state']}",
-    )
+    # What each outcome means, and what the system does next, is in config/options.yaml:
+    # on the question mark, and on each choice when the pointer rests on it.
+    outcome = st.selectbox("Outcome", list(outcomes), help=ui.choices_help("Outcome"))
     notes = st.text_area("Notes", placeholder="What happened, in a sentence or two.")
     if st.form_submit_button("Resolve"):
         result = resolve_cta(

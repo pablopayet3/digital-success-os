@@ -715,12 +715,19 @@ missing or only half there. This section is what closed them.
   element it explains. Each stop says what it is, who uses it, and gives an example.
   Each stop can be read by a recorded voice (`scripts/tour_voice.py`, ADR 0025).
 - **A definition behind every number** (`config/glossary.yaml`), as a hover text.
+- **A definition behind every choice of a filter** (`config/options.yaml`, ADR 0027):
+  resting the pointer on `pooled`, `at_risk` or `yellow` says what it means. The word
+  "pilot" is defined on the Overview and on the Pilot page, where it is first used.
 - **A hands-on path for reviewers** (`docs/reviewer-guide.md`) and an admin reset of the
   shared hosted data, so several people can try it without spoiling it for the next.
+- **The hosted app is kept awake during the day** (`.github/workflows/keep-awake.yml`,
+  ADR 0026): a request every five minutes from 06:00 to 22:00 US Eastern time, so a
+  reviewer does not wait a minute for the first page. A test keeps the schedule inside
+  the host's free hours.
 - **A picture of every page** in `docs/screenshots/`.
 - **Every page of the app is run by a test** on the small world (`tests/test_app.py`),
   and again with the internet blocked, which is the offline promise as a test.
-  202 tests in total.
+  208 tests in total.
 
 ### How to run
 
@@ -785,3 +792,8 @@ uv run --group notebook jupyter nbconvert --to notebook --execute --inplace anal
 - `0020-pilot-readiness-answered-from-data`
 - `0021-a-generated-data-dictionary-with-a-tested-glossary`
 - `0022-diagrams-drawn-in-the-app-without-the-network`
+- `0023-the-tour-read-aloud-by-the-browser`
+- `0024-the-real-model-on-the-public-demo-when-its-host-has-a-key`
+- `0025-a-tour-of-every-element-with-a-recorded-voice`
+- `0026-the-hosted-app-kept-awake-by-a-scheduled-request`
+- `0027-the-meaning-of-each-choice-in-a-filter-shown-on-hover`

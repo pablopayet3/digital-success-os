@@ -1,0 +1,47 @@
+<!-- Synthetic data, fictional company. What a choice in a filter means, shown when the
+     pointer rests on it (app/ui.py::option_hints, ADR 0027). The page library draws the
+     choices of a filter itself and has no hover text for one choice, so this short script
+     adds it. __HINTS__ is replaced by {choice: meaning}, from config/options.yaml. -->
+<style>
+  /* This element only carries the script. It takes no room on the page. */
+  .st-key-option_hints { display: none; }
+</style>
+<script>
+(() => {
+  // The page runs this script again each time it redraws. The words are refreshed each
+  // time; the small window and its listeners are set up once.
+  const first = !window.dsoOptionHints;
+  window.dsoOptionHints = __HINTS__;
+  if (!first) return;
+
+  const tip = document.createElement("div");
+  tip.style.cssText =
+    "position: fixed; z-index: 2000000; display: none; pointer-events: none;" +
+    "max-width: 20rem; padding: 0.5rem 0.7rem; border-radius: 0.5rem;" +
+    "background: #1c2330; color: #f4f6fa; font-size: 0.82rem; line-height: 1.4;" +
+    "border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);";
+  document.body.appendChild(tip);
+
+  // A choice in an open list, or a choice already picked, which the page draws as a small
+  // tag. A tag also holds its "remove" button, so its words are read from its label.
+  const CHOICE = '[role="option"], [data-tag]';
+  const wordsOf = (choice) =>
+    (choice.getAttribute("aria-label") || choice.textContent || "").trim();
+
+  document.addEventListener("mouseover", (event) => {
+    const choice = event.target.closest ? event.target.closest(CHOICE) : null;
+    const meaning = choice && window.dsoOptionHints[wordsOf(choice)];
+    if (!meaning) { tip.style.display = "none"; return; }
+    tip.textContent = meaning;
+    tip.style.display = "block";
+    // Beside the choice when there is room, otherwise under it.
+    const box = choice.getBoundingClientRect();
+    const beside = box.right + 12 + tip.offsetWidth < window.innerWidth;
+    tip.style.left = (beside ? box.right + 12 : Math.max(8, box.left)) + "px";
+    tip.style.top = (beside ? box.top : box.bottom + 6) + "px";
+  });
+  // The window never stays behind when the list scrolls or closes.
+  document.addEventListener("scroll", () => { tip.style.display = "none"; }, true);
+  document.addEventListener("mousedown", () => { tip.style.display = "none"; }, true);
+})();
+</script>
