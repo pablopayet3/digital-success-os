@@ -14,7 +14,9 @@ catalog = load_catalog()
 
 st.subheader("The play catalog")
 st.caption(
-    "Plays are configuration (`config/plays.yaml`). Consent, frequency caps and holdouts are enforced by the engine for all of them."
+    "Each play is a few lines of configuration, not software. The system enforces three "
+    "rules for every play: the customer has agreed to be contacted, no customer is "
+    "contacted more than twice a week, and a share of customers is held out for comparison."
 )
 st.dataframe(
     pd.DataFrame(
@@ -46,8 +48,9 @@ if results.empty:
     st.stop()
 
 st.caption(
-    f"As of {results['as_of'][0]}. This is a simulation: any lift comes from the assumptions in "
-    "`config/sim_effects.yaml`. What is real is the measurement."
+    f"As of {results['as_of'][0]}. The customers are simulated, so any improvement shown here "
+    "comes from the simulation's assumptions. The method of measurement is what a real "
+    "pilot would use."
 )
 table = results.assign(
     treatment=[
@@ -79,7 +82,9 @@ st.dataframe(
 measured = results.dropna(subset=["lift"])
 if len(measured):
     st.write(
-        "**Lift on the success metric, with its 95% interval.** An interval that crosses zero means the play may have done nothing."
+        "**The improvement on each play's measure of success, with its margin of error.** Lift is "
+    "the difference between customers in the play and customers held out. A margin that "
+    "crosses zero means the play may have achieved nothing."
     )
     base = alt.Chart(measured).encode(y=alt.Y("play_name:N", title=None, sort=None))
     # Colours are set by hand so the interval and the zero line show on a dark page too.
@@ -110,7 +115,9 @@ st.write(f"**Success metric:** {play.success_metric['description']}")
 st.write(f"**Verdict:** {row['verdict']}  \n**Recommendation:** {row['recommendation']}")
 if pd.notna(row["detectable_lift"]):
     st.caption(
-        f"Smallest lift this sample could detect: about {row['detectable_lift']:.0%}. Split as designed: {'yes' if row['srm_ok'] else 'NO'}."
+        f"The smallest improvement this number of customers could reveal: about "
+        f"{row['detectable_lift']:.0%}. Customers divided between the two groups as designed: "
+        f"{'yes' if row['srm_ok'] else 'NO'}."
     )
 
 left, right = st.columns(2)
@@ -128,7 +135,8 @@ with left:
         use_container_width=True,
     )
     st.caption(
-        "Read from the journey's own event log. A branch can skip a step, so a later step is not always smaller than the one before."
+        "Counted from the journey's own record of events. A customer can skip a step, so a "
+        "later step is not always smaller than the one before it."
     )
 with right:
     st.write("**How the journeys ended**")
@@ -142,7 +150,8 @@ with right:
 
 left, right = st.columns(2)
 with left:
-    st.write("**By the week accounts entered** (one odd week cannot hide in the average)")
+    st.write("**Results by the week customers entered** (so that one unusual week cannot hide in "
+        "the average)")
     try:
         weeks = ui.query(
             f"SELECT * FROM gold.experiment_cohorts WHERE play_id = '{play.id}' ORDER BY week_starting"
@@ -201,7 +210,7 @@ with right:
 
 left, right = st.columns(2)
 with left:
-    st.write("**Intervention ladder** (results by the highest rung an account reached)")
+    st.write("**The ladder of help** (results by the highest step a customer reached)")
     ladder = ui.query(
         f"""
         SELECT highest_tier AS rung, accounts, successes

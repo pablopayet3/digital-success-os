@@ -13,9 +13,11 @@ from common.paths import ROOT
 st.title("Agents")
 ui.job_intro("agent")
 st.write(
-    "Two agents. The **onboarding agent** answers setup questions from the help centre and "
-    "hands off when a hard rule says so. The **mailbox triage agent** reads every reply in the "
-    "shared mailbox: a model labels it, rules decide what happens."
+    "This page covers two AI agents. The **onboarding agent** answers customers' setup "
+    "questions from the help centre, and passes the customer to a person whenever a rule "
+    "written in code requires it. The **mailbox triage agent** reads every reply that "
+    "lands in the shared mailbox: a model labels the reply, and rules decide what happens "
+    "to it."
 )
 
 conversations = ui.rows("SELECT * FROM conversations ORDER BY day DESC, conversation_id DESC")
@@ -56,7 +58,9 @@ with tab_conversations:
         with right:
             st.write("**Who decided to hand off**")
             st.caption(
-                "hard_rule: code stopped it. agent: the model asked for a person. failure: a tool or the model was unavailable."
+                "Who decided the handoff. hard_rule: a rule written in code stopped the conversation "
+            "before the model could answer. agent: the model itself asked for a person. "
+            "failure: a tool or the model was unavailable, so a person took over."
             )
             st.dataframe(
                 escalated.groupby("escalated_by").size().reset_index(name="handoffs"),
@@ -115,7 +119,8 @@ with tab_mailbox:
         st.info("Nothing triaged yet.")
     else:
         st.write(
-            "**What happened to each reply.** The model proposes an intent; `config/routing.yaml` decides the action."
+            "**What happened to each reply.** The model proposes what the customer wants. A table "
+        "of rules, kept as configuration, decides the action."
         )
         st.dataframe(
             triage.groupby(["intent", "action"]).size().reset_index(name="replies"),
@@ -128,8 +133,9 @@ with tab_mailbox:
 
 with tab_feedback:
     st.write(
-        "A score says how unhappy a customer is. The comment says why. A small model reads "
-        "each recent NPS comment and high-priority ticket once and labels its sentiment and theme."
+        "A survey score says how unhappy a customer is. The comment says why. A small AI model "
+        "reads each recent survey comment and each high-priority support ticket once, and "
+        "labels its sentiment and its theme."
     )
     feedback = ui.rows(
         "SELECT kind, sentiment, theme, count(*) AS texts FROM text_classifications GROUP BY kind, sentiment, theme"
@@ -152,7 +158,8 @@ with tab_feedback:
             )
             st.dataframe(ranked, hide_index=True, width="stretch")
             st.caption(
-                "This is the list a play owner reads before writing the next play, and the list Product hears about."
+                "The owner of a play reads this list before designing the next play, and the Product "
+            "team hears about the themes that recur."
             )
         st.caption(
             f"{int(feedback['texts'].sum())} texts classified: NPS comments and high-priority tickets from the last 30 days of each run."
@@ -244,6 +251,8 @@ with tab_review:
 
 with tab_prompts:
     st.write(
-        "Prompts are versioned like code. The changelog says what changed and why; the evals compare versions on the same cases."
+        "The agent's instructions, called prompts, are kept in versions, as code is. The change "
+        "log records what changed and why, and the evaluation compares the versions on the "
+        "same test conversations."
     )
     st.markdown((ROOT / "prompts" / "CHANGELOG.md").read_text(encoding="utf-8"))

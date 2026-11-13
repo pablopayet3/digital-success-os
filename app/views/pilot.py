@@ -19,9 +19,9 @@ ui.job_intro("pilot")
 segments = load_yaml("rollout.yaml")["segments"]
 catalog = load_catalog()
 st.write(
-    f"The pilot runs on one segment: **{', '.join(segments)}** accounts, the ones with no "
-    "named success manager. Prove the pattern there, then scale it by changing configuration, "
-    "not code."
+    f"The pilot runs on one group of customers: **{', '.join(segments)}**, the customers "
+    "with no named success manager. The pattern is proven there first. Extending it to "
+    "another group is then a change of configuration, not new software."
 )
 
 tiers = ui.query(
@@ -33,7 +33,9 @@ st.dataframe(tiers, hide_index=True, width="stretch")
 
 st.subheader("Readiness checklist")
 st.caption(
-    "The checklist of the pilot plan, answered from live data each time this page loads, not ticked by hand. A play moves from a slice to a full test only when every line holds."
+    "Each line is answered from live data every time this page opens. Nobody ticks it by "
+    "hand. A play moves from a small slice of customers to a full test only when every line "
+    "holds."
 )
 checks = readiness_checks(ui.data_dir())
 ready = sum(check["passed"] for check in checks)
@@ -47,7 +49,9 @@ else:
 
 st.subheader("Rollout stage of each play")
 st.caption(
-    "slice = 10% of eligible accounts, to check nothing breaks. full = every eligible account, split into treatment and holdout."
+    "A slice is 10% of the customers who qualify, to confirm that nothing breaks. A full test "
+    "is every customer who qualifies, divided between those who receive the play and those "
+    "held out for comparison."
 )
 try:
     results = ui.query(
@@ -74,7 +78,9 @@ st.dataframe(stages.drop(columns="play_id"), hide_index=True, width="stretch")
 
 st.subheader("Results per rung of the intervention ladder")
 st.caption(
-    "Digital first, an agent next, a person last. Each play is read on its own success metric. Accounts that reach the human rung are the harder cases."
+    "Help is tried in order: a digital message first, the AI agent next, a person last. Each "
+    "play is judged on its own measure of success. The customers who reach a person are "
+    "the harder cases, so their results are not comparable with the others."
 )
 metric_of = {play.id: play.success_metric["id"] for play in catalog.plays}
 ladder = ui.query(
@@ -97,7 +103,8 @@ st.dataframe(handoffs, hide_index=True, width="stretch")
 
 st.subheader("Handoff quality")
 st.caption(
-    "A handoff is only worth making if a person picks it up in time and it ends well. Definitions: `docs/metrics.md`, Human-fallback metrics."
+    "A handoff is worth making only if a person picks it up in time and it ends well. Hover "
+    "over a number for its definition."
 )
 quality = ui.query(
     """
@@ -149,7 +156,9 @@ for column, (label, (value, note)) in zip(st.columns(6), measures.items(), stric
 
 st.subheader("Weekly review notes")
 st.caption(
-    "One row per week of the pilot. The note is written by a rule from the same numbers, so it cannot flatter. In a real review the play owners add the decisions they took."
+    "One row for each week of the pilot. The note is produced by a rule from the same "
+    "numbers, so it cannot flatter the result. In a real review, the owners of the plays "
+    "add the decisions they took."
 )
 notes = pd.DataFrame(weekly_notes(ui.data_dir()))
 if notes.empty:
@@ -179,7 +188,9 @@ for segment in [tier for tier in ("pooled",) if tier not in segments]:
     preview = pd.DataFrame(scaling_preview(segment, ui.today()))
     st.write(f"**Preview: what adding `{segment}` would do today**")
     st.caption(
-        "The same rules engine, run now on one more segment, without writing anything (`engine/rules.py::preview_segment`). It shows day one only: later rungs of each ladder add tasks in the weeks after."
+        "The same rules, applied today to one more group of customers, without changing "
+        "anything. It shows the first day only: the later steps of each play add tasks in the "
+        "weeks that follow."
     )
     shown = preview.drop(columns="play_id").rename(columns=lambda name: name.replace("_", " "))
     st.dataframe(shown, hide_index=True, width="stretch")

@@ -26,7 +26,8 @@ three.caption("Freshness: each source delivered its data on time")
 
 st.subheader("What the pipeline caught")
 st.caption(
-    "The generator injects these problems on purpose, and records what it injected, so tests can prove they were caught."
+    "This demo plants known problems in its own data, and records what it planted, so that "
+    "the checks can be shown to catch every one."
 )
 st.dataframe(ui.query("SELECT * FROM gold.dq_summary"), hide_index=True, width="stretch")
 
@@ -38,7 +39,8 @@ with left:
     )
     st.bar_chart(rejected, x="reason", y="rows", horizontal=True)
     st.caption(
-        "Rejected rows are kept in a dead-letter table with the reason. Nothing is silently dropped."
+        "A rejected record is kept in a separate table, with the reason it was rejected. "
+        "Nothing is silently discarded."
     )
 with right:
     st.subheader("Freshness")

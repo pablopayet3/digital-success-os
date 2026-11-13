@@ -8,6 +8,7 @@ from agents.llm import get_llm
 from agents.onboarding import converse, scripted
 from agents.runner import hand_off, record_conversation
 from app import ui
+from common.config import load_yaml
 from engine.catalog import load_catalog
 from engine.channels import render_template
 from engine.context import load_day, records
@@ -144,8 +145,10 @@ with tab_chat:
             )
         else:
             in_play = f"This account is in the play (treatment; journey {enrolment['status']})."
+        # The signal by its plain name, as the Overview lists it.
+        plain = {item["id"]: item["name"] for item in load_yaml("job.yaml")["signals"]}
         st.info(
-            f"**Signal firing today:** `{signal}`. {evidence[signal]}\n\n"
+            f"**Signal firing today:** {plain.get(signal, signal)}. {evidence[signal]}\n\n"
             f"**Play it triggers:** {play.name} ({ladder}). {where}\n\n{in_play}"
         )
         first_message(play, account_id, evidence[signal], enrolment)
@@ -218,9 +221,10 @@ with tab_chat:
 
 with tab_day:
     st.write(
-        "One simulated day: customers react to yesterday's touches, new telemetry lands, the "
-        "pipeline rebuilds the tables, staff work their queues, the mailbox is triaged, the "
-        "rules engine enrols accounts and the journeys deliver today's steps. About 30 seconds."
+        "One simulated day, in order: customers react to yesterday's messages, new usage data "
+        "arrives, the pipeline rebuilds the tables, staff work their queues, the shared mailbox "
+        "is sorted, the rules put customers into plays, and the journeys deliver the day's "
+        "steps. It takes about 30 seconds."
     )
     st.caption(f"Simulated today: {ui.today()}")
     if "offline" in get_llm().mode:
