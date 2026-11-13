@@ -296,6 +296,39 @@ stops:
       A day with no messages at all means that a journey has stopped. Someone should find
       out why.
 
+  # --- Ask the data -----------------------------------------------------------------------
+  - page: ask
+    target: Example questions, by team
+    title: Ask the data
+    what: >
+      On this page, anyone can ask a question about the data and get an answer in plain
+      words. Claude, an AI model, answers it. It reads the warehouse with read-only queries
+      and searches the program's documents. Every number in its answer comes from that data,
+      and each answer shows the queries and documents it used. Select an example question
+      to try it.
+    who: >
+      Every team asks questions like these each week. CS Leadership asks which customers
+      are at risk, the Sales team asks who is running out of seats, and the Data Engineering
+      team asks whether a test failed. Without this page, each question waits for an analyst.
+    example: >
+      Ask "Which customers are close to using all of their seats?" Claude queries the main
+      table, lists the customers, and names the table it used.
+
+  - page: ask
+    target: Talk to the assistant
+    title: Talk to the assistant
+    what: >
+      The same assistant also answers out loud. Press Talk and ask your question. The voice
+      listens all the time, answers as it speaks, and stops as soon as you speak over it,
+      like a phone call. A voice service listens and speaks, and Claude finds each answer,
+      which also appears in full on the screen.
+    who: >
+      A team leader can ask a question in the middle of a meeting without opening a
+      dashboard.
+    example: >
+      Say "How many tasks are waiting for the Sales team?" The voice says the number in a
+      sentence, and the full answer appears below it.
+
   # --- Data quality ---------------------------------------------------------------------
   - page: quality
     target: Data tests passing

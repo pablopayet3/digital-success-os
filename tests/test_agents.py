@@ -94,10 +94,13 @@ def test_cost_comes_from_tokens_and_the_price_list(tmp_path):
 
 def test_models_come_from_config_and_only_the_agent_gets_the_stronger_one():
     roles = get_llm().config["roles"]
-    assert {role["model"] for name, role in roles.items() if name != "agent"} == {
-        "claude-haiku-5-5"
-    }
+    # The "Ask the data" assistant writes SQL for visitors, so it gets the middle model
+    # (ADR 0028). Every background job stays on the small one.
+    assert {
+        role["model"] for name, role in roles.items() if name not in ("agent", "assistant")
+    } == {"claude-haiku-5-5"}
     assert roles["agent"]["model"] != "claude-haiku-5-5"
+    assert roles["assistant"]["model"] not in ("claude-haiku-5-5", roles["agent"]["model"])
 
 
 # --- Retrieval ---------------------------------------------------------------------------

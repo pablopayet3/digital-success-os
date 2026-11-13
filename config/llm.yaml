@@ -18,7 +18,13 @@ roles:
     effort: low
     max_tokens: 4000
     refusal_fallback: true    # if the model declines, the API retries on a fallback model
-  # Everything else uses the small, cheap model.
+  # The "Ask the data" assistant (ADR 0028): it writes SQL and reads documents, so it gets
+  # the middle model. Its spend counts against the same budget as the agent.
+  assistant:
+    model: claude-sonnet-5-5
+    effort: low
+    max_tokens: 3000
+  # Everything else uses the small model.
   classifier:
     model: claude-haiku-5-5
     effort: low
@@ -39,6 +45,7 @@ roles:
 # Which version of each prompt is in use (files in prompts/, history in prompts/CHANGELOG.md).
 prompt_versions:
   onboarding_agent: v3
+  assistant: v1
 
 # US dollars per million tokens, used to track spend against the budget.
 # Source: Anthropic's published API prices (checked November 2026). Update when they change.

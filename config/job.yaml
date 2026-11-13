@@ -80,7 +80,7 @@ lines:
     plain: >
       The models estimate which customers are at risk of leaving and which are ready to
       buy more. Each estimate comes with the evidence behind it.
-    pages: [accounts]
+    pages: [accounts, ask]
 
   - line: AI-agent signal design
     asks: >
@@ -156,6 +156,10 @@ pages:
   operating: >
     This page holds the working documents of the program: who owns what, which decisions
     were taken and why, what each team depends on, and how a decision can be changed.
+  ask: >
+    This page answers questions about the data and the program, typed or spoken. Claude,
+    an AI model, reads the warehouse and the documents to answer, and shows how it found
+    each answer. Example questions are grouped by team.
 
 # The workflow on the Overview page: each step and the team accountable for it.
 workflow:

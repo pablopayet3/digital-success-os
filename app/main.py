@@ -20,7 +20,7 @@ st.set_page_config(page_title="Digital Success OS (synthetic data)", layout="wid
 # The menu follows the order of the work: data, then models, then the responses, then
 # how it is run. The names are in app/ui.py, so the tour and the pages use the same ones.
 MENU = {
-    "Start here": ["overview"],
+    "Start here": ["overview", "ask"],
     "1. Data and models": ["quality", "accounts"],
     "2. Journeys, AI agent, handoffs": ["plays", "demo", "agent", "console"],
     "3. Pilot, ownership, decisions": ["pilot", "operating"],

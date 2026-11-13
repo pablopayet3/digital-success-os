@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 
 STAND_IN_MODEL = "stand-in (keyword rules, not an LLM)"
 
@@ -40,11 +41,39 @@ def stand_in_transport(request: dict) -> dict:
         return _text(json.dumps({"results": [classify(item) for item in items]}))
     if schema and "verdict" in schema["properties"]:
         return _text(json.dumps(_judge(request["messages"][-1]["content"])))
+    if "You answer questions about the Digital Success OS" in request["system"]:
+        return _assistant(request)
     if request["tools"]:
         return _agent(request)
     if "account owner" in request["system"]:
         return _text(_brief(json.loads(request["messages"][-1]["content"])))
     return _text("OK")
+
+
+# --- the stand-in for the "Ask the data" assistant ---------------------------------------
+
+
+def _assistant(request: dict) -> dict:
+    """Search the documents for the question, then name what was found. It writes no SQL
+    and composes no answer: it is labelled as rules, not a model, wherever it appears."""
+    last = request["messages"][-1]["content"]
+    if isinstance(last, str):
+        if not request["tools"]:
+            return _text(_ASSISTANT_NOTE)
+        return _tools(request, [("search_docs", {"query": last})])
+    found = " ".join(str(block.get("content", "")) for block in last if isinstance(block, dict))
+    sources = sorted(set(re.findall(r"\[([^\]]+\.md)\]", found)))[:3]
+    if not sources:
+        return _text(_ASSISTANT_NOTE)
+    return _text(
+        f"{_ASSISTANT_NOTE} The documents closest to your question are: {', '.join(sources)}."
+    )
+
+
+_ASSISTANT_NOTE = (
+    "This reply comes from the labelled stand-in, which is a set of keyword rules and not "
+    "an AI model, so it cannot write an answer from the data."
+)
 
 
 # --- the stand-in agent ------------------------------------------------------------------
