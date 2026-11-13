@@ -16,10 +16,10 @@
 stops:
   - page: overview
     company: >
-      At a real company this is not one application. Each step runs in a different
-      platform, owned by a different team: Databricks for data, Gainsight for journeys and
-      tasks, Salesforce for customer records, Tableau for reporting, and the company's own
-      AI agents. Select Next to walk through the work in order.
+      Each step runs in a different platform, owned by a different team: Databricks for
+      data, Gainsight for journeys and tasks, Salesforce for customer records, Tableau for
+      reporting, and the company's own AI agents. Select Next to walk through the work in
+      order.
   - page: quality
     company: >
       At a real company this is the Databricks lakehouse, built and monitored by the Data
