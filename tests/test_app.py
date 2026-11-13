@@ -113,3 +113,25 @@ def test_the_scripted_story_ends_in_a_task_for_sales(app_data, ops):
         for row in ops.rows("SELECT cta_id FROM ctas"):
             if row["cta_id"] not in before:
                 ops.execute("DELETE FROM ctas WHERE cta_id = :id", id=row["cta_id"])
+
+
+# --- The shared, hosted demo ---------------------------------------------------------------------
+
+
+def test_only_an_admin_on_the_hosted_demo_is_offered_the_reset(app_data, monkeypatch):
+    """Visitors share one hosted store, so an admin can put it back. Nobody else can."""
+    monkeypatch.setenv("DSO_HOSTED", "1")
+    console = str(ROOT / "app" / "views" / "console.py")
+    for role, offered in (("Admin", True), ("Sales", False)):
+        app = AppTest.from_file(console, default_timeout=120)
+        app.session_state["console_role"] = role
+        app.run()
+        assert not app.exception, [error.value for error in app.exception]
+        assert any(b.label == "Reset the demo data" for b in app.button) is offered, role
+
+
+def test_the_overview_opens_with_a_path_for_someone_handed_the_link(app_data):
+    app = AppTest.from_file(str(ROOT / "app" / "views" / "overview.py"), default_timeout=120).run()
+    (guide,) = [e for e in app.expander if e.label.startswith("First time here?")]
+    text = " ".join(block.value for block in guide.markdown)
+    assert "Run the story" in text and "Human console" in text and "Synthetic data" in text

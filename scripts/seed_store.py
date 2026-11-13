@@ -11,6 +11,8 @@ Rules:
   - If the hosted store already has data, nothing is touched.
   - Two services start at the same time, so the copy holds a database lock: only one of
     them copies, the other finds the data there.
+  - With --reset (or the Admin's button in the Human console) the hosted store is emptied
+    and filled again, which puts the demo back to its starting state after people tried it.
 
 Exit code 0 means the hosted store is ready (or not in use). Any other code tells the
 start script to fall back to the local file, so the demo still comes up.
@@ -29,7 +31,13 @@ from common.store import TABLES, Store, open_store  # noqa: E402
 SEED_LOCK = 4242  # any fixed number: it only has to be the same in every service
 
 
-def seed(data_dir: Path = DATA_DIR) -> str:
+def seed(data_dir: Path = DATA_DIR, reset: bool = False) -> str:
+    """Copy the demo state into an empty hosted store. With reset=True, empty it first.
+
+    A reset is how an admin puts the hosted demo back to its starting state after people
+    have tried it: every task they created or closed goes, and the original state returns.
+    Emptying and copying happen in one transaction, so nobody sees a half-empty store.
+    """
     target = open_store(data_dir)
     if target.engine.url.get_backend_name() == "sqlite":
         return "the store is the local file: nothing to seed"
@@ -40,7 +48,10 @@ def seed(data_dir: Path = DATA_DIR) -> str:
 
     with target.engine.begin() as con:
         con.execute(text(f"SELECT pg_advisory_xact_lock({SEED_LOCK})"))
-        if con.execute(text("SELECT count(*) FROM enrollments")).scalar():
+        if reset:
+            for table in TABLES:
+                con.execute(text(f"DELETE FROM {table}"))
+        elif con.execute(text("SELECT count(*) FROM enrollments")).scalar():
             return "the hosted store already has data: left as it is"
         copied = 0
         for table in TABLES:
@@ -53,8 +64,9 @@ def seed(data_dir: Path = DATA_DIR) -> str:
                 text(f"INSERT INTO {table} ({', '.join(names)}) VALUES ({placeholders})"), rows
             )
             copied += len(rows)
-    return f"copied {copied} rows of demo state into the hosted store"
+    done = "reset the hosted store to the demo's starting state" if reset else "seeded"
+    return f"{done}: copied {copied} rows of demo state into the hosted store"
 
 
 if __name__ == "__main__":
-    print("seed_store:", seed())
+    print("seed_store:", seed(reset="--reset" in sys.argv))

@@ -112,3 +112,34 @@ def test_seeding_does_nothing_when_the_store_is_the_local_file(monkeypatch, tmp_
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     assert "nothing to seed" in module.seed(tmp_path)
+
+
+@pytest.mark.skipif(not os.environ.get("DSO_TEST_POSTGRES_URL"), reason="needs a real Postgres")
+def test_an_admin_reset_puts_the_hosted_store_back_to_the_demo_state(monkeypatch, tmp_path):
+    """What reviewers did goes; what the image was built with comes back."""
+    import importlib.util
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parents[1] / "scripts" / "seed_store.py"
+    spec = importlib.util.spec_from_file_location("seed_store", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    # The demo state the image carries: one task, in the local file.
+    Store(f"sqlite:///{(tmp_path / 'ops.db').as_posix()}").insert("ctas", cta("CTA-00001"))
+    # The hosted store after a reviewer has been in: a different task.
+    hosted = Store(os.environ["DSO_TEST_POSTGRES_URL"])
+    with hosted.engine.begin() as con:
+        for table in TABLES:
+            con.execute(text(f"DELETE FROM {table}"))
+    hosted.insert("ctas", cta("CTA-99999", status="resolved"))
+
+    monkeypatch.setenv("DSO_OPERATIONAL_STORE", os.environ["DSO_TEST_POSTGRES_URL"])
+    try:
+        message = module.seed(tmp_path, reset=True)
+        assert "reset" in message and "copied 1 rows" in message
+        assert [row["cta_id"] for row in hosted.rows("SELECT cta_id FROM ctas")] == ["CTA-00001"]
+    finally:
+        with hosted.engine.begin() as con:  # leave the shared database empty for what follows
+            for table in TABLES:
+                con.execute(text(f"DELETE FROM {table}"))

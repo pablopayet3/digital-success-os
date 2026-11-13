@@ -59,6 +59,20 @@ if top_right.button("Sign out"):
 if "console_message" in st.session_state:
     st.success(st.session_state.pop("console_message"))
 
+# The hosted demo is shared: whatever one visitor creates or closes, the next one sees.
+# An admin can put it back to the state the image was built with.
+if role == "Admin" and os.environ.get("DSO_HOSTED"):
+    with st.expander("Admin: reset the demo data"):
+        st.write(
+            "Removes every task and conversation visitors created or closed, and restores "
+            "the demo's starting state. Use it before handing the demo to someone new."
+        )
+        if st.button("Reset the demo data"):
+            from scripts.seed_store import seed
+
+            st.session_state.console_message = "Demo data: " + seed(ui.data_dir(), reset=True)
+            ui.refresh()
+
 tasks = ui.rows("SELECT * FROM ctas WHERE status <> 'resolved' ORDER BY sla_due_on, created_on")
 if len(tasks) and queues:
     tasks = tasks[tasks["queue"].isin(queues)]
@@ -70,6 +84,9 @@ if len(alerts) and (queues is None or alerts["queue"].isin(queues).any()):
 
 if tasks.empty:
     st.success("Nothing waiting in your queues.")
+    st.caption(
+        "To put a task here: open the Live demo page and press Run the story. The price question is handed to Sales."
+    )
     st.stop()
 
 order = {"urgent": 0, "high": 1, "normal": 2, "low": 3}

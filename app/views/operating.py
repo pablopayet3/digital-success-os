@@ -13,6 +13,7 @@ st.write(
 DOCS = ROOT / "docs"
 GROUPS = {
     "How it runs": [
+        "reviewer-guide.md",
         "human-fallback.md",
         "principles.md",
         "ownership-map.md",

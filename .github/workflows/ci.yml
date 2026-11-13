@@ -84,3 +84,9 @@ jobs:
           uv run python run.py run-days 1
           uv run python run.py experiments
           uv run python scripts/check_store.py postgresql
+      - name: An admin reset puts the hosted store back to the demo state
+        env:
+          DSO_OPERATIONAL_STORE: env:DATABASE_URL
+        run: |
+          uv run python scripts/seed_store.py --reset
+          uv run python scripts/check_store.py postgresql

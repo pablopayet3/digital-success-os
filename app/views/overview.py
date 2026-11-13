@@ -8,6 +8,7 @@ import streamlit as st
 
 from app import ui
 from common.config import load_yaml
+from common.paths import ROOT
 
 # A task closed with one of these outcomes counts as a handoff that was worth making.
 GOOD_OUTCOMES = ["resolved", "saved", "expansion_opportunity"]
@@ -18,6 +19,12 @@ st.write(
     "person. When the agent cannot help it hands off with full context, and the person's "
     "outcome comes back into the system. Every play is measured against a holdout."
 )
+# For someone handed the link: a five-minute path through the whole loop.
+guide = ROOT / "docs" / "reviewer-guide.md"
+if guide.exists():
+    with st.expander("First time here? Try the whole loop yourself in five minutes"):
+        steps = guide.read_text(encoding="utf-8").splitlines()[1:]  # without the title line
+        st.markdown("\n".join(steps))
 segments = load_yaml("rollout.yaml")["segments"]
 in_pilot = "coverage_tier IN (" + ", ".join(f"'{s}'" for s in segments) + ")"
 st.caption(f"Simulated today: {ui.today()}. Pilot segment: {', '.join(segments)}.")

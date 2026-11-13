@@ -82,7 +82,7 @@ From `uv run python run.py demo` (180 days of history, then 30 simulated days of
 | Seat expansion: expansion closed, treatment against holdout | 19% against 21%: **no effect detected** (the sample could only have shown 20 points or more) |
 | Agent evaluation, real model, 44 cases | Onboarding agent 30 of 30 with prompt v3 (v1: 29, v2: 25); mailbox 10 of 10; briefs 4 of 4; classifier 96% on 160 labelled replies |
 | Cost of every real model call behind this (834 calls) | about $3 |
-| Automated tests | 188 |
+| Automated tests | 191 |
 
 Three honest notes. The lift comes from assumptions in `config/sim_effects.yaml`: this
 demonstrates a measurement system, not a result. The agent answers are real: one live
@@ -95,6 +95,7 @@ the evaluation harness that the stand-in could never have shown (ADR 0017).
 
 - **The app:** https://digital-success-os-app.onrender.com (free hosting: the first load can take a minute; it runs the labelled stand-in, not the real model)
 - **The API:** https://digital-success-os-api.onrender.com/health
+- **Try the whole loop yourself in five minutes:** [docs/reviewer-guide.md](docs/reviewer-guide.md). Make the agent hand you a task, pick it up in the Human console as Sales, close it, and see the system remember. The console's sign-in details are shared on request, never in this repository.
 - **The dashboard:** [Digital Success pilot on Tableau Public](https://public.tableau.com/views/DigitalSuccesspilotsyntheticdata/DigitalSuccesspilot_Syntheticdatafictionalcompany)
 
 ## Run it in 60 seconds
@@ -145,7 +146,7 @@ file names past the 260-character limit.
 | Accounts | One account: health and why, signals with evidence, scores with reasons, everything the system did and every decision not to act |
 | Plays and experiments | The play catalog; each play against its holdout with an interval and a verdict; the journey funnel; results by entry week and per ladder rung; revenue per group; the audit log |
 | Agents | Conversations with tool calls and retrieval, and a thumbs up or down on each; mailbox triage; the evaluation report; the review queue of cases people sent back and the list of questions no help article answered; the prompt changelog |
-| Human console | Sign in by role, work a queue, open a handoff packet, resolve it: the return signal |
+| Human console | Sign in by role, work a queue, open a handoff packet, resolve it: the return signal. On the hosted demo an admin can reset the shared data |
 | Data quality | What was rejected and why, test results, freshness, the data contract |
 | Pilot | The readiness checklist answered from live data; rollout stage and verdict per play; results per rung; handoff quality (pickup time, SLA breaches, re-contact, docs gap); weekly review notes; a live preview of what adding the next segment would do |
 | Operating model | Ownership, change control, principles, the dependency map drawn as a diagram, the data dictionary, play specs, decision records |
@@ -263,7 +264,7 @@ What each phase delivered, and three decisions to defend for each, is in
 
 ## What runs for real, and what has not been run yet
 
-Running on GitHub Actions: CI on every push (lint, 188 tests on Linux, the dbt build, a
+Running on GitHub Actions: CI on every push (lint, 191 tests on Linux, the dbt build, a
 secret scan), the container image build (it generates a demo world inside the image and
 publishes it), and the daily pipeline schedule, which opens an issue when a run fails.
 
@@ -315,5 +316,5 @@ experiments/  play results against holdouts
 api/ app/     FastAPI endpoints; the Streamlit app
 integrations/ the CRM sync
 docs/         operating documents, decision records, play specs, model cards
-tests/        188 tests; they generate a small world and run everything on it, every app page included
+tests/        191 tests; they generate a small world and run everything on it, every app page included
 ```
