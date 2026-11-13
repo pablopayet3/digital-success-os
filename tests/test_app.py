@@ -223,32 +223,69 @@ def test_the_overview_says_what_this_is_and_shows_the_workflow(app_data):
     assert "A guide to the pages" in headings
 
 
-def test_every_tour_stop_opens_a_real_page_and_every_page_has_a_stop():
+def test_every_tour_stop_is_complete_and_every_page_has_a_stop():
     from app.tour import stops
 
     for stop in stops():
         assert (ROOT / "app" / "views" / f"{stop['page']}.py").exists(), stop["page"]
-        assert stop["company"].strip()
+        for part in ("target", "title", "what", "who", "example"):
+            assert stop[part].strip(), f"{stop['title']}: nothing written for '{part}'"
     # A visitor who follows the tour has seen every page of the app.
     assert {stop["page"] for stop in stops()} == set(PAGES)
+    # Words the owner ruled out of anything a visitor reads.
+    text = " ".join(str(value) for stop in stops() for value in stop.values()).lower()
+    assert "cheap" not in text and " thing " not in text and " things " not in text
 
 
-def test_next_walks_through_every_stop_and_finish_ends_the_tour(app_data):
+def words_on(app) -> str:
+    """Every label and text a page shows, as one string (what the tour can point at)."""
+    words = [number.label for number in app.metric]
+    for kind in ("title", "header", "subheader", "markdown", "caption", "info", "warning"):
+        words += [str(element.value) for element in getattr(app, kind)]
+    for kind in ("selectbox", "multiselect", "text_input", "button", "expander", "tabs"):
+        words += [str(getattr(element, "label", "")) for element in getattr(app, kind)]
+    return " | ".join(words)
+
+
+def test_every_tour_stop_points_at_something_that_is_on_its_page(app_data):
+    """The frame is drawn around the element that carries the stop's words. If a label on
+    a page is reworded and the tour is not, this test names the stop that lost its element."""
+    from app.tour import stops
+
+    shown = {}
+    for stop in stops():
+        page = stop["page"]
+        if page not in shown:
+            view = str(ROOT / "app" / "views" / f"{page}.py")
+            shown[page] = words_on(AppTest.from_file(view, default_timeout=120).run())
+        assert stop["target"] in shown[page], f"{page}: nothing says '{stop['target']}'"
+        if "tab" in stop:
+            assert stop["tab"] in shown[page], f"{page}: no tab called '{stop['tab']}'"
+
+
+def test_the_tour_moves_stop_by_stop_and_page_by_page_and_can_be_ended(app_data):
     from app.tour import stops
 
     app = AppTest.from_file(str(ROOT / "app" / "main.py"), default_timeout=120)
     app.session_state["tour_step"] = 0
     app.run()
-    seen = []
-    for _ in range(len(stops()) + 1):
+
+    def press(label):
+        next(button for button in app.button if button.label == label).click().run()
         assert not app.exception, [error.value for error in app.exception]
-        forward = [button for button in app.button if button.label in ("Next", "Finish")]
-        if app.session_state["tour_step"] is None or not forward:
-            break
-        seen.append(app.title[0].value)  # the page the stop opened
-        forward[0].click().run()
-    assert len(seen) == len(stops()) and app.session_state["tour_step"] is None
+
+    press("Next")
+    assert app.session_state["tour_step"] == 1 and app.title[0].value == "Digital Success OS"
+    # "Next page" jumps to the first stop of each following page, in the order of the menu.
+    seen = [app.title[0].value]
+    while not next(button for button in app.button if button.label == "Next page").disabled:
+        press("Next page")
+        seen.append(app.title[0].value)
     assert {"Data quality", "Accounts", "Live demo", "Human console", "Pilot"} <= set(seen)
+    assert app.session_state["tour_step"] == len(stops()) - 1  # the closing stop
+    press("Finish")
+    assert app.session_state["tour_step"] is None
+    assert "Next" not in [button.label for button in app.button]
 
 
 def test_the_tour_greets_a_hosted_visitor_but_never_interrupts_a_local_demo(app_data, monkeypatch):

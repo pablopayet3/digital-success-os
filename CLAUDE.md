@@ -259,7 +259,7 @@ has run against a Developer Edition org (6 accounts, 6 tasks; a second run creat
 nothing), signed in through the browser with the vendor's command-line tool:
 `SALESFORCE_CLI_ORG=dso-demo` in `.env`, and `sf` must be on the PATH (it installs to
 `%APPDATA%\npm`, which this app's shell does not have on its PATH by default).
-201 tests in total.
+202 tests in total.
 
 After the phases (the brief read again line by line; see the last section of
 `docs/phase-notes.md`):
@@ -303,15 +303,27 @@ After the phases (the brief read again line by line; see the last section of
   each. One source for the opening of every page (`app/ui.py::job_intro`), for the top of
   the Overview (`ui.what_this_is`: what this is, the workflow as cards, the role line by
   line) and for the menu's order (`app/main.py`). Page names are `ui.PAGE_NAMES`.
-- `app/tour.py` and `config/tour.yaml`: the guided tour, a slim strip at the top of the
-  page with Back, Next and End, one stop per page. It never covers the page. It names
-  the platform and the team at a real company; the page's own opening says the rest. It
-  starts by itself only on the hosted demo (`DSO_HOSTED`).
+- `app/tour.py`, `app/tour_card.html` and `config/tour.yaml`: the guided tour (ADR 0025).
+  A small window fixed in a corner, one stop per metric or section, with Back, Next,
+  Next page and End. Each stop says what the element is, who uses it and for what, and
+  gives an example. A short script frames the element (found by the words it carries)
+  and brings it to the top of the page. A test checks every stop's words are on its page.
+  It starts by itself only on the hosted demo (`DSO_HOSTED`).
+- `scripts/tour_voice.py`: records each stop once with a text-to-speech service, in the
+  voice set in `config/tour.yaml` (the owner's choice: the voice of his other apps). It
+  needs `OPENAI_API_KEY`, in `.env` or through `--key-file`. Recordings go to
+  `app/tour_audio/`, named after a fingerprint of the stop's words: after changing a
+  stop's words, run the script again. The app only plays the files.
+- `config/glossary.yaml` and `ui.metric`: every number is drawn through `ui.metric`,
+  which adds its definition as a hover text. A test fails for a number without one.
+- The Overview's top (`ui.what_this_is`): what this is, three expanders (every signal,
+  one play taken apart, how a holdout works), the workflow as cards, a guide to the
+  pages. The Live demo opens with the message the system sent first, because the play
+  is proactive. The Human console shows one task read-only before the sign-in.
 - How visitor-facing text is written (the owner's rules of 12 and 13 November 2026):
   complete sentences, every term defined where it is used, each team named as a team,
-  never the words "cheap" or "thing", no line about the author. The browser-voice
-  "Read aloud" button was removed (ADR 0023): the owner wants a recorded voice instead,
-  which is not built yet.
+  never the words "cheap" or "thing", no line about the author, and nothing on screen
+  that reads as notes about a job posting.
 - The agent on the public demo (ADR 0024, the owner's decision of 12 November 2026,
   which changes the brief's rule that the hosted app never calls the API): the stand-in
   by default; with `ANTHROPIC_API_KEY` set by the owner in the host's dashboard,

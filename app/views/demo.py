@@ -9,11 +9,46 @@ from agents.onboarding import converse, scripted
 from agents.runner import hand_off, record_conversation
 from app import ui
 from engine.catalog import load_catalog
+from engine.channels import render_template
 from engine.context import load_day, records
 
 # The two messages of the demo path: a setup question, then a question about price.
 STORY = ["How do I invite my whole team at once?", "Thanks. How much would 10 more seats cost?"]
 MAX_MESSAGE = 400  # characters a visitor may type in one message
+
+
+def first_message(play, account_id: str, evidence: str, enrolment: dict | None) -> None:
+    """Step 1 of a play: the message the system sends first, without being asked.
+
+    The play is proactive. Without this, the page would open on the customer's question and
+    look as if the customer had contacted us first.
+    """
+    steps = load_catalog().journeys[play.journey].steps
+    opener = next((step for step in steps if step.type in ("email", "in_app")), None)
+    if opener is None:
+        return  # a play that goes straight to a person has no message to show
+    account = records(
+        ui.query(f"SELECT * FROM gold.account_current WHERE account_id = '{account_id}'")
+    )[0]
+    subject, body = render_template(opener.template, account, None, evidence)
+    sent = ui.store().one(
+        "SELECT touch_date FROM touches WHERE account_id = :account AND play_id = :play "
+        "AND template = :template ORDER BY touch_date LIMIT 1",
+        account=account_id,
+        play=play.id,
+        template=opener.template,
+    )
+    if sent:
+        note = f"Sent to this customer on {sent['touch_date']}, without anyone asking."
+    elif enrolment and enrolment["arm"] == "holdout":
+        note = "This customer is held out for comparison, so this message was not sent to them."
+    else:
+        note = "Sent as soon as the customer enters the play, without anyone asking."
+    st.markdown("**Step 1. The system writes first.**")
+    with st.container(border=True):
+        st.caption(f"The play's first message. {note}")
+        st.markdown(f"**Subject: {subject}**")
+        st.markdown(body)
 
 st.title("Live demo")
 ui.job_intro("demo")
@@ -21,9 +56,11 @@ tab_chat, tab_day = st.tabs(["Talk to the onboarding agent", "Advance one day"])
 
 with tab_chat:
     st.write(
-        "The whole loop on one account: a signal fires, it triggers a play, the play's agent "
-        "talks to the admin, and a question the agent must not answer becomes a task for a "
-        "person. You are the admin. A handoff creates a real task: open it in the Human console."
+        "One play, from start to finish, on one customer. **The system makes the first move.** "
+        "It notices a signal and writes to the customer without being asked. The customer "
+        "replies to that message, the AI agent answers, and a question the agent must not "
+        "answer becomes a task for a person. You play the customer. A handoff creates a real "
+        "task: open it in the Human console."
     )
     llm = get_llm()
     if llm.settings.stand_in_when_unavailable:
@@ -98,13 +135,15 @@ with tab_chat:
             f"**Signal firing today:** `{signal}`. {evidence[signal]}\n\n"
             f"**Play it triggers:** {play.name} ({ladder}). {where}\n\n{in_play}"
         )
+        first_message(play, account_id, evidence[signal], enrolment)
     else:
         st.caption("No signal is firing for this account today. The agent answers all the same.")
 
+    st.markdown("**Step 2. The customer replies to that message.**")
     with st.form("story"):
         st.write("**The scripted story.** One click, or edit the two messages first.")
         # Messages are kept short: on the public demo each one may be sent to a paid model.
-        first = st.text_input("The admin asks", STORY[0], max_chars=MAX_MESSAGE)
+        first = st.text_input("The customer replies", STORY[0], max_chars=MAX_MESSAGE)
         second = st.text_input("Then asks", STORY[1], max_chars=MAX_MESSAGE)
         run, _, over = st.columns([1, 4, 1])
         if run.form_submit_button("Run the story"):

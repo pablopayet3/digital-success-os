@@ -10,11 +10,11 @@ not watch a demo of it.
 **Sign-in details** for the Human console are sent to you separately. There is one
 password per role: CSM, Sales and Admin. They are never written in this repository.
 
-When you open the app, a guided tour starts: a slim strip at the top of the page that
-walks through the pages in order, one Next at a time. It names the platform and the team
-that would do each step at a real company, and it never covers the page. Every page opens
-by saying which line of the role it answers, in plain words. You can end the tour at any
-point. The button "Guided tour" in the sidebar starts it again.
+When you open the app, a guided tour starts: a small window in a corner that explains
+one metric or one section at a time, and frames it on the page. Each stop says what the
+element is, who uses it, and gives an example. "Next page" skips ahead, and you can end
+the tour at any stop. The button "Guided tour" in the sidebar starts it again. Hovering
+over the question mark beside any number gives its definition.
 
 Everything below can be done on the hosted app. Nothing you do there can break
 anything: it is a shared demo, and an admin can reset it.

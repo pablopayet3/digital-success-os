@@ -1,65 +1,684 @@
 # Synthetic data, fictional company (Lumen Labs / Relay).
 #
-# The guided tour: a slim strip at the top of the page (app/tour.py). One stop per page, in
-# the order of the menu. The strip never covers the page it explains.
+# The guided tour: a small window in a corner that explains the app one element at a time
+# (app/tour.py). Each stop is one metric or one section. The element is framed on the page.
 #
-#   page     the page the stop opens (a file in app/views/)
-#   company  which platform does this at a real company, and which team works in it
+#   page     the page the stop is on (a file in app/views/)
+#   target   words that appear on the element, exactly as on screen: the frame goes there
+#   group    true = frame the whole row the element sits in (a row of numbers)
+#   tab      the tab to open first, when the element is inside one
+#   title    the stop's heading
+#   what     what the element is and how to read it
+#   who      who uses it at a real company, and for what
+#   example  one concrete case
 #
-# What a page is for is said by the page itself, in its opening (config/job.yaml), so the
-# tour has nothing to repeat. It adds the one fact the pages may not show: the real tools.
+# How it is written: complete sentences, every term defined where it is used, each team
+# named as a team, never the words "cheap" or "thing", no line about the author.
 #
-# Real product names appear here on purpose, as plain text: the tour exists to show how
-# the one app maps onto the several platforms a real company uses. Nothing else in the app
-# names them (see the conventions in CLAUDE.md).
+# Real product names appear here on purpose, as plain text: the tour shows how the one app
+# maps onto the several platforms a real company uses. Nothing else in the app names them
+# (see the conventions in CLAUDE.md).
+#
+# A test checks that every target is really on its page.
+
+# The recorded voice (scripts/tour_voice.py): the same voice and manner as the owner's
+# Alizee applications. Changing a word below means recording every stop again.
+voice:
+  model: gpt-4o-mini-tts
+  name: marin
+  manner: >
+    Sound light, bright and warm, with a smile in your voice, like a friendly guide who
+    enjoys this. Speak clear, natural American English. Keep an easy, lively pace, and slow
+    down a little for numbers and for the names of tools and teams.
 
 stops:
+  # --- Overview -------------------------------------------------------------------------
   - page: overview
-    company: >
-      Each step runs in a different platform, owned by a different team: Databricks for
-      data, Gainsight for journeys and tasks, Salesforce for customer records, Tableau for
-      reporting, and the company's own AI agents. Select Next to walk through the work in
-      order.
+    target: What this is.
+    title: Start here
+    what: >
+      This page summarises the whole operation. The three paragraphs at the top say what
+      the system does, who uses it, and the three terms every other page relies on: signal,
+      play and holdout.
+    who: >
+      At a real company each step runs in a different platform: Databricks for data,
+      Gainsight for journeys and tasks, Salesforce for customer records, and Tableau for
+      reporting. This application puts them side by side.
+    example: >
+      A customer signs up and never finishes setup. The system notices, sends a guide, lets
+      an AI agent answer the customer's questions, and brings in a person only if needed.
+
+  - page: overview
+    target: The workflow, from signal to outcome
+    title: The workflow
+    what: >
+      Read the cards from left to right. Data arrives and is validated, signals and health
+      scores are computed, and plays decide which customer receives which help. The second
+      line of each card names the team accountable for that step.
+    who: >
+      Every team on these cards works in its own platform. The person leading this programme
+      is accountable for the chain between them.
+    example: >
+      The Data Engineering team delivers a clean table. The Data Science team scores it.
+      The CS Operations team's journey sends the first email. No customer sees any of this.
+
+  - page: overview
+    target: A guide to the pages
+    title: A guide to the pages
+    what: >
+      One row for each page: what it covers and what you will find there. The pages follow
+      the order of the work, and this tour visits them in the same order.
+    who: >
+      A new member of any team can use this table to find the page that concerns them.
+    example: >
+      A data engineer goes to Data quality. A success manager goes to Accounts and to the
+      Human console.
+
+  - page: overview
+    target: Accounts in the pilot
+    group: true
+    title: The pilot at a glance
+    what: >
+      Five numbers describe the pilot today: the customers it covers, what they pay per
+      year, how many need attention, how many are receiving a play, and how many handoffs
+      are waiting for a person. Hover over the question mark beside a number for its
+      definition.
+    who: >
+      CS Leadership reads these first, to judge the size of the pilot and the load on the
+      team.
+    example: >
+      If the number of open tasks keeps rising, the plays are creating more handoffs than
+      the team can absorb.
+
+  - page: overview
+    target: The measures the pilot is run on
+    title: The eight measures
+    what: >
+      These eight measures decide whether the pilot is working. Each is defined once, with
+      its formula and its source, so that no two reports can disagree. The next stops take
+      them one at a time.
+    who: >
+      The Analytics team builds them. CS Leadership reviews them every week.
+    example: >
+      Two dashboards that disagree about "active users" stop every meeting. One definition
+      prevents it.
+
+  - page: overview
+    target: Monthly active users
+    title: Monthly active users
+    what: >
+      The number of people who used the product at least once in the last 30 days, across
+      every customer in the pilot. The line beneath compares it with 30 days earlier.
+    who: >
+      CS Leadership uses it to answer the first question of adoption: are customers using
+      what they bought?
+    example: >
+      A customer with 20 paid seats and 4 active users is paying for 16 seats nobody uses,
+      and is likely to reduce or cancel at renewal.
+
+  - page: overview
+    target: AI credits used, 30 days
+    title: Consumption
+    what: >
+      How much customers used the product's AI feature in the last 30 days, counted in
+      credits. Active users show breadth of use. Consumption shows depth.
+    who: >
+      Sales and CS Leadership watch it, because at many software companies consumption is
+      what the customer pays for.
+    example: >
+      A customer who uses 90% of its included credits is a candidate for a higher edition.
+
+  - page: overview
+    target: Prerequisite closure
+    title: Prerequisite closure
+    what: >
+      The average share of setup steps that customers have completed, such as inviting
+      users or connecting an integration.
+    who: >
+      The CS Operations team uses it to judge the onboarding play. It is the earliest sign
+      that a customer will get value from the product.
+    example: >
+      A customer who has invited nobody after two weeks has completed one step out of four.
+      That is the customer the onboarding play is for.
+
+  - page: overview
+    target: Agent invocation
+    title: Agent invocation
+    what: >
+      Of the customers in a play, the share who had a conversation with the AI agent. The
+      others were helped by the email alone, or have not reached that step. It measures how
+      much the agent is used, not how good it is.
+    who: >
+      The AI Agent Engineering team and the person leading the programme use it to see
+      whether customers reach the agent at all.
+    example: >
+      Seven customers out of 61 talked to the agent. If that share stayed near zero, the
+      email that invites the conversation would need rewriting.
+
+  - page: overview
+    target: Handoff rate
+    title: Handoff rate
+    what: >
+      Of all conversations with the AI agent, the share the agent passed to a person.
+    who: >
+      The AI Agent Engineering team tunes the agent against it. The Scaled CS team feels it
+      as workload.
+    example: >
+      A rate of 90% means the agent resolves almost nothing. A rate of 2% may mean it is
+      answering price questions it should have passed to Sales.
+
+  - page: overview
+    target: Escalation conversion
+    title: Escalation conversion
+    what: >
+      An escalation is the moment automation passes a customer to a person, which creates a
+      task. This is the share of closed tasks that ended well: the problem resolved, the
+      customer kept, or a sales opportunity found.
+    who: >
+      CS Leadership uses it to judge whether the escalations deserved a person's time.
+    example: >
+      Out of 83 closed tasks, 46 ended well. The other 37 are where to look for
+      unnecessary handoffs.
+
+  - page: overview
+    target: Revenue retained
+    title: Revenue retained
+    what: >
+      Of the yearly revenue of the customers who entered a play, the share still under
+      contract 30 days later. The line beneath gives the same figure for the holdout: the
+      similar customers deliberately left alone.
+    who: >
+      CS Leadership and Finance read it. Only the difference between the two groups can be
+      credited to the plays.
+    example: >
+      If both groups keep 95% of their revenue, the plays changed nothing, however good
+      95% looks.
+
+  - page: overview
+    target: Expansion from the plays
+    title: Expansion from the plays
+    what: >
+      New revenue won within 30 days from customers in a play, set against the customers
+      left alone.
+    who: >
+      Sales and CS Leadership read it to see whether the plays that suggest an upgrade pay
+      for themselves.
+    example: >
+      In this demo the customers are simulated, so the amount is an assumption. The method
+      of comparison is what a real pilot would use.
+
+  - page: overview
+    target: From signal to outcome
+    title: From signal to outcome
+    what: >
+      The whole loop as counts: customers showing a signal, customers put into a play,
+      customers held out, messages delivered, conversations with the agent, tasks handed to
+      a person, and tasks a person has closed.
+    who: >
+      The person leading the programme reads it to find where the chain narrows.
+    example: >
+      Many signals and few customers in a play would mean the rules for entering a play are
+      too strict.
+
+  - page: overview
+    target: Health by coverage tier
+    title: Health by coverage tier
+    what: >
+      A coverage tier is the level of human attention a customer receives. High-touch
+      customers have a named success manager, pooled customers share a team, and uncovered
+      customers have no one. The bars show the health of the customers in each tier.
+    who: >
+      CS Leadership uses it to decide where the team's attention should go.
+    example: >
+      A large red segment among uncovered customers is the case for this pilot: nobody is
+      watching them.
+
+  - page: overview
+    target: Signals firing today (pilot segment)
+    title: Signals firing today
+    what: >
+      Each bar is one signal, with the number of pilot customers showing it today. Point at
+      a bar to read what the signal means.
+    who: >
+      The CS Operations team reads it as the day's demand: what the plays must respond to.
+    example: >
+      A sudden rise in "Repeated support problems" after a product release tells the team
+      to pause upgrade messages for those customers.
+
+  - page: overview
+    target: What the system did each day
+    title: What the system did each day
+    what: >
+      Every message the system delivered, by day and by channel: email, in-app message, or
+      AI agent.
+    who: >
+      The CS Operations team uses it to confirm that the journeys are running, and to spot
+      a gap or a surge.
+    example: >
+      A day with no messages at all means a journey stopped, and someone should find out
+      why.
+
+  # --- Data quality ---------------------------------------------------------------------
   - page: quality
-    company: >
+    target: Data tests passing
+    group: true
+    title: Can the data be trusted?
+    what: >
+      Plays act on data, so the data is checked before anything acts on it. These three
+      numbers summarise the checks: automated tests on every table, a written contract for
+      the main table, and proof that each source delivered on time.
+    who: >
       At a real company this is the Databricks lakehouse, built and monitored by the Data
-      Engineering team. This same pipeline was also run on a real Databricks workspace.
+      Engineering team.
+    example: >
+      If a customer appeared twice in the data, the same customer could receive the same
+      email twice. A test catches it first.
+
+  - page: quality
+    target: What the pipeline caught
+    title: What the pipeline caught
+    what: >
+      The data problems found and handled. This demo plants known problems in its data on
+      purpose, and records what it planted, so the tests can prove that each one was caught.
+    who: >
+      The Data Engineering team uses a table like this to show that the checks really work.
+    example: >
+      Duplicate events, events dated in the future, and events with no customer identifier
+      are all planted, and all caught.
+
+  - page: quality
+    target: Rejected at ingest, by reason
+    title: Rejected records
+    what: >
+      Records that failed validation on arrival, grouped by reason. A rejected record is
+      kept in a separate table with its reason. Nothing is silently discarded.
+    who: >
+      The Data Engineering team uses the reasons to fix a problem at its source.
+    example: >
+      A spike in "unknown event name" usually means the product team released a new
+      feature without telling the data team.
+
+  - page: quality
+    target: "Data contract: gold.account_daily"
+    title: The data contract
+    what: >
+      The written agreement on what the main table contains: its columns, their types and
+      their allowed values. Each line is one promise, checked by code on every run.
+    who: >
+      The person leading the programme writes it. The Data Engineering team builds to it.
+      The plays, the models and the dashboards all read this one table.
+    example: >
+      "Every row has a customer identifier" is one promise. If it ever fails, the pipeline
+      stops before a play can act on the bad row.
+
+  - page: quality
+    target: Data tests
+    title: The automated tests
+    what: >
+      The full list of automated tests and their results. A failing test appears here in
+      red.
+    who: >
+      The Data Engineering team is alerted when a test fails, and the plays wait until it
+      passes again.
+    example: >
+      A test that checks "seats in use never exceed seats paid for" would catch a broken
+      licence feed.
+
+  # --- Accounts -------------------------------------------------------------------------
   - page: accounts
-    company: >
-      At a real company these are health scores in Gainsight, supplied by Databricks. The
-      Data Science team owns the predictive models, and a success manager reads this view
-      before speaking to a customer.
+    target: Open an account
+    title: One customer at a time
+    what: >
+      Choose a customer from the list, which is sorted by health with the lowest first. The
+      filters above narrow it by coverage tier, lifecycle stage and health band.
+    who: >
+      At a real company a success manager opens this view in Gainsight before speaking to
+      a customer.
+    example: >
+      Before a call, the success manager sees in one screen why the customer is flagged
+      and what has already been sent.
+
+  - page: accounts
+    target: Churn risk
+    group: true
+    title: Four numbers for this customer
+    what: >
+      The health score, a model's estimate that the customer will cancel within 90 days, a
+      model's estimate that it will buy more, and the seats in use. Churn means a customer
+      leaving.
+    who: >
+      The Data Science team owns the two models. Success managers and Sales act on the
+      scores.
+    example: >
+      A customer with a churn risk of 60% and nearly empty seats is a save. One with full
+      seats and a high expansion score is a sales conversation.
+
+  - page: accounts
+    target: Why the health score is what it is
+    title: Why the score is what it is
+    what: >
+      The health score is built from five components, each with a published weight. The
+      chart shows what each one contributes.
+    who: >
+      A success manager uses it to see why a score is low, and to challenge it, without
+      taking a number on trust.
+    example: >
+      A score of 35 that is low only because of two bad support tickets calls for a
+      different conversation than one caused by falling usage.
+
+  - page: accounts
+    target: Signals firing today
+    title: The signals on this customer
+    what: >
+      The signals this customer is showing today, each with its evidence in words. A signal
+      is what can start a play.
+    who: >
+      The success manager reads it to understand why the system is about to act.
+    example: >
+      "Setup has stalled: day 44, 25% of setup steps done" is the evidence behind the
+      onboarding play.
+
+  - page: accounts
+    target: What the system did, and why
+    title: The record of every decision
+    what: >
+      A complete record for this customer: every play it entered, every message it
+      received, every task raised, and every occasion on which the system decided not to
+      act, with the reason.
+    who: >
+      Success managers, and anyone auditing the system, use it to check that nothing done
+      to a customer is unexplained.
+    example: >
+      "Not contacted: the customer has opted out of email" is a decision too, and it is
+      recorded here.
+
+  # --- Plays and experiments -------------------------------------------------------------
   - page: plays
-    company: >
-      At a real company the journeys run in Gainsight Journey Orchestrator, operated by the
-      CS Operations team. The results are read in Tableau by CS Leadership and the
-      Analytics team. This demo has a real, public Tableau dashboard.
+    target: The play catalog
+    title: The catalogue of plays
+    what: >
+      Every play in one table: the signal that starts it, its steps, its owner, its measure
+      of success, and the share of customers held out. A play is configuration, so changing
+      one is an edit that goes through change control, not a software release.
+    who: >
+      At a real company these are journeys in Gainsight Journey Orchestrator, operated by
+      the CS Operations team.
+    example: >
+      "Onboarding rescue" starts when setup has stalled. It sends a guide, then offers the
+      AI agent, then raises a task for a person.
+
+  - page: plays
+    target: Results against the holdout
+    title: Did each play work?
+    what: >
+      Each play is compared with its holdout on the measure named before launch. The chart
+      shows the difference with its margin of error. Where the margin crosses zero, the
+      verdict says the play may have achieved nothing.
+    who: >
+      The Analytics team validates the result. CS Leadership decides whether to scale the
+      play, correct it or stop it.
+    example: >
+      A play that lifts setup completion by 12 points, with a margin of 5, is working. One
+      that lifts it by 3, with a margin of 8, is not proven.
+
+  - page: plays
+    target: One play in detail
+    title: One play in detail
+    what: >
+      Choose a play to see it closely: how many customers reached each step of its
+      journey, its result week by week, and the revenue of its customers against those
+      held out.
+    who: >
+      The owner of the play uses it to find the step where customers drop out.
+    example: >
+      If most customers open the email and few talk to the agent, the invitation to the
+      agent is the step to rewrite.
+
+  # --- Live demo --------------------------------------------------------------------------
   - page: demo
-    company: >
-      At a real company these are the company's own AI agents, built by the AI Agent
-      Engineering team. Here the agent is Claude. Only the customer ever sees this
-      conversation, so on this page you take the customer's place.
+    target: You are the admin of
+    title: You are the customer
+    what: >
+      On this page you take the customer's place. Choose a customer. The box below shows
+      the signal firing for it today, the play that signal triggers, and whether the
+      customer is in the play or held out.
+    who: >
+      At a real company only the customer sees this conversation. The AI Agent Engineering
+      team builds the agent behind it.
+    example: >
+      The first customer in the list has stalled in setup, which is the signal that starts
+      the onboarding play.
+
+  - page: demo
+    target: The scripted story.
+    title: Run the story
+    what: >
+      Select "Run the story". The customer asks how to invite their team, and the AI agent
+      answers from the help centre, using that customer's own data. The customer then asks
+      for a price, and a rule written in code passes the question to the Sales team.
+    who: >
+      The Sales team receives the task. The price question never reaches the AI model.
+    example: >
+      "How much would 10 more seats cost?" becomes a task for Sales, with a summary of the
+      conversation attached.
+
+  - page: demo
+    target: Or type your own
+    title: Try your own message
+    what: >
+      You may type any message. A question about setup is answered. A request for a
+      refund, a price or a person is handed over at once.
+    who: >
+      The rules that decide a handoff are written in code by the person leading the
+      programme, so the agent cannot be talked around them.
+    example: >
+      Type "I want a refund". The agent does not answer, and a person receives the task.
+
+  # --- Agents -----------------------------------------------------------------------------
   - page: agent
-    company: >
-      At a real company this is the evaluation suite of the AI Agent Engineering team, run
-      before every change to the agent.
+    target: Agent conversations
+    group: true
+    title: The agent's activity
+    what: >
+      Four numbers: the agent's conversations, the share it handed to a person, the
+      customer replies sorted in the shared mailbox, and what the AI model has cost.
+    who: >
+      At a real company the AI Agent Engineering team builds the agents, and the person
+      leading the programme answers for their cost.
+    example: >
+      A conversation with the real model costs about three cents, which is why a spending
+      limit is built in.
+
+  - page: agent
+    target: Conversations
+    tab: Conversations
+    title: Every conversation
+    what: >
+      Open a conversation to read the exchange, the help articles the agent searched, the
+      tools it used, and who wrote each reply.
+    who: >
+      The AI Agent Engineering team reviews failed conversations here every week.
+    example: >
+      If the agent searched for "single sign-on" and found no article, the fix is a new
+      article, not a new prompt.
+
+  - page: agent
+    target: Mailbox triage
+    tab: Mailbox triage
+    title: The shared mailbox
+    what: >
+      When a customer replies to one of our emails, the reply lands in a shared mailbox. A
+      model labels each reply by intent and sentiment, and rules written in code decide
+      where it goes. Triage means sorting by urgency and type.
+    who: >
+      The Scaled CS team and Sales receive the replies that need a person.
+    example: >
+      "Please stop emailing me" is labelled as an opt-out, and the customer is removed
+      from every journey at once.
+
+  - page: agent
+    target: Evaluation
+    tab: Evaluation
+    title: The agent's examination
+    what: >
+      The agent was run on a fixed set of test conversations with the real model. Code
+      checks first whether it handed off when it should have. A second model then scores
+      the wording.
+    who: >
+      The AI Agent Engineering team runs it before every change. The person leading the
+      programme decides what "good" means.
+    example: >
+      Three versions of the agent's instructions were compared. The one expected to win
+      did not, so it was not used.
+
+  - page: agent
+    target: Review queue
+    tab: Review queue
+    title: The feedback loop
+    what: >
+      A task that a person marked as something the agent should have handled lands here,
+      with any conversation given a thumbs down. Each becomes a candidate test case.
+    who: >
+      The Scaled CS team supplies the cases. The AI Agent Engineering team turns them into
+      tests.
+    example: >
+      A success manager closes a task as "the agent should have handled this". The next
+      version of the agent must pass that case.
+
+  # --- Human console ----------------------------------------------------------------------
   - page: console
-    company: >
+    target: Human console
+    title: The person who receives the handoff
+    what: >
+      This is the screen of the person who picks up a task. Each role signs in and sees
+      only its own queue. Each task carries the reason it was raised, the customer's own
+      words, what has already been tried, and a recommended next step.
+    who: >
       At a real company these are tasks in Gainsight Cockpit and in Salesforce, worked by
-      the Scaled CS team and the Sales team. Tasks from this demo were pushed into a real
-      Salesforce org.
+      the Scaled CS team and the Sales team.
+    example: >
+      The price question from the Live demo page arrives here as a task for Sales. Closing
+      it with an outcome tells the journey what to do next.
+
+  - page: console
+    target: "What a person receives: an example"
+    title: What a person receives
+    what: >
+      One task, shown read-only. It carries the handoff packet: why the task was raised,
+      the customer's own words, what has already been tried, the account at a glance, and
+      a recommended next step.
+    who: >
+      A success manager or a member of the Sales team reads it and can act at once,
+      without opening three other systems to find the context.
+    example: >
+      A task raised for a price question shows the customer's exact question and the
+      number of seats in use, so the reply can be written in a minute.
+
+  # --- Pilot ------------------------------------------------------------------------------
   - page: pilot
-    company: >
-      At a real company this is the pilot plan and the weekly review, kept in Confluence
-      and Jira and presented to CS Leadership.
+    target: Readiness checklist
+    title: Is the pilot ready?
+    what: >
+      Six conditions that must hold before a pilot runs: the data is tested and current,
+      consent and contact limits are enforced, the agent passes its evaluation, the queues
+      have capacity, outcomes return to the journey, and the results are up to date. Each
+      line is answered from live data.
+    who: >
+      The person leading the programme presents it to CS Leadership before launch.
+    example: >
+      If the agent's evaluation fell below its pass mark, that line would turn red and the
+      launch would wait.
+
+  - page: pilot
+    target: Rollout stage of each play
+    title: Rollout stages
+    what: >
+      Each play begins on a slice of ten percent of the customers who qualify. It moves to
+      a full test, with a holdout, only when the slice has run cleanly.
+    who: >
+      The CS Operations team moves a play from one stage to the next, after a review.
+    example: >
+      A new play that sent the wrong email would reach ten percent of customers, not all
+      of them.
+
+  - page: pilot
+    target: Results per rung of the intervention ladder
+    title: How far up the ladder?
+    what: >
+      How far customers had to go: how many were helped by the digital step alone, how
+      many needed the AI agent, and how many reached a person.
+    who: >
+      CS Leadership uses it to see where the work is really being done, and what it costs.
+    example: >
+      If most customers succeed after the email alone, the team's time is being saved for
+      the customers who need it.
+
+  - page: pilot
+    target: Handoff quality
+    title: The quality of the handoffs
+    what: >
+      Six measures of the handoffs to people: how quickly tasks are picked up, how many
+      miss their deadline, how many end well, how many were unnecessary, how many customers
+      had to be contacted again, and how many arose because no help article covered the
+      question.
+    who: >
+      The leads of the Scaled CS team and of Sales use them to manage their queues.
+    example: >
+      A high share of unnecessary handoffs means the agent is passing on questions it
+      could have answered.
+
+  - page: pilot
+    target: Weekly review notes
+    title: The weekly review
+    what: >
+      One row for each week of the pilot, with the note a weekly review would record.
+    who: >
+      At a real company this review is presented to CS Leadership, and its decisions are
+      kept in Confluence and Jira.
+    example: >
+      "Week 3: handoffs rose by half, the Sales queue went past its limit" is a note that
+      leads to a decision.
+
+  - page: pilot
+    target: How the pattern scales
+    title: Scaling to the next group
+    what: >
+      The pilot runs on uncovered customers. This preview shows what would happen if the
+      next tier were added today: how many customers would enter each play, how many would
+      be held out, and which team's queue could not absorb the first day's work.
+    who: >
+      The person leading the programme uses it to agree capacity with the team leads before
+      scaling.
+    example: >
+      Adding pooled customers might send 40 tasks to a queue that can take 15 a day. The
+      preview shows that before it happens.
+
+  # --- Operating model --------------------------------------------------------------------
   - page: operating
-    company: >
+    target: Operating model
+    title: Who owns what, and why
+    what: >
+      The working documents of the programme. The ownership map names the team that owns
+      every table, play, agent and queue, and marks the gaps. The dependency map shows
+      which team waits for which. The decision records give the reason for every design
+      choice.
+    who: >
       At a real company these documents live in Confluence and Jira, and every team in the
       chain relies on them.
+    example: >
+      When someone asks "who decides the health score weights?", the ownership map answers
+      in one line.
+
+  # --- Close ------------------------------------------------------------------------------
   - page: overview
-    company: >
-      What was run for real: the data pipeline on a Databricks workspace, tasks pushed into
-      a Salesforce org, a public Tableau dashboard, the Claude API answering on the Live
-      demo page, a Postgres database behind this site, and GitHub Actions running the tests
-      on every change and the pipeline every day. Gainsight has no free version, so this
-      application stands in for it. The customers are simulated.
+    target: What this is.
+    title: What was run for real
+    what: >
+      The data pipeline was run on a Databricks workspace. Tasks were pushed into a
+      Salesforce org. The results feed a public Tableau dashboard. The AI model answers on
+      the Live demo page. A Postgres database sits behind this site, and GitHub Actions
+      runs the tests on every change.
+    who: >
+      Gainsight has no free version, so this application stands in for it.
+    example: >
+      The customers are simulated. The code, the checks and the connections are real.

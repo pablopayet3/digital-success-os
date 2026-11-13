@@ -31,6 +31,53 @@ def password_for(role: str) -> str | None:
     return "demo" if load_settings().env == "dev" and not os.environ.get("DSO_HOSTED") else None
 
 
+def show_task(task, packet: dict) -> None:
+    """Draw one task as the person who receives it sees it: the handoff packet."""
+    st.header(f"{task['title']}")
+    st.caption(
+        f"{packet['account_name']} ({task['account_id']}) | reason: {task['reason_code']} | priority: {task['priority']} | due {task['sla_due_on']}"
+    )
+
+    left, right = st.columns(2)
+    with left:
+        st.subheader("Why this is on your desk")
+        trigger = packet["trigger"]
+        st.write(f"**Source:** {trigger.get('source')} | **Play:** {trigger.get('play') or 'none'}")
+        if trigger.get("signal"):
+            st.write(f"**Signal:** {trigger['signal']}. {trigger.get('evidence') or ''}")
+        else:
+            # Not from a journey step (the agent or the mailbox handed off): show what is firing.
+            firing = trigger.get("all_signals_firing") or {}
+            listed = "; ".join(f"{name} ({why})" for name, why in firing.items())
+            st.write(f"**Signals firing on the account:** {listed or 'none today'}.")
+        if packet.get("customer_quote"):
+            st.write("**In the customer's words:**")
+            st.info(packet["customer_quote"])
+        if packet.get("conversation_summary"):
+            st.write(f"**What happened with the agent:** {packet['conversation_summary']}")
+        st.write("**What was already tried:**")
+        for item in packet.get("what_was_tried") or ["Nothing yet."]:
+            st.write(f"- {item}")
+        st.success(f"**Recommended next step:** {packet['recommended_next_step']}")
+        contact = packet.get("contact")
+        if contact:
+            st.write(
+                f"**Contact:** {contact.get('full_name') or contact.get('name')} ({contact.get('role')}), {contact.get('email')}"
+            )
+    with right:
+        st.subheader("The account at a glance")
+        snapshot = packet["account_snapshot"]
+        health = snapshot["health"]
+        one, two, three = st.columns(3)
+        ui.metric(one, "Health", f"{health['score']:.0f}", health["band"], delta_color="off")
+        ui.metric(two, "Seats", f"{snapshot['seats']['assigned']} of {snapshot['seats']['licensed']}")
+        ui.metric(three, "Renewal in", f"{snapshot['days_to_renewal']} days")
+        st.json(snapshot, expanded=False)
+        if packet.get("brief"):
+            st.subheader("Brief")
+            st.text(packet["brief"])
+
+
 if "console_role" not in st.session_state:
     st.write("Sign in to work a queue. Each role sees the queues it owns.")
     with st.form("login"):
@@ -46,6 +93,18 @@ if "console_role" not in st.session_state:
         st.caption(
             "Local demo: the password for every role is `demo`. When hosted, passwords come from environment variables."
         )
+    # A visitor without a password still sees what a person receives: one task, read-only.
+    example = ui.rows(
+        "SELECT * FROM ctas ORDER BY CASE WHEN status <> 'resolved' THEN 0 ELSE 1 END, "
+        "created_on DESC LIMIT 1"
+    )
+    if len(example):
+        st.subheader("What a person receives: an example")
+        st.caption(
+            "One task from the demo, shown read-only. Signing in opens the whole queue and lets "
+            "you close a task, which sends its outcome back to the journey."
+        )
+        show_task(example.iloc[0], json.loads(example.iloc[0]["packet"]))
     st.stop()
 
 role = st.session_state.console_role
@@ -118,49 +177,7 @@ st.dataframe(
 
 task = tasks[tasks["cta_id"] == st.selectbox("Open a task", tasks["cta_id"])].iloc[0]
 packet = json.loads(task["packet"])
-st.header(f"{task['title']}")
-st.caption(
-    f"{packet['account_name']} ({task['account_id']}) | reason: {task['reason_code']} | priority: {task['priority']} | due {task['sla_due_on']}"
-)
-
-left, right = st.columns(2)
-with left:
-    st.subheader("Why this is on your desk")
-    trigger = packet["trigger"]
-    st.write(f"**Source:** {trigger.get('source')} | **Play:** {trigger.get('play') or 'none'}")
-    if trigger.get("signal"):
-        st.write(f"**Signal:** {trigger['signal']}. {trigger.get('evidence') or ''}")
-    else:
-        # Not from a journey step (the agent or the mailbox handed off): show what is firing.
-        firing = trigger.get("all_signals_firing") or {}
-        listed = "; ".join(f"{name} ({why})" for name, why in firing.items())
-        st.write(f"**Signals firing on the account:** {listed or 'none today'}.")
-    if packet.get("customer_quote"):
-        st.write("**In the customer's words:**")
-        st.info(packet["customer_quote"])
-    if packet.get("conversation_summary"):
-        st.write(f"**What happened with the agent:** {packet['conversation_summary']}")
-    st.write("**What was already tried:**")
-    for item in packet.get("what_was_tried") or ["Nothing yet."]:
-        st.write(f"- {item}")
-    st.success(f"**Recommended next step:** {packet['recommended_next_step']}")
-    contact = packet.get("contact")
-    if contact:
-        st.write(
-            f"**Contact:** {contact.get('full_name') or contact.get('name')} ({contact.get('role')}), {contact.get('email')}"
-        )
-with right:
-    st.subheader("The account at a glance")
-    snapshot = packet["account_snapshot"]
-    health = snapshot["health"]
-    one, two, three = st.columns(3)
-    ui.metric(one, "Health", f"{health['score']:.0f}", health["band"], delta_color="off")
-    ui.metric(two, "Seats", f"{snapshot['seats']['assigned']} of {snapshot['seats']['licensed']}")
-    ui.metric(three, "Renewal in", f"{snapshot['days_to_renewal']} days")
-    st.json(snapshot, expanded=False)
-    if packet.get("brief"):
-        st.subheader("Brief")
-        st.text(packet["brief"])
+show_task(task, packet)
 
 st.subheader("Close the task")
 st.caption(

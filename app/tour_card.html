@@ -1,0 +1,99 @@
+<!-- Synthetic data, fictional company. The guided tour's corner window (app/tour.py).
+     The style makes the tour's container a small window fixed in a corner, so it never
+     covers the element it explains. The script finds that element on the page, scrolls it
+     into view and draws a glowing frame around it.
+     __STOP__ is replaced by what to find: {target, tab, expand, group, scroll}. -->
+<style>
+  .st-key-tour_card {
+    position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 999;
+    width: min(23rem, calc(100vw - 2.5rem)); max-height: 70vh; overflow-y: auto;
+    padding: 1rem 1.1rem 0.6rem; border-radius: 0.75rem;
+    border: 1px solid rgba(128, 128, 128, 0.45);
+    box-shadow: 0 10px 34px rgba(0, 0, 0, 0.45);
+    gap: 0.45rem;
+  }
+  /* Room below the page while the tour runs, so that even the last element of a page can
+     be brought to the top, clear of the window. */
+  [data-testid="stMainBlockContainer"] { padding-bottom: 80vh; }
+  /* Smaller words than the page, so the window stays small. */
+  .st-key-tour_card p, .st-key-tour_card li { font-size: 0.86rem; line-height: 1.45; }
+  /* The glowing frame around the element the window is explaining. */
+  .dso-tour-target {
+    outline: 3px solid #f5a524; outline-offset: 6px; border-radius: 8px;
+    scroll-margin-top: 6.5rem;
+    animation: dso-tour-glow 1.8s ease-in-out infinite;
+  }
+  @keyframes dso-tour-glow {
+    0%, 100% { box-shadow: 0 0 0 6px rgba(245, 165, 36, 0.15), 0 0 18px 4px rgba(245, 165, 36, 0.40); }
+    50% { box-shadow: 0 0 0 6px rgba(245, 165, 36, 0.25), 0 0 34px 12px rgba(245, 165, 36, 0.70); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dso-tour-target { animation: none; box-shadow: 0 0 22px 6px rgba(245, 165, 36, 0.55); }
+  }
+</style>
+<script>
+(() => {
+  const want = __STOP__;
+  const MARK = "dso-tour-target";
+  // Each stop starts this script again. The newest one takes over from the one before.
+  const mine = {};
+  window.dsoTourStop = mine;
+  const card = document.querySelector(".st-key-tour_card");
+  const app = document.querySelector('[data-testid="stApp"]');
+  // The window takes the page's own background, so it reads in a light and in a dark theme.
+  if (card && app) card.style.background = getComputedStyle(app).backgroundColor;
+  document.querySelectorAll("." + MARK).forEach((old) => old.classList.remove(MARK));
+  if (!want.target) return;
+
+  const main = document.querySelector('[data-testid="stMain"]') || document.body;
+  const outside = (element) => !element.closest(".st-key-tour_card");
+  const shown = (element) => element.offsetParent !== null;
+  const withText = (selector, text) =>
+    [...main.querySelectorAll(selector)].filter((el) => outside(el) && el.textContent.includes(text));
+
+  // The page redraws its elements while it loads, and again whenever the visitor uses it.
+  // So this does not frame the element once: it keeps looking, four times a second, and
+  // puts the frame back whenever the element has been redrawn.
+  let looks = 0;
+  let scrolledTo = null;
+  const look = () => {
+    if (window.dsoTourStop !== mine) { clearInterval(timer); return; }
+    looks += 1;
+    const settling = looks <= 40;  // the first ten seconds
+    if (settling && want.tab) {
+      const tab = withText('button[role="tab"]', want.tab)[0];
+      if (tab && tab.getAttribute("aria-selected") !== "true") tab.click();
+    }
+    if (settling && want.expand) {
+      const summary = withText("summary", want.expand)[0];
+      if (summary && !summary.parentElement.open) summary.click();
+    }
+    // Of everything that contains the words, the smallest piece is the label itself.
+    const found = withText(
+      'h1, h2, h3, h4, summary, label, p, button[role="tab"], [data-testid="stCaptionContainer"]',
+      want.target
+    ).filter(shown).sort((a, b) => a.textContent.length - b.textContent.length)[0];
+    if (!found) return;
+
+    let box = found.closest('[data-testid="stMetric"]')
+      || found.closest('[data-testid="stExpander"], [data-testid="stAlert"], [data-testid="stForm"]')
+      || found.closest('[data-testid="stElementContainer"]')
+      || found;
+    // A stop about a whole row of numbers frames the row.
+    if (want.group && box.closest('[data-testid="stHorizontalBlock"]')) {
+      box = box.closest('[data-testid="stHorizontalBlock"]');
+    }
+    document.querySelectorAll("." + MARK).forEach((old) => { if (old !== box) old.classList.remove(MARK); });
+    box.classList.add(MARK);
+    // Bring it to the top of the page, clear of the window in the corner. Only while the
+    // page settles: afterwards the visitor scrolls where they like. No animation, because
+    // a smooth scroll does not finish in a tab that is in the background.
+    if (want.scroll && settling && scrolledTo !== box) {
+      box.scrollIntoView({ behavior: "auto", block: "start" });
+      scrolledTo = box;
+    }
+  };
+  const timer = setInterval(look, 250);
+  look();
+})();
+</script>

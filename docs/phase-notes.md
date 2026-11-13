@@ -710,15 +710,17 @@ missing or only half there. This section is what closed them.
 - **The role, line by line** (`config/job.yaml`): the ten lines of the role in plain
   words. Every page opens with the line it answers, and the Overview says what the
   system is, draws the workflow with the team on each step, and lists the ten lines.
-- **A guided tour in the app** (`app/tour.py`, words in `config/tour.yaml`): a slim strip
-  at the top of the page, one stop per page, that names the platform and the team at a
-  real company and never covers the page.
+- **A guided tour in the app** (`app/tour.py`, words in `config/tour.yaml`): a small
+  window in a corner, one stop per metric or section, with a glowing frame on the
+  element it explains. Each stop says what it is, who uses it, and gives an example.
+  Each stop can be read by a recorded voice (`scripts/tour_voice.py`, ADR 0025).
+- **A definition behind every number** (`config/glossary.yaml`), as a hover text.
 - **A hands-on path for reviewers** (`docs/reviewer-guide.md`) and an admin reset of the
   shared hosted data, so several people can try it without spoiling it for the next.
 - **A picture of every page** in `docs/screenshots/`.
 - **Every page of the app is run by a test** on the small world (`tests/test_app.py`),
   and again with the internet blocked, which is the offline promise as a test.
-  201 tests in total.
+  202 tests in total.
 
 ### How to run
 
