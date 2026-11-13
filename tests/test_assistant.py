@@ -40,6 +40,10 @@ from common.settings import load_settings
         "SELECT 1 -- a comment",
         "ATTACH 'other.db'",
         "PRAGMA show_tables",
+        "SELECT * FROM 'data/landing/crm_accounts.csv'",
+        "SELECT * FROM gold.signals, 'secrets.parquet'",
+        'SELECT * FROM "bronze"."raw_events"',
+        "SELECT * FROM \"data/landing/tickets.csv\"",
     ],
 )
 def test_the_sql_guard_refuses_anything_but_one_read_on_gold_or_silver(sql):
@@ -54,6 +58,8 @@ def test_the_sql_guard_allows_reads_on_gold_and_silver():
         "SELECT a.account_id FROM gold.account_current a JOIN silver.stg_ops_ctas c "
         "ON a.account_id = c.account_id"
     )
+    # Quoted text is fine where it is a value, not a file.
+    check_sql("SELECT count(*) FROM gold.signals WHERE signal_id IN ('detractor', 'usage_drop')")
 
 
 def test_a_query_returns_at_most_the_row_limit(simulated):

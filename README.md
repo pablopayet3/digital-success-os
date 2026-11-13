@@ -268,7 +268,7 @@ What each phase delivered, and three decisions to defend for each, is in
 
 ## What runs for real, and what has not been run yet
 
-Running on GitHub Actions: CI on every push (lint, 238 tests on Linux, the dbt build, a
+Running on GitHub Actions: CI on every push (lint, 246 tests on Linux, the dbt build, a
 secret scan), the container image build (it generates a demo world inside the image and
 publishes it), and the daily pipeline schedule, which opens an issue when a run fails.
 
@@ -320,5 +320,5 @@ experiments/  play results against holdouts
 api/ app/     FastAPI endpoints; the Streamlit app
 integrations/ the CRM sync
 docs/         operating documents, decision records, play specs, model cards
-tests/        238 tests; they generate a small world and run everything on it, every app page included
+tests/        246 tests; they generate a small world and run everything on it, every app page included
 ```

@@ -1,17 +1,17 @@
 {
  "note": "Synthetic data, fictional company. Written by scripts/assistant_examples.py.",
  "data_as_of": "2026-09-07",
- "written_at": "2026-11-13T19:49:52+00:00",
+ "written_at": "2026-11-13T20:20:08+00:00",
  "answers": [
   {
    "team": "CS Leadership",
    "question": "Which uncovered customers are most at risk of leaving right now, and why?",
-   "answer": "The uncovered customers most at risk are small-business accounts, and the highest-risk one is Eldenta Retail. Uncovered means the customer has no assigned success manager. The churn risk score is the model's estimated chance that a customer leaves in the next 90 days, on a scale of 0 to 1.\n\nOf 159 uncovered customers, 40 are flagged high risk. Together they hold $58,633 in annual recurring revenue (ARR).\n\n| Customer | Risk | ARR | Main reasons |\n|---|---|---|---|\n| Eldenta Retail | 0.98 | $1,764 | Many high-priority tickets, setup incomplete |\n| Bexyx Analytics | 0.74 | $795 | Setup incomplete, high-priority tickets, few seats active |\n| Kelomi Energy | 0.60 | $717 | Setup incomplete, never answered the NPS survey, nearly all seats assigned |\n| Yoranda Freight | 0.55 | $1,147 | Setup incomplete, never answered NPS, high-priority tickets |\n| Drinanda Finance | 0.53 | $0 | Setup incomplete, few seats active, never answered NPS |\n\nNPS is the Net Promoter Score, a 0-to-10 satisfaction survey. The pattern across these accounts is incomplete setup, support trouble, and low seat use or no survey response. None of them is in a renewal negotiation, and all have at least 157 days until renewal.\n\nSource: gold.account_current",
+   "answer": "The uncovered customers most at risk of leaving are small-business accounts. Uncovered customers are the ones with no assigned success manager. Eldenta Retail is the highest, with a modeled 76% chance of leaving in the next 90 days.\n\n| Customer | ARR (annual recurring revenue) | Churn risk | Main reasons |\n|---|---|---|---|\n| Eldenta Retail | $1,764 | 76% | Many high-priority and other support tickets, setup incomplete |\n| Kelomi Energy | $717 | 60% | Setup incomplete, never answered the NPS survey (NPS is a 0 to 10 satisfaction score), reads our emails |\n| Drinolo Software | $1,411 | 45% | Setup incomplete, never answered NPS, admin rarely logs in |\n| Norora Logistics | $1,771 | 42% | Few seats active, setup incomplete, never answered NPS |\n| Iskuvia Logistics | $0 | 36% | Setup incomplete, never answered NPS, nearly all seats assigned |\n\nIncomplete setup shows up for every customer in the top eight. Never answering the NPS survey shows up for most of them. Eldenta Retail is the only one with a support problem as a main reason. Of the 159 uncovered customers, 40 are flagged \"High risk of leaving\", and together they represent $61,832 in ARR.\n\nSource: gold.account_current",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [
-    "select account_name, segment, arr, round(churn_risk_score,2) risk, health_band, days_to_renewal, renewal_in_negotiation, churn_top_reasons from gold.account_current where coverage_tier='uncovered' and churn_risk_high order by churn_risk_score desc limit 8",
-    "select count(*) n, sum(case when churn_risk_high then 1 end) high, sum(case when churn_risk_high then arr end) arr_high from gold.account_current where coverage_tier='uncovered'"
+    "select account_name, segment, arr, round(churn_risk_score,2) risk, health_band, days_to_renewal, churn_top_reasons from gold.account_current where coverage_tier='uncovered' order by churn_risk_score desc limit 8",
+    "select count(*) n, sum(case when churn_risk_high then 1 else 0 end) high, sum(case when churn_risk_high then arr end) high_arr from gold.account_current where coverage_tier='uncovered'"
    ],
    "documents": [],
    "available": true
@@ -19,7 +19,7 @@
   {
    "team": "CS Leadership",
    "question": "How much annual revenue do the customers in the pilot represent, and how much of it is in the red health band?",
-   "answer": "The pilot customers (the \"uncovered\" tier, meaning those with no assigned success manager) represent $369,753 in annual recurring revenue (ARR) across 159 accounts. Of that, $17,136 is in the red health band, which is the lowest of the three bands (green, yellow, red) and flags the accounts in the worst health. That is 7 accounts. The figures are as of today, 2026-09-07.\n\nSource: gold.account_current",
+   "answer": "The 159 customers in the pilot (those with no assigned success manager, called the \"uncovered\" coverage tier) represent $366,004 in annual recurring revenue (ARR). Of that, $14,590 is in the red health band, which is the lowest of the three bands (green, yellow and red). The red amount comes from 5 customers, or about 4% of the pilot's ARR. These figures are as of today, 2026-09-07.\n\nSource: gold.account_current",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [
@@ -31,11 +31,11 @@
   {
    "team": "CS Operations",
    "question": "Which play has the most customers in it right now?",
-   "answer": "Two plays are tied for the most customers in them right now. Onboarding rescue and usage recovery each have 3 customers whose journeys are still running. A journey counts as running if it is active or waiting on a person. No other play has anyone in it at the moment.\n\nThis count covers only customers who are getting the play. It leaves out customers held out for comparison and journeys that have finished or exited.\n\nSource: silver.stg_ops_enrollments",
+   "answer": "The Onboarding rescue play has the most customers in it right now, with 4 customers still in progress. Usage recovery and Reference request each have 2, and Seat expansion and Detractor save each have 1.\n\nI counted customers whose journey is active or waiting on a person, and left out customers held out for comparison and journeys already finished. If you meant total enrollments including holdouts, the ranking could differ.\n\nSource: silver.stg_ops_enrollments",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [
-    "select play_id, count(distinct account_id) accts, count(*) rows_, sum(case when arm='treatment' then 1 else 0 end) trt from silver.stg_ops_enrollments where status in ('active','waiting_on_human') group by 1 order by 2 desc"
+    "select play_id, count(distinct account_id) c, count(*) n from silver.stg_ops_enrollments where status in ('active','waiting_on_human') group by 1 order by 2 desc"
    ],
    "documents": [],
    "available": true
@@ -43,24 +43,24 @@
   {
    "team": "CS Operations",
    "question": "How many customers were kept out of a play, and for what reasons?",
-   "answer": "In the operational data, 47 enrollments were held out on purpose, covering 45 distinct customers. A holdout is a group of eligible customers who get nothing from a play, so the play's effect can be measured against them. Some customers were held out of more than one play. The only reason recorded is that deliberate comparison. The holdout is assigned by a hash of the customer, play and play version, not by anything about the customer.\n\nSeparately, 24 customers who did enter a play later exited it, which is different from being kept out. Sixteen exited with \"human: no_response\" and 8 with \"human: not_a_fit\". Both reasons come from the human-handoff step.\n\nI can't give you a count of customers excluded by rule, such as no consent, a paused account, or the cap of two touches in seven days. The program says these decisions go into an audit log. That log isn't in the tables I can read, so the audit log is what would answer that part.\n\nSource: silver.stg_ops_enrollments; docs/decisions/0014-plays-as-config-with-deterministic-holdouts.md",
+   "answer": "Two things could count as \"kept out\", so here are both.\n\n**Held out on purpose (the holdout):** 47 enrollments were held out, covering 45 distinct customers. The holdout is a share of eligible customers who are deliberately left alone so the play's effect can be measured. The only reason is that they were chosen for comparison. Some customers were held out of more than one play, which is why 47 is larger than 45.\n\n**Eligible but removed from a play after it started (exited):** 22 customers.\n\n| Exit reason | Customers |\n|---|---|\n| A person tried and got no response | 16 |\n| A person judged the customer not a fit | 6 |\n\nI found no other recorded reason in the enrollment data. This table also doesn't record customers who were never eligible, for example because they have no contact we may email.\n\nSource: silver.stg_ops_enrollments",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [
-    "select arm, status, coalesce(exit_reason,'(none)') reason, count(*) n, count(distinct account_id) accts from silver.stg_ops_enrollments where arm='holdout' or status='exited' group by 1,2,3 order by n desc"
+    "select arm, status, coalesce(exit_reason,'(none)') r, count(*) n, count(distinct account_id) a from silver.stg_ops_enrollments where arm='holdout' or status='exited' group by 1,2,3 order by n desc"
    ],
    "documents": [
-    "docs/decisions/0014-plays-as-config-with-deterministic-holdouts.md",
-    "docs/play-specs/detractor_save.md",
+    "docs/play-specs/advocacy_ask.md",
     "docs/play-specs/edition_upgrade.md",
-    "docs/play-specs/expansion_seats.md"
+    "docs/play-specs/usage_recovery.md",
+    "docs/play-specs/detractor_save.md"
    ],
    "available": true
   },
   {
    "team": "Data Engineering",
    "question": "Did any data test fail in the last pipeline run?",
-   "answer": "No. No data test failed in the last pipeline run. All 100 tests passed, with zero failing rows. The tests cover checks such as unique IDs, no missing values, and valid links between tables. The run timestamps are 2026-11-13, which is later than the warehouse's \"today\" of 2026-09-07. The test run was probably on the real calendar, not the simulated one.\n\nSource: gold.dq_test_results",
+   "answer": "No. All 100 data tests in the last pipeline run passed, and none reported any failing rows. The run finished at about 20:13 UTC on 2026-11-13, a timestamp that sits outside the simulated calendar, where today is 2026-09-07. The table holds only this one run, so I can't compare it with earlier runs.\n\nSource: gold.dq_test_results",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [
@@ -73,7 +73,7 @@
   {
    "team": "Data Engineering",
    "question": "Which records were rejected when the data arrived, and why?",
-   "answer": "At ingest, 1,319 of the 100,447 event lines received were rejected and sent to the dead-letter queue. That queue holds rejected rows, with the reason, so they can be replayed later. There were three reasons:\n\n| Reason | Rows |\n|---|---|\n| Missing account id | 1,004 |\n| Unknown event name (not on the agreed list) | 268 |\n| Malformed JSON (the line couldn't be read) | 47 |\n\nThese rows can't be used at all. Rows that are messy but usable are loaded and repaired later instead. Those repairs removed 439 duplicate events and 186 future-dated events. They also kept 108 late-arriving events under their true date.\n\nA rejected setup event can make an account look one step behind until the queue is replayed.\n\nThe warehouse doesn't hold the individual rejected rows. It holds only the counts by reason.\n\nSource: gold.dq_summary, docs/decisions/0009-ingest-validation-and-dead-letter.md",
+   "answer": "In the current warehouse run, 1,318 of 100,326 product event lines were rejected at ingest and sent to the dead-letter queue. That is the holding area for rows that can't be used. The reasons are:\n\n| Reason | Rows |\n|---|---|\n| No account id | 1,004 |\n| Unknown event name | 268 |\n| Broken JSON (the line can't be read) | 46 |\n\nRejected events are only those that can't be used at all. Other problems are loaded and repaired later in the pipeline instead of being rejected:\n- 438 duplicate events removed.\n- 185 future-dated events removed.\n- 108 late-arriving events kept under their true date.\n- 9 duplicate contacts removed.\n\nA rejected event can hide a real fact. For example, a lost setup step can make an account look one step behind until the dead letter is replayed. Seat counts are not affected, because they come from the licence snapshot.\n\nSource: gold.dq_summary, docs/decisions/0009-ingest-validation-and-dead-letter.md",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [
@@ -81,15 +81,14 @@
    ],
    "documents": [
     "docs/decisions/0009-ingest-validation-and-dead-letter.md",
-    "docs/eda-report.md",
-    "docs/data-requirements.md"
+    "docs/eda-report.md"
    ],
    "available": true
   },
   {
    "team": "Data Science",
    "question": "What are the five parts of the health score, and how much does each one weigh?",
-   "answer": "The health score is a 0 to 100 number for each account. It is a weighted sum of five components, and each component also runs from 0 to 100:\n\n| Component | Weight |\n|---|---|\n| Adoption | 35% |\n| Sentiment | 20% |\n| Engagement | 15% |\n| Support | 15% |\n| Commercial | 15% |\n\n- **Adoption** is the share of assigned seats that were active this month, blended with how much of the setup is complete.\n- **Sentiment** is the latest customer survey score (NPS, a 0 to 10 rating of how likely a customer is to recommend the product) times 10.\n- **Engagement** combines how many emails the account opened with how often its admins logged in.\n- **Support** starts at 100 and loses points for high-priority tickets.\n- **Commercial** blends seat utilization with whether seats are growing or shrinking.\n\nA score of 70 or above is green, 50 to 69 is yellow, and below 50 is red.\n\nSource: docs/metrics.md",
+   "answer": "The health score is a weighted sum of five parts. Each part is scored from 0 to 100.\n\n| Part | Weight | What it measures |\n|---|---|---|\n| Adoption | 35% | Share of assigned seats active this month (60%) and setup completion (40%) |\n| Sentiment | 20% | Latest survey score times 10, or 60 if the customer was never surveyed |\n| Engagement | 15% | Email open rate (70%) and admin logins (30%) |\n| Support | 15% | 100 minus penalties for open and recent high-priority tickets |\n| Commercial | 15% | Seat utilization (50%) and whether seats are growing, flat or shrinking (50%) |\n\nA score of 70 or above is green, 50 to 69 is yellow, and below 50 is red.\n\nSource: docs/metrics.md",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [],
@@ -104,11 +103,11 @@
   {
    "team": "Data Science",
    "question": "Which signal is firing for the most customers today?",
-   "answer": "The signal firing for the most customers today (2026-09-07) is expansion_ready. It fires for 88 customers. A signal is a rule that flags a customer who may need help or may be ready for an offer. The next most common signals are churn_risk_high with 51 customers, seat_pressure with 23, edition_fit with 21, and activation_stalled with 20.\n\nSource: gold.signals",
+   "answer": "\"Likely to buy more\" is firing for the most customers today (2026-09-07). It's firing for 85 customers. \"High risk of leaving\" is next with 51, and \"Ready to be a reference\" follows with 29. I counted each customer once per signal.\n\nSource: gold.signals",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [
-    "select signal_id, count(distinct account_id) n from gold.signals where snapshot_date=(select max(snapshot_date) from gold.signals) group by 1 order by 2 desc limit 5"
+    "select signal_id, count(distinct account_id) n from gold.signals where snapshot_date=date '2026-09-07' group by 1 order by 2 desc"
    ],
    "documents": [],
    "available": true
@@ -116,11 +115,11 @@
   {
    "team": "AI Agent Engineering",
    "question": "How many conversations did the AI agent have, and why were some passed to a person?",
-   "answer": "The onboarding agent had 9 conversations between 2026-09-01 and 2026-09-05. It resolved 7 of them itself and handed 2 to a person (an \"escalation\").\n\nThe two handoffs had different causes:\n- **Not in the docs:** The agent itself asked for a person because the answer wasn't in its documentation. That was 1 conversation.\n- **Frustration:** A hard rule, which is fixed code and not the agent's judgment, ended the conversation and sent it to a person when the customer showed frustration. That was 1 conversation.\n\nWith only 9 conversations, these counts are too small to show a trend.\n\nSource: silver.stg_ops_conversations",
+   "answer": "The AI agent had 7 conversations in total, and all 7 were passed to a person. None were marked as resolved by the agent.\n\n| Reason for handoff | Who decided | Conversations |\n|---|---|---|\n| Agent unavailable (a tool or the model was down) | A failure | 6 |\n| Customer frustration | A hard rule, meaning a fixed rule in the code that stops the conversation | 1 |\n\nAll 7 handoffs went to the Scaled CS team's queue.\n\nSeven conversations is a small sample, and zero resolved is unusual. I didn't check whether the operational copy is complete or whether the failures share a cause.\n\nSource: silver.stg_ops_conversations",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [
-    "select outcome, coalesce(reason_code,'-') r, coalesce(escalated_by,'-') e, count(*) n, min(conversation_date) d0, max(conversation_date) d1 from silver.stg_ops_conversations group by 1,2,3 order by n desc"
+    "select outcome, reason_code, escalated_by, queue, count(*) n from silver.stg_ops_conversations group by 1,2,3,4 order by n desc"
    ],
    "documents": [],
    "available": true
@@ -128,80 +127,68 @@
   {
    "team": "AI Agent Engineering",
    "question": "When must the AI agent hand a conversation to a person?",
-   "answer": "The AI agent must hand a conversation to a person right away when any of these hard rules fires. These rules are written in code, so the model can't talk its way around them.\n\n| Trigger | Goes to |\n|---|---|\n| The customer asks for a person | Scaled CS team |\n| The customer is frustrated (keyword match, or a classifier score of 0.7 or above) | Scaled CS team |\n| Pricing or upgrade question | Sales team |\n| Contract, refund, billing or legal question | Scaled CS team |\n| The help center doesn't cover the question (the agent may ask one clarifying question first) | Scaled CS team |\n| A tool fails or times out | Scaled CS team |\n| The same question comes back a second time | Scaled CS team |\n| The model is unavailable, declines, or asks to hand off | Scaled CS team |\n\nThe first three rules (a request for a person, frustration, and pricing or upgrade) run before the model is called at all. A pricing question never reaches the model.\n\nA journey can also reach its human step on schedule. In onboarding rescue, for example, a person steps in if the account is still stalled after the email and the agent.\n\nSource: docs/human-fallback.md, docs/play-specs/onboarding_rescue.md",
+   "answer": "The AI agent must hand a conversation to a person when any of these hard rules fires. They are enforced in code, so the model can't talk its way around them.\n\n- **Customer asks for a person.** This goes to the Scaled CS team.\n- **Customer is frustrated.** Either keywords or a classifier score of 0.7 or higher triggers it. This goes to the Scaled CS team.\n- **Pricing or upgrade question.** This goes to Account owners (Sales).\n- **Contract, refund, billing or legal question.** This goes to the Scaled CS team.\n- **The help center doesn't cover the question.** The agent may ask one clarifying question first. Then it goes to the Scaled CS team.\n- **A tool fails or times out.** The agent hands off and never guesses. This goes to the Scaled CS team.\n- **The same question comes back a second time.** This goes to the Scaled CS team.\n- **The model is unavailable, declines, or asks to hand off.** This goes to the Scaled CS team.\n\nThe first three rules run before the agent model is called at all, so a pricing question never reaches it. A handoff can also happen when a play's ladder reaches its human step. For example, in the Onboarding rescue play, a person steps in if the agent escalates or setup is still stalled 4 days after the agent step. Separately, the mailbox triage agent sends replies to a person when they contain a complaint, buying intent or a meeting request, or when the classifier is unsure.\n\nSource: docs/human-fallback.md, docs/play-specs/onboarding_rescue.md",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [],
    "documents": [
-    "docs/play-specs/onboarding_rescue.md",
     "docs/human-fallback.md",
-    "docs/metrics.md"
+    "docs/play-specs/onboarding_rescue.md"
    ],
    "available": true
   },
   {
    "team": "Sales",
    "question": "Which customers are close to using all of their seats?",
-   "answer": "As of 2026-09-07, 23 customers have 90% or more of their licensed seats assigned. That is the program's \"seat pressure\" signal, and these accounts together carry $155,285 in annual recurring revenue (ARR). Fourteen of the 23 are in the \"uncovered\" tier, meaning they have no assigned success manager, and the pilot covers that tier.\n\nThe largest by ARR are:\n\n| Customer | Tier | Seats assigned / licensed | ARR |\n|---|---|---|---|\n| Ularro Builders | high_touch | 103 / 108 | $31,752 |\n| Jorarro Works | pooled | 77 / 84 | $22,680 |\n| Dovuvia Finance | uncovered | 77 / 85 | $20,910 |\n| Pellomi Education | pooled | 47 / 49 | $13,818 |\n| Joranda Software | uncovered | 61 / 65 | $10,296 |\n| Sorivo Travel | uncovered | 64 / 64 | $10,022 |\n\nSorivo Travel has every licensed seat assigned.\n\nSource: gold.account_current, docs/play-specs/expansion_seats.md",
+   "answer": "As of 2026-09-07, 25 customers have at least 90% of their licensed seats assigned. That is the threshold for the \"Seats are nearly full\" signal. Of those, 16 are in the pilot group, meaning customers with no assigned success manager.\n\nThese are the five largest by annual recurring revenue (ARR):\n\n| Customer | Coverage | Seats used / licensed | ARR |\n|---|---|---|---|\n| Ularro Builders | high touch | 103 / 108 | $31,752 |\n| Jorarro Works | pooled | 77 / 84 | $22,680 |\n| Pellomi Education | pooled | 47 / 49 | $13,818 |\n| Joranda Software | uncovered | 61 / 65 | $10,296 |\n| Sorivo Travel | uncovered | 64 / 64 (full) | $10,022 |\n\nSorivo Travel has already used every seat.\n\nSource: gold.account_current, docs/play-specs/expansion_seats.md",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [
-    "select count(*) n, sum(arr) arr, sum(case when coverage_tier='uncovered' then 1 else 0 end) unc from gold.account_current where seat_utilisation>=0.9 and seats_licensed>0",
-    "select account_name, segment, coverage_tier, seats_assigned, seats_licensed, round(seat_utilisation,2) u, arr from gold.account_current where seat_utilisation>=0.9 and seats_licensed>0 order by arr desc limit 8"
+    "select count(*) n, sum(case when coverage_tier='uncovered' then 1 end) unc, min(seat_utilisation) mn from gold.account_current where seat_utilisation>=0.9",
+    "select account_name, coverage_tier, seats_assigned, seats_licensed, round(seat_utilisation,3) u, arr from gold.account_current where seat_utilisation>=0.9 order by arr desc limit 10"
    ],
    "documents": [
-    "docs/model-cards/expansion.md",
     "docs/play-specs/expansion_seats.md",
-    "docs/model-cards/churn.md",
-    "docs/eda-report.md"
+    "docs/metrics.md",
+    "docs/decisions/0005-simulated-treatment-effects.md"
    ],
    "available": true
   },
   {
    "team": "Sales",
    "question": "How many tasks are waiting for the Sales team?",
-   "answer": "There are no tasks waiting for the Sales team right now. All 41 tasks sent to the Sales queue (the list of tasks for account owners) are resolved, and none are open. The data is copied from the operational store once a day, so a task created since the last refresh would not show up yet.\n\nSource: silver.stg_ops_ctas",
+   "answer": "One task is waiting for the Sales team's queue (the Account owners queue). It is open, no one has picked it up yet, and it isn't past its due date. The other 31 tasks sent to that queue have been resolved.\n\nSource: silver.stg_ops_ctas",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [
-    "select status, count(*) n, sum(case when sla_due_on < date '2026-09-07' then 1 else 0 end) past_due from silver.stg_ops_ctas where queue='sales' group by status"
+    "select status, count(*) n, sum(case when picked_up_on is null then 1 else 0 end) not_picked, sum(case when sla_due_on<date '2026-09-07' then 1 else 0 end) overdue from silver.stg_ops_ctas where queue='sales' group by status"
    ],
-   "documents": [
-    "docs/ownership-map.md",
-    "docs/play-specs/expansion_seats.md",
-    "docs/metrics.md"
-   ],
+   "documents": [],
    "available": true
   },
   {
    "team": "Analytics",
    "question": "Did the onboarding play work against its holdout?",
-   "answer": "We can't tell yet. The verdict for the onboarding rescue play is \"Too early\", because each group has fewer than 20 accounts.\n\nThe treatment group had 10 accounts, and 1 of them completed setup, which is 10%. The holdout group had 12 accounts, and none completed setup, which is 0%. The lift is 10 percentage points. The 95% interval runs from about –8.6 to +28.6 points, and the p-value is 0.26. That is well above the 0.05 bar, so the gap could easily be chance.\n\nWith groups this small, the test could only reliably detect a lift of about 26 points. The recommendation is to keep testing.\n\nSource: gold.experiment_results; docs/metrics.md",
+   "answer": "We can't tell yet. The Onboarding rescue play has too few customers to give a reliable result. The treated group has 10 customers and the holdout group has 12. A holdout is a share of eligible customers kept back so we can measure the play's effect. The result is flagged \"too early\" because it needs at least 20 customers in each group.\n\nThe setup completion rate was 20% for treated customers (2 of 10) and 8.3% for the holdout (1 of 12). That is a lift of about 11.7 percentage points. The 95% confidence interval runs from -17.6 to +41.0 points, and the p-value is 0.43. The interval includes zero, so this gap could easily be chance. The recommendation is to keep testing.\n\nSource: gold.experiment_results",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [
-    "SELECT * FROM gold.experiment_results WHERE play_id LIKE 'onboarding%'"
+    "SELECT * FROM gold.experiment_results WHERE play LIKE '%onboarding%'",
+    "SELECT * FROM gold.experiment_results WHERE play_id='onboarding_rescue'"
    ],
-   "documents": [
-    "docs/decisions/0016-experiment-design-for-the-pilot.md",
-    "docs/metrics.md",
-    "docs/pilot-plan.md",
-    "docs/play-specs/onboarding_rescue.md"
-   ],
+   "documents": [],
    "available": true
   },
   {
    "team": "Analytics",
    "question": "How is a holdout chosen, and why does it matter?",
-   "answer": "A holdout is a group of customers who qualify for a play but are deliberately left out of it. The system picks them with a fixed formula, not a random draw. It feeds the account, the play and the play's version into a hash, which is a function that always gives the same output for the same input. The hash result places each customer in treatment (gets the play) or holdout (gets nothing). The same customer always lands in the same group, on any day and on any machine. Nobody can steer a customer into treatment, and re-running the engine never reshuffles the groups. Raising the play's version reshuffles them on purpose.\n\nThis matters because the holdout is the comparison group. Comparing treated customers with holdout customers shows the play's own effect, apart from what would have happened anyway. To keep that comparison clean, a holdout customer is recorded as \"would have entered\" and is kept out of other exclusive plays during the measurement window, then released afterward.\n\nIn the pilot, most plays use a 50% holdout, because a large holdout teaches faster. The detractor play, which helps unhappy customers, uses 20%, because withholding help from them has a real cost. The find-the-admin task uses 0%, because it is data hygiene and not an experiment. After the pilot, plays that scale move to a standing 10% holdout.\n\nSource: docs/decisions/0014-plays-as-config-with-deterministic-holdouts.md",
+   "answer": "A holdout is a group of qualifying customers who get no help from a play, so the play's effect can be measured against them. The system picks that group with a fixed formula (a hash) of the account, the play and the play's version. It doesn't use a random draw. That formula also decides whether the account falls inside the 10% rollout slice.\n\nBecause it's a formula, the same account always gets the same answer on any machine and on any day. Nobody can nudge an account into treatment, and re-running the engine never reshuffles the groups. Raising a play's version reshuffles them on purpose. Exclusions are applied before assignment, so they can't favor one group.\n\nA holdout counts as a real enrollment that receives nothing. While the measurement window lasts, it also keeps the account out of other exclusive plays, so another play can't contaminate the comparison. The account is released afterward.\n\nPilot holdouts are large because a small holdout learns slowly:\n- Most plays hold out 50%.\n- The Detractor save play holds out 20%, because withholding help from an unhappy customer has a real cost.\n- The Find the admin play holds out 0%, because it is data hygiene and not an experiment.\n- Plays that scale after the pilot move to a 10% standing holdout.\n\nThis matters because the holdout is the only fair baseline. Without a comparable group that got nothing, you can't tell whether customers improved because of the play or would have improved anyway. The system also checks that the treatment and holdout split matches the design. In one case the Seat expansion play showed 91 treatment and 58 holdout accounts against a 50/50 design. That turned out to be chance, because the hash had assigned 93 and 60.\n\nSource: docs/decisions/0014-plays-as-config-with-deterministic-holdouts.md and docs/decisions/0016-experiment-design-for-the-pilot.md",
    "model": "claude-sonnet-5-5",
    "stored": true,
    "sql": [],
    "documents": [
-    "docs/model-cards/churn.md",
-    "docs/model-cards/expansion.md",
     "docs/decisions/0014-plays-as-config-with-deterministic-holdouts.md",
-    "docs/decisions/0004-churn-threshold-by-capacity.md"
+    "docs/decisions/0016-experiment-design-for-the-pilot.md"
    ],
    "available": true
   }

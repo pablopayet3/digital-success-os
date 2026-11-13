@@ -260,7 +260,7 @@ has run against a Developer Edition org (6 accounts, 6 tasks; a second run creat
 nothing), signed in through the browser with the vendor's command-line tool:
 `SALESFORCE_CLI_ORG=dso-demo` in `.env`, and `sf` must be on the PATH (it installs to
 `%APPDATA%\npm`, which this app's shell does not have on its PATH by default).
-238 tests in total.
+246 tests in total.
 
 After the phases (the brief read again line by line; see the last section of
 `docs/phase-notes.md`):

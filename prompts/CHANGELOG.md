@@ -83,7 +83,12 @@ Articles only.
 
 ## assistant
 
-### v1 (current)
+### v2 (current)
+
+Plays, signals, queues and outcomes are named in plain words, never by their codes
+(the owner's rule that every term a visitor reads is plain English).
+
+### v1
 
 First version (ADR 0028): answers questions about the data and the program with three
 read-only tools, cites its source, and never states a number that no tool returned.

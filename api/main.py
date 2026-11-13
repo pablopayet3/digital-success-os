@@ -27,7 +27,7 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from agents import assistant, mailbox, voice
 from agents.classify import classify_replies
@@ -272,7 +272,8 @@ def export_cs_platform() -> dict:
 
 
 class Question(BaseModel):
-    question: str
+    # The same limit as the page's own box: each question may be sent to a paid model.
+    question: str = Field(max_length=400)
 
 
 class VoiceEnd(BaseModel):

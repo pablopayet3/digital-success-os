@@ -45,7 +45,7 @@ roles:
 # Which version of each prompt is in use (files in prompts/, history in prompts/CHANGELOG.md).
 prompt_versions:
   onboarding_agent: v3
-  assistant: v1
+  assistant: v2
 
 # US dollars per million tokens, used to track spend against the budget.
 # Source: Anthropic's published API prices (checked November 2026). Update when they change.

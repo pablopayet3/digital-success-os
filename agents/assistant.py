@@ -76,6 +76,14 @@ OTHER_SCHEMAS = re.compile(
 )
 
 
+# A quoted text that looks like a file or a path, wherever it appears (FROM a, 'b.csv').
+FILE_LIKE = re.compile(
+    r"'[^']*(\.(csv|tsv|parquet|json|jsonl|ndjson|txt|env|db|duckdb|sqlite|xlsx|gz|zst)"
+    r"|[/\\])[^']*'",
+    re.IGNORECASE,
+)
+
+
 class UnsafeSQL(ValueError):
     """The statement is not one read-only SELECT on the gold or silver schemas."""
 
@@ -100,6 +108,12 @@ def check_sql(sql: str) -> str:
         raise UnsafeSQL("The answer key (ground truth) may never be read.")
     if FORBIDDEN_FUNCTIONS.search(statement):
         raise UnsafeSQL("Reading files or settings is not allowed.")
+    # DuckDB reads a file named in quotes in place of a table (FROM 'some/file.csv'), and a
+    # quoted name ("bronze"."x") would slip past the schema check below. Neither is needed.
+    if '"' in statement or "`" in statement:
+        raise UnsafeSQL("Quoted names are not allowed; write gold.table_name.")
+    if re.search(r"\b(?:from|join)\s*'", statement, re.I) or FILE_LIKE.search(statement):
+        raise UnsafeSQL("Reading files is not allowed.")
     if OTHER_SCHEMAS.search(statement):
         raise UnsafeSQL("Only the gold and silver schemas may be read.")
     # Every table after FROM or JOIN must be in gold or silver, or be a name defined in WITH.
@@ -298,7 +312,25 @@ def system_prompt(data_dir: Path = DATA_DIR) -> str:
         today_text = str(today["d"][0])[:10]
     except Exception:
         today_text = "unknown"
-    return template.format(row_limit=settings()["sql_row_limit"], today=today_text)
+    return template.format(
+        row_limit=settings()["sql_row_limit"], today=today_text, names=plain_names()
+    )
+
+
+def plain_names() -> str:
+    """The official plain names of the plays, signals and queues, so answers never show codes."""
+    from engine.catalog import load_catalog  # imported here: agents depends on engine
+
+    catalog = load_catalog()
+    plays = [f"{play.id} = {play.name}" for play in catalog.plays]
+    signals = [f"{s['id']} = {s['name']}" for s in load_yaml("job.yaml")["signals"]]
+    queues = [f"{key} = {queue['name']}" for key, queue in catalog.routing["queues"].items()]
+    lines = [
+        "Plays: " + "; ".join(plays) + ".",
+        "Signals: " + "; ".join(signals) + ".",
+        "Queues (teams): " + "; ".join(queues) + ".",
+    ]
+    return "\n".join(lines)
 
 
 def run_tool(name: str, arguments: dict, data_dir: Path, answer: Answer) -> str:
