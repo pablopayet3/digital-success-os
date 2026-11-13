@@ -30,7 +30,15 @@ def first_message(play, account_id: str, evidence: str, enrolment: dict | None) 
     account = records(
         ui.query(f"SELECT * FROM gold.account_current WHERE account_id = '{account_id}'")
     )[0]
-    subject, body = render_template(opener.template, account, None, evidence)
+    # Addressed to the customer's administrator, as the real message is.
+    contacts = records(
+        ui.query(
+            f"SELECT full_name FROM gold.dim_contact WHERE account_id = '{account_id}' "
+            "ORDER BY is_valid_admin DESC LIMIT 1"
+        )
+    )
+    contact = contacts[0] if contacts else None
+    subject, body = render_template(opener.template, account, contact, evidence)
     sent = ui.store().one(
         "SELECT touch_date FROM touches WHERE account_id = :account AND play_id = :play "
         "AND template = :template ORDER BY touch_date LIMIT 1",
@@ -90,7 +98,12 @@ with tab_chat:
         f"{row.account_name} ({row.edition}, {row.prerequisite_closure_pct:.0%} set up)": row.account_id
         for row in stalled.itertuples()
     }
-    account_id = labels[st.selectbox("You are the admin of", list(labels))]
+    # Open on a customer who really received the play's first message: the story is clearer.
+    emails = ui.rows("SELECT DISTINCT account_id FROM touches WHERE channel = 'email'")
+    emailed = set(emails["account_id"]) if len(emails) else set()
+    ids = list(labels.values())
+    start = next((position for position, one in enumerate(ids) if one in emailed), 0)
+    account_id = labels[st.selectbox("You are the admin of", list(labels), index=start)]
     if st.session_state.get("demo_account") != account_id:
         st.session_state.demo_account, st.session_state.demo_messages = account_id, []
         st.session_state.pop("demo_task", None)
