@@ -24,6 +24,8 @@ Who answers as the model (add to any command):
     (nothing)      real model responses replayed from cache/llm/; no key, no network
     --live         the cache first, then the API, up to the budget; needs a key in .env
     --stand-in     keyword rules, labelled as a stand-in everywhere; no key, no network
+    --crm          (app) send each new handoff to the CRM as it happens, and complete it
+                   there when a person closes it (ADR 0032)
 
 This file is the single entry point (see docs/decisions/0006). The Makefile
 only forwards to it, for machines that have `make`.
@@ -48,6 +50,11 @@ def main() -> None:
     parser.add_argument("--profile", default=None, help="config profile, for example: small")
     parser.add_argument("--live", action="store_true", help="call the API when not cached")
     parser.add_argument("--stand-in", action="store_true", help="keyword rules play the model")
+    parser.add_argument(
+        "--crm",
+        action="store_true",
+        help="app: send each new handoff to the CRM as it happens (needs a CRM sign-in)",
+    )
     parser.add_argument("--no-browser", action="store_true", help="for app: do not open a tab")
     parser.add_argument("--push", action="store_true", help="for crm-sync: really send it")
     args = parser.parse_args()
@@ -131,6 +138,8 @@ def main() -> None:
     elif args.command == "lint":
         sys.exit(subprocess.call([sys.executable, "-m", "ruff", "check", "."]))
     elif args.command == "app":
+        if args.crm:
+            os.environ["DSO_CRM_LIVE"] = "true"  # read by integrations/crm_sync.py
         start_app(open_browser=not args.no_browser)
     elif args.command == "api":
         command = [sys.executable, "-m", "uvicorn", "api.main:app", "--port", "8000"]

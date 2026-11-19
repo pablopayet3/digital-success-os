@@ -12,6 +12,7 @@ from common.settings import load_settings
 from engine.approvals import decide
 from engine.catalog import load_catalog
 from engine.handoff import resolve_cta
+from integrations import crm_sync
 
 # Which queues each role works. Admin sees everything.
 ROLE_QUEUES = {
@@ -79,6 +80,19 @@ def show_task(task, packet: dict) -> None:
         if packet.get("brief"):
             st.subheader("Brief")
             st.text(packet["brief"])
+
+
+def complete_in_crm(cta_id: str, outcome: str, notes: str) -> str:
+    """When the app runs with --crm, mark the task completed in the CRM too (ADR 0032)."""
+    if not crm_sync.live_enabled():
+        return ""
+    try:
+        link = crm_sync.complete_task_now(cta_id, outcome, notes)
+    except Exception as error:  # another company's service: report it, never block the close
+        return f" The CRM could not be updated: {str(error)[:200]}"
+    if link is None:
+        return " The CRM has no task for this handoff, so nothing was changed there."
+    return " The task is marked completed in the CRM as well."
 
 
 def show_approvals(queues: list[str] | None, role: str, today: str) -> None:
@@ -164,7 +178,9 @@ if "console_role" not in st.session_state:
         "Some messages are sent only after a person approves them, such as a request to act "
         "as a reference. After you sign in as CSM or Admin, you can approve or reject them."
     )
-    draft = ui.rows("SELECT * FROM drafts ORDER BY status = 'pending' DESC, created_on DESC LIMIT 1")
+    draft = ui.rows(
+        "SELECT * FROM drafts ORDER BY status = 'pending' DESC, created_on DESC LIMIT 1"
+    )
     if len(draft):
         with st.container(border=True):
             st.caption(f"Draft {draft.iloc[0]['draft_id']}, status: {draft.iloc[0]['status']}.")
@@ -286,5 +302,6 @@ with st.form("resolve"):
                 if outcome == "agent_should_have_handled"
                 else ""
             )
+            + complete_in_crm(task["cta_id"], outcome, notes)
         )
         ui.refresh()

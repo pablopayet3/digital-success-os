@@ -260,7 +260,14 @@ has run against a Developer Edition org (6 accounts, 6 tasks; a second run creat
 nothing), signed in through the browser with the vendor's command-line tool:
 `SALESFORCE_CLI_ORG=dso-demo` in `.env`, and `sf` must be on the PATH (it installs to
 `%APPDATA%\npm`, which this app's shell does not have on its PATH by default).
-246 tests in total.
+249 tests in total.
+
+Live CRM link (ADR 0032): `uv run python run.py app --crm`, started from a normal terminal
+on the owner's computer (signed in with `sf org login web --alias dso-demo`). A handoff on
+the Live demo page is sent to the CRM at once (`crm_sync.send_task_now`), and closing it
+in the Human console completes it there (`complete_task_now`). Never on the hosted demo.
+The browser sign-in is tried before any password in `.env`. A rehearsal leaves a CRM task
+and `live_demo` rows in the local store: remove the local rows afterwards.
 
 After the phases (the brief read again line by line; see the last section of
 `docs/phase-notes.md`):

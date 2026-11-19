@@ -156,7 +156,8 @@ def push(client, payloads: list[dict]) -> dict:
     return done
 
 
-# Three ways to sign in. The first complete set found in .env is used.
+# Three ways to sign in: the browser sign-in first when it is named, then the first
+# complete set of credentials found in .env.
 OAUTH_SETTINGS = ("SALESFORCE_CONSUMER_KEY", "SALESFORCE_CONSUMER_SECRET", "SALESFORCE_DOMAIN")
 PASSWORD_SETTINGS = ("SALESFORCE_USERNAME", "SALESFORCE_PASSWORD", "SALESFORCE_SECURITY_TOKEN")
 CLI_SETTING = "SALESFORCE_CLI_ORG"  # the name given to the org at `sf org login web --alias`
@@ -166,6 +167,11 @@ def connect():
     """A connection to the CRM, from credentials in the environment (.env). Never in code."""
     from simple_salesforce import Salesforce  # imported here: only a real push needs it
 
+    # The browser sign-in comes first when it is set up: it keeps no secret in .env, and
+    # newer orgs refuse the password sign-in anyway.
+    if os.environ.get(CLI_SETTING):
+        session = cli_session(os.environ[CLI_SETTING])
+        return Salesforce(instance_url=session["instanceUrl"], session_id=session["accessToken"])
     if all(os.environ.get(name) for name in OAUTH_SETTINGS):
         return Salesforce(
             consumer_key=os.environ["SALESFORCE_CONSUMER_KEY"],
@@ -179,9 +185,6 @@ def connect():
             security_token=os.environ["SALESFORCE_SECURITY_TOKEN"],
             domain=my_domain(os.environ.get("SALESFORCE_DOMAIN") or "login"),
         )
-    if os.environ.get(CLI_SETTING):
-        session = cli_session(os.environ[CLI_SETTING])
-        return Salesforce(instance_url=session["instanceUrl"], session_id=session["accessToken"])
     raise RuntimeError(
         "No complete set of CRM credentials in .env. Add either "
         f"{', '.join(OAUTH_SETTINGS)} or {', '.join(PASSWORD_SETTINGS)} or {CLI_SETTING}. "
@@ -197,7 +200,10 @@ def cli_session(org: str) -> dict:
     access token is used in this process only: it is never printed and never written into
     the project. (The same idea as the warehouse's browser sign-in.)
     """
-    tool = shutil.which("sf")
+    # On Windows the tool installs into the npm folder under APPDATA, which an app's own
+    # PATH may lack.
+    npm = Path(os.environ.get("APPDATA", "")) / "npm"
+    tool = shutil.which("sf") or shutil.which("sf", path=str(npm))
     if tool is None:
         raise RuntimeError(
             f"{CLI_SETTING} is set, but the Salesforce command-line tool (sf) is not installed."
@@ -249,3 +255,70 @@ def explain_refusal(error: Exception) -> str:
         "Steps for both ways: docs/decisions/0019.",
     ]
     return "\n".join(lines)
+
+
+# --- Live mode: one task at a time, as it happens (ADR 0032) ------------------------------
+#
+# In the live demo a handoff is sent to the CRM the moment it is created, and closing it in
+# the Human console marks it completed there. Only when the app is started with
+# `run.py app --crm` on a computer that is signed in to the CRM. Never on the hosted demo,
+# which holds no CRM access. A failure is reported on screen and never stops the demo.
+
+LIVE_SETTING = "DSO_CRM_LIVE"
+
+
+def live_enabled() -> bool:
+    """True when this app was started with --crm and is not the hosted demo."""
+    return os.environ.get(LIVE_SETTING) == "true" and not os.environ.get("DSO_HOSTED")
+
+
+def send_task_now(cta_id: str, data_dir: Path = DATA_DIR, client=None) -> dict:
+    """Send one new handoff to the CRM: its account (created or updated) and the task.
+
+    Returns {"created": bool, "url": link to the task in the CRM}.
+    """
+    task = open_store(data_dir).one("SELECT * FROM ctas WHERE cta_id = :id", id=cta_id)
+    if task is None:
+        raise ValueError(f"No task {cta_id}")
+    accounts = {row["account_id"]: row for row in crm_export(data_dir)}
+    account = accounts.get(task["account_id"])
+    if account is None:
+        raise ValueError(f"The account of {cta_id} is not in today's data")
+    client = client or connect()
+    payload = {"account": account_fields(account), "tasks": [task_fields(task)]}
+    done = push(client, [payload])
+    found = client.query(
+        f"SELECT Id FROM Task WHERE Subject LIKE '[{cta_id}]%' ORDER BY CreatedDate DESC LIMIT 1"
+    )
+    task_id = found["records"][0]["Id"] if found["records"] else None
+    return {"created": done["tasks_created"] == 1, "url": task_link(client, task_id)}
+
+
+def complete_task_now(cta_id: str, outcome: str, notes: str = "", client=None) -> str | None:
+    """Mark the CRM task of a handoff as completed, with the outcome a person recorded.
+
+    Returns a link to the task, or None when the CRM has no task for this handoff.
+    """
+    client = client or connect()
+    found = client.query(
+        f"SELECT Id, Description FROM Task WHERE Subject LIKE '[{cta_id}]%' LIMIT 1"
+    )
+    if not found["records"]:
+        return None
+    record = found["records"][0]
+    closing = f"Closed in the Human console. Outcome: {outcome}." + (f" {notes}" if notes else "")
+    client.Task.update(
+        record["Id"],
+        {"Status": "Completed", "Description": f"{record['Description'] or ''}\n{closing}"[:32000]},
+    )
+    return task_link(client, record["Id"])
+
+
+def task_link(client, task_id: str | None) -> str | None:
+    """The address of a task in the CRM's own interface."""
+    if not task_id:
+        return None
+    base = getattr(client, "base_url", "") or ""
+    host = base.split("/services/")[0] if "/services/" in base else base.rstrip("/")
+    host = host.replace(".my.salesforce.com", ".lightning.force.com")
+    return f"{host}/lightning/r/Task/{task_id}/view" if host else None

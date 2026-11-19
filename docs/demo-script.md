@@ -126,6 +126,15 @@ Press one example button, then type or say one question of your own.
 | What happens when a queue overflows? | Human console, ADR 0004 | Flags follow capacity; an alert fires at two days of backlog |
 | How would this run in production? | `docs/production-architecture.md` | Same code, a `prod` profile; a table of what is real and what is simulated |
 
+## The live CRM moment (optional, from your computer)
+
+Start the app from a terminal with `uv run python run.py app --crm` (signed in to the
+CRM beforehand with `sf org login web --alias dso-demo`). In step 4, after the price
+question is handed to Sales, the page says "The task is now in the CRM" with a link: open
+it in the CRM tab and refresh. In step 5's console, closing the task marks it completed
+in the CRM too. Do one rehearsal the day before, then remove the rehearsal rows from the
+local store (see CLAUDE.md).
+
 ## Running it locally instead
 
 Start the app with `uv run python run.py app` (and the API with `uv run python run.py api`

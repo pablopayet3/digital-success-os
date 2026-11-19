@@ -12,6 +12,7 @@ from common.config import load_yaml
 from engine.catalog import load_catalog
 from engine.channels import render_template
 from engine.context import load_day, records
+from integrations import crm_sync
 
 # The two messages of the demo path: a setup question, then a question about price.
 STORY = ["How do I invite my whole team at once?", "Thanks. How much would 10 more seats cost?"]
@@ -58,6 +59,31 @@ def first_message(play, account_id: str, evidence: str, enrolment: dict | None) 
         st.caption(f"The play's first message. {note}")
         st.markdown(f"**Subject: {subject}**")
         st.markdown(body)
+
+
+def send_to_crm(task_id: str) -> dict | None:
+    """Send the new task to the CRM at once, when the app runs with --crm (ADR 0032).
+
+    Returns what to show on screen. A failure is reported, never raised: the demo goes on.
+    """
+    if not crm_sync.live_enabled():
+        return None
+    with st.spinner("Sending the task to the CRM..."):
+        try:
+            return {"ok": True, **crm_sync.send_task_now(task_id, ui.data_dir())}
+        except Exception as error:  # the CRM is another company's service: anything can fail
+            return {"ok": False, "error": str(error)[:300]}
+
+
+def show_crm_result(crm: dict) -> None:
+    if crm["ok"]:
+        link = f" [Open it in the CRM]({crm['url']})." if crm.get("url") else ""
+        st.success(
+            "**The task is now in the CRM**, on the account, with the customer's own words "
+            f"and the summary. The account owner sees it in their own task list.{link}"
+        )
+    else:
+        st.warning(f"The task could not be sent to the CRM: {crm['error']}")
 
 
 st.title("Live demo")
@@ -109,6 +135,7 @@ with tab_chat:
     if st.session_state.get("demo_account") != account_id:
         st.session_state.demo_account, st.session_state.demo_messages = account_id, []
         st.session_state.pop("demo_task", None)
+        st.session_state.pop("demo_crm", None)
 
     # Where this conversation sits in the loop: the signal, and the play it triggers.
     firing = ui.query(
@@ -168,9 +195,11 @@ with tab_chat:
         if run.form_submit_button("Run the story"):
             st.session_state.demo_messages = [first, second]
             st.session_state.pop("demo_task", None)
+            st.session_state.pop("demo_crm", None)
         if over.form_submit_button("Start over"):
             st.session_state.demo_messages = []
             st.session_state.pop("demo_task", None)
+            st.session_state.pop("demo_crm", None)
 
     st.caption(
         "Or type your own message. For example: Where do I set up single sign-on? How much "
@@ -207,12 +236,16 @@ with tab_chat:
                 task_id = hand_off(ctx, conversation, account, contact)
                 record_conversation(ctx, conversation, account, contact, None, "live_demo", task_id)
                 st.session_state.demo_task = task_id
+                st.session_state.demo_crm = send_to_crm(task_id)
             escalation = conversation.escalation
             st.warning(
                 f"Handed off to a person. Reason: **{escalation.reason_code}**. Queue: **{escalation.queue}**. "
                 f"Decided by: **{conversation.escalated_by}**. Task **{st.session_state.demo_task}** is now in the Human console."
             )
             st.write(f"**Summary written for the person who picks it up:** {conversation.summary}")
+            crm = st.session_state.get("demo_crm")
+            if crm:
+                show_crm_result(crm)
         with st.expander("What the agent did behind the answer"):
             st.write("Tool calls")
             st.json(conversation.tool_calls)

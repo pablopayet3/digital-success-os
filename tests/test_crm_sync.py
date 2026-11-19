@@ -28,19 +28,21 @@ class FakeCrm:
     def __init__(self):
         self.records = {"Account": {}, "Task": {}}
         self.Account, self.Task = FakeObject(self, "Account"), FakeObject(self, "Task")
+        self.base_url = "https://acme-dev-ed.develop.my.salesforce.com/services/data/v59.0/"
 
     def query(self, soql):
         if "FROM Account" in soql:
             number = soql.split("AccountNumber = '")[1].split("'")[0]
             ids = [i for i, r in self.records["Account"].items() if r["AccountNumber"] == number]
         else:
-            what = soql.split("WhatId = '")[1].split("'")[0]
+            what = soql.split("WhatId = '")[1].split("'")[0] if "WhatId" in soql else None
             marker = soql.split("LIKE '")[1].split("%")[0]
             ids = [
                 i for i, r in self.records["Task"].items()
-                if r["WhatId"] == what and r["Subject"].startswith(marker)
+                if what in (None, r["WhatId"]) and r["Subject"].startswith(marker)
             ]  # fmt: skip
-        return {"records": [{"Id": i} for i in ids[:1]]}
+        found = [{"Id": i, **self.records["Task"].get(i, {})} for i in ids[:1]]
+        return {"records": found}
 
 
 def test_payloads_cover_accounts_with_open_tasks_and_say_the_data_is_synthetic(simulated):
@@ -170,7 +172,7 @@ def fake_tool(monkeypatch, output: str, installed: bool = True) -> list:
         asked.append(command)
         return SimpleNamespace(stdout=output, returncode=0)
 
-    monkeypatch.setattr(shutil, "which", lambda name: "sf" if installed else None)
+    monkeypatch.setattr(shutil, "which", lambda name, **_: "sf" if installed else None)
     monkeypatch.setattr(subprocess, "run", run)
     return asked
 
@@ -201,3 +203,51 @@ def test_a_missing_or_signed_out_tool_is_explained_without_showing_its_output(mo
     with pytest.raises(RuntimeError, match="sf org login web") as refused:
         sign_in_with(monkeypatch, SALESFORCE_CLI_ORG="demo-org")
     assert "a-secret-token" not in str(refused.value)
+
+
+# --- Live mode: one task as it happens (ADR 0032) ------------------------------------------
+
+
+def test_a_new_handoff_is_sent_once_and_closing_it_completes_it_in_the_crm(simulated):
+    from common.store import open_store
+    from integrations.crm_sync import complete_task_now, send_task_now
+
+    _, data_dir = simulated
+    task = open_store(data_dir).one("SELECT cta_id FROM ctas WHERE status <> 'resolved' LIMIT 1")
+    crm = FakeCrm()
+    first = send_task_now(task["cta_id"], data_dir, client=crm)
+    again = send_task_now(task["cta_id"], data_dir, client=crm)  # a second click
+    assert first["created"] and not again["created"] and len(crm.records["Task"]) == 1
+    assert first["url"].startswith("https://acme-dev-ed.develop.lightning.force.com/lightning/r/Task/")
+    (sent,) = crm.records["Task"].values()
+    assert sent["Subject"].startswith(f"[{task['cta_id']}]") and sent["Status"] == "Not Started"
+
+    link = complete_task_now(task["cta_id"], "expansion_opportunity", "Call booked.", client=crm)
+    assert link and sent["Status"] == "Completed"
+    assert "Outcome: expansion_opportunity. Call booked." in sent["Description"]
+    assert complete_task_now("CTA-NOT-THERE", "resolved", client=crm) is None
+
+
+def test_the_live_link_is_off_unless_asked_for_and_never_on_the_hosted_demo(monkeypatch):
+    from integrations.crm_sync import live_enabled
+
+    monkeypatch.delenv("DSO_CRM_LIVE", raising=False)
+    monkeypatch.delenv("DSO_HOSTED", raising=False)
+    assert not live_enabled()
+    monkeypatch.setenv("DSO_CRM_LIVE", "true")
+    assert live_enabled()
+    monkeypatch.setenv("DSO_HOSTED", "1")
+    assert not live_enabled()
+
+
+def test_the_browser_sign_in_wins_over_left_over_passwords(monkeypatch):
+    session = {"result": {"instanceUrl": "https://acme.example", "accessToken": "a-session"}}
+    fake_tool(monkeypatch, json.dumps(session))
+    given = sign_in_with(
+        monkeypatch,
+        SALESFORCE_CLI_ORG="demo-org",
+        SALESFORCE_USERNAME="someone@example.com",
+        SALESFORCE_PASSWORD="a password",
+        SALESFORCE_SECURITY_TOKEN="a token",
+    )
+    assert given == {"instance_url": "https://acme.example", "session_id": "a-session"}
