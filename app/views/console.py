@@ -194,7 +194,11 @@ role = st.session_state.console_role
 queues = ROLE_QUEUES[role]
 catalog = load_catalog()
 top_left, top_right = st.columns([5, 1])
-top_left.write(f"Signed in as **{role}**. Queues: {', '.join(queues) if queues else 'all'}.")
+team_names = [catalog.routing["queues"][queue]["name"] for queue in queues or []]
+top_left.write(
+    f"Signed in as **{role}**. "
+    + (f"Queues: {', '.join(team_names)}." if team_names else "You see every team's queue.")
+)
 if top_right.button("Sign out"):
     del st.session_state.console_role
     st.rerun()

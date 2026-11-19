@@ -33,3 +33,6 @@ cache/stand_in/
 
 # Extracts for a BI tool: rebuilt with `uv run python run.py extracts`
 exports/
+
+# Backup video clips of the live demo (recorded locally, not committed)
+/demo-clips/
