@@ -40,7 +40,7 @@ Hand the account owner a brief when an account is running out of seats: the sign
 | Rung | What happens | Move up when |
 |---|---|---|
 | agentic | An AI-written brief for the account owner, grounded in the account's data. | The brief always goes to a person. AI drafts, a human sells. |
-| human | Sales CTA. The account owner decides whether and how to reach out. | Last rung. |
+| human | A task for Sales. The account owner decides whether and how to reach out. | Last rung. |
 
 ## Journey steps
 

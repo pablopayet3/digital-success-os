@@ -43,7 +43,7 @@ Show an account at an edition limit what the next edition lifts, with its own nu
 |---|---|---|
 | digital | Value email showing the limit the account has reached and what lifts it. | The contact replies with a question. |
 | agentic | The agent answers product questions from the docs. | Any pricing or buying question. Always a human. |
-| human | Sales CTA for the account owner, with a brief. | Last rung. |
+| human | A task for the account owner in Sales, with a brief. | Last rung. |
 
 ## Journey steps
 

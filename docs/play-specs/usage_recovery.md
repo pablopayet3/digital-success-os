@@ -40,7 +40,7 @@ Remind an account whose usage is falling of what it is not using, twice, digital
 | Rung | What happens | Move up when |
 |---|---|---|
 | digital | Re-engagement email, then an in-app nudge. | Skip this tier when sentiment is already negative (a detractor score or support friction): go straight to a human. |
-| human | CTA to the pooled CS team with usage trend, sentiment and tickets. | Usage is still falling 12 days after the first email. |
+| human | A task for the Scaled CS team, with usage trend, sentiment and tickets. | Usage is still falling 12 days after the first email. |
 
 ## Journey steps
 

@@ -10,6 +10,35 @@ from common.config import load_yaml
 from engine.catalog import load_catalog
 from engine.journeys import journey_funnel
 
+KINDS = {"email": "Email", "in-app": "Message in the product", "agent": "AI agent",
+         "cta": "Task for a person"}  # fmt: skip
+ENDINGS = {"completed": "Finished", "exited": "Left early", "active": "Still running",
+           "waiting_on_human": "Waiting for a person", "holdout": "Held out"}  # fmt: skip
+
+
+def words(code: str) -> str:
+    """A configuration code as words: "no_longer_stalled" becomes "no longer stalled"."""
+    text = str(code).replace("_", " ").replace("human: ", "a person recorded: ")
+    return text.replace("csm ", "success manager ")
+
+
+def plain_reason(reason: str) -> str:
+    """An audit reason in words: "signal activation_stalled" names the signal."""
+    if reason.startswith("signal "):
+        code = reason.removeprefix("signal ")
+        names = {item["id"]: item["name"] for item in load_yaml("job.yaml")["signals"]}
+        return f"its signal fired: {names.get(code, words(code)).lower()}"
+    return words(reason)
+
+
+def plain_stage(stage: str) -> str:
+    """A funnel step such as "email: setup_guide (digital)" as "Email: setup guide"."""
+    kind, _, rest = stage.partition(": ")
+    if kind in KINDS:
+        return f"{KINDS[kind]}: {words(rest.split(' (')[0])}"
+    return stage
+
+
 st.title("Plays and experiments")
 ui.job_intro("plays")
 catalog = load_catalog()
@@ -20,24 +49,26 @@ st.caption(
     "rules for every play: the customer has agreed to be contacted, no customer is "
     "contacted more than twice a week, and a share of customers is held out for comparison."
 )
-st.dataframe(
+# Plain words for the configuration's codes, so the table reads without a key. A plain
+# table (st.table) wraps long text instead of cutting it off.
+SIGNAL_NAMES = {item["id"]: item["name"] for item in load_yaml("job.yaml")["signals"]}
+RUNGS = {"digital": "Digital message", "agentic": "AI agent", "human": "A person"}
+STAGES = {"slice": "10% slice", "full": "Full test"}
+st.table(
     pd.DataFrame(
         [
             {
-                "priority": play.priority,
-                "play": play.name,
-                "trigger": ", ".join(play.trigger),
-                "ladder": " > ".join(rung.tier for rung in play.intervention_ladder),
-                "stage": play.rollout_stage,
-                "holdout": f"{play.holdout_pct:.0%}",
-                "success metric": play.success_metric["id"],
-                "owner": play.owner,
+                "Play": play.name,
+                "Starts when": " or ".join(SIGNAL_NAMES.get(s, s) for s in play.trigger),
+                "Help, in order": " → ".join(RUNGS[rung.tier] for rung in play.intervention_ladder),
+                "Stage": STAGES.get(play.rollout_stage, play.rollout_stage),
+                "Held out": f"{play.holdout_pct:.0%}",
+                "Measure of success": play.success_metric["description"],
+                "Owner": play.owner,
             }
-            for play in catalog.plays
+            for play in sorted(catalog.plays, key=lambda play: play.priority)
         ]
-    ),
-    hide_index=True,
-    width="stretch",
+    ).set_index("Play")
 )
 
 st.subheader("Results against the holdout")
@@ -73,12 +104,25 @@ table = results.assign(
     lift=[f"{value:+.0%}" if pd.notna(value) else "n/a" for value in results["lift"]],
     p=[f"{value:.3f}" if pd.notna(value) else "n/a" for value in results["p_value"]],
 )
-st.dataframe(
-    table[
-        ["play_name", "metric", "treatment", "holdout", "lift", "p", "verdict", "recommendation"]
-    ],
-    hide_index=True,
-    width="stretch",
+measures = {play.id: play.success_metric["description"] for play in catalog.plays}
+st.table(
+    pd.DataFrame(
+        {
+            "Play": table["play_name"],
+            "Measure": [measures.get(play_id, "") for play_id in table["play_id"]],
+            "In the play": table["treatment"],
+            "Held out": table["holdout"],
+            "Difference": table["lift"],
+            "Chance it is luck (p)": table["p"],
+            "Verdict": table["verdict"],
+        }
+    ).set_index("Play")
+)
+st.caption(
+    "In the play and Held out: the share of customers who reached the measure, with the "
+    "counts. Difference: the first minus the second. Chance it is luck (p): how likely a "
+    "difference this large would be if the play did nothing; below 0.05 is usually read as "
+    "real. The recommendation for each play is under One play in detail."
 )
 
 measured = results.dropna(subset=["lift"])
@@ -157,6 +201,7 @@ left, right = st.columns(2)
 with left:
     st.write("**Journey funnel** (the number of customers who reached each step)")
     funnel = pd.DataFrame(journey_funnel(ui.store(), catalog.journeys[play.journey], play.id))
+    funnel["stage"] = [plain_stage(stage) for stage in funnel["stage"]]
     st.altair_chart(
         alt.Chart(funnel)
         .mark_bar()
@@ -179,7 +224,17 @@ with right:
         "GROUP BY status, exit_reason ORDER BY accounts DESC",
         play=play.id,
     )
-    st.dataframe(endings, hide_index=True, width="stretch", height=250)
+    st.table(
+        pd.DataFrame(
+            {
+                "How it ended": [
+                    ENDINGS.get(status, words(status)) for status in endings["status"]
+                ],
+                "Why": [words(reason) for reason in endings["reason"]],
+                "Customers": endings["accounts"],
+            }
+        ).set_index("How it ended")
+    )
 
 left, right = st.columns(2)
 with left:
@@ -218,26 +273,25 @@ with right:
     if row is None or "arr_at_entry_treatment" not in results.columns or not row["n_holdout"]:
         st.caption("This play has no holdout to compare with.")
     else:
-        st.dataframe(
+        groups = {"treatment": "In the play", "holdout": "Held out"}
+        st.table(
             pd.DataFrame(
                 [
                     {
-                        "group": arm,
-                        "accounts": int(row[f"n_{arm}"]),
-                        "ARR at entry": f"${row[f'arr_at_entry_{arm}']:,.0f}",
-                        "ARR retained": ui.pct(
+                        "Group": groups[arm],
+                        "Customers": int(row[f"n_{arm}"]),
+                        "Revenue at entry": f"${row[f'arr_at_entry_{arm}']:,.0f}",
+                        "Revenue kept": ui.pct(
                             row[f"retained_arr_{arm}"] / row[f"arr_at_entry_{arm}"], 1
                         )
                         if row[f"arr_at_entry_{arm}"]
                         else "n/a",
-                        "still a customer": ui.pct(row[f"still_customer_{arm}"]),
-                        "expansion won": f"${row[f'expansion_won_{arm}']:,.0f}",
+                        "Still a customer": ui.pct(row[f"still_customer_{arm}"]),
+                        "Expansion won": f"${row[f'expansion_won_{arm}']:,.0f}",
                     }
                     for arm in ("treatment", "holdout")
                 ]
-            ),
-            hide_index=True,
-            width="stretch",
+            ).set_index("Group")
         )
         st.caption(
             '"Still a customer" is the safeguard that every play is checked against. A play '
@@ -258,9 +312,20 @@ with left:
         ladder["rate"] = [
             ui.pct(s / a) for s, a in zip(ladder["successes"], ladder["accounts"], strict=True)
         ]
-        st.dataframe(ladder, hide_index=True, width="stretch")
+        st.table(
+            pd.DataFrame(
+                {
+                    "Highest step reached": [
+                        RUNGS.get(rung, "Nothing yet") for rung in ladder["rung"]
+                    ],
+                    "Customers": ladder["accounts"],
+                    "Reached the measure": [int(n) for n in ladder["successes"]],
+                    "Share": ladder["rate"],
+                }
+            ).set_index("Highest step reached")
+        )
     for rung in play.intervention_ladder:
-        st.caption(f"{rung.tier}: {rung.action} Move up when: {rung.move_up_when}")
+        st.caption(f"{RUNGS[rung.tier]}: {rung.action} Move up when: {rung.move_up_when}")
 with right:
     st.write("**Who entered, who was held out, who was kept out, and why** (from the audit log)")
     audit = ui.rows(
@@ -268,5 +333,16 @@ with right:
         "GROUP BY decision, reason ORDER BY accounts DESC",
         play=play.id,
     )
-    st.dataframe(audit, hide_index=True, width="stretch", height=280)
+    decisions = {"entered": "Entered", "holdout": "Held out", "excluded": "Kept out"}
+    st.table(
+        pd.DataFrame(
+            {
+                "Decision": [decisions.get(d, words(d)) for d in audit["decision"]],
+                "Reason": [plain_reason(reason or "") for reason in audit["reason"]],
+                "Customers": audit["accounts"],
+            }
+        )
+        .head(8)
+        .set_index("Decision")
+    )
 st.caption(f"Full specification: `docs/play-specs/{play.id}.md`")

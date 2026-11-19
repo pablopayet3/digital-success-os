@@ -41,7 +41,7 @@ Get a stalled account through setup. First the setup guide for the steps still m
 |---|---|---|
 | digital | Email with the setup guide for the steps still missing. | Still stalled 3 days after the email. |
 | agentic | The onboarding agent offers the admin a conversation to finish setup. | The agent escalates (asked for a person, pricing or contract question, frustration, no answer in the docs, a tool failed), or the account is still stalled 4 days later. |
-| human | CTA to the pooled CS team with what was tried and what is still missing. | Last rung. |
+| human | A task for the Scaled CS team, with what was tried and what is still missing. | Last rung. |
 
 ## Journey steps
 

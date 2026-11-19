@@ -38,7 +38,7 @@ Put the unhappy customer in front of a person within 48 hours. The task carries 
 
 | Rung | What happens | Move up when |
 |---|---|---|
-| human | CTA to the pooled CS team with the NPS comment, usage and open tickets. | Straight to a human. A detractor should not get an automated reply. |
+| human | A task for the Scaled CS team, with the NPS comment, usage and open tickets. | Straight to a human. A detractor should not get an automated reply. |
 
 ## Journey steps
 

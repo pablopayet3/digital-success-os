@@ -53,7 +53,7 @@ plays:
     exclusions: [already_in_this_play, renewal_in_negotiation, in_another_play]
     intervention_ladder:
       - tier: human
-        action: CTA to the pooled CS team with the NPS comment, usage and open tickets.
+        action: A task for the Scaled CS team, with the NPS comment, usage and open tickets.
         move_up_when: Straight to a human. A detractor should not get an automated reply.
     channel_sequence: [cta]
     journey: detractor_save
@@ -81,7 +81,7 @@ plays:
           Skip this tier when sentiment is already negative (a detractor score or support
           friction): go straight to a human.
       - tier: human
-        action: CTA to the pooled CS team with usage trend, sentiment and tickets.
+        action: A task for the Scaled CS team, with usage trend, sentiment and tickets.
         move_up_when: Usage is still falling 12 days after the first email.
     channel_sequence: [email, in_app, cta]
     journey: usage_recovery
@@ -114,7 +114,7 @@ plays:
           The agent escalates (asked for a person, pricing or contract question, frustration,
           no answer in the docs, a tool failed), or the account is still stalled 4 days later.
       - tier: human
-        action: CTA to the pooled CS team with what was tried and what is still missing.
+        action: A task for the Scaled CS team, with what was tried and what is still missing.
         move_up_when: Last rung.
     channel_sequence: [email, agent, cta]
     journey: onboarding_rescue
@@ -144,7 +144,7 @@ plays:
         action: The agent answers product questions from the docs.
         move_up_when: Any pricing or buying question. Always a human.
       - tier: human
-        action: Sales CTA for the account owner, with a brief.
+        action: A task for the account owner in Sales, with a brief.
         move_up_when: Last rung.
     channel_sequence: [email, agent, cta]
     journey: edition_upgrade
@@ -170,7 +170,7 @@ plays:
         action: An AI-written brief for the account owner, grounded in the account's data.
         move_up_when: The brief always goes to a person. AI drafts, a human sells.
       - tier: human
-        action: Sales CTA. The account owner decides whether and how to reach out.
+        action: A task for Sales. The account owner decides whether and how to reach out.
         move_up_when: Last rung.
     channel_sequence: [cta]
     journey: expansion_seats
