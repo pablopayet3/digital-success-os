@@ -534,6 +534,23 @@ stops:
       Suppose most customers open the email but few talk to the agent. Then the invitation
       to talk to the agent is the step to rewrite.
 
+  - page: plays
+    target: The journey, drawn
+    title: The journey, drawn
+    what: >
+      This drawing shows the chosen play as a flow, from top to bottom: the signal that
+      starts it, who may enter, the share held out for comparison, and then each step.
+      Diamonds are questions the system asks of the data, such as whether setup is still
+      stalled. Blue steps are digital messages, purple is the AI agent, and orange is a
+      person. Each step shows how many customers reached it.
+    who: >
+      The CS Operations team reviews a journey here before it goes live. The owner of the
+      play uses it to explain the play to the teams who will receive its handoffs.
+    example: >
+      The drawing is made from the same settings that run the play. If someone changes a
+      wait from three days to five, the drawing changes with it, so it can never be out of
+      date.
+
   # --- Live demo --------------------------------------------------------------------------
   - page: demo
     target: You are the admin of

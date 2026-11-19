@@ -737,7 +737,7 @@ missing or only half there. This section is what closed them.
 - **A picture of every page** in `docs/screenshots/`.
 - **Every page of the app is run by a test** on the small world (`tests/test_app.py`),
   and again with the internet blocked, which is the offline promise as a test.
-  252 tests in total.
+  253 tests in total.
 
 ### How to run
 
@@ -813,3 +813,4 @@ uv run --group notebook jupyter nbconvert --to notebook --execute --inplace anal
 - `0031-an-event-log-in-plain-words`
 - `0032-a-handoff-reaches-the-crm-as-it-happens`
 - `0033-one-next-best-action-per-customer`
+- `0034-the-journey-drawn-from-the-configuration-that-runs-it`

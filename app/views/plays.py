@@ -5,6 +5,8 @@ import pandas as pd
 import streamlit as st
 
 from app import ui
+from app.journey_canvas import journey_dot, step_counts
+from common.config import load_yaml
 from engine.catalog import load_catalog
 from engine.journeys import journey_funnel
 
@@ -109,11 +111,42 @@ names = {play.name: play for play in catalog.plays}
 # Open on the play with the most rungs in its ladder: it shows the whole pattern.
 longest = max(catalog.plays, key=lambda play: len(play.intervention_ladder))
 play = names[st.selectbox("Play", list(names), index=list(names).index(longest.name))]
-row = results[results["play_id"] == play.id].iloc[0]
+found = results[results["play_id"] == play.id]
+row = found.iloc[0] if len(found) else None  # a new play has no result yet
 st.write(f"**Objective:** {play.objective}")
 st.write(f"**Success metric:** {play.success_metric['description']}")
-st.write(f"**Verdict:** {row['verdict']}  \n**Recommendation:** {row['recommendation']}")
-if pd.notna(row["detectable_lift"]):
+if row is None:
+    st.write("**Verdict:** no customer has finished this play yet, so there is no result.")
+else:
+    st.write(f"**Verdict:** {row['verdict']}  \n**Recommendation:** {row['recommendation']}")
+
+# The journey drawn from the same configuration that runs it (app/journey_canvas.py).
+st.write("**The journey, drawn**")
+st.caption(
+    "Read it from top to bottom: the signal that starts the play, who may enter, the share "
+    "held out for comparison, then each step. Blue is a digital message, purple is the AI "
+    "agent, orange is a person. Each step says how many customers reached it."
+)
+arms = {
+    item["arm"]: item["n"]
+    for item in ui.rows(
+        "SELECT arm, count(*) AS n FROM enrollments WHERE play_id = :play GROUP BY arm",
+        play=play.id,
+    ).to_dict("records")
+}
+signal_names = {item["id"]: item["name"] for item in load_yaml("job.yaml")["signals"]}
+st.graphviz_chart(
+    journey_dot(
+        play,
+        catalog.journeys[play.journey],
+        catalog.routing["queues"],
+        signal_names,
+        step_counts(ui.store(), play.id),
+        arms,
+    ),
+    use_container_width=False,  # its natural size, readable; the box scrolls sideways
+)
+if row is not None and pd.notna(row["detectable_lift"]):
     st.caption(
         f"The smallest improvement this number of customers could reveal: about "
         f"{row['detectable_lift']:.0%}. Customers divided between the two groups as designed: "
@@ -182,7 +215,7 @@ with left:
         )
 with right:
     st.write("**Revenue in the 30 days after entry**")
-    if "arr_at_entry_treatment" not in results.columns or not row["n_holdout"]:
+    if row is None or "arr_at_entry_treatment" not in results.columns or not row["n_holdout"]:
         st.caption("This play has no holdout to compare with.")
     else:
         st.dataframe(

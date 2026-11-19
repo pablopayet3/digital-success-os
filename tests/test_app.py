@@ -356,7 +356,39 @@ def test_the_script_that_shows_a_meaning_is_given_every_meaning(app_data):
 
     app = AppTest.from_file(str(ROOT / "app" / "main.py"), default_timeout=120).run()
     assert not app.exception, [error.value for error in app.exception]
-    script = next(str(html.proto.body) for html in app.get("html") if "dsoOptionHints" in str(html.proto.body))
+    script = next(
+        str(html.proto.body) for html in app.get("html") if "dsoOptionHints" in str(html.proto.body)
+    )
     for block in load_yaml("options.yaml").values():
         for choice in block["choices"]:
             assert f'"{choice}"' in script, choice
+
+
+def test_the_journey_canvas_draws_every_step_of_every_play_in_plain_words(app_data):
+    import re
+
+    from app.journey_canvas import journey_dot, step_counts
+    from common.config import load_yaml
+    from common.store import open_store
+    from engine.catalog import load_catalog
+
+    catalog, store = load_catalog(), open_store(app_data)
+    names = {item["id"]: item["name"] for item in load_yaml("job.yaml")["signals"]}
+    for play in catalog.plays:
+        journey = catalog.journeys[play.journey]
+        dot = journey_dot(
+            play, journey, catalog.routing["queues"], names, step_counts(store, play.id), {}
+        )
+        for step in journey.steps:
+            assert f"step_{step.id} [" in dot, (play.id, step.id)  # every step is drawn
+            if step.type == "branch":  # and both ways out of every question
+                assert f"step_{step.id} -> step_{step.then} " in dot
+                assert f"step_{step.id} -> step_{step.otherwise} " in dot
+        labels = " ".join(re.findall(r'label="([^"]*)"', dot))
+        assert "_" not in labels, (play.id, labels)  # no codes on screen
+    # The approval step says who approves it.
+    reference = catalog.play("advocacy_ask")
+    dot = journey_dot(
+        reference, catalog.journeys[reference.journey], catalog.routing["queues"], names, {}, {}
+    )
+    assert "waits for approval by the Scaled CS team" in dot
