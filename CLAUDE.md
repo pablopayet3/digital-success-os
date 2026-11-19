@@ -260,7 +260,7 @@ has run against a Developer Edition org (6 accounts, 6 tasks; a second run creat
 nothing), signed in through the browser with the vendor's command-line tool:
 `SALESFORCE_CLI_ORG=dso-demo` in `.env`, and `sf` must be on the PATH (it installs to
 `%APPDATA%\npm`, which this app's shell does not have on its PATH by default).
-249 tests in total.
+252 tests in total.
 
 Live CRM link (ADR 0032): `uv run python run.py app --crm`, started from a normal terminal
 on the owner's computer (signed in with `sf org login web --alias dso-demo`). A handoff on
@@ -354,6 +354,10 @@ After the phases (the brief read again line by line; see the last section of
   a recent survey score of 9 or 10, green health, 90 days or older, no open urgent
   ticket, no churn flag. One email, approved by the Scaled CS team. Success measure
   `advocate_responded` (the "Yes" link clicked). Eight plays in total.
+- The next best action (`engine/next_action.py`, ADR 0033), on the Accounts page: one
+  recommendation per customer across every play, by precedence (open task, pending
+  draft, play under way or holdout, firing signals and the engine's last decision, then a
+  red health score with nothing firing). Everything else that applies is listed after it.
 - The event log on the Overview (`app/events.py`, ADR 0031): the latest actions as
   sentences, from `journey_events` and the enrolments. Words per event in `ACTIONS`.
 - The Overview's top (`ui.what_this_is`): what this is, three expanders (every signal,

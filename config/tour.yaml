@@ -434,6 +434,24 @@ stops:
       conversation with Sales.
 
   - page: accounts
+    target: Next best action
+    title: Next best action
+    what: >
+      This box gives the one action that should happen next for this customer, who should
+      do it, and why. It weighs everything the system knows, in a fixed order: a task
+      waiting for a person, a draft waiting for approval, a play under way, a comparison in
+      progress, and then today's signals. Everything else that also applies is listed
+      below it, so nothing is hidden.
+    who: >
+      A success manager or a salesperson opens it before acting on a customer. The CS
+      Operations team uses it to check that the plays and the people never work against
+      each other.
+    example: >
+      A customer who gave a low survey score has a call waiting with the Scaled CS team.
+      Its setup has also stalled, but the onboarding play waits until the call is done, so
+      the customer hears from one voice at a time.
+
+  - page: accounts
     target: Why the health score is what it is
     title: Why the score is what it is
     what: >

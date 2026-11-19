@@ -6,6 +6,9 @@ import pandas as pd
 import streamlit as st
 
 from app import ui
+from common.config import load_yaml
+from engine.catalog import load_catalog
+from engine.next_action import next_best_action
 
 st.title("Accounts")
 ui.job_intro("accounts")
@@ -71,6 +74,34 @@ two.caption("A model's estimate of the chance that the customer will cancel with
 three.caption("A model's estimate of the chance that the customer will buy more within 90 days")
 four.caption("The seats in use, out of the seats the customer pays for")
 
+# The one thing to do next, across every play (engine/next_action.py, ADR 0033).
+firing_today = ui.query(
+    f"""
+    SELECT signal_id, evidence FROM gold.signals
+    WHERE account_id = '{account_id}'
+      AND snapshot_date = (SELECT max(snapshot_date) FROM gold.account_current)
+    """
+)
+best = next_best_action(
+    ui.store(),
+    load_catalog(),
+    account_id,
+    dict(zip(firing_today["signal_id"], firing_today["evidence"], strict=True)),
+    account.to_dict(),
+)
+st.subheader("Next best action")
+with st.container(border=True):
+    st.markdown(f"**{best['action']}**")
+    st.markdown(f"**Who:** {best['who']}. **Why:** {best['why']}")
+    if best["also"]:
+        st.caption("Also open for this customer:")
+        st.markdown("\n".join(f"- {line}" for line in best["also"]))
+st.caption(
+    "The recommendation looks at everything the system knows about this customer, in this "
+    "order: a task waiting for a person, a draft waiting for approval, a play under way, a "
+    "comparison in progress, then today's signals and the plays they start."
+)
+
 left, right = st.columns(2)
 with left:
     st.subheader("Why the health score is what it is")
@@ -98,7 +129,14 @@ with right:
         """
     )
     if len(signals):
-        st.dataframe(signals, hide_index=True, width="stretch")
+        # Plain names and the whole evidence, one per line: no codes, nothing cut off.
+        names = {item["id"]: item["name"] for item in load_yaml("job.yaml")["signals"]}
+        st.markdown(
+            "\n".join(
+                f"- **{names.get(row.signal_id, row.signal_id)}.** {row.evidence}"
+                for row in signals.itertuples()
+            )
+        )
     else:
         st.write("None.")
     steps = {

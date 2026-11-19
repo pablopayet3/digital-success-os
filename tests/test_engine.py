@@ -515,3 +515,43 @@ def test_the_event_log_says_what_happened_in_plain_words(ops):
     line = events.sentence(recent[0], "Wexyx Energy", "Setup has stalled", "Onboarding rescue")
     assert line.startswith("Wexyx Energy ") and line.endswith("in the play Onboarding rescue.")
     assert "->" not in line and "_" not in line.split("Why")[0]
+
+
+# --- The next best action (ADR 0033) ------------------------------------------------------
+
+
+def test_the_next_best_action_puts_a_waiting_person_first_and_hides_nothing(ops, catalog):
+    from engine.next_action import next_best_action
+
+    task = ops.one("SELECT * FROM ctas WHERE status <> 'resolved' ORDER BY sla_due_on LIMIT 1")
+    best = next_best_action(ops, catalog, task["account_id"], {"detractor": "NPS score of 3"})
+    assert task["cta_id"] in best["why"] and task["sla_due_on"] in best["action"]
+    assert best["who"] == catalog.routing["queues"][task["queue"]]["name"]
+    # The detractor signal is not lost: it is listed after the recommendation.
+    assert all("Why:" in line for line in best["also"])
+
+
+def test_a_held_out_customer_is_left_alone_until_the_comparison_ends(ops, catalog):
+    from engine.next_action import next_best_action
+
+    held = ops.one("SELECT * FROM enrollments WHERE status = 'holdout' LIMIT 1")
+    if ops.one("SELECT 1 AS x FROM ctas WHERE account_id = :a AND status <> 'resolved'",
+               a=held["account_id"]):  # fmt: skip
+        pytest.skip("this customer also has an open task, which comes first")
+    best = next_best_action(ops, catalog, held["account_id"], {})
+    assert best["action"].startswith("Leave this customer alone") and best["who"] == "Nobody"
+
+
+def test_with_nothing_firing_a_red_customer_is_still_raised_to_a_person(ops, catalog):
+    from engine.next_action import next_best_action
+
+    quiet = "A-NOBODY"  # no task, no play, no signal
+    assert next_best_action(ops, catalog, quiet, {})["action"] == "No action needed today."
+    red = next_best_action(ops, catalog, quiet, {}, {"health_band": "red", "health_score": 31})
+    assert red["action"].startswith("Review this customer") and "31" in red["why"]
+    # A signal no play answers is said plainly, not hidden behind "nothing fired".
+    unanswered = next_best_action(
+        ops, catalog, quiet, {"churn_risk_high": "Churn risk 41%"},
+        {"health_band": "red", "health_score": 31},
+    )  # fmt: skip
+    assert "no play responds" in unanswered["why"]
