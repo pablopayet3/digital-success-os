@@ -113,6 +113,16 @@ Press one example button, then type or say one question of your own.
 
 ## If they ask to go deeper
 
+**If someone notices "Contract checks passing: 13 of 14" on the Data quality page:** "That's
+the freshness check working. No new data has arrived for a week because this demo world is
+frozen. In production that alerts Data Engineering, and the plays pause until fresh data
+lands." It is true, and it shows a safeguard catching a real condition.
+
+**Backup clips** of each live step are in `demo-clips/` on the owner's computer (not in
+the repository): the story and handoff, closing the task, a draft waiting for approval, the
+next best action and the journey, and the results against the holdout.
+
+
 | Question | Where to go | The short answer |
 |---|---|---|
 | How do you know the model is any good? | `docs/model-cards/` | Time-based split, compared with a benchmark, precision at the team's capacity, reasons in words |
