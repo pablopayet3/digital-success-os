@@ -218,7 +218,9 @@ def test_a_new_handoff_is_sent_once_and_closing_it_completes_it_in_the_crm(simul
     first = send_task_now(task["cta_id"], data_dir, client=crm)
     again = send_task_now(task["cta_id"], data_dir, client=crm)  # a second click
     assert first["created"] and not again["created"] and len(crm.records["Task"]) == 1
-    assert first["url"].startswith("https://acme-dev-ed.develop.lightning.force.com/lightning/r/Task/")
+    assert first["url"].startswith(
+        "https://acme-dev-ed.develop.lightning.force.com/lightning/r/Task/"
+    )
     (sent,) = crm.records["Task"].values()
     assert sent["Subject"].startswith(f"[{task['cta_id']}]") and sent["Status"] == "Not Started"
 
@@ -228,16 +230,47 @@ def test_a_new_handoff_is_sent_once_and_closing_it_completes_it_in_the_crm(simul
     assert complete_task_now("CTA-NOT-THERE", "resolved", client=crm) is None
 
 
-def test_the_live_link_is_off_unless_asked_for_and_never_on_the_hosted_demo(monkeypatch):
+def test_the_live_link_is_off_unless_asked_for_and_on_the_host_only_for_the_presenter(monkeypatch):
     from integrations.crm_sync import live_enabled
 
     monkeypatch.delenv("DSO_CRM_LIVE", raising=False)
     monkeypatch.delenv("DSO_HOSTED", raising=False)
-    assert not live_enabled()
+    assert not live_enabled() and not live_enabled(presenter=True)
     monkeypatch.setenv("DSO_CRM_LIVE", "true")
     assert live_enabled()
     monkeypatch.setenv("DSO_HOSTED", "1")
-    assert not live_enabled()
+    assert not live_enabled()  # a public visitor's handoff never reaches the CRM
+    assert live_enabled(presenter=True)
+
+
+class CountingCrm(FakeCrm):
+    """A CRM that also answers how many demo tasks were created today."""
+
+    def __init__(self, created_today: int):
+        super().__init__()
+        self.created_today = created_today
+
+    def query(self, soql):
+        if soql.startswith("SELECT COUNT()"):
+            return {"totalSize": self.created_today, "records": []}
+        return super().query(soql)
+
+
+def test_the_hosted_demo_stops_at_its_daily_cap(simulated, monkeypatch):
+    import pytest
+
+    from common.store import open_store
+    from integrations.crm_sync import send_task_now
+
+    _, data_dir = simulated
+    task = open_store(data_dir).one("SELECT cta_id FROM ctas WHERE status <> 'resolved' LIMIT 1")
+    monkeypatch.setenv("DSO_HOSTED", "1")
+    monkeypatch.setenv("DSO_CRM_DAILY_CAP", "3")  # instead of the 40 a day of the hosted demo
+    with pytest.raises(RuntimeError, match="daily limit of 3"):
+        send_task_now(task["cta_id"], data_dir, client=CountingCrm(created_today=3))
+    assert send_task_now(task["cta_id"], data_dir, client=CountingCrm(created_today=2))["created"]
+    monkeypatch.delenv("DSO_HOSTED")  # on a laptop there is no cap and no count query
+    assert send_task_now(task["cta_id"], data_dir, client=FakeCrm())["created"]
 
 
 def test_the_browser_sign_in_wins_over_left_over_passwords(monkeypatch):

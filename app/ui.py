@@ -54,6 +54,20 @@ def query(sql: str) -> pd.DataFrame:
     return pd.DataFrame()
 
 
+def presenter() -> bool:
+    """True when this browser session may use the live connections to other systems.
+
+    Always on a laptop. On the hosted demo only for the presenter: after signing in with the
+    admin password on the Live demo page, or to the Human console as Admin. A public
+    visitor sees every step on screen, but nothing they do reaches a real system (ADR 0032).
+    """
+    if not os.environ.get("DSO_HOSTED"):
+        return True
+    return bool(
+        st.session_state.get("presenter") or st.session_state.get("console_role") == "Admin"
+    )
+
+
 def store() -> Store:
     """The operational store (live state: enrolments, tasks, conversations)."""
     return open_store(data_dir())

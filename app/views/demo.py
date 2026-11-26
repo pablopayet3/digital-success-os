@@ -1,5 +1,6 @@
 """Live demo: talk to the agent, watch it hand off, move the world forward a day."""
 
+import hmac
 import os
 
 import streamlit as st
@@ -61,12 +62,38 @@ def first_message(play, account_id: str, evidence: str, enrolment: dict | None) 
         st.markdown(body)
 
 
+def presenter_sign_in() -> None:
+    """On the hosted demo, the presenter signs in to send handoffs to the real CRM (ADR 0032).
+
+    Shown only when the host has a CRM connection. A visitor without the password sees every
+    step on screen and in the Human console; nothing they do reaches the CRM.
+    """
+    if not (os.environ.get("DSO_HOSTED") and os.environ.get(crm_sync.LIVE_SETTING) == "true"):
+        return
+    if ui.presenter():
+        st.caption("Presenter mode: a handoff on this page is also sent to the real CRM.")
+        return
+    with st.expander("Presenter: also send handoffs to the real CRM"):
+        st.caption(
+            "Every visitor sees the whole story on this page and in the Human console. The "
+            "presenter can also send the task to a real CRM, with the admin password."
+        )
+        with st.form("presenter"):
+            password = st.text_input("Admin password", type="password")
+            if st.form_submit_button("Sign in"):
+                expected = os.environ.get("CONSOLE_PASSWORD_ADMIN")
+                if expected and hmac.compare_digest(password, expected):
+                    st.session_state.presenter = True
+                    st.rerun()
+                st.error("The password is wrong.")
+
+
 def send_to_crm(task_id: str) -> dict | None:
-    """Send the new task to the CRM at once, when the app runs with --crm (ADR 0032).
+    """Send the new task to the CRM at once, when live sends are on (ADR 0032).
 
     Returns what to show on screen. A failure is reported, never raised: the demo goes on.
     """
-    if not crm_sync.live_enabled():
+    if not crm_sync.live_enabled(ui.presenter()):
         return None
     with st.spinner("Sending the task to the CRM..."):
         try:
@@ -98,6 +125,7 @@ with tab_chat:
         "question that the agent must not answer becomes a task for a person. You play the "
         "customer. A handoff creates a real task, which you can open in the Human console."
     )
+    presenter_sign_in()
     llm = get_llm()
     if llm.settings.stand_in_when_unavailable:
         # The public demo with the real model: say what it may spend, and when that is gone.

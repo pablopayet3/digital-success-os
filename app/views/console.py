@@ -83,8 +83,8 @@ def show_task(task, packet: dict) -> None:
 
 
 def complete_in_crm(cta_id: str, outcome: str, notes: str) -> str:
-    """When the app runs with --crm, mark the task completed in the CRM too (ADR 0032)."""
-    if not crm_sync.live_enabled():
+    """When live sends are on, mark the task completed in the CRM too (ADR 0032)."""
+    if not crm_sync.live_enabled(ui.presenter()):
         return ""
     try:
         link = crm_sync.complete_task_now(cta_id, outcome, notes)

@@ -265,8 +265,12 @@ nothing), signed in through the browser with the vendor's command-line tool:
 Live CRM link (ADR 0032): `uv run python run.py app --crm`, started from a normal terminal
 on the owner's computer (signed in with `sf org login web --alias dso-demo`). A handoff on
 the Live demo page is sent to the CRM at once (`crm_sync.send_task_now`), and closing it
-in the Human console completes it there (`complete_task_now`). Never on the hosted demo.
-The browser sign-in is tried before any password in `.env`. A rehearsal leaves a CRM task
+in the Human console completes it there (`complete_task_now`). On the hosted demo (revised
+26 November 2026): only for the presenter, signed in with the admin password on the Live
+demo page or as Admin in the console (`ui.presenter`), at most 40 new tasks a day, with
+`DSO_CRM_LIVE` and the connected app's `SALESFORCE_CONSUMER_*` and `SALESFORCE_DOMAIN` set
+by the owner in the host's dashboard. The browser sign-in is tried before any password in
+`.env`. A rehearsal leaves a CRM task
 and `live_demo` rows in the local store: remove the local rows afterwards.
 
 After the phases (the brief read again line by line; see the last section of

@@ -260,16 +260,44 @@ def explain_refusal(error: Exception) -> str:
 # --- Live mode: one task at a time, as it happens (ADR 0032) ------------------------------
 #
 # In the live demo a handoff is sent to the CRM the moment it is created, and closing it in
-# the Human console marks it completed there. Only when the app is started with
-# `run.py app --crm` on a computer that is signed in to the CRM. Never on the hosted demo,
-# which holds no CRM access. A failure is reported on screen and never stops the demo.
+# the Human console marks it completed there. Switched on by `run.py app --crm` on a laptop,
+# or by DSO_CRM_LIVE=true on the host. On the hosted demo only for the presenter, who signs
+# in with the admin password, and at most HOSTED_DAILY_CAP new tasks a day: a public
+# visitor's handoff never reaches the CRM. A failure is reported on screen and never stops
+# the demo.
 
 LIVE_SETTING = "DSO_CRM_LIVE"
+CAP_SETTING = "DSO_CRM_DAILY_CAP"
+HOSTED_DAILY_CAP = 40
 
 
-def live_enabled() -> bool:
-    """True when this app was started with --crm and is not the hosted demo."""
-    return os.environ.get(LIVE_SETTING) == "true" and not os.environ.get("DSO_HOSTED")
+def live_enabled(presenter: bool = False) -> bool:
+    """True when a live send is allowed: switched on, and on the host only for the presenter."""
+    if os.environ.get(LIVE_SETTING) != "true":
+        return False
+    return presenter or not os.environ.get("DSO_HOSTED")
+
+
+def daily_cap() -> int | None:
+    """How many new demo tasks the CRM may receive per day. No cap on a laptop."""
+    if not os.environ.get("DSO_HOSTED"):
+        return None
+    return int(os.environ.get(CAP_SETTING) or HOSTED_DAILY_CAP)
+
+
+def check_daily_cap(client) -> None:
+    """Refuse a new task when the hosted demo has already sent its daily share."""
+    cap = daily_cap()
+    if cap is None:
+        return
+    sent = client.query(
+        "SELECT COUNT() FROM Task WHERE CreatedDate = TODAY AND Subject LIKE '[CTA-%'"
+    )["totalSize"]
+    if sent >= cap:
+        raise RuntimeError(
+            f"The demo's daily limit of {cap} tasks in the CRM is reached. "
+            "The task is in the Human console as usual."
+        )
 
 
 def send_task_now(cta_id: str, data_dir: Path = DATA_DIR, client=None) -> dict:
@@ -285,6 +313,7 @@ def send_task_now(cta_id: str, data_dir: Path = DATA_DIR, client=None) -> dict:
     if account is None:
         raise ValueError(f"The account of {cta_id} is not in today's data")
     client = client or connect()
+    check_daily_cap(client)
     payload = {"account": account_fields(account), "tasks": [task_fields(task)]}
     done = push(client, [payload])
     found = client.query(

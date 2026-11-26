@@ -50,6 +50,27 @@ Option 3.
 - Each rehearsal leaves a task in the CRM and rows in the local store (`scenario =
   'live_demo'`). Remove the local rows afterwards, as for screenshots.
 
+## Revised 26 November 2026: the hosted demo, for the presenter only
+
+The owner asked for nothing to run locally on the day: one hosted link for the whole
+demonstration. The two reasons above for keeping the hosted demo out of the CRM are kept,
+and answered instead of avoided:
+
+- **Credentials on the host.** The hosted app signs in with the CRM's own way for one
+  system to reach another (a connected app: consumer key and secret, OAuth client
+  credentials, already supported by `connect`). The owner creates it in the org and types
+  the values into the host's dashboard. They are never in the repository.
+- **A public link.** `live_enabled(presenter)` is true on the host only for a presenter:
+  someone who signed in on the Live demo page with the admin password, or to the Human
+  console as Admin (`ui.presenter`). A public visitor sees every step on screen and in the
+  Human console, and nothing they do reaches the CRM.
+- **A cap.** On the host at most `HOSTED_DAILY_CAP` (40) new demo tasks a day reach the CRM
+  (`DSO_CRM_DAILY_CAP` overrides it). The count is asked of the CRM itself, so a restart
+  cannot reset it. Every task already says it is synthetic data from a fictional company.
+
+To switch it on, the host's app service needs `DSO_CRM_LIVE=true`,
+`SALESFORCE_CONSUMER_KEY`, `SALESFORCE_CONSUMER_SECRET` and `SALESFORCE_DOMAIN`.
+
 ## Revisit if
 
 The handoffs of the simulation itself should reach the CRM: batch them through the
