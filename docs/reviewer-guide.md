@@ -68,6 +68,7 @@ On the Live demo page, press **Start over** and type your own message.
 | `What does the Premium edition cost?` | Handed to Sales, not to the support queue |
 | `Can I talk to someone?` | Handed to a person at once, marked high priority |
 | `This is useless. Nothing works and I am sick of it!` | Frustration is detected and a person takes over |
+| `We get an error every time we open a board` | Handed to Support: a fault is Support's to fix, not the agent's |
 | Sign in to the console as **CSM** instead of Sales | Different queues: each role sees only the work it owns |
 | Close a task as `agent_should_have_handled` | It lands in the review queue (Agents page) as a draft test case for the agent |
 
