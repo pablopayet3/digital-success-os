@@ -58,7 +58,7 @@ the evidence in words.
 
 | Signal | Rule |
 |---|---|
-| `activation_stalled` | Account is at least 7 days old and fewer than 50% of setup steps are done |
+| `activation_stalled` | Account is at least 7 days old, setup is not finished, and no new setup step was done in the last 7 days |
 | `usage_drop` | Monthly active users down 30% or more against the previous 30 days (at least 3 before) |
 | `seat_pressure` | 90% or more of licensed seats are assigned |
 | `edition_fit` | Not on the top edition, and at the automation-rule limit, at the integration limit, or using 90% or more of included Assist credits |
@@ -93,7 +93,7 @@ success metric before launch; the others are available as guardrails.
 
 | Metric | Definition | Success metric of |
 |---|---|---|
-| `setup_completed` | Prerequisite closure reached 75% or more on any day in the window | Onboarding rescue |
+| `setup_completed` | Every setup step done (prerequisite closure of 100%) on any day in the window | Onboarding rescue |
 | `usage_recovered` | Monthly active users reached 90% or more of the level before the drop (the prior-30-day figure on the day of entry) | Usage recovery |
 | `retained_30d` | The account had not churned by the end of the window | Detractor save; guardrail for every play |
 | `valid_admin_restored` | The account had an admin we may email on any day in the window | Find the admin |

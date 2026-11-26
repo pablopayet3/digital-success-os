@@ -11,19 +11,33 @@ with accounts as (
 
     select * from {{ ref('account_daily') }}
 
+),
+
+week_before as (
+
+    select account_id, snapshot_date, prerequisite_closure_pct from accounts
+
 )
 
--- Onboarding has stalled: a week in, fewer than half of the setup steps are done.
+-- Onboarding has stalled: at least a week in, setup not finished, and no new setup step
+-- in the last 7 days. It looks at progress, not at a share of the steps, so a customer
+-- stuck on the last step is caught as well as one stuck on the first. (A week before
+-- signup there is no row: then any step done counts as progress.)
 select
-    snapshot_date,
-    account_id,
+    accounts.snapshot_date,
+    accounts.account_id,
     'activation_stalled' as signal_id,
-    cast(prerequisite_closure_pct as double) as signal_value,
-    'Day ' || {{ text('account_age_days') }} || ': '
-        || {{ text('cast(round(100 * prerequisite_closure_pct) as integer)') }}
-        || '% of setup steps done' as evidence
+    cast(accounts.prerequisite_closure_pct as double) as signal_value,
+    'Day ' || {{ text('accounts.account_age_days') }} || ': '
+        || {{ text('cast(round(4 * accounts.prerequisite_closure_pct) as integer)') }}
+        || ' of 4 setup steps done, none in the last 7 days' as evidence
 from accounts
-where account_age_days >= 7 and prerequisite_closure_pct < 0.5
+left join week_before
+    on week_before.account_id = accounts.account_id
+    and week_before.snapshot_date = {{ days_before('accounts.snapshot_date', 7) }}
+where accounts.account_age_days >= 7
+    and accounts.prerequisite_closure_pct < 1
+    and coalesce(week_before.prerequisite_closure_pct, 0) >= accounts.prerequisite_closure_pct
 
 union all
 

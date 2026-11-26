@@ -139,6 +139,7 @@ def test_questions_the_help_centre_does_not_answer_are_not_covered(question):
     ("I want a refund for last month", "pricing_contract_legal", "pooled_csm"),
     ("What does our contract say about cancellation?", "pricing_contract_legal", "pooled_csm"),
     ("Honestly I'm fed up, this is useless", "frustration", "pooled_csm"),
+    ("We get an error every time we open a board", "product_fault", "support"),
 ])  # fmt: skip
 def test_keyword_rules_escalate_without_any_model(message, reason, queue):
     escalation = check_message(message, signals=None, earlier=[])

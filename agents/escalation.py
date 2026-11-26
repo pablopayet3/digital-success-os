@@ -9,6 +9,7 @@ the model cannot talk its way around them:
   1. The customer asks for a person.
   2. The customer is frustrated (classifier score at or above the threshold).
   3. Pricing, contract, refund or legal: always a human. Pricing and upgrades go to Sales.
+  3b. Something is broken (an error, a bug, a crash): Support owns faults, so it goes there.
   4. The docs do not cover the question. (One clarifying question is allowed first.)
   5. A tool fails or times out. Hand off; never guess.
   6. The same question comes back a second time.
@@ -42,6 +43,12 @@ PRICING = re.compile(
 CONTRACT_OR_LEGAL = re.compile(
     r"\b(contract|refund|refunds|invoice|billing|charged|cancel|cancellation|terminate|legal|"
     r"lawyer|liability|gdpr|dpa|data processing|terms of service|renewal terms)\b",
+    re.IGNORECASE,
+)
+# A fault, not a how-to question. "It doesn't work" is left out on purpose: it is usually
+# a vague setup question, and the agent asks one clarifying question first.
+PRODUCT_FAULT = re.compile(
+    r"\b(error|errors|bug|bugs|crash|crashes|crashed|crashing|broken|stopped working|outage)\b",
     re.IGNORECASE,
 )
 FRUSTRATED = re.compile(
@@ -90,6 +97,13 @@ def check_message(
             "pricing_contract_legal",
             "sales",
             "Pricing or upgrade question: goes to the account owner.",
+        )
+
+    if PRODUCT_FAULT.search(text):
+        return Escalation(
+            "product_fault",
+            "support",
+            "The customer reports something broken: Support owns faults.",
         )
 
     if FRUSTRATED.search(text) or signals.frustration >= FRUSTRATION_THRESHOLD:

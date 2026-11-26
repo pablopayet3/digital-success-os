@@ -95,7 +95,7 @@ shared:
   window_end: The last day of the measurement window (30 days after entry).
   window_complete: True once the whole window has passed.
   days_observed: Days of the window that have data so far. Results count accounts observed for 7 days or more.
-  setup_completed: Setup reached 75% or more on any day in the window.
+  setup_completed: Every setup step was done on some day in the window.
   usage_recovered: Monthly active users came back to 90% or more of the level before the drop.
   retained_30d: Still a customer at the end of the window. The guardrail for every play.
   valid_admin_restored: The account had an admin we may email on any day in the window.

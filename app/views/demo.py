@@ -145,7 +145,7 @@ with tab_chat:
         """
         SELECT account_id, account_name, edition, prerequisite_closure_pct
         FROM gold.account_current
-        WHERE coverage_tier = 'uncovered' AND prerequisite_closure_pct < 0.75 AND contacts_total > 0
+        WHERE coverage_tier = 'uncovered' AND prerequisite_closure_pct < 1 AND contacts_total > 0
         ORDER BY CASE WHEN signals_firing LIKE '%activation_stalled%' THEN 0 ELSE 1 END, account_id
         LIMIT 25
         """

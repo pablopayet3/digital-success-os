@@ -11,13 +11,13 @@ Synthetic data, fictional company. Generated from `config/plays.yaml`, `config/j
 | Exclusive | Yes. An account is in one exclusive play at a time. |
 | Rollout stage | Full test: every eligible account, split into treatment and holdout. |
 | Holdout | 50% of eligible accounts |
-| Re-entry | Not within 60 days of leaving the play |
+| Re-entry | Not within 14 days of leaving the play |
 
 ## Trigger and threshold
 
 An account becomes a candidate when any of these signals fires:
 
-- `activation_stalled`: Account is 7 or more days old and fewer than 50% of setup steps are done.
+- `activation_stalled`: Account is 7 or more days old, setup is not finished, and no new setup step was done in the last 7 days.
 
 ## Audience
 
@@ -54,7 +54,7 @@ Get a stalled account through setup. First the setup guide for the steps still m
 7. `csm_handoff`: Task for a person in queue `pooled_csm`, priority normal, reason `onboarding_stalled`. The journey waits for the outcome.
 8. `progressing`: Exit with reason `no_longer_stalled`.
 
-Goal (ends the journey at once when reached): `prerequisite_closure_pct >= 0.75`.
+Goal (ends the journey at once when reached): `prerequisite_closure_pct >= 1.0`.
 
 ## What the automation may use
 
@@ -88,6 +88,6 @@ Goal (ends the journey at once when reached): `prerequisite_closure_pct >= 0.75`
 
 ## Success metric
 
-`setup_completed`: Prerequisite closure reaches 75% or more within 30 days.
+`setup_completed`: Every setup step is done within 30 days.
 
 Measured over 30 days from entry, treatment against holdout, with a confidence interval (`docs/metrics.md`). Decided before launch; changing it is a new play version.

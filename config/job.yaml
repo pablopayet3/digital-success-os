@@ -188,7 +188,7 @@ signals:
   - id: activation_stalled
     name: Setup has stalled
     kind: Warning
-    fires_when: The customer signed up at least 7 days ago and has completed fewer than half of the setup steps.
+    fires_when: The customer signed up at least 7 days ago, setup is not finished, and no new setup step was done in the last 7 days.
   - id: usage_drop
     name: Usage is falling
     kind: Warning

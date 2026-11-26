@@ -132,7 +132,7 @@ outcomes as (
         at_entry.segment,
         at_entry.edition,
         coalesce(at_entry.arr_at_entry, 0) as arr_at_entry,
-        coalesce(in_window.best_closure >= 0.75, false) as setup_completed,
+        coalesce(in_window.best_closure >= 1, false) as setup_completed,
         coalesce(in_window.best_mau >= 0.9 * at_entry.mau_before_drop, false) as usage_recovered,
         (accounts.churned_at is null or accounts.churned_at > enrolments.window_end)
             as retained_30d,

@@ -682,7 +682,7 @@ What happened to every account that entered a play, treatment and holdout alike.
 | `segment` | varchar | smb, mid or enterprise. |  |
 | `edition` | varchar | Edition on that day: free, standard, premium or enterprise. |  |
 | `arr_at_entry` | integer | ARR on the day the account entered the play. |  |
-| `setup_completed` | boolean | Setup reached 75% or more on any day in the window. |  |
+| `setup_completed` | boolean | Every setup step was done on some day in the window. |  |
 | `usage_recovered` | boolean | Monthly active users came back to 90% or more of the level before the drop. |  |
 | `retained_30d` | boolean | Still a customer at the end of the window. The guardrail for every play. | not_null |
 | `valid_admin_restored` | boolean | The account had an admin we may email on any day in the window. |  |

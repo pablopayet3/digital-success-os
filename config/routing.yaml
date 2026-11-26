@@ -39,6 +39,7 @@ reason_codes:
   customer_asked_for_person: The customer asked the agent for a human
   frustration: The agent detected frustration
   pricing_contract_legal: A pricing, contract, refund or legal question (always a human)
+  product_fault: The customer reports something broken; Support owns faults
   not_in_docs: The agent could not find an answer in the docs
   low_confidence: The agent or the classifier was not confident enough
   tool_failure: A tool failed or timed out (hand off, never guess)

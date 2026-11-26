@@ -27,7 +27,7 @@
 
 journeys:
   onboarding_rescue:
-    goal: {metric: prerequisite_closure_pct, at_least: 0.75}
+    goal: {metric: prerequisite_closure_pct, at_least: 1.0}
     steps:
       - {id: setup_guide, type: email, template: setup_guide, tier: digital}
       - {id: wait_for_progress, type: wait, days: 3}

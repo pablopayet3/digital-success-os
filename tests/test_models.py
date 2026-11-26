@@ -79,8 +79,13 @@ def test_signals_match_their_rules(warehouse):
         """
         SELECT
             (SELECT count(*) FROM gold.signals WHERE signal_id = 'activation_stalled'),
-            (SELECT count(*) FROM gold.account_daily
-             WHERE account_age_days >= 7 AND prerequisite_closure_pct < 0.5)
+            (SELECT count(*) FROM gold.account_daily AS today
+             LEFT JOIN gold.account_daily AS week_before
+               ON week_before.account_id = today.account_id
+              AND week_before.snapshot_date = today.snapshot_date - INTERVAL 7 DAY
+             WHERE today.account_age_days >= 7 AND today.prerequisite_closure_pct < 1
+               AND coalesce(week_before.prerequisite_closure_pct, 0)
+                   >= today.prerequisite_closure_pct)
         """
     ).fetchone()
     assert stalled_signals == stalled_rule > 0

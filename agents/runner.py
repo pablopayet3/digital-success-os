@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 
+from agents.briefs import write_brief
 from agents.llm import get_llm
 from agents.onboarding import Conversation, converse, scripted
 from agents.simulated_customer import script_for, takes_up_the_offer
@@ -65,6 +66,15 @@ def hand_off(
     """Create the CTA for an escalated conversation. Returns the CTA id."""
     escalation = conversation.escalation
     urgent = escalation.reason_code in ("frustration", "customer_asked_for_person")
+    brief = None
+    if escalation.queue == "sales":  # Sales always gets the account-owner brief
+        quote = (conversation.customer_quote or escalation.why).rstrip(" .?!")
+        trigger = {
+            "play_id": enrollment["play_id"] if enrollment else "agent",
+            "trigger_signal": "pricing question to the agent",
+            "trigger_evidence": f'The customer asked: "{quote}"',
+        }
+        brief = write_brief(ctx, account, trigger)
     return create_cta(
         ctx,
         account["account_id"],
@@ -79,6 +89,7 @@ def hand_off(
         contact=contact,
         conversation_summary=conversation.summary,
         customer_quote=conversation.customer_quote,
+        brief=brief,
     )
 
 

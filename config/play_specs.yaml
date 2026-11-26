@@ -9,7 +9,7 @@
 
 # What each trigger signal means, with its threshold (dbt/models/marts/signals.sql).
 signals:
-  activation_stalled: Account is 7 or more days old and fewer than 50% of setup steps are done.
+  activation_stalled: Account is 7 or more days old, setup is not finished, and no new setup step was done in the last 7 days.
   usage_drop: Monthly active users are down 30% or more on the previous 30 days (at least 3 users before).
   seat_pressure: 90% or more of licensed seats are assigned.
   edition_fit: At the automation-rule or integration limit of the edition, or 90% of included Assist credits used in 30 days. Not for the top edition.

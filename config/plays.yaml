@@ -120,11 +120,12 @@ plays:
     journey: onboarding_rescue
     priority: 3              # ahead of usage recovery: finish setup first
     exclusive: true
+    cooldown_days: 14        # a customer can stall again at a later step
     holdout_pct: 0.5
     rollout_stage: full
     success_metric:
       id: setup_completed
-      description: Prerequisite closure reaches 75% or more within 30 days.
+      description: Every setup step is done within 30 days.
     version: 1
 
   - id: edition_upgrade
