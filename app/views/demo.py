@@ -279,10 +279,28 @@ with tab_chat:
             escalation = conversation.escalation
             team = QUEUE_NAMES.get(escalation.queue, escalation.queue)
             decided = DECIDED_BY.get(conversation.escalated_by, conversation.escalated_by)
+            task_id = st.session_state.demo_task
+            if escalation.queue == "sales":
+                # As in real life, the task is kept in the CS platform (the Human console stands
+                # in for Gainsight) and synced to the account owner's task list in Salesforce.
+                # Without the live link (a visitor), it reaches the console only.
+                sent = (st.session_state.get("demo_crm") or {}).get("ok")
+                where = (
+                    f"Task {task_id} is in the Human console, which stands in for Gainsight, "
+                    + (
+                        "and in Salesforce, for the account owner."
+                        if sent
+                        else "and would also go to the account owner in Salesforce (the "
+                        "public demo does not send it)."
+                    )
+                )
+            else:
+                where = (
+                    f"Task {task_id} is waiting in the Human console, which stands in for "
+                    "Gainsight."
+                )
             st.warning(
-                f"**Handed to a person: {team}.** {escalation.why}\n\n"
-                f"Decided by {decided}. Task {st.session_state.demo_task} is waiting in the "
-                "Human console."
+                f"**Handed to a person: {team}.** {escalation.why}\n\nDecided by {decided}. {where}"
             )
             st.markdown(f"**What {team} receives with the task:**")
             missing = re.search(r"Setup still missing: (.*)\.$", conversation.summary or "")

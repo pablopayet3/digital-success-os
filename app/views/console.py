@@ -243,10 +243,12 @@ if tasks.empty:
 
 order = {"urgent": 0, "high": 1, "normal": 2, "low": 3}
 tasks = tasks.assign(rank=tasks["priority"].map(order), overdue=tasks["sla_due_on"] < today)
-tasks = tasks.sort_values(["rank", "sla_due_on"])
+# Newest first, so a task just made on the Live demo is at the top of the list.
+tasks = tasks.sort_values("cta_id", ascending=False)
 st.caption(
-    f"{len(tasks)} open tasks, with the most urgent first. {int(tasks['overdue'].sum())} of "
-    f"them are past the date promised for a reply. Today is {today}."
+    f"{len(tasks)} open tasks, the newest first (a task from the Live demo is at the top). "
+    f"{int(tasks['overdue'].sum())} of them are past the date promised for a reply. "
+    f"Today is {today}."
 )
 st.dataframe(
     tasks[
@@ -271,9 +273,16 @@ st.dataframe(
 # The Live demo's button opens its new task here; forget it if this role cannot see it.
 if st.session_state.get("open_task") not in set(tasks["cta_id"]):
     st.session_state.pop("open_task", None)
-task = tasks[tasks["cta_id"] == st.selectbox("Open a task", tasks["cta_id"], key="open_task")].iloc[
-    0
-]
+chosen = st.selectbox(
+    "Open a task",
+    tasks["cta_id"],
+    index=None,
+    placeholder="Choose a task to see it and close it",
+    key="open_task",
+)
+if chosen is None:
+    st.stop()
+task = tasks[tasks["cta_id"] == chosen].iloc[0]
 packet = json.loads(task["packet"])
 show_task(task, packet)
 
