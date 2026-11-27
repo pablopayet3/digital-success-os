@@ -136,14 +136,20 @@ next best action and the journey, and the results against the holdout.
 | What happens when a queue overflows? | Human console, ADR 0004 | Flags follow capacity; an alert fires at two days of backlog |
 | How would this run in production? | `docs/production-architecture.md` | Same code, a `prod` profile; a table of what is real and what is simulated |
 
-## The live CRM moment (optional, from your computer)
+## The live CRM moment
 
-Start the app from a terminal with `uv run python run.py app --crm` (signed in to the
-CRM beforehand with `sf org login web --alias dso-demo`). In step 4, after the price
-question is handed to Sales, the page says "The task is now in the CRM" with a link: open
-it in the CRM tab and refresh. In step 5's console, closing the task marks it completed
-in the CRM too. Do one rehearsal the day before, then remove the rehearsal rows from the
-local store (see CLAUDE.md).
+On the hosted demo (ADR 0032, revised 26 November 2026): before you start, sign in with
+the admin password twice, in the Live demo page's "Presenter" box and as Admin in the
+Human console. Visitors who are not signed in never reach the CRM, and the hosted demo
+creates at most 40 CRM tasks a day. In step 4, after the price question is handed to
+Sales, the page says "The task is now in the CRM" with a link: open it in the CRM tab
+and refresh. In the console, closing the task with "Resolve" marks it completed in the
+CRM too. Rehearse once the day before, then reset the hosted data from the console
+(Admin) and delete the rehearsal task in the CRM.
+
+From your own computer instead: `uv run python run.py app --crm`, signed in to the CRM
+beforehand with `sf org login web --alias dso-demo`. Remove the rehearsal rows from the
+local store afterwards (see CLAUDE.md).
 
 ## Running it locally instead
 
