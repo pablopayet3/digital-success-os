@@ -90,7 +90,8 @@ def test_an_expansion_task_carries_the_account_owner_brief(simulated):
     assert with_brief, "the simulated world should have a Sales task with a brief"
     brief = json.loads(with_brief[0]["packet"])["brief"]
     description = task_fields(with_brief[0])["Description"]
-    assert "Brief for the account owner:" in description and brief in description
+    assert "BRIEF FOR THE ACCOUNT OWNER" in description
+    assert all(f"• {line.strip()}" in description for line in brief.splitlines() if line.strip())
 
 
 # --- Signing in ----------------------------------------------------------------------------------

@@ -51,7 +51,7 @@ from common.store import open_store
 MAX_ACCOUNTS = 50
 EXPORT_DIR = ROOT / "exports" / "crm_sync"
 PRIORITY = {"urgent": "High", "high": "High", "normal": "Normal", "low": "Low"}
-NOTE = "• Synthetic data, fictional company (Digital Success OS demo)."
+NOTE = "Synthetic data, fictional company (Digital Success OS demo)."
 # Who raised a handoff, in words for the CRM task.
 SOURCES = {"agent": "the AI agent", "journey": "a play", "mailbox": "the shared mailbox"}
 
@@ -97,28 +97,32 @@ def account_fields(row: dict) -> dict:
 def task_fields(task: dict) -> dict:
     """One open handoff as a CRM task. The id in the subject makes a re-run find it.
 
-    The task's comments are plain text in the CRM (no bold), so each line is a bullet with
-    its label first, and every code is said in words.
+    The task's comments are plain text in the CRM (no bold), so each section has a heading
+    in capitals, its lines are bullets, a blank line separates the sections, and every code
+    is said in words.
     """
     packet = json.loads(task["packet"])
     routing = load_yaml("routing.yaml")
     why = routing["reason_codes"].get(task["reason_code"], task["reason_code"])
     team = routing["queues"].get(task["queue"], {}).get("name", task["queue"])
     raised_by = SOURCES.get(task["source"], task["source"])
-    lines = [
-        f"• Next step: {packet.get('recommended_next_step') or 'see the handoff packet'}",
-        f"• Why a person: {why}. For: {team}. Raised by: {raised_by}.",
+    sections = [
+        ("NEXT STEP", [packet.get("recommended_next_step") or "See the handoff packet."]),
+        ("WHY A PERSON", [why.rstrip(".") + ".", f"For: {team}.", f"Raised by: {raised_by}."]),
     ]
     if packet.get("customer_quote"):
-        lines.append(f'• In the customer\'s words: "{packet["customer_quote"]}"')
+        sections.append(("IN THE CUSTOMER'S WORDS", [f'"{packet["customer_quote"]}"']))
     if packet.get("conversation_summary"):
-        lines.append(f"• What the agent did: {packet['conversation_summary']}")
+        sections.append(("WHAT THE AGENT DID", [packet["conversation_summary"]]))
     if packet.get("brief"):
-        lines += ["• Brief for the account owner:", packet["brief"]]
-    lines.append(NOTE)
+        brief = [line.strip() for line in packet["brief"].splitlines() if line.strip()]
+        sections.append(("BRIEF FOR THE ACCOUNT OWNER", brief))
+    text = "\n\n".join(
+        heading + "\n" + "\n".join(f"• {line}" for line in lines) for heading, lines in sections
+    )
     return {
         "Subject": f"[{task['cta_id']}] {task['title']}"[:255],
-        "Description": "\n".join(lines),
+        "Description": f"{text}\n\n{NOTE}",
         "Priority": PRIORITY.get(task["priority"], "Normal"),
         "Status": "Not Started",
         "ActivityDate": task["sla_due_on"],
@@ -351,7 +355,7 @@ def complete_task_now(cta_id: str, outcome: str, notes: str = "", client=None) -
     )
     description = record["Description"] or ""
     if closing not in description:  # closing twice must not repeat the line
-        description = f"{description}\n{closing}"
+        description = f"{description}\n\nOUTCOME\n{closing}"
     client.Task.update(record["Id"], {"Status": "Completed", "Description": description[:32000]})
     return task_link(client, record["Id"])
 
