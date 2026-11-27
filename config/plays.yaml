@@ -59,7 +59,7 @@ plays:
     journey: detractor_save
     priority: 2
     exclusive: true
-    holdout_pct: 0.2         # small holdout: withholding help from detractors has a cost
+    holdout_pct: 0.0         # no holdout: help is never withheld from an unhappy customer (ADR 0035)
     rollout_stage: full
     success_metric:
       id: retained_30d

@@ -10,7 +10,7 @@ Synthetic data, fictional company. Generated from `config/plays.yaml`, `config/j
 | Priority | 2 of 8 (1 claims an account first) |
 | Exclusive | Yes. An account is in one exclusive play at a time. |
 | Rollout stage | Full test: every eligible account, split into treatment and holdout. |
-| Holdout | 20% of eligible accounts |
+| Holdout | None. This play is data hygiene, not an experiment. |
 | Re-entry | Not within 60 days of leaving the play |
 
 ## Trigger and threshold
