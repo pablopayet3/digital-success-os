@@ -44,13 +44,16 @@ import subprocess
 from pathlib import Path
 
 from api.exports import crm_export
+from common.config import load_yaml
 from common.paths import DATA_DIR, ROOT
 from common.store import open_store
 
 MAX_ACCOUNTS = 50
 EXPORT_DIR = ROOT / "exports" / "crm_sync"
 PRIORITY = {"urgent": "High", "high": "High", "normal": "Normal", "low": "Low"}
-NOTE = "Synthetic data, fictional company (Digital Success OS demo)."
+NOTE = "• Synthetic data, fictional company (Digital Success OS demo)."
+# Who raised a handoff, in words for the CRM task.
+SOURCES = {"agent": "the AI agent", "journey": "a play", "mailbox": "the shared mailbox"}
 
 
 def build_payloads(data_dir: Path = DATA_DIR, limit: int = MAX_ACCOUNTS) -> list[dict]:
@@ -92,18 +95,26 @@ def account_fields(row: dict) -> dict:
 
 
 def task_fields(task: dict) -> dict:
-    """One open handoff as a CRM task. The id in the subject makes a re-run find it."""
+    """One open handoff as a CRM task. The id in the subject makes a re-run find it.
+
+    The task's comments are plain text in the CRM (no bold), so each line is a bullet with
+    its label first, and every code is said in words.
+    """
     packet = json.loads(task["packet"])
+    routing = load_yaml("routing.yaml")
+    why = routing["reason_codes"].get(task["reason_code"], task["reason_code"])
+    team = routing["queues"].get(task["queue"], {}).get("name", task["queue"])
+    raised_by = SOURCES.get(task["source"], task["source"])
     lines = [
-        f"Next step: {packet.get('recommended_next_step') or 'see the handoff packet'}",
-        f"Why a person: {task['reason_code']} (queue: {task['queue']}, from: {task['source']})",
+        f"• Next step: {packet.get('recommended_next_step') or 'see the handoff packet'}",
+        f"• Why a person: {why}. For: {team}. Raised by: {raised_by}.",
     ]
     if packet.get("customer_quote"):
-        lines.append(f"In the customer's words: {packet['customer_quote']}")
+        lines.append(f'• In the customer\'s words: "{packet["customer_quote"]}"')
     if packet.get("conversation_summary"):
-        lines.append(f"What the agent did: {packet['conversation_summary']}")
+        lines.append(f"• What the agent did: {packet['conversation_summary']}")
     if packet.get("brief"):
-        lines += ["Brief for the account owner:", packet["brief"]]
+        lines += ["• Brief for the account owner:", packet["brief"]]
     lines.append(NOTE)
     return {
         "Subject": f"[{task['cta_id']}] {task['title']}"[:255],
@@ -335,11 +346,13 @@ def complete_task_now(cta_id: str, outcome: str, notes: str = "", client=None) -
     if not found["records"]:
         return None
     record = found["records"][0]
-    closing = f"Closed in the Human console. Outcome: {outcome}." + (f" {notes}" if notes else "")
-    client.Task.update(
-        record["Id"],
-        {"Status": "Completed", "Description": f"{record['Description'] or ''}\n{closing}"[:32000]},
+    closing = f"• Closed in the Human console. Outcome: {outcome.replace('_', ' ')}." + (
+        f" {notes}" if notes else ""
     )
+    description = record["Description"] or ""
+    if closing not in description:  # closing twice must not repeat the line
+        description = f"{description}\n{closing}"
+    client.Task.update(record["Id"], {"Status": "Completed", "Description": description[:32000]})
     return task_link(client, record["Id"])
 
 

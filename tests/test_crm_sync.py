@@ -226,7 +226,7 @@ def test_a_new_handoff_is_sent_once_and_closing_it_completes_it_in_the_crm(simul
 
     link = complete_task_now(task["cta_id"], "expansion_opportunity", "Call booked.", client=crm)
     assert link and sent["Status"] == "Completed"
-    assert "Outcome: expansion_opportunity. Call booked." in sent["Description"]
+    assert "Outcome: expansion opportunity. Call booked." in sent["Description"]
     assert complete_task_now("CTA-NOT-THERE", "resolved", client=crm) is None
 
 

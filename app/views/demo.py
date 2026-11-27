@@ -89,7 +89,9 @@ def presenter_sign_in() -> None:
     if not (os.environ.get("DSO_HOSTED") and os.environ.get(crm_sync.LIVE_SETTING) == "true"):
         return
     if ui.presenter():
-        st.caption("Presenter mode: a handoff on this page is also sent to the real CRM.")
+        st.caption(
+            "You are signed in as the presenter: the Sales task also goes to the real Salesforce."
+        )
         return
     # Hidden from visitors: the presenter opens the page with ?presenter=1, or signs in to the
     # Human console as Admin, which turns presenter mode on as well.
@@ -147,8 +149,8 @@ with tab_chat:
     # Real product names on this page at the owner's request (27 November 2026), as plain
     # text, the same exception as the guided tour.
     st.caption(
-        "At a real company: the data in Databricks, the play in Gainsight (the Human console "
-        "stands in for its task list), the Sales task in Salesforce."
+        "In real life: the customer data sits in Databricks, the play runs in Gainsight (the "
+        "Human console plays that part here), and the Sales task goes to Salesforce."
     )
     presenter_sign_in()
     llm = get_llm()
@@ -163,8 +165,8 @@ with tab_chat:
             )
         else:
             st.caption(
-                f"The real model answers here. This public demo may spend ${budget:.2f} on it "
-                f"in total. Used so far: ${llm.total_spent_usd:.2f}."
+                f"A real AI model answers. Budget for this demo: ${budget:.0f}. "
+                f"Used so far: ${llm.total_spent_usd:.2f}."
             )
     stalled = stalled_customers()  # "setup stalled" customers come first
     labels = {
@@ -173,7 +175,7 @@ with tab_chat:
     }
     # Open on a customer who really received the play's first message: the story is clearer.
     start = first_customer(list(labels.values()))
-    account_id = labels[st.selectbox("You are the admin of", list(labels), index=start)]
+    account_id = labels[st.selectbox("You are the admin of (select)", list(labels), index=start)]
     if st.session_state.get("demo_account") != account_id:
         st.session_state.demo_account, st.session_state.demo_messages = account_id, []
         st.session_state.pop("demo_task", None)
@@ -212,7 +214,7 @@ with tab_chat:
         # The signal by its plain name, as the Overview lists it.
         plain = {item["id"]: item["name"] for item in load_yaml("job.yaml")["signals"]}
         st.info(
-            f"**Why:** {plain.get(signal, signal).lower().rstrip('.')} "
+            f"**Signal:** {plain.get(signal, signal).lower().rstrip('.')} "
             f"({plain_evidence(evidence[signal])}).\n\n"
             f"**Play:** {play.name}: {ladder}.\n\n{in_play}"
         )
@@ -301,6 +303,11 @@ with tab_chat:
             crm = st.session_state.get("demo_crm")
             if crm:
                 show_crm_result(crm)
+            # Same tab, so a sign-in to the console is kept. The console plays Gainsight's
+            # task list: this is where the task lands in this demo.
+            if st.button("Open this task in the Human console"):
+                st.session_state.open_task = st.session_state.demo_task
+                st.switch_page("views/console.py")
         with st.expander("What the agent did behind the answer"):
             st.write("Tool calls")
             st.json(conversation.tool_calls)

@@ -268,7 +268,12 @@ st.dataframe(
     width="stretch",
 )
 
-task = tasks[tasks["cta_id"] == st.selectbox("Open a task", tasks["cta_id"])].iloc[0]
+# The Live demo's button opens its new task here; forget it if this role cannot see it.
+if st.session_state.get("open_task") not in set(tasks["cta_id"]):
+    st.session_state.pop("open_task", None)
+task = tasks[tasks["cta_id"] == st.selectbox("Open a task", tasks["cta_id"], key="open_task")].iloc[
+    0
+]
 packet = json.loads(task["packet"])
 show_task(task, packet)
 
