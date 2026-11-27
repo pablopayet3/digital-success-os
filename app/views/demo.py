@@ -10,14 +10,13 @@ from agents.llm import get_llm
 from agents.onboarding import converse, scripted
 from agents.runner import hand_off, record_conversation
 from app import ui
+from app.demo_story import STORY, first_customer, stalled_customers
 from common.config import load_yaml
 from engine.catalog import load_catalog
 from engine.channels import render_template
 from engine.context import load_day, records
 from integrations import crm_sync
 
-# The two messages of the demo path: a setup question, then a question about price.
-STORY = ["How do I invite my whole team at once?", "Thanks. How much would 10 more seats cost?"]
 MAX_MESSAGE = 400  # characters a visitor may type in one message
 # The rungs of a play's ladder, and the states of a journey, in plain words for the page.
 LADDER_WORDS = {
@@ -177,24 +176,13 @@ with tab_chat:
                 f"The real model answers here. This public demo may spend ${budget:.2f} on it "
                 f"in total. Used so far: ${llm.total_spent_usd:.2f}."
             )
-    stalled = ui.query(
-        """
-        SELECT account_id, account_name, edition, prerequisite_closure_pct
-        FROM gold.account_current
-        WHERE coverage_tier = 'uncovered' AND prerequisite_closure_pct < 1 AND contacts_total > 0
-        ORDER BY CASE WHEN signals_firing LIKE '%activation_stalled%' THEN 0 ELSE 1 END, account_id
-        LIMIT 25
-        """
-    )  # accounts whose "setup stalled" signal is firing today come first
+    stalled = stalled_customers()  # "setup stalled" customers come first
     labels = {
         f"{row.account_name} ({row.edition}, {row.prerequisite_closure_pct:.0%} set up)": row.account_id
         for row in stalled.itertuples()
     }
     # Open on a customer who really received the play's first message: the story is clearer.
-    emails = ui.rows("SELECT DISTINCT account_id FROM touches WHERE channel = 'email'")
-    emailed = set(emails["account_id"]) if len(emails) else set()
-    ids = list(labels.values())
-    start = next((position for position, one in enumerate(ids) if one in emailed), 0)
+    start = first_customer(list(labels.values()))
     account_id = labels[st.selectbox("You are the admin of", list(labels), index=start)]
     if st.session_state.get("demo_account") != account_id:
         st.session_state.demo_account, st.session_state.demo_messages = account_id, []

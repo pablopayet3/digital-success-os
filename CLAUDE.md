@@ -312,6 +312,9 @@ After the phases (the brief read again line by line; see the last section of
   today: regenerating the data or advancing a day breaks the match (the agent then
   hands off as `agent_unavailable`). Store them again with one `--live` run of the
   same conversations (about 3 cents each).
+  For the hosted demo, `scripts/story_answers.py` stores them on a copy of the world the image
+  builds (`run.py demo 10 --profile small` in a separate worktree, then `DSO_DATA_DIR` pointing
+  at it): run it again after any change to the world, the signals or the agent's prompt.
 - `config/job.yaml`: the ten lines of the role, in plain words, and the page that shows
   each. One source for the opening of every page (`app/ui.py::job_intro`), for the top of
   the Overview (`ui.what_this_is`: what this is, the workflow as cards, the role line by
