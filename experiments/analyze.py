@@ -227,7 +227,7 @@ def cohorts(mature: pd.DataFrame, metric: str) -> list[dict]:
 
 
 def money(treatment: pd.DataFrame, holdout: pd.DataFrame) -> dict:
-    """Revenue kept and revenue added, per group."""
+    """ARR kept and ARR added, per group."""
     result = {}
     for arm, group in (("treatment", treatment), ("holdout", holdout)):
         arr = float(group["arr_at_entry"].sum())

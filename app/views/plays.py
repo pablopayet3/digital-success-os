@@ -269,7 +269,7 @@ with left:
             width="stretch",
         )
 with right:
-    st.write("**Revenue in the 30 days after entry**")
+    st.write("**ARR in the 30 days after entry**")
     if row is None or "arr_at_entry_treatment" not in results.columns or not row["n_holdout"]:
         st.caption("This play has no holdout to compare with.")
     else:
@@ -280,8 +280,8 @@ with right:
                     {
                         "Group": groups[arm],
                         "Customers": int(row[f"n_{arm}"]),
-                        "Revenue at entry": f"${row[f'arr_at_entry_{arm}']:,.0f}",
-                        "Revenue kept": ui.pct(
+                        "ARR at entry": f"${row[f'arr_at_entry_{arm}']:,.0f}",
+                        "Share of ARR kept": ui.pct(
                             row[f"retained_arr_{arm}"] / row[f"arr_at_entry_{arm}"], 1
                         )
                         if row[f"arr_at_entry_{arm}"]
