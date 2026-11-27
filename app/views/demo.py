@@ -18,18 +18,18 @@ from engine.context import load_day, records
 from integrations import crm_sync
 
 MAX_MESSAGE = 400  # characters a visitor may type in one message
-# The rungs of a play's ladder, and the states of a journey, in plain words for the page.
+# Who decided a handoff, and each team by its name, in plain words for the page.
+DECIDED_BY = {
+    "hard_rule": "a rule in code, before any AI model saw the message",
+    "agent": "the AI agent",
+    "failure": "a safety net, because the agent could not answer",
+}
+QUEUE_NAMES = {key: queue["name"] for key, queue in load_yaml("routing.yaml")["queues"].items()}
+# The steps of a play's ladder, in plain words for the page.
 LADDER_WORDS = {
-    "digital": "an automated email or in-product message",
+    "digital": "an email first",
     "agentic": "the AI agent",
     "human": "a person",
-}
-JOURNEY_WORDS = {
-    "active": "under way",
-    "waiting_on_human": "waiting for a person to pick up the task",
-    "completed": "finished, because every step has run",
-    "exited": "over, because the customer left the play",
-    "opted_out": "stopped, because the customer opted out",
 }
 
 
@@ -144,21 +144,11 @@ else:
     tab_chat, tab_day = st.tabs(["Talk to the onboarding agent", "Advance one day"])
 
 with tab_chat:
-    st.write(
-        "This page follows one play from start to finish, on one customer: **Onboarding "
-        "rescue**, which starts when a new customer's setup stalls. **The system "
-        "makes the first move.** It notices a signal and writes to the customer without "
-        "being asked. The customer replies to that message, and the AI agent answers. A "
-        "question that the agent must not answer becomes a task for a person. You play the "
-        "customer. A handoff creates a real task, which you can open in the Human console."
-    )
     # Real product names on this page at the owner's request (27 November 2026), as plain
     # text, the same exception as the guided tour.
     st.caption(
-        "At a real company, the signal would come from a data warehouse such as Databricks, "
-        "and the play would run in a customer success platform such as Gainsight, whose task "
-        "list the Human console stands in for. A task for Sales would land in a CRM such as "
-        "Salesforce."
+        "At a real company: the data in Databricks, the play in Gainsight (the Human console "
+        "stands in for its task list), the Sales task in Salesforce."
     )
     presenter_sign_in()
     llm = get_llm()
@@ -207,13 +197,6 @@ with tab_chat:
         ladder = ", then ".join(
             LADDER_WORDS.get(rung.tier, rung.tier) for rung in play.intervention_ladder
         )
-        where = (
-            "This page shows the AI agent's step. If the agent cannot help, the next step is a "
-            "task for a person."
-            if with_agent
-            else "This play has no AI agent step. Below is what the agent says if the customer "
-            "writes in anyway."
-        )
         enrolment = ui.store().one(
             "SELECT arm, status FROM enrollments WHERE account_id = :account AND play_id = :play "
             "ORDER BY enrolled_on DESC LIMIT 1",
@@ -221,26 +204,17 @@ with tab_chat:
             play=play.id,
         )
         if enrolment is None:
-            in_play = "This customer has not entered the play yet."
+            in_play = "**This customer:** not in the play yet."
         elif enrolment["arm"] == "holdout":
-            in_play = (
-                "This customer is in the **holdout**, the group the system deliberately leaves "
-                "alone so the play can be compared. If the customer writes in anyway, the agent "
-                "still answers."
-            )
+            in_play = "**This customer:** held out, so the play leaves it alone, for comparison."
         else:
-            state = JOURNEY_WORDS.get(enrolment["status"], enrolment["status"].replace("_", " "))
-            in_play = (
-                f"This customer is in the **play group**, not the holdout, so it receives the "
-                f"play's help. Its journey is {state}."
-            )
+            in_play = "**This customer:** in the play group, so it gets the play's help."
         # The signal by its plain name, as the Overview lists it.
         plain = {item["id"]: item["name"] for item in load_yaml("job.yaml")["signals"]}
         st.info(
-            f"**Why the system acted:** {plain.get(signal, signal)}. The data shows "
-            f"{plain_evidence(evidence[signal])}.\n\n"
-            f"**What it does about it:** it starts the **{play.name}** play, which tries the "
-            f"lightest help first: {ladder}. {where}\n\n{in_play}"
+            f"**Why:** {plain.get(signal, signal).lower().rstrip('.')} "
+            f"({plain_evidence(evidence[signal])}).\n\n"
+            f"**Play:** {play.name}: {ladder}.\n\n{in_play}"
         )
         first_message(play, account_id, evidence[signal], enrolment)
     else:
@@ -301,11 +275,29 @@ with tab_chat:
                 st.session_state.demo_task = task_id
                 st.session_state.demo_crm = send_to_crm(task_id)
             escalation = conversation.escalation
+            team = QUEUE_NAMES.get(escalation.queue, escalation.queue)
+            decided = DECIDED_BY.get(conversation.escalated_by, conversation.escalated_by)
             st.warning(
-                f"Handed off to a person. Reason: **{escalation.reason_code}**. Queue: **{escalation.queue}**. "
-                f"Decided by: **{conversation.escalated_by}**. Task **{st.session_state.demo_task}** is now in the Human console."
+                f"**Handed to a person: {team}.** {escalation.why}\n\n"
+                f"Decided by {decided}. Task {st.session_state.demo_task} is waiting in the "
+                "Human console."
             )
-            st.write(f"**Summary written for the person who picks it up:** {conversation.summary}")
+            st.markdown(f"**What {team} receives with the task:**")
+            missing = re.search(r"Setup still missing: (.*)\.$", conversation.summary or "")
+            if conversation.escalated_by == "hard_rule" and missing:
+                answered = sum(1 for turn in conversation.transcript if turn["role"] == "agent")
+                st.markdown(
+                    f'- **The customer wrote:** "{conversation.customer_quote}"\n'
+                    f"- **Already answered by the agent:** {answered} earlier "
+                    f"{'question' if answered == 1 else 'questions'}\n"
+                    f"- **Setup still missing:** {missing.group(1)}\n"
+                    f"- **Suggested next step:** {conversation.recommended_next_step}"
+                )
+            else:  # the agent wrote the summary itself: show it as it is
+                st.markdown(
+                    f"- **Summary:** {conversation.summary}\n"
+                    f"- **Suggested next step:** {conversation.recommended_next_step}"
+                )
             crm = st.session_state.get("demo_crm")
             if crm:
                 show_crm_result(crm)

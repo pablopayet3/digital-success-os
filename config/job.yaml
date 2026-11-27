@@ -138,9 +138,9 @@ pages:
     starts it, its steps, its owner and how its success is measured. Below are the result
     of each play against its holdout, and one play in detail.
   demo: >
-    This page holds a live conversation with the AI agent, in which you play the
-    administrator of one customer. Ask a question about setup, then ask for a price, and
-    watch a rule pass the customer to the Sales team.
+    One play, one customer, Onboarding rescue. Setup stalls → the system writes to the
+    customer first → you reply, playing the customer → the AI agent answers → a price
+    question becomes a task for Sales, in the Human console.
   agent: >
     This page shows every conversation the agent has had, the customer replies it sorted
     in the shared mailbox, and its results on a fixed set of test conversations.

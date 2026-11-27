@@ -30,10 +30,16 @@ def data_is_ready() -> bool:
 
 def banner() -> None:
     """On every page: this is made-up data, and who is playing the model."""
+    mode = get_llm().mode
+    if mode.startswith("live"):
+        answers = "The AI agent's answers come from a real AI model."
+    elif mode.startswith("offline"):
+        answers = "The AI agent's answers are replayed from a real AI model's stored replies."
+    else:
+        answers = "The AI agent's answers come from a labelled stand-in, not a real AI model."
     st.caption(
-        ":orange[**Synthetic data, fictional company.**] Lumen Labs and Relay do not exist. "
-        f"New AI answers are produced by: **{get_llm().mode}**. "
-        "Stored conversations say who answered them."
+        ":orange[**This demo uses synthetic data about a fictional company.**] The company, "
+        "Lumen Labs, and its product, Relay, do not exist. " + answers
     )
 
 

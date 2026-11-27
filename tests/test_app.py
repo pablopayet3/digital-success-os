@@ -103,8 +103,8 @@ def test_the_scripted_story_ends_in_a_task_for_sales(app_data, ops):
         next(button for button in app.button if button.label == "Run the story").click().run()
         assert not app.exception, [error.value for error in app.exception]
         handoff = " ".join(warning.value for warning in app.warning)
-        assert "pricing_contract_legal" in handoff and "sales" in handoff
-        assert "hard_rule" in handoff  # code stopped it, before the model was asked
+        assert "Account owners (Sales)" in handoff  # the team, by its name
+        assert "a rule in code" in handoff  # code stopped it, before the model was asked
         (task,) = [row for row in ops.rows("SELECT * FROM ctas") if row["cta_id"] not in before]
         assert task["queue"] == "sales" and task["source"] == "agent" and task["cta_id"] in handoff
     finally:
