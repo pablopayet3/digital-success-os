@@ -93,10 +93,14 @@ def converse(
             break
         result.transcript.append({"role": "customer", "text": customer_text})
 
-        # Steps 1 and 2: read the message and apply the hard rules before the agent speaks.
-        escalation = check_message(
-            customer_text, classify_message(customer_text), earlier_questions
-        )
+        # Steps 1 and 2: apply the hard rules before the agent speaks. The keyword rules run
+        # first: when one of them already decides (a price question, a request for a person),
+        # no model is called at all, so the handoff is instant and costs nothing.
+        escalation = check_message(customer_text, None, earlier_questions)
+        if escalation is None:
+            escalation = check_message(
+                customer_text, classify_message(customer_text), earlier_questions
+            )
         if escalation:
             return hand_off(escalation, "hard_rule", customer_text)
         earlier_questions.append(customer_text)

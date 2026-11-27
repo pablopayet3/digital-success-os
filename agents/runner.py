@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 
-from agents.briefs import write_brief
+from agents.briefs import brief_facts, template_brief
 from agents.llm import get_llm
 from agents.onboarding import Conversation, converse, scripted
 from agents.simulated_customer import script_for, takes_up_the_offer
@@ -74,7 +74,9 @@ def hand_off(
             "trigger_signal": "pricing question to the agent",
             "trigger_evidence": f'The customer asked: "{quote}"',
         }
-        brief = write_brief(ctx, account, trigger)
+        # Built from the account's facts, without a model call: the customer is waiting on
+        # the page, and a template cannot invent a number (agents/briefs.py).
+        brief = template_brief(brief_facts(account, trigger), trigger)
     return create_cta(
         ctx,
         account["account_id"],

@@ -26,7 +26,8 @@ human's outcome comes back into the system. Every play has a holdout.
   `docs/demo-script.md`, `docs/bi-dashboard-guide.md`, `integrations/crm_sync.py` with
   ADR 0019, the ADRs about the production profile (the brief update asked for those),
   and `config/tour.yaml`: the app's guided tour names them as plain text, with no
-  logos, because the owner asked for it on 12 November 2026. No other screen does. The app does not list those two documents. The employer is never named.
+  logos, because the owner asked for it on 12 November 2026. The Live demo page names
+  them once, in one caption, also at the owner's request (27 November 2026). No other screen does. The app does not list those two documents. The employer is never named.
 - Every file and screen says "Synthetic data, fictional company".
 - Simple, readable code over clever code. This code is walked through live, line by line.
   Short functions, plain names, comments that say why.

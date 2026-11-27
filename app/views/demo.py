@@ -2,6 +2,7 @@
 
 import hmac
 import os
+import re
 
 import streamlit as st
 
@@ -18,6 +19,24 @@ from integrations import crm_sync
 # The two messages of the demo path: a setup question, then a question about price.
 STORY = ["How do I invite my whole team at once?", "Thanks. How much would 10 more seats cost?"]
 MAX_MESSAGE = 400  # characters a visitor may type in one message
+# The rungs of a play's ladder, and the states of a journey, in plain words for the page.
+LADDER_WORDS = {
+    "digital": "an automated email or in-product message",
+    "agentic": "the AI agent",
+    "human": "a person",
+}
+JOURNEY_WORDS = {
+    "active": "under way",
+    "waiting_on_human": "waiting for a person to pick up the task",
+    "completed": "finished, because every step has run",
+    "exited": "over, because the customer left the play",
+    "opted_out": "stopped, because the customer opted out",
+}
+
+
+def plain_evidence(evidence: str) -> str:
+    """The evidence as a phrase: "Day 23: 2 of 4 ..." becomes "day 23 since signup, 2 of 4 ..."."""
+    return re.sub(r"^Day (\d+): ", r"day \1 since signup, ", evidence)
 
 
 def first_message(play, account_id: str, evidence: str, enrolment: dict | None) -> None:
@@ -73,6 +92,10 @@ def presenter_sign_in() -> None:
     if ui.presenter():
         st.caption("Presenter mode: a handoff on this page is also sent to the real CRM.")
         return
+    # Hidden from visitors: the presenter opens the page with ?presenter=1, or signs in to the
+    # Human console as Admin, which turns presenter mode on as well.
+    if st.query_params.get("presenter") != "1":
+        return
     with st.expander("Presenter: also send handoffs to the real CRM"):
         st.caption(
             "Every visitor sees the whole story on this page and in the Human console. The "
@@ -115,15 +138,28 @@ def show_crm_result(crm: dict) -> None:
 
 st.title("Live demo")
 ui.job_intro("demo")
-tab_chat, tab_day = st.tabs(["Talk to the onboarding agent", "Advance one day"])
+# The hosted demo is read-only, so it has no "Advance one day" tab and no tabs at all.
+if os.environ.get("DSO_HOSTED"):
+    tab_chat, tab_day = st.container(), None
+else:
+    tab_chat, tab_day = st.tabs(["Talk to the onboarding agent", "Advance one day"])
 
 with tab_chat:
     st.write(
-        "This page follows one play from start to finish, on one customer. **The system "
+        "This page follows one play from start to finish, on one customer: **Onboarding "
+        "rescue**, which starts when a new customer's setup stalls. **The system "
         "makes the first move.** It notices a signal and writes to the customer without "
         "being asked. The customer replies to that message, and the AI agent answers. A "
         "question that the agent must not answer becomes a task for a person. You play the "
         "customer. A handoff creates a real task, which you can open in the Human console."
+    )
+    # Real product names on this page at the owner's request (27 November 2026), as plain
+    # text, the same exception as the guided tour.
+    st.caption(
+        "At a real company, the signal would come from a data warehouse such as Databricks, "
+        "and the play would run in a customer success platform such as Gainsight, whose task "
+        "list the Human console stands in for. A task for Sales would land in a CRM such as "
+        "Salesforce."
     )
     presenter_sign_in()
     llm = get_llm()
@@ -180,11 +216,15 @@ with tab_chat:
     if plays:
         play = min(with_agent or plays, key=lambda play: play.priority)
         signal = next(signal for signal in play.trigger if signal in evidence)
-        ladder = " > ".join(rung.tier for rung in play.intervention_ladder)
+        ladder = ", then ".join(
+            LADDER_WORDS.get(rung.tier, rung.tier) for rung in play.intervention_ladder
+        )
         where = (
-            "This page is the agent's rung of that ladder; a handoff is the next one."
+            "This page shows the AI agent's step. If the agent cannot help, the next step is a "
+            "task for a person."
             if with_agent
-            else "That play has no agent rung. Below is what the agent says if this admin writes in."
+            else "This play has no AI agent step. Below is what the agent says if the customer "
+            "writes in anyway."
         )
         enrolment = ui.store().one(
             "SELECT arm, status FROM enrollments WHERE account_id = :account AND play_id = :play "
@@ -193,19 +233,26 @@ with tab_chat:
             play=play.id,
         )
         if enrolment is None:
-            in_play = "This account has not entered the play."
+            in_play = "This customer has not entered the play yet."
         elif enrolment["arm"] == "holdout":
             in_play = (
-                "This account is **held out** of the play: the engine leaves it alone, to "
-                "compare. If its admin writes in, the agent still answers."
+                "This customer is in the **holdout**, the group the system deliberately leaves "
+                "alone so the play can be compared. If the customer writes in anyway, the agent "
+                "still answers."
             )
         else:
-            in_play = f"This account is in the play (treatment; journey {enrolment['status']})."
+            state = JOURNEY_WORDS.get(enrolment["status"], enrolment["status"].replace("_", " "))
+            in_play = (
+                f"This customer is in the **play group**, not the holdout, so it receives the "
+                f"play's help. Its journey is {state}."
+            )
         # The signal by its plain name, as the Overview lists it.
         plain = {item["id"]: item["name"] for item in load_yaml("job.yaml")["signals"]}
         st.info(
-            f"**Signal firing today:** {plain.get(signal, signal)}. {evidence[signal]}\n\n"
-            f"**Play it triggers:** {play.name} ({ladder}). {where}\n\n{in_play}"
+            f"**Why the system acted:** {plain.get(signal, signal)}. The data shows "
+            f"{plain_evidence(evidence[signal])}.\n\n"
+            f"**What it does about it:** it starts the **{play.name}** play, which tries the "
+            f"lightest help first: {ladder}. {where}\n\n{in_play}"
         )
         first_message(play, account_id, evidence[signal], enrolment)
     else:
@@ -287,45 +334,46 @@ with tab_chat:
                 f"Agent replies written by: {', '.join(models) or 'no agent model (a hard rule stopped it first)'}."
             )
 
-with tab_day:
-    st.write(
-        "One simulated day runs these steps in order. Customers react to yesterday's "
-        "messages. New usage data arrives. The pipeline rebuilds the tables. Staff work on "
-        "their queues. The shared mailbox is sorted. The rules put customers into plays. "
-        "The journeys send the day's messages. It takes about 30 seconds."
-    )
-    st.caption(f"Simulated today: {ui.today()}")
-    if "offline" in get_llm().mode:
-        st.caption(
-            "Have the conversation on the other tab first. A new day changes the customers' "
-            "data, so the stored answers no longer match, and the agent will say that it is "
-            "unavailable."
+if tab_day is not None:
+    with tab_day:
+        st.write(
+            "One simulated day runs these steps in order. Customers react to yesterday's "
+            "messages. New usage data arrives. The pipeline rebuilds the tables. Staff work on "
+            "their queues. The shared mailbox is sorted. The rules put customers into plays. "
+            "The journeys send the day's messages. It takes about 30 seconds."
         )
-    if os.environ.get("DSO_HOSTED"):
-        st.info(
-            "This is turned off in the hosted demo, which is read-only. To run it locally, use "
-            "`uv run python run.py run-day`."
-        )
-    elif st.button("Advance one day"):
-        from engine.run import run_day
+        st.caption(f"Simulated today: {ui.today()}")
+        if "offline" in get_llm().mode:
+            st.caption(
+                "Have the conversation on the other tab first. A new day changes the customers' "
+                "data, so the stored answers no longer match, and the agent will say that it is "
+                "unavailable."
+            )
+        if os.environ.get("DSO_HOSTED"):
+            st.info(
+                "This is turned off in the hosted demo, which is read-only. To run it locally, use "
+                "`uv run python run.py run-day`."
+            )
+        elif st.button("Advance one day"):
+            from engine.run import run_day
 
-        with st.spinner("The world moves, the pipeline runs, the engine acts..."):
-            st.session_state.demo_day = run_day(ui.data_dir(), verbose=False)
-        ui.refresh()
-    if "demo_day" in st.session_state:
-        summary = st.session_state.demo_day
-        st.success(f"Simulated {summary['date']}.")
-        keys = [
-            "entered",
-            "holdout",
-            "excluded",
-            "emails",
-            "in_app",
-            "agent_conversations",
-            "ctas",
-            "mailbox_replies_triaged",
-            "resolved_by_staff",
-            "goal_reached",
-        ]
-        for column, key in zip(st.columns(5) * 2, keys, strict=True):
-            ui.metric(column, key.replace("_", " "), summary.get(key, 0))
+            with st.spinner("The world moves, the pipeline runs, the engine acts..."):
+                st.session_state.demo_day = run_day(ui.data_dir(), verbose=False)
+            ui.refresh()
+        if "demo_day" in st.session_state:
+            summary = st.session_state.demo_day
+            st.success(f"Simulated {summary['date']}.")
+            keys = [
+                "entered",
+                "holdout",
+                "excluded",
+                "emails",
+                "in_app",
+                "agent_conversations",
+                "ctas",
+                "mailbox_replies_triaged",
+                "resolved_by_staff",
+                "goal_reached",
+            ]
+            for column, key in zip(st.columns(5) * 2, keys, strict=True):
+                ui.metric(column, key.replace("_", " "), summary.get(key, 0))

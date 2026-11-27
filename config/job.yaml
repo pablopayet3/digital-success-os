@@ -88,7 +88,7 @@ lines:
       models into practical agent plays, prompts, retrieval logic, escalation rules and
       feedback loops.
     plain: >
-      These pages show when the AI agent steps in, what it may answer, and when it must
+      The Live demo and Agents pages show when the AI agent steps in, what it may answer, and when it must
       pass the customer to a person. The agent in this demonstration helps customers finish
       setting up the product. It is not a general support agent.
     pages: [demo, agent]
