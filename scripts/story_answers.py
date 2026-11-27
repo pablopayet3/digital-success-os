@@ -15,6 +15,10 @@ world or the agent's prompt (about 3 cents per customer):
     uv run python scripts/story_answers.py
 
 The new files in cache/llm/ are then committed, and the image carries them.
+
+This makes the story instant on any copy of that exact world (a local run of the image,
+for example). The hosted image was found not to match it exactly (27 November 2026), so
+on the host the story is warmed up once by hand before a live demo (see CLAUDE.md).
 """
 
 from __future__ import annotations
