@@ -183,10 +183,13 @@ def create_tasks(account: dict, conversation, needs: list) -> list[dict]:
             conversation,
             account,
             contact,
-            enrollment=enrollment if linked else None,
+            enrollment=enrollment,  # every task carries the play's context
             step_id=person_step if linked else None,
             escalation=need,
         )
+        if enrollment and not linked:
+            # Context only: closing this task must not move the play, the CS task does that.
+            store.update("ctas", {"cta_id": task_id}, enrollment_id=None)
         tasks.append({"id": task_id, "queue": need.queue, "why": need.why})
         if linked:  # the play now waits for the person, as at its own person step
             store.update(
@@ -215,18 +218,20 @@ def create_tasks(account: dict, conversation, needs: list) -> list[dict]:
 
 
 def where_it_lands(task: dict) -> str:
-    """Where each task lands, as at a real company: Sales in Salesforce, CS in Gainsight."""
+    """Where each task lands, as at a real company: a task for Sales in Salesforce, a CTA
+    for Customer Success in Gainsight. The same handoff, named the way each tool names it."""
     if task["queue"] == "sales":
+        label = crm_sync.crm_label(task["id"])
         if (st.session_state.get("demo_crm") or {}).get("ok"):
-            return f"Task {task['id']} is in Salesforce, in the account owner's task list."
+            return f"Task {label} is in Salesforce, in the Sales team's queue."
         return (
-            f"Task {task['id']} goes to the account owner's task list in Salesforce. The public "
-            "demo does not send it, so here it waits in the Human console's Sales queue."
+            f"Task {label} goes to the Sales team's queue in Salesforce. The public demo does "
+            f"not send it, so here it waits in the Human console's Sales queue as {task['id']}."
         )
     team = QUEUE_NAMES.get(task["queue"], task["queue"])
     return (
-        f"Task {task['id']} is a CTA in Gainsight, in the {team}'s queue (the Human console "
-        "plays Gainsight here)."
+        f"{task['id']} is a CTA in Gainsight, in the {team}'s queue (the Human console plays "
+        "Gainsight here)."
     )
 
 
@@ -282,7 +287,7 @@ def show_crm_result(crm: dict) -> None:
         link = f" [Open it in the CRM]({crm['url']})." if crm.get("url") else ""
         st.success(
             "**The task is now in the CRM**, on the account, with the customer's own words "
-            f"and the summary. The account owner sees it in their own task list.{link}"
+            f"and the summary. The Sales team sees it in its queue.{link}"
         )
     else:
         st.warning(f"The task could not be sent to the CRM: {crm['error']}")

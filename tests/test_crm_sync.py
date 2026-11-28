@@ -6,7 +6,7 @@ ours: the mapping, and that running twice does not create anything twice.
 
 import json
 
-from integrations.crm_sync import build_payloads, dry_run, push
+from integrations.crm_sync import build_payloads, crm_label, dry_run, push
 
 
 class FakeObject:
@@ -57,7 +57,7 @@ def test_payloads_cover_accounts_with_open_tasks_and_say_the_data_is_synthetic(s
         assert account["AccountNumber"].startswith("A") and "Health" in account["Description"]
         assert "Synthetic data" in account["Description"] and tasks
         for task in tasks:
-            assert task["Subject"].startswith("[CTA-")
+            assert task["Subject"].startswith("[TASK-")
             assert task["Priority"] in ("High", "Normal", "Low")
 
 
@@ -93,7 +93,7 @@ def test_an_expansion_task_carries_the_account_owner_brief(simulated):
     assert with_brief, "the simulated world should have a Sales task with a brief"
     brief = json.loads(with_brief[0]["packet"])["brief"]
     description = task_fields(with_brief[0])["Description"]
-    assert "BRIEF FOR THE ACCOUNT OWNER" in description
+    assert "BRIEF FOR THE SALES TEAM" in description
     assert all(f"• {line.strip()}" in description for line in brief.splitlines() if line.strip())
 
 
@@ -221,7 +221,9 @@ def test_a_new_handoff_is_sent_once_and_closing_it_completes_it_in_the_crm(simul
     crm = FakeCrm()
     # An older CRM task with the same number, left by an earlier copy of the demo's store
     # (the hosted store is refilled on every deploy and its numbers start again).
-    crm.Task.create({"Subject": f"[{task['cta_id']}] an earlier rehearsal", "WhatId": "ACC0000"})
+    crm.Task.create(
+        {"Subject": f"[{crm_label(task['cta_id'])}] an earlier rehearsal", "WhatId": "ACC0000"}
+    )
     old = dict(crm.records["Task"])
     first = send_task_now(task["cta_id"], data_dir, client=crm)
     again = send_task_now(task["cta_id"], data_dir, client=crm)  # a second click
@@ -230,7 +232,10 @@ def test_a_new_handoff_is_sent_once_and_closing_it_completes_it_in_the_crm(simul
         "https://acme-dev-ed.develop.lightning.force.com/lightning/r/Task/"
     )
     (sent,) = [record for key, record in crm.records["Task"].items() if key not in old]
-    assert sent["Subject"].startswith(f"[{task['cta_id']}]") and sent["Status"] == "Not Started"
+    assert (
+        sent["Subject"].startswith(f"[{crm_label(task['cta_id'])}]")
+        and sent["Status"] == "Not Started"
+    )
 
     link = complete_task_now(
         task["cta_id"], "expansion_opportunity", "Call booked.", client=crm, data_dir=data_dir

@@ -116,12 +116,20 @@ def task_fields(task: dict) -> dict:
         sections.append(("WHAT THE AGENT DID", [packet["conversation_summary"]]))
     if packet.get("brief"):
         brief = [line.strip() for line in packet["brief"].splitlines() if line.strip()]
-        sections.append(("BRIEF FOR THE ACCOUNT OWNER", brief))
+        sections.append(("BRIEF FOR THE SALES TEAM", brief))
     text = "\n\n".join(
         heading + "\n" + "\n".join(f"• {line}" for line in lines) for heading, lines in sections
     )
+    if packet.get("draft_reply"):
+        # The reply drafted for the person, as an email reads: no bullets. It comes first,
+        # so the Sales team can copy it into an email to the admin, check it, and send it.
+        contact = packet.get("contact") or {}
+        name = contact.get("full_name") or contact.get("name")
+        to = f"To: {name}, {contact.get('email')}\n" if contact else ""
+        heading = "DRAFT REPLY TO THE CUSTOMER (CHECK, EDIT, SEND)\n"
+        text = f"{heading}{to}\n{packet['draft_reply']}\n\n{text}"
     return {
-        "Subject": f"[{task['cta_id']}] {task['title']}"[:255],
+        "Subject": f"[{crm_label(task['cta_id'])}] {task['title']}"[:255],
         "Description": f"{text}\n\n{NOTE}",
         "Priority": PRIORITY.get(task["priority"], "Normal"),
         "Status": "Not Started",
@@ -137,6 +145,11 @@ def dry_run(data_dir: Path = DATA_DIR, folder: Path = EXPORT_DIR) -> dict:
         json.dumps(payloads, indent=1), encoding="utf-8", newline="\n"
     )
     return {"accounts": len(payloads), "tasks": sum(len(p["tasks"]) for p in payloads)}
+
+
+def crm_label(cta_id: str) -> str:
+    """The handoff's name in the CRM: a task there, as a CTA is in the CS platform."""
+    return cta_id.replace("CTA-", "TASK-", 1)
 
 
 def push(
@@ -161,7 +174,7 @@ def push(
             crm_id = client.Account.create(account)["id"]
             done["accounts_created"] += 1
         for task in payload["tasks"]:
-            marker = task["Subject"].split("]")[0] + "]"  # for example [CTA-00012]
+            marker = task["Subject"].split("]")[0] + "]"  # for example [TASK-00012]
             existing = keep_existing and client.query(
                 f"SELECT Id FROM Task WHERE WhatId = '{crm_id}' "
                 f"AND Subject LIKE '{marker}%' LIMIT 1"
@@ -311,7 +324,7 @@ def check_daily_cap(client) -> None:
     if cap is None:
         return
     sent = client.query(
-        "SELECT COUNT() FROM Task WHERE CreatedDate = TODAY AND Subject LIKE '[CTA-%'"
+        "SELECT COUNT() FROM Task WHERE CreatedDate = TODAY AND Subject LIKE '[TASK-%'"
     )["totalSize"]
     if sent >= cap:
         raise RuntimeError(
@@ -362,7 +375,7 @@ def complete_task_now(
         found = client.query(f"SELECT Id, Description FROM Task WHERE Id = '{crm_task_id}'")
     else:
         found = client.query(
-            f"SELECT Id, Description FROM Task WHERE Subject LIKE '[{cta_id}]%' "
+            f"SELECT Id, Description FROM Task WHERE Subject LIKE '[{crm_label(cta_id)}]%' "
             "ORDER BY CreatedDate DESC LIMIT 1"
         )
     if not found["records"]:

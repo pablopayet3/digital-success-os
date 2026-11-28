@@ -118,7 +118,7 @@ def check_message_all(
             Escalation(
                 "pricing_contract_legal",
                 "sales",
-                "Pricing or upgrade question: goes to the account owner.",
+                "Pricing or upgrade question: goes to the Sales team.",
             )
         )
     if PRODUCT_FAULT.search(text):
@@ -180,7 +180,7 @@ def _promise(escalation: Escalation, queues: dict, quote: str) -> str:
     """One sentence per team: who will contact the customer, about what, and by when."""
     within = _within(queues[escalation.queue])
     if escalation.queue == "sales":
-        return f"Your account owner on our Sales team will email you about pricing within {within}."
+        return f"Someone from our Sales team will email you about pricing within {within}."
     if escalation.queue == "pooled_csm":
         topic = (
             "to set up single sign-on with you" if SINGLE_SIGN_ON.search(quote) else "to help you"

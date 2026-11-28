@@ -104,7 +104,10 @@ def hand_off(
         enrollment=enrollment,
         step_id=step_id,
         contact=contact,
-        conversation_summary=conversation.summary,
+        # The summary opens with why this team has it: each team its own reason.
+        conversation_summary=conversation.summary.replace(
+            conversation.escalation.why, escalation.why, 1
+        ),
         customer_quote=conversation.customer_quote,
         brief=brief,
         draft_reply=draft_reply(escalation, contact, conversation.customer_quote or ""),

@@ -10,7 +10,7 @@ queues:
     sla_hours: 48            # must be picked up within this time
     capacity_per_day: 12     # CTAs the team can work in a day
   sales:
-    name: Account owners (Sales)
+    name: Sales team
     sla_hours: 72
     capacity_per_day: 15
   support:

@@ -3,12 +3,14 @@
 import hmac
 import json
 import os
+import re
 from datetime import date
 
 import streamlit as st
 
 from app import ui
 from app.events import customer_timeline
+from common.config import load_yaml
 from common.settings import load_settings
 from engine.approvals import decide
 from engine.catalog import load_catalog
@@ -34,30 +36,43 @@ def password_for(role: str) -> str | None:
     return "demo" if load_settings().env == "dev" and not os.environ.get("DSO_HOSTED") else None
 
 
+# Plain words for what the packet stores as codes.
+REASONS = load_yaml("routing.yaml")["reason_codes"]
+SIGNALS = {item["id"]: item["name"] for item in load_yaml("job.yaml")["signals"]}
+SOURCES = {"agent": "the AI agent", "journey": "a play", "mailbox": "the shared mailbox"}
+
+
 def show_task(task, packet: dict) -> None:
     """Draw one task as the person who receives it sees it: the handoff packet."""
     st.header(f"{task['title']}")
+    reason = REASONS.get(task["reason_code"], task["reason_code"])
     st.caption(
-        f"{packet['account_name']} ({task['account_id']}) | reason: {task['reason_code']} | priority: {task['priority']} | due {task['sla_due_on']}"
+        f"{packet['account_name']} ({task['account_id']}) | {reason} | priority: "
+        f"{task['priority']} | due {task['sla_due_on']}"
     )
 
     left, right = st.columns(2)
     with left:
         st.subheader("Why this is on your desk")
         trigger = packet["trigger"]
-        st.write(f"**Source:** {trigger.get('source')} | **Play:** {trigger.get('play') or 'none'}")
+        source = SOURCES.get(trigger.get("source"), trigger.get("source"))
+        play = catalog.play(trigger["play"]).name if trigger.get("play") else None
+        st.write(f"**From:** {source}" + (f", in the play {play}" if play else ""))
         if trigger.get("signal"):
-            st.write(f"**Signal:** {trigger['signal']}. {trigger.get('evidence') or ''}")
+            name = SIGNALS.get(trigger["signal"], trigger["signal"])
+            st.write(f"**Signal:** {name}. {trigger.get('evidence') or ''}")
         else:
             # Not from a journey step (the agent or the mailbox handed off): show what is firing.
             firing = trigger.get("all_signals_firing") or {}
-            listed = "; ".join(f"{name} ({why})" for name, why in firing.items())
+            listed = "; ".join(f"{SIGNALS.get(key, key)} ({why})" for key, why in firing.items())
             st.write(f"**Signals firing on the account:** {listed or 'none today'}.")
         if packet.get("customer_quote"):
             st.write("**In the customer's words:**")
             st.info(packet["customer_quote"])
         if packet.get("conversation_summary"):
-            st.write(f"**What happened with the agent:** {packet['conversation_summary']}")
+            # The customer's words are quoted just above: do not repeat them here.
+            summary = re.sub(r' The admin of .*? wrote: ".*?"', "", packet["conversation_summary"])
+            st.write(f"**What happened with the agent:** {summary}")
         st.write("**What was already tried:**")
         for item in packet.get("what_was_tried") or ["Nothing yet."]:
             st.write(f"- {item}")
@@ -77,7 +92,6 @@ def show_task(task, packet: dict) -> None:
             two, "Seats", f"{snapshot['seats']['assigned']} of {snapshot['seats']['licensed']}"
         )
         ui.metric(three, "Renewal in", f"{snapshot['days_to_renewal']} days")
-        st.json(snapshot, expanded=False)
         if packet.get("brief"):
             st.subheader("Brief")
             st.text(packet["brief"])
@@ -85,6 +99,11 @@ def show_task(task, packet: dict) -> None:
 
 def what_happens_next(task, result: dict) -> str:
     """The return signal in plain words: what the play does with the person's outcome."""
+    if task["play_id"] and not task["enrollment_id"]:
+        # A task beside the play (the Sales question on the Live demo): it does not move it.
+        return (
+            f"The play {catalog.play(task['play_id']).name} carries on: this task sits beside it."
+        )
     if result["next_state"] == "sales_owns":
         return "Sales takes it from here, and the play stops sending messages."
     if not task["play_id"] or result["enrollment_status"] is None:
@@ -286,7 +305,7 @@ st.caption(
     f"{len(tasks)} open tasks, the newest first (a task from the Live demo is at the top). "
     f"{int(tasks['overdue'].sum())} of them are past the date promised for a reply. "
     f"Today is {today}. In real life the Customer Success teams' tasks are CTAs in Gainsight, "
-    "which this console plays, and the Sales queue is the account owners' task list in "
+    "which this console plays, and the Sales queue is the Sales team's queue in "
     "Salesforce."
 )
 st.dataframe(

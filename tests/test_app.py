@@ -108,7 +108,7 @@ def test_the_scripted_story_ends_in_one_task_for_sales_and_one_for_customer_succ
         next(button for button in app.button if button.label == "Run the story").click().run()
         assert not app.exception, [error.value for error in app.exception]
         handoff = " ".join(warning.value for warning in app.warning)
-        assert "Account owners (Sales)" in handoff and "Scaled CS team" in handoff
+        assert "Sales team" in handoff and "Scaled CS team" in handoff
         assert "a rule in code" in handoff  # code stopped it, before the model was asked
         new = [row for row in ops.rows("SELECT * FROM ctas") if row["cta_id"] not in before]
         assert sorted(task["queue"] for task in new) == ["pooled_csm", "sales"]
