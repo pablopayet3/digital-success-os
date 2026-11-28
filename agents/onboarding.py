@@ -25,7 +25,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from agents.classify import classify_message
-from agents.escalation import Escalation, check_message, check_retrieval
+from agents.escalation import Escalation, check_message_all, check_retrieval, warm_transfer
 from agents.llm import LLMUnavailable, get_llm
 from agents.tools import HANDOFF_REASONS, TOOL_DEFINITIONS, AgentTools, ToolFailure
 from common.config import load_yaml
@@ -39,6 +39,7 @@ MAX_CUSTOMER_TURNS = 4
 class Conversation:
     outcome: str = "resolved"  # resolved | escalated
     escalation: Escalation | None = None
+    more_escalations: list = field(default_factory=list)  # other teams the same message needs
     summary: str = ""  # for the human who picks up a handoff
     recommended_next_step: str = ""
     customer_quote: str | None = None  # the message that triggered a handoff
@@ -85,6 +86,18 @@ def converse(
         result.customer_quote = quote
         result.summary = summary or _summary(result, tools, escalation)
         result.recommended_next_step = next_step or _default_next_step(escalation)
+        if by != "agent":
+            # A warm handoff: the customer is told who takes over, about what, and by when.
+            # The agent's own handoff already says so in the model's words.
+            teams = [escalation, *result.more_escalations]
+            queues = load_yaml("routing.yaml")["queues"]
+            result.transcript.append(
+                {
+                    "role": "agent",
+                    "kind": "handoff",
+                    "text": warm_transfer(teams, queues, quote or ""),
+                }
+            )
         return _finish(result, tools, llm, log_start)
 
     for _ in range(MAX_CUSTOMER_TURNS):
@@ -96,13 +109,14 @@ def converse(
         # Steps 1 and 2: apply the hard rules before the agent speaks. The keyword rules run
         # first: when one of them already decides (a price question, a request for a person),
         # no model is called at all, so the handoff is instant and costs nothing.
-        escalation = check_message(customer_text, None, earlier_questions)
-        if escalation is None:
-            escalation = check_message(
+        needs = check_message_all(customer_text, None, earlier_questions)
+        if not needs:
+            needs = check_message_all(
                 customer_text, classify_message(customer_text), earlier_questions
             )
-        if escalation:
-            return hand_off(escalation, "hard_rule", customer_text)
+        if needs:  # one handoff per team the message needs, the most important first
+            result.more_escalations = needs[1:]
+            return hand_off(needs[0], "hard_rule", customer_text)
         earlier_questions.append(customer_text)
 
         # Step 3: the agent's turn. If the previous turn ended on tool results, the new

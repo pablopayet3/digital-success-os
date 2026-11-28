@@ -10,8 +10,13 @@ import pandas as pd
 
 from app import ui
 
-# The two messages of the demo path: a setup question, then a question about price.
-STORY = ["How do I invite my whole team at once?", "Thanks. How much would 10 more seats cost?"]
+# The two messages of the demo path: a setup question the agent answers, then a message
+# with two needs, a price (Sales, in Salesforce) and a person to help with single sign-on
+# (the Customer Success team, in Gainsight). Each need gets one owner.
+STORY = [
+    "How do I invite my whole team at once?",
+    "Thanks. How much would 10 more seats cost? And could someone help us set up single sign-on?",
+]
 
 
 def stalled_customers() -> pd.DataFrame:

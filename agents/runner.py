@@ -17,8 +17,9 @@ from __future__ import annotations
 import json
 
 from agents.briefs import brief_facts, template_brief
+from agents.escalation import SINGLE_SIGN_ON
 from agents.llm import get_llm
-from agents.onboarding import Conversation, converse, scripted
+from agents.onboarding import Conversation, _default_next_step, converse, scripted
 from agents.simulated_customer import script_for, takes_up_the_offer
 from agents.tracing import Trace
 from engine import channels
@@ -61,10 +62,20 @@ def run_onboarding_step(
 
 
 def hand_off(
-    ctx, conversation: Conversation, account, contact, enrollment=None, step_id=None
+    ctx,
+    conversation: Conversation,
+    account,
+    contact,
+    enrollment=None,
+    step_id=None,
+    escalation=None,
 ) -> str:
-    """Create the CTA for an escalated conversation. Returns the CTA id."""
-    escalation = conversation.escalation
+    """Create the CTA for an escalated conversation. Returns the CTA id.
+
+    `escalation` picks one of the teams when a message needed more than one
+    (`conversation.more_escalations`); by default, the main one.
+    """
+    escalation = escalation or conversation.escalation
     urgent = escalation.reason_code in ("frustration", "customer_asked_for_person")
     brief = None
     if escalation.queue == "sales":  # Sales always gets the account-owner brief
@@ -84,7 +95,11 @@ def hand_off(
         priority="high" if urgent else "normal",
         reason_code=escalation.reason_code,
         title=f"Agent handoff: {escalation.why}",
-        next_step=conversation.recommended_next_step,
+        next_step=(
+            conversation.recommended_next_step
+            if escalation is conversation.escalation
+            else _default_next_step(escalation)
+        ),
         source="agent",
         enrollment=enrollment,
         step_id=step_id,
@@ -92,7 +107,37 @@ def hand_off(
         conversation_summary=conversation.summary,
         customer_quote=conversation.customer_quote,
         brief=brief,
+        draft_reply=draft_reply(escalation, contact, conversation.customer_quote or ""),
     )
+
+
+def draft_reply(escalation, contact, quote: str) -> str:
+    """A first reply to the customer, for the person who takes over to check, edit and send.
+
+    Written from a template, not by a model: it never quotes a price or promises anything
+    only the person can decide. The person stays the one who sends it.
+    """
+    name = contact["full_name"].split()[0] if contact else "there"
+    if escalation.queue == "sales":
+        about = "more seats" if "seat" in quote.lower() else "pricing"
+        body = (
+            f"Thanks for asking about {about}. I'll send you the price for your plan today. "
+            "Would a 15-minute call this week help, to make sure it fits what your team needs?"
+        )
+    elif escalation.queue == "pooled_csm":
+        task = (
+            "set up single sign-on with you"
+            if SINGLE_SIGN_ON.search(quote)
+            else "help you finish setting up Relay"
+        )
+        body = f"I'm happy to {task}. Does Thursday at 10:00 work for a 30-minute call?"
+    elif escalation.queue == "support":
+        body = (
+            "Thanks for reporting this. I'm looking into it now and will update you within a day."
+        )
+    else:
+        body = "Thanks for your message. I'm looking into it and will get back to you shortly."
+    return f"Hi {name},\n\n{body}\n\nBest regards"
 
 
 def record_conversation(

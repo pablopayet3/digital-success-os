@@ -55,6 +55,7 @@ class HandoffPacket(BaseModel):
     account_snapshot: dict  # health and its components, seats, edition, renewal, tickets
     recommended_next_step: str
     brief: str | None = None  # account-owner brief for Sales CTAs (Phase 5)
+    draft_reply: str | None = None  # a reply to the customer, for the person to check and send
     priority: str
     queue: str
     sla_due_at: str
@@ -76,6 +77,7 @@ def create_cta(
     conversation_summary: str | None = None,
     customer_quote: str | None = None,
     brief: str | None = None,
+    draft_reply: str | None = None,
 ) -> str:
     """Create a task for a human, with a full handoff packet. Returns the CTA id."""
     account = ctx.accounts[account_id]
@@ -104,6 +106,7 @@ def create_cta(
         account_snapshot=account_snapshot(account),
         recommended_next_step=next_step,
         brief=brief,
+        draft_reply=draft_reply,
         priority=priority,
         queue=queue,
         sla_due_at=sla_due_on,
@@ -334,7 +337,7 @@ def _latest_nps_comment(ctx: DayContext, account_id: str) -> str | None:
         )
     )
     warehouse.close()
-    return f"NPS {found[0]['score']}: \"{found[0]['comment']}\"" if found else None
+    return f'NPS {found[0]["score"]}: "{found[0]["comment"]}"' if found else None
 
 
 def _queue_as_eval_candidate(store: Store, cta: dict, notes: str, day: str, export: bool) -> None:

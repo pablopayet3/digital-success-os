@@ -366,6 +366,14 @@ After the phases (the brief read again line by line; see the last section of
   a recent survey score of 9 or 10, green health, 90 days or older, no open urgent
   ticket, no churn flag. One email, approved by the Scaled CS team. Success measure
   `advocate_responded` (the "Yes" link clicked). Eight plays in total.
+- One owner per need, the warm handoff and draft replies (ADR 0036): a message that needs
+  two teams (the story's "How much would 10 more seats cost? And could someone help us set
+  up single sign-on?") becomes one task per team (`check_message_all`,
+  `conversation.more_escalations`): Sales in Salesforce, Customer Success as a CTA in the
+  Human console (Gainsight), linked to the play's person step. The agent's last message
+  tells the customer who takes over and by when (`warm_transfer`, `kind: handoff`). Each
+  agent handoff carries a `draft_reply`; the console sends it with "Send the reply and
+  close" and then shows the customer's path through the play (`app/events.py`).
 - The next best action (`engine/next_action.py`, ADR 0033), on the Accounts page: one
   recommendation per customer across every play, by precedence (open task, pending
   draft, play under way or holdout, firing signals and the engine's last decision, then a

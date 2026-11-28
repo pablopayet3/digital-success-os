@@ -95,24 +95,48 @@ def test_a_diagram_the_translator_does_not_know_is_refused_not_guessed():
 # --- The Live demo page ------------------------------------------------------------------------
 
 
-def test_the_scripted_story_ends_in_a_task_for_sales(app_data, ops):
-    """One click: a setup question is answered, a price question becomes a task for Sales."""
+def test_the_scripted_story_ends_in_one_task_for_sales_and_one_for_customer_success(app_data, ops):
+    """One click: a setup question is answered; the next message needs two teams, so it
+    becomes two tasks, one owner each, each with a draft reply, and the customer is told."""
+    import json
+
     before = {row["cta_id"] for row in ops.rows("SELECT cta_id FROM ctas")}
+    enrollments = ops.rows("SELECT * FROM enrollments")
+
     app = AppTest.from_file(str(ROOT / "app" / "views" / "demo.py"), default_timeout=120).run()
     try:
         next(button for button in app.button if button.label == "Run the story").click().run()
         assert not app.exception, [error.value for error in app.exception]
         handoff = " ".join(warning.value for warning in app.warning)
-        assert "Account owners (Sales)" in handoff  # the team, by its name
+        assert "Account owners (Sales)" in handoff and "Scaled CS team" in handoff
         assert "a rule in code" in handoff  # code stopped it, before the model was asked
-        (task,) = [row for row in ops.rows("SELECT * FROM ctas") if row["cta_id"] not in before]
-        assert task["queue"] == "sales" and task["source"] == "agent" and task["cta_id"] in handoff
+        new = [row for row in ops.rows("SELECT * FROM ctas") if row["cta_id"] not in before]
+        assert sorted(task["queue"] for task in new) == ["pooled_csm", "sales"]
+        for task in new:
+            assert task["source"] == "agent" and task["cta_id"] in handoff
+            assert json.loads(task["packet"])["draft_reply"].startswith("Hi ")
+        # The warm handoff: the customer is told who takes over, and by when.
+        said = " ".join(
+            message.markdown[0].value for message in app.chat_message if message.markdown
+        )
+        assert "within three days" in said and "within two days" in said
     finally:
         # The page writes real rows. Take them out again: other tests share this store.
         ops.execute("DELETE FROM conversations WHERE scenario = 'live_demo'")
-        for row in ops.rows("SELECT cta_id FROM ctas"):
-            if row["cta_id"] not in before:
-                ops.execute("DELETE FROM ctas WHERE cta_id = :id", id=row["cta_id"])
+        made = {row["cta_id"] for row in ops.rows("SELECT cta_id FROM ctas")} - before
+        ops.execute("DELETE FROM journey_events WHERE detail = 'live_demo'")
+        for cta_id in made:
+            ops.execute("DELETE FROM ctas WHERE cta_id = :id", id=cta_id)
+            ops.execute("DELETE FROM journey_events WHERE detail LIKE :id", id=f"{cta_id} -> %")
+        for row in enrollments:  # the play waited for a person: put it back as it was
+            ops.update(
+                "enrollments",
+                {"enrollment_id": row["enrollment_id"]},
+                status=row["status"],
+                current_step=row["current_step"],
+                exit_reason=row["exit_reason"],
+                closed_on=row["closed_on"],
+            )
 
 
 def test_the_public_demo_says_on_screen_when_the_model_budget_is_used_up(app_data, tmp_path):

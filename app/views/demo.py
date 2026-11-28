@@ -1,6 +1,7 @@
 """Live demo: talk to the agent, watch it hand off, move the world forward a day."""
 
 import hmac
+import json
 import os
 import re
 
@@ -55,7 +56,7 @@ def first_message(play, account_id: str, evidence: str, enrolment: dict | None) 
     contacts = records(
         ui.query(
             f"SELECT full_name FROM gold.dim_contact WHERE account_id = '{account_id}' "
-            "ORDER BY is_valid_admin DESC LIMIT 1"
+            "ORDER BY is_valid_admin DESC, contact_id LIMIT 1"
         )
     )
     contact = contacts[0] if contacts else None
@@ -126,6 +127,156 @@ def send_to_crm(task_id: str) -> dict | None:
             return {"ok": False, "error": str(error)[:300]}
 
 
+def create_tasks(account: dict, conversation, needs: list) -> list[dict]:
+    """One task per team the customer needs, each with its draft reply.
+
+    A task for the Customer Success team is the play's person step: it is linked to the
+    customer's place in the play, so the outcome a person records moves the play on. Each
+    task is written into the play's record of events, which the console shows afterwards.
+    """
+    store = ui.store()
+    ctx = load_day(ui.data_dir(), store, load_catalog())
+    account_id = account["account_id"]
+    # The administrator, the person the play's first email went to (see first_message).
+    contacts = sorted(
+        ctx.contacts.get(account_id, []),
+        key=lambda one: (not one.get("is_valid_admin"), one["contact_id"]),
+    )
+    contact = next(iter(contacts), None)
+    # The customer's place in the play: the one under way, or else the latest one (the
+    # customer has come back, so the play's person step picks the task up again).
+    enrollment = store.one(
+        "SELECT * FROM enrollments WHERE account_id = :account AND arm = 'treatment' "
+        "ORDER BY CASE WHEN status IN ('active', 'waiting_on_human') THEN 0 ELSE 1 END, "
+        "enrolled_on DESC LIMIT 1",
+        account=account_id,
+    )
+    person_step = None
+    if enrollment:
+        journey = ctx.catalog.journeys[ctx.catalog.play(enrollment["play_id"]).journey]
+        person_step = next(
+            (
+                step.id
+                for step in journey.steps
+                if step.type == "cta" and step.queue == "pooled_csm"
+            ),
+            None,
+        )
+    if enrollment:  # the conversation itself, as the journeys record an agent step
+        store.insert(
+            "journey_events",
+            {
+                "event_date": ctx.day,
+                "enrollment_id": enrollment["enrollment_id"],
+                "account_id": account_id,
+                "play_id": enrollment["play_id"],
+                "step_id": None,
+                "event": "agent_escalated",
+                "detail": "live_demo",
+            },
+        )
+    tasks = []
+    for need in needs:
+        linked = need.queue == "pooled_csm" and person_step is not None
+        task_id = hand_off(
+            ctx,
+            conversation,
+            account,
+            contact,
+            enrollment=enrollment if linked else None,
+            step_id=person_step if linked else None,
+            escalation=need,
+        )
+        tasks.append({"id": task_id, "queue": need.queue, "why": need.why})
+        if linked:  # the play now waits for the person, as at its own person step
+            store.update(
+                "enrollments",
+                {"enrollment_id": enrollment["enrollment_id"]},
+                status="waiting_on_human",
+                current_step=person_step,
+                exit_reason=None,
+                closed_on=None,
+            )
+        if enrollment:
+            store.insert(
+                "journey_events",
+                {
+                    "event_date": ctx.day,
+                    "enrollment_id": enrollment["enrollment_id"],
+                    "account_id": account_id,
+                    "play_id": enrollment["play_id"],
+                    "step_id": person_step if linked else None,
+                    "event": "cta_created",
+                    "detail": f"{task_id} -> {need.queue}",  # as the journeys record it
+                },
+            )
+    record_conversation(ctx, conversation, account, contact, None, "live_demo", tasks[0]["id"])
+    return tasks
+
+
+def where_it_lands(task: dict) -> str:
+    """Where each task lands, as at a real company: Sales in Salesforce, CS in Gainsight."""
+    if task["queue"] == "sales":
+        if (st.session_state.get("demo_crm") or {}).get("ok"):
+            return f"Task {task['id']} is in Salesforce, in the account owner's task list."
+        return (
+            f"Task {task['id']} goes to the account owner's task list in Salesforce. The public "
+            "demo does not send it, so here it waits in the Human console's Sales queue."
+        )
+    team = QUEUE_NAMES.get(task["queue"], task["queue"])
+    return (
+        f"Task {task['id']} is a CTA in Gainsight, in the {team}'s queue (the Human console "
+        "plays Gainsight here)."
+    )
+
+
+def show_handoff(conversation, tasks: list[dict]) -> None:
+    """One box per team: who owns it, where it lands, and the reply drafted for them."""
+    decided = DECIDED_BY.get(conversation.escalated_by, conversation.escalated_by)
+    rows = ui.store().rows(
+        "SELECT cta_id, packet FROM ctas WHERE cta_id IN ("
+        + ", ".join(f"'{task['id']}'" for task in tasks)
+        + ")"
+    )
+    drafts = {row["cta_id"]: json.loads(row["packet"]).get("draft_reply") for row in rows}
+    for column, task in zip(st.columns(len(tasks)), tasks, strict=True):
+        team = QUEUE_NAMES.get(task["queue"], task["queue"])
+        with column:
+            st.warning(
+                f"**Handed to a person: {team}.** {task['why']}\n\n"
+                f"Decided by {decided}. {where_it_lands(task)}"
+            )
+            if drafts.get(task["id"]):
+                st.markdown("**Draft reply, ready for the person to check and send:**")
+                with st.container(border=True):
+                    st.text(drafts[task["id"]])
+            if task["queue"] == "sales" and st.session_state.get("demo_crm"):
+                show_crm_result(st.session_state.demo_crm)
+            # Same tab, so a sign-in to the console is kept.
+            if st.button("Open this task in the Human console", key=f"open_{task['id']}"):
+                st.session_state.open_task = task["id"]
+                st.switch_page("views/console.py")
+
+    st.markdown("**Each person receives, with the task:**")
+    missing = re.search(r"Setup still missing: (.*)\.$", conversation.summary or "")
+    answered = sum(
+        1
+        for turn in conversation.transcript
+        if turn["role"] == "agent" and turn.get("kind") != "handoff"
+    )
+    lines = [f'- **The customer wrote:** "{conversation.customer_quote}"']
+    if conversation.escalated_by == "hard_rule" and missing:
+        lines.append(
+            f"- **Already answered by the agent:** {answered} earlier "
+            f"{'question' if answered == 1 else 'questions'}"
+        )
+        lines.append(f"- **Setup still missing:** {missing.group(1)}")
+    else:  # the agent wrote the summary itself: show it as it is
+        lines.append(f"- **Summary:** {conversation.summary}")
+    lines.append("- **The account at a glance:** health, seats, edition, renewal date, tickets")
+    st.markdown("\n".join(lines))
+
+
 def show_crm_result(crm: dict) -> None:
     if crm["ok"]:
         link = f" [Open it in the CRM]({crm['url']})." if crm.get("url") else ""
@@ -150,7 +301,8 @@ with tab_chat:
     # text, the same exception as the guided tour.
     st.caption(
         "In real life: the customer data sits in Databricks, the play runs in Gainsight (the "
-        "Human console plays that part here), and the Sales task goes to Salesforce."
+        "Human console plays that part here), a task for Customer Success is a CTA in "
+        "Gainsight, and a task for Sales goes to Salesforce."
     )
     presenter_sign_in()
     llm = get_llm()
@@ -178,7 +330,7 @@ with tab_chat:
     account_id = labels[st.selectbox("You are the admin of (select)", list(labels), index=start)]
     if st.session_state.get("demo_account") != account_id:
         st.session_state.demo_account, st.session_state.demo_messages = account_id, []
-        st.session_state.pop("demo_task", None)
+        st.session_state.pop("demo_tasks", None)
         st.session_state.pop("demo_crm", None)
 
     # Where this conversation sits in the loop: the signal, and the play it triggers.
@@ -233,11 +385,11 @@ with tab_chat:
         run, _, over = st.columns([1, 4, 1])
         if run.form_submit_button("Run the story"):
             st.session_state.demo_messages = [first, second]
-            st.session_state.pop("demo_task", None)
+            st.session_state.pop("demo_tasks", None)
             st.session_state.pop("demo_crm", None)
         if over.form_submit_button("Start over"):
             st.session_state.demo_messages = []
-            st.session_state.pop("demo_task", None)
+            st.session_state.pop("demo_tasks", None)
             st.session_state.pop("demo_crm", None)
 
     st.caption(
@@ -254,7 +406,7 @@ with tab_chat:
             "person, which is the safe way to fail. To have the model answer anything you type, "
             "start the app with `uv run python run.py app --live`."
         )
-    finished = "demo_task" in st.session_state
+    finished = "demo_tasks" in st.session_state
     message = st.chat_input("Your message to the agent", disabled=finished, max_chars=MAX_MESSAGE)
     if message:
         st.session_state.demo_messages.append(message)
@@ -271,66 +423,13 @@ with tab_chat:
             with st.chat_message("user" if turn["role"] == "customer" else "assistant"):
                 st.write(turn["text"])
         if conversation.outcome == "escalated":
+            needs = [conversation.escalation, *conversation.more_escalations]
             if not finished:
-                with st.spinner("Creating the task for a person, with the full context..."):
-                    ctx = load_day(ui.data_dir(), ui.store(), load_catalog())
-                    contact = next(iter(ctx.contacts.get(account_id, [])), None)
-                    task_id = hand_off(ctx, conversation, account, contact)
-                    record_conversation(
-                        ctx, conversation, account, contact, None, "live_demo", task_id
-                    )
-                    st.session_state.demo_task = task_id
-                st.session_state.demo_crm = send_to_crm(task_id)
-            escalation = conversation.escalation
-            team = QUEUE_NAMES.get(escalation.queue, escalation.queue)
-            decided = DECIDED_BY.get(conversation.escalated_by, conversation.escalated_by)
-            task_id = st.session_state.demo_task
-            if escalation.queue == "sales":
-                # As in real life, the task is kept in the CS platform (the Human console stands
-                # in for Gainsight) and synced to the account owner's task list in Salesforce.
-                # Without the live link (a visitor), it reaches the console only.
-                sent = (st.session_state.get("demo_crm") or {}).get("ok")
-                where = (
-                    f"Task {task_id} is in the Human console, which stands in for Gainsight, "
-                    + (
-                        "and in Salesforce, for the account owner."
-                        if sent
-                        else "and would also go to the account owner in Salesforce (the "
-                        "public demo does not send it)."
-                    )
-                )
-            else:
-                where = (
-                    f"Task {task_id} is waiting in the Human console, which stands in for "
-                    "Gainsight."
-                )
-            st.warning(
-                f"**Handed to a person: {team}.** {escalation.why}\n\nDecided by {decided}. {where}"
-            )
-            st.markdown(f"**What {team} receives with the task:**")
-            missing = re.search(r"Setup still missing: (.*)\.$", conversation.summary or "")
-            if conversation.escalated_by == "hard_rule" and missing:
-                answered = sum(1 for turn in conversation.transcript if turn["role"] == "agent")
-                st.markdown(
-                    f'- **The customer wrote:** "{conversation.customer_quote}"\n'
-                    f"- **Already answered by the agent:** {answered} earlier "
-                    f"{'question' if answered == 1 else 'questions'}\n"
-                    f"- **Setup still missing:** {missing.group(1)}\n"
-                    f"- **Suggested next step:** {conversation.recommended_next_step}"
-                )
-            else:  # the agent wrote the summary itself: show it as it is
-                st.markdown(
-                    f"- **Summary:** {conversation.summary}\n"
-                    f"- **Suggested next step:** {conversation.recommended_next_step}"
-                )
-            crm = st.session_state.get("demo_crm")
-            if crm:
-                show_crm_result(crm)
-            # Same tab, so a sign-in to the console is kept. The console plays Gainsight's
-            # task list: this is where the task lands in this demo.
-            if st.button("Open this task in the Human console"):
-                st.session_state.open_task = st.session_state.demo_task
-                st.switch_page("views/console.py")
+                with st.spinner("Creating a task for each team, with the full context..."):
+                    st.session_state.demo_tasks = create_tasks(account, conversation, needs)
+                sales = [task for task in st.session_state.demo_tasks if task["queue"] == "sales"]
+                st.session_state.demo_crm = send_to_crm(sales[0]["id"]) if sales else None
+            show_handoff(conversation, st.session_state.demo_tasks)
         with st.expander("What the agent did behind the answer"):
             st.write("Tool calls")
             st.json(conversation.tool_calls)

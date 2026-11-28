@@ -8,6 +8,7 @@ from datetime import date
 import streamlit as st
 
 from app import ui
+from app.events import customer_timeline
 from common.settings import load_settings
 from engine.approvals import decide
 from engine.catalog import load_catalog
@@ -80,6 +81,30 @@ def show_task(task, packet: dict) -> None:
         if packet.get("brief"):
             st.subheader("Brief")
             st.text(packet["brief"])
+
+
+def what_happens_next(task, result: dict) -> str:
+    """The return signal in plain words: what the play does with the person's outcome."""
+    if result["next_state"] == "sales_owns":
+        return "Sales takes it from here, and the play stops sending messages."
+    if not task["play_id"] or result["enrollment_status"] is None:
+        return "This task was not a step of a play, so no play changes."
+    play = catalog.play(task["play_id"])
+    if result["enrollment_status"] == "exited":
+        return f"The customer leaves the play {play.name}, which sends them nothing more."
+    if result["enrollment_status"] == "completed":
+        return f"The play {play.name} ends for this customer."
+    enrollment = ui.store().one(
+        "SELECT current_step FROM enrollments WHERE enrollment_id = :id", id=task["enrollment_id"]
+    )
+    journey = catalog.journeys[play.journey]
+    if enrollment and journey.step(enrollment["current_step"]).type == "exit":
+        return (
+            f"The customer goes back to the play {play.name}. A person was its last step, so it "
+            "closes for this customer on its next daily run, and the result counts against "
+            "the holdout."
+        )
+    return f"The customer goes back into the play {play.name}, at its next step."
 
 
 def complete_in_crm(cta_id: str, outcome: str, notes: str) -> str:
@@ -205,6 +230,18 @@ if top_right.button("Sign out"):
 
 if "console_message" in st.session_state:
     st.success(st.session_state.pop("console_message"))
+    closed = st.session_state.pop("closed_task", None)
+    if closed and closed["play_id"]:
+        # The return signal, made visible: the customer's path through the play, ending with
+        # what the person just recorded and what the play did with it.
+        play = catalog.play(closed["play_id"])
+        st.markdown(f"**This customer's path through the play {play.name}:**")
+        st.markdown(
+            "\n".join(
+                f"- {event['day']}: {event['text']}"
+                for event in customer_timeline(ui.store(), closed["account_id"], play.id)
+            )
+        )
 
 # The hosted demo is shared: whatever one visitor creates or closes, the next one sees.
 # An admin can put it back to the state the image was built with.
@@ -248,7 +285,9 @@ tasks = tasks.sort_values("cta_id", ascending=False)
 st.caption(
     f"{len(tasks)} open tasks, the newest first (a task from the Live demo is at the top). "
     f"{int(tasks['overdue'].sum())} of them are past the date promised for a reply. "
-    f"Today is {today}."
+    f"Today is {today}. In real life the Customer Success teams' tasks are CTAs in Gainsight, "
+    "which this console plays, and the Sales queue is the account owners' task list in "
+    "Salesforce."
 )
 st.dataframe(
     tasks[
@@ -292,12 +331,24 @@ st.caption(
     "journey resumes, ends, or passes to the Sales team."
 )
 outcomes = catalog.routing["outcomes"]
+draft = packet.get("draft_reply")
 with st.form("resolve"):
+    # A handoff from the agent arrives with a reply drafted for the customer. The person
+    # checks it, edits it, and is the one who sends it.
+    reply = (
+        st.text_area(
+            "Reply to the customer (drafted for you: check, edit, send)", draft, height=170
+        )
+        if draft
+        else None
+    )
     # What each outcome means, and what the system does next, is in config/options.yaml:
     # on the question mark, and on each choice when the pointer rests on it.
     outcome = st.selectbox("Outcome", list(outcomes), help=ui.choices_help("Outcome"))
     notes = st.text_area("Notes", placeholder="What happened, in a sentence or two.")
-    if st.form_submit_button("Resolve"):
+    if st.form_submit_button("Send the reply and close" if draft else "Resolve"):
+        if reply:  # the demo sends no email: the reply is kept with the outcome
+            notes = f"{notes}\n\nReply sent to the customer:\n{reply}".strip()
         result = resolve_cta(
             ui.store(),
             catalog,
@@ -309,12 +360,9 @@ with st.form("resolve"):
             export_eval_case=True,
         )
         st.session_state.console_message = (
-            f"{task['cta_id']} resolved as {outcome}. Journey: {result['next_state']}"
-            + (
-                f" (enrolment is now {result['enrollment_status']})."
-                if result["enrollment_status"]
-                else "."
-            )
+            (f"{task['cta_id']}: reply sent and task closed. " if reply else "")
+            + f"Outcome: {outcomes[outcome]['description'].lower()}. "
+            + what_happens_next(task, result)
             + (
                 " Saved as a draft evaluation case in evals/cases/from_feedback/."
                 if outcome == "agent_should_have_handled"
@@ -322,4 +370,8 @@ with st.form("resolve"):
             )
             + complete_in_crm(task["cta_id"], outcome, notes)
         )
+        st.session_state.closed_task = {
+            "account_id": task["account_id"],
+            "play_id": task["play_id"],
+        }
         ui.refresh()

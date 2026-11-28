@@ -29,6 +29,12 @@ ACTIONS = {
     "draft_rejected": "had a draft rejected by a person, so the play ended",
     "deferred": "had a message postponed ({detail})",
     "goal_reached": "reached the play's goal, so the play ended",
+    "return_signal": "had a task closed by a person, with the outcome: {detail}",
+}
+# What each outcome a person records means, in their words (config/routing.yaml).
+OUTCOMES = {
+    key: outcome["description"].lower()
+    for key, outcome in load_yaml("routing.yaml")["outcomes"].items()
 }
 
 
@@ -62,12 +68,32 @@ def latest_events(store, limit: int = 15) -> list[dict]:
     return shown[:limit]
 
 
-def sentence(event: dict, account_name: str, signal_name: str, play_name: str) -> str:
-    """One event as a sentence: the customer, the action, and why."""
+def action(event: dict) -> str:
+    """What happened, as the end of a sentence."""
     detail = event.get("detail") or ""
     if event["event"] in ("cta_created", "draft_created") and " -> " in detail:
         # "CTA-1A2B -> pooled_csm" becomes the team's name.
         queue = detail.split(" -> ")[1]
         detail = QUEUE_NAMES.get(queue, queue)
-    action = ACTIONS[event["event"]].format(detail=detail)
-    return f"{account_name} {action}. Why: {signal_name.lower()}, in the play {play_name}."
+    if event["event"] == "return_signal":
+        # "resolved -> re_enter_journey" becomes "problem solved".
+        outcome = detail.split(" -> ")[0]
+        detail = OUTCOMES.get(outcome, outcome.replace("_", " "))
+    return ACTIONS[event["event"]].format(detail=detail)
+
+
+def sentence(event: dict, account_name: str, signal_name: str, play_name: str) -> str:
+    """One event as a sentence: the customer, the action, and why."""
+    return f"{account_name} {action(event)}. Why: {signal_name.lower()}, in the play {play_name}."
+
+
+def customer_timeline(store, account_id: str, play_id: str) -> list[dict]:
+    """One customer's path through one play, oldest first: what the system and people did."""
+    rows = [
+        row
+        for row in latest_events(store, limit=100_000)
+        if row["account_id"] == account_id and row["play_id"] == play_id
+    ]
+    order = list(ACTIONS)
+    rows.sort(key=lambda r: (r["day"], order.index(r["event"])))
+    return [{"day": row["day"], "text": action(row)} for row in rows]

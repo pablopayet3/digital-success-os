@@ -140,7 +140,8 @@ pages:
   demo: >
     One play, one customer, Onboarding rescue. Setup stalls → the system writes to the
     customer first → you reply, playing the customer → the AI agent answers → a price
-    question becomes a task for Sales, in the Human console.
+    question becomes a task for Sales, a request for setup help a task for Customer
+    Success, each with a reply drafted for the person who sends it.
   agent: >
     This page shows every conversation the agent has had, the customer replies it sorted
     in the shared mailbox, and its results on a fixed set of test conversations.

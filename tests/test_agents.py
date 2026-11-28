@@ -219,7 +219,31 @@ def test_a_person_takes_over_before_the_agent_speaks(account, message, reason):
     assert conversation.outcome == "escalated"
     assert conversation.escalation.reason_code == reason
     assert agent_calls_since(mark) == 0
-    assert not [turn for turn in conversation.transcript if turn["role"] == "agent"]
+    # The agent wrote nothing; its only message is the warm handoff, written by a rule.
+    (said,) = [turn for turn in conversation.transcript if turn["role"] == "agent"]
+    assert said["kind"] == "handoff" and "won't need to repeat anything" in said["text"]
+
+
+def test_a_message_with_two_needs_gets_one_owner_for_each_and_the_customer_is_told(account):
+    from agents.runner import draft_reply
+
+    lines = [
+        "Thanks. How much would 10 more seats cost? And could someone help us set up single "
+        "sign-on?"
+    ]
+    conversation = converse(account, scripted(lines))
+    teams = [conversation.escalation, *conversation.more_escalations]
+    assert sorted(team.queue for team in teams) == ["pooled_csm", "sales"]  # one task each
+    warm = conversation.transcript[-1]
+    assert warm["kind"] == "handoff" and warm["text"].startswith("Those go to two people")
+    assert "Sales team will email you about pricing within three days" in warm["text"]
+    assert "within two days to set up single sign-on with you" in warm["text"]
+    # Each person gets a draft to check and send. The Sales draft never quotes a price.
+    contact = {"full_name": "Sydney Moreau"}
+    sales, success = sorted(teams, key=lambda team: team.queue != "sales")
+    assert draft_reply(sales, contact, lines[0]).startswith("Hi Sydney,")
+    assert "$" not in draft_reply(sales, contact, lines[0])
+    assert "single sign-on" in draft_reply(success, contact, lines[0])
 
 
 def test_a_failing_tool_means_a_handoff_never_a_guess(account):
@@ -228,7 +252,10 @@ def test_a_failing_tool_means_a_handoff_never_a_guess(account):
     )
     assert conversation.outcome == "escalated"
     assert conversation.escalation.reason_code == "tool_failure"
-    assert not [turn for turn in conversation.transcript if turn["role"] == "agent"]
+    # no answer from the agent: only the warm handoff, written by a rule
+    assert [turn.get("kind") for turn in conversation.transcript if turn["role"] == "agent"] == [
+        "handoff"
+    ]
 
 
 def test_a_question_outside_the_help_centre_is_handed_off(account):
