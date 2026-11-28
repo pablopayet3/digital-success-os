@@ -87,7 +87,7 @@ def complete_in_crm(cta_id: str, outcome: str, notes: str) -> str:
     if not crm_sync.live_enabled(ui.presenter()):
         return ""
     try:
-        link = crm_sync.complete_task_now(cta_id, outcome, notes)
+        link = crm_sync.complete_task_now(cta_id, outcome, notes, data_dir=ui.data_dir())
     except Exception as error:  # another company's service: report it, never block the close
         return f" The CRM could not be updated: {str(error)[:200]}"
     if link is None:

@@ -139,11 +139,14 @@ def dry_run(data_dir: Path = DATA_DIR, folder: Path = EXPORT_DIR) -> dict:
     return {"accounts": len(payloads), "tasks": sum(len(p["tasks"]) for p in payloads)}
 
 
-def push(client, payloads: list[dict]) -> dict:
+def push(
+    client, payloads: list[dict], keep_existing: bool = True, created: list | None = None
+) -> dict:
     """Send the payloads. `client` is a simple-salesforce connection (or a stand-in).
 
     Accounts are created once and updated after that. A task is created only if no task
-    with its id in the subject exists yet.
+    with its id in the subject exists yet (`keep_existing=False` skips that check). The CRM
+    ids of new tasks are added to `created` when a list is given.
     """
     done = {"accounts_created": 0, "accounts_updated": 0, "tasks_created": 0, "tasks_kept": 0}
     for payload in payloads:
@@ -159,15 +162,17 @@ def push(client, payloads: list[dict]) -> dict:
             done["accounts_created"] += 1
         for task in payload["tasks"]:
             marker = task["Subject"].split("]")[0] + "]"  # for example [CTA-00012]
-            existing = client.query(
+            existing = keep_existing and client.query(
                 f"SELECT Id FROM Task WHERE WhatId = '{crm_id}' "
                 f"AND Subject LIKE '{marker}%' LIMIT 1"
             )
-            if existing["records"]:
+            if existing and existing["records"]:
                 done["tasks_kept"] += 1
             else:
-                client.Task.create({**task, "WhatId": crm_id})
+                new = client.Task.create({**task, "WhatId": crm_id})
                 done["tasks_created"] += 1
+                if created is not None:
+                    created.append(new["id"])
     return done
 
 
@@ -328,25 +333,38 @@ def send_task_now(cta_id: str, data_dir: Path = DATA_DIR, client=None) -> dict:
     if account is None:
         raise ValueError(f"The account of {cta_id} is not in today's data")
     client = client or connect()
+    # The handoff remembers the CRM task it created, so a second click sends nothing.
+    # Matching on the subject is not enough: the hosted demo's store is refilled on every
+    # deploy, task numbers start again, and the CRM may hold an older task with the same id.
+    packet = json.loads(task["packet"] or "{}")
+    if packet.get("crm_task_id"):
+        return {"created": False, "url": task_link(client, packet["crm_task_id"])}
     check_daily_cap(client)
     payload = {"account": account_fields(account), "tasks": [task_fields(task)]}
-    done = push(client, [payload])
-    found = client.query(
-        f"SELECT Id FROM Task WHERE Subject LIKE '[{cta_id}]%' ORDER BY CreatedDate DESC LIMIT 1"
-    )
-    task_id = found["records"][0]["Id"] if found["records"] else None
-    return {"created": done["tasks_created"] == 1, "url": task_link(client, task_id)}
+    created: list = []
+    push(client, [payload], keep_existing=False, created=created)
+    packet["crm_task_id"] = created[0]
+    open_store(data_dir).update("ctas", {"cta_id": cta_id}, packet=json.dumps(packet))
+    return {"created": True, "url": task_link(client, created[0])}
 
 
-def complete_task_now(cta_id: str, outcome: str, notes: str = "", client=None) -> str | None:
+def complete_task_now(
+    cta_id: str, outcome: str, notes: str = "", client=None, data_dir: Path = DATA_DIR
+) -> str | None:
     """Mark the CRM task of a handoff as completed, with the outcome a person recorded.
 
     Returns a link to the task, or None when the CRM has no task for this handoff.
     """
     client = client or connect()
-    found = client.query(
-        f"SELECT Id, Description FROM Task WHERE Subject LIKE '[{cta_id}]%' LIMIT 1"
-    )
+    task = open_store(data_dir).one("SELECT packet FROM ctas WHERE cta_id = :id", id=cta_id)
+    crm_task_id = json.loads((task or {}).get("packet") or "{}").get("crm_task_id")
+    if crm_task_id:  # the task this handoff created, not an older one with the same number
+        found = client.query(f"SELECT Id, Description FROM Task WHERE Id = '{crm_task_id}'")
+    else:
+        found = client.query(
+            f"SELECT Id, Description FROM Task WHERE Subject LIKE '[{cta_id}]%' "
+            "ORDER BY CreatedDate DESC LIMIT 1"
+        )
     if not found["records"]:
         return None
     record = found["records"][0]

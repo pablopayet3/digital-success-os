@@ -34,6 +34,9 @@ class FakeCrm:
         if "FROM Account" in soql:
             number = soql.split("AccountNumber = '")[1].split("'")[0]
             ids = [i for i, r in self.records["Account"].items() if r["AccountNumber"] == number]
+        elif "WHERE Id = '" in soql:
+            wanted = soql.split("WHERE Id = '")[1].split("'")[0]
+            ids = [wanted] if wanted in self.records["Task"] else []
         else:
             what = soql.split("WhatId = '")[1].split("'")[0] if "WhatId" in soql else None
             marker = soql.split("LIKE '")[1].split("%")[0]
@@ -216,19 +219,27 @@ def test_a_new_handoff_is_sent_once_and_closing_it_completes_it_in_the_crm(simul
     _, data_dir = simulated
     task = open_store(data_dir).one("SELECT cta_id FROM ctas WHERE status <> 'resolved' LIMIT 1")
     crm = FakeCrm()
+    # An older CRM task with the same number, left by an earlier copy of the demo's store
+    # (the hosted store is refilled on every deploy and its numbers start again).
+    crm.Task.create({"Subject": f"[{task['cta_id']}] an earlier rehearsal", "WhatId": "ACC0000"})
+    old = dict(crm.records["Task"])
     first = send_task_now(task["cta_id"], data_dir, client=crm)
     again = send_task_now(task["cta_id"], data_dir, client=crm)  # a second click
-    assert first["created"] and not again["created"] and len(crm.records["Task"]) == 1
+    assert first["created"] and not again["created"] and len(crm.records["Task"]) == 2
     assert first["url"].startswith(
         "https://acme-dev-ed.develop.lightning.force.com/lightning/r/Task/"
     )
-    (sent,) = crm.records["Task"].values()
+    (sent,) = [record for key, record in crm.records["Task"].items() if key not in old]
     assert sent["Subject"].startswith(f"[{task['cta_id']}]") and sent["Status"] == "Not Started"
 
-    link = complete_task_now(task["cta_id"], "expansion_opportunity", "Call booked.", client=crm)
+    link = complete_task_now(
+        task["cta_id"], "expansion_opportunity", "Call booked.", client=crm, data_dir=data_dir
+    )
     assert link and sent["Status"] == "Completed"
     assert "Outcome: expansion opportunity. Call booked." in sent["Description"]
-    assert complete_task_now("CTA-NOT-THERE", "resolved", client=crm) is None
+    assert "Status" not in next(iter(old.values()))  # the older task is left alone
+    assert complete_task_now("CTA-NOT-THERE", "resolved", client=crm, data_dir=data_dir) is None
+    forget_crm_task(data_dir, task["cta_id"])
 
 
 def test_the_live_link_is_off_unless_asked_for_and_on_the_host_only_for_the_presenter(monkeypatch):
@@ -270,8 +281,22 @@ def test_the_hosted_demo_stops_at_its_daily_cap(simulated, monkeypatch):
     with pytest.raises(RuntimeError, match="daily limit of 3"):
         send_task_now(task["cta_id"], data_dir, client=CountingCrm(created_today=3))
     assert send_task_now(task["cta_id"], data_dir, client=CountingCrm(created_today=2))["created"]
+    forget_crm_task(data_dir, task["cta_id"])
     monkeypatch.delenv("DSO_HOSTED")  # on a laptop there is no cap and no count query
     assert send_task_now(task["cta_id"], data_dir, client=FakeCrm())["created"]
+    forget_crm_task(data_dir, task["cta_id"])
+
+
+def forget_crm_task(data_dir, cta_id):
+    """Undo what a send records on the handoff, so the shared test store stays as it was."""
+    from common.store import open_store
+
+    store = open_store(data_dir)
+    packet = json.loads(
+        store.one("SELECT packet FROM ctas WHERE cta_id = :id", id=cta_id)["packet"]
+    )
+    packet.pop("crm_task_id", None)
+    store.update("ctas", {"cta_id": cta_id}, packet=json.dumps(packet))
 
 
 def test_the_browser_sign_in_wins_over_left_over_passwords(monkeypatch):

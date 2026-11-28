@@ -264,17 +264,22 @@ with tab_chat:
             ui.query(f"SELECT * FROM gold.account_current WHERE account_id = '{account_id}'")
         )[0]
         # The whole conversation is replayed on each message. Cached answers make that free.
-        conversation = converse(account, scripted(st.session_state.demo_messages))
+        # A visible line while it runs, so a slow moment reads as the agent at work.
+        with st.spinner("The agent is reading the help articles and checking the account..."):
+            conversation = converse(account, scripted(st.session_state.demo_messages))
         for turn in conversation.transcript:
             with st.chat_message("user" if turn["role"] == "customer" else "assistant"):
                 st.write(turn["text"])
         if conversation.outcome == "escalated":
             if not finished:
-                ctx = load_day(ui.data_dir(), ui.store(), load_catalog())
-                contact = next(iter(ctx.contacts.get(account_id, [])), None)
-                task_id = hand_off(ctx, conversation, account, contact)
-                record_conversation(ctx, conversation, account, contact, None, "live_demo", task_id)
-                st.session_state.demo_task = task_id
+                with st.spinner("Creating the task for a person, with the full context..."):
+                    ctx = load_day(ui.data_dir(), ui.store(), load_catalog())
+                    contact = next(iter(ctx.contacts.get(account_id, [])), None)
+                    task_id = hand_off(ctx, conversation, account, contact)
+                    record_conversation(
+                        ctx, conversation, account, contact, None, "live_demo", task_id
+                    )
+                    st.session_state.demo_task = task_id
                 st.session_state.demo_crm = send_to_crm(task_id)
             escalation = conversation.escalation
             team = QUEUE_NAMES.get(escalation.queue, escalation.queue)
